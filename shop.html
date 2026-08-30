@@ -266,14 +266,18 @@ const ALL_PRODUCTS = [
   {id:12,name:"Training Jacket",sub:"Windbreaker Pro",price:6800,cat:"performance",img:"https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H"},
 ];
 
-let cart = JSON.parse(localStorage.getItem('apex_cart')||'[]');
-let wishlist = JSON.parse(localStorage.getItem('apex_wishlist')||'[]');
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || localStorage.getItem('apex_cart') || '[]');
+let wishlist = JSON.parse(localStorage.getItem('zenvy_wishlist') || localStorage.getItem('apex_wishlist') || '[]');
 let currentCatFilter = 'all';
 let currentPriceFilter = 'all';
 let currentSort = 'default';
 let searchQ = '';
 
-function saveCart(){ localStorage.setItem('apex_cart', JSON.stringify(cart)); updateCartCount(); }
+function saveCart(){
+  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  localStorage.setItem('apex_cart', JSON.stringify(cart));
+  updateCartCount();
+}
 function updateCartCount(){
   const total = cart.reduce((s,i)=>s+i.qty,0);
   const badge = document.getElementById('cart-count');
@@ -284,7 +288,17 @@ function quickAddToCart(id,name,price,img,size='M'){
   const ex = cart.find(i=>i.id===id&&i.size===size);
   if(ex) ex.qty++;
   else cart.push({id,name,price,img,size,qty:1});
-  saveCart(); showToast(`${name} added to bag!`); renderCartItems();
+  saveCart();
+  showToast(`Added ${name} to your bag`);
+  renderCartItems();
+}
+
+function toggleWishlist(btn, id){
+  const idx = wishlist.indexOf(id);
+  if(idx > -1) { wishlist.splice(idx,1); btn.classList.remove('active'); showToast('Removed from wishlist'); }
+  else { wishlist.push(id); btn.classList.add('active'); showToast('Added to wishlist'); }
+  localStorage.setItem('zenvy_wishlist', JSON.stringify(wishlist));
+  localStorage.setItem('apex_wishlist', JSON.stringify(wishlist));
 }
 
 function renderCartItems(){

@@ -6,29 +6,28 @@
 <title>ZENVY - Premium Quality Sportswear & Custom Jerseys</title>
 <meta name="description" content="ZENVY – Premium quality club jerseys, national team kits, custom sportswear, and performance gear in Bangladesh."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
     theme: {
       extend: {
         colors: {
-          "background": "#fbf9f8",
+          "background": "#f8f6f2",
           "surface-variant": "#e4e2e2",
           "primary-container": "#1c1b1b",
           "on-primary": "#ffffff",
           "error": "#ba1a1a",
-          "error-container": "#ffdad6",
           "on-surface": "#1b1c1c",
           "secondary": "#003ec6",
-          "surface-container-low": "#f5f3f3",
-          "on-surface-variant": "#444748",
+          "surface-container-low": "#f4efe8",
+          "on-surface-variant": "#5a5a5a",
           "secondary-container": "#0052fe",
           "on-secondary": "#ffffff",
-          "surface": "#fbf9f8",
+          "surface": "#ffffff",
           "outline": "#747878",
-          "primary": "#000000",
-          "outline-variant": "#c4c7c7",
+          "primary": "#111111",
+          "outline-variant": "#e2dfd9",
           "brand-green": "#00a83f"
         },
         spacing: {
@@ -37,21 +36,22 @@
           "container-max": "1320px"
         },
         fontFamily: {
-          "body-lg": ["Inter"],
-          "caption": ["Inter"],
-          "display-lg": ["Montserrat"],
-          "label-md": ["Inter"],
-          "headline-md": ["Montserrat"],
-          "headline-lg": ["Montserrat"],
-          "body-md": ["Inter"]
+          "serif-display": ["Playfair Display", "serif"],
+          "body-lg": ["Inter", "sans-serif"],
+          "caption": ["Inter", "sans-serif"],
+          "display-lg": ["Montserrat", "sans-serif"],
+          "label-md": ["Inter", "sans-serif"],
+          "headline-md": ["Montserrat", "sans-serif"],
+          "headline-lg": ["Montserrat", "sans-serif"],
+          "body-md": ["Inter", "sans-serif"]
         }
       }
     }
   }
 </script>
 <style>
-  .ambient-shadow{box-shadow:0 8px 30px rgba(0,0,0,0.05);}
-  .ambient-shadow-hover:hover{box-shadow:0 20px 40px rgba(0,0,0,0.12);}
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.04);}
+  .ambient-shadow-hover:hover{box-shadow:0 20px 40px rgba(0,0,0,0.08);}
   #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
   #cart-drawer.open{transform:translateX(0);}
   #mobile-menu{transform:translateX(-100%);transition:transform .3s ease;}
@@ -65,7 +65,12 @@
   .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
 </style>
 </head>
-<body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
+<body class="bg-[#f8f6f2] text-[#111111] antialiased min-h-screen font-body-md overflow-x-hidden">
+
+<!-- ===== ANNOUNCEMENT TOP BAR ===== -->
+<div class="bg-[#111111] text-white text-[11px] font-label-md uppercase tracking-[0.2em] py-2 text-center font-semibold">
+  <span>🚚 FREE EXPRESS SHIPPING ON ALL BANGLADESH ORDERS OVER ৳ 3,000</span>
+</div>
 
 <!-- ===== CART DRAWER ===== -->
 <div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
@@ -79,7 +84,7 @@
       <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
       <p class="font-headline-md text-lg text-primary mb-2">Your bag is empty</p>
       <p class="font-body-md text-sm text-on-surface-variant mb-6">Add items to get started.</p>
-      <button onclick="closeCart(); window.location='shop.html'" class="bg-primary text-on-primary font-label-md text-xs uppercase px-7 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-lg">Shop Now</button>
+      <button onclick="closeCart(); window.location='shop.html'" class="bg-primary text-on-primary font-label-md text-xs uppercase px-7 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-xl font-bold">Shop Now</button>
     </div>
     <div id="cart-list" class="hidden space-y-4"></div>
   </div>
@@ -88,14 +93,14 @@
       <span class="font-body-lg text-base text-on-surface-variant">Subtotal</span>
       <span id="cart-subtotal" class="font-headline-md text-lg text-primary font-bold">৳ 0</span>
     </div>
-    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-xs uppercase px-8 py-3.5 hover:bg-secondary transition-colors tracking-widest text-center mb-3 rounded-lg font-bold">Checkout</a>
-    <button onclick="closeCart()" class="block w-full border border-primary text-primary font-label-md text-xs uppercase px-8 py-3.5 tracking-widest text-center rounded-lg">Continue Shopping</button>
+    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-xs uppercase px-8 py-3.5 hover:bg-secondary transition-colors tracking-widest text-center mb-3 rounded-xl font-bold">Checkout</a>
+    <button onclick="closeCart()" class="block w-full border border-primary text-primary font-label-md text-xs uppercase px-8 py-3.5 tracking-widest text-center rounded-xl font-bold">Continue Shopping</button>
   </div>
 </aside>
 
 <!-- ===== SEARCH OVERLAY ===== -->
 <div id="search-overlay" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-start justify-center pt-24 px-4">
-  <div class="bg-white rounded-2xl w-full max-w-2xl p-6 ambient-shadow relative">
+  <div class="bg-white rounded-3xl w-full max-w-2xl p-6 ambient-shadow relative">
     <div class="flex items-center gap-3 border-b border-outline-variant pb-4">
       <span class="material-symbols-outlined text-on-surface-variant text-2xl">search</span>
       <input type="text" id="search-input" placeholder="Search Real Madrid, Barcelona, Argentina, PSG..." class="w-full text-lg outline-none font-body-md bg-transparent" oninput="liveSearch(this.value)"/>
@@ -109,7 +114,7 @@
 <div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
 <aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
   <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <a href="index.html" class="font-headline-md text-2xl font-black tracking-tighter text-primary">ZENVY</a>
+    <a href="index.html" class="font-serif-display text-2xl font-bold tracking-tight text-primary">ZENVY</a>
     <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
   </div>
   <nav class="flex-1 px-6 py-6 flex flex-col gap-5">
@@ -121,42 +126,36 @@
       <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
     </a>
     <hr class="border-outline-variant"/>
-    <a href="admin/login.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-secondary font-bold flex items-center gap-1.5">
-      <span class="material-symbols-outlined text-base">admin_panel_settings</span>Admin Portal
-    </a>
     <a href="account.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors">My Account</a>
+    <a href="admin/login.html" onclick="closeMobileMenu()" class="font-label-md text-xs uppercase tracking-wider text-on-surface-variant/60 hover:text-primary transition-colors mt-auto">Admin Portal</a>
   </nav>
 </aside>
 
-<!-- ===== TOP NAV ===== -->
-<nav class="fixed w-full top-0 left-0 z-50 bg-white/90 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] border-b border-outline-variant/40">
-  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 md:h-20 max-w-container-max mx-auto">
-    <!-- Brand Logo -->
-    <a class="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
+<!-- ===== NAVIGATION NAVBAR ===== -->
+<nav class="sticky top-0 z-50 bg-[#f8f6f2]/90 backdrop-blur-xl border-b border-outline-variant/60">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
+    <a class="font-serif-display text-3xl font-bold tracking-tight text-primary flex items-center gap-2" href="index.html">
+      ZENVY
+    </a>
     
-    <!-- Navigation Links (Desktop) -->
     <div class="hidden md:flex gap-8 items-center">
-      <a class="font-label-md text-xs uppercase tracking-widest text-primary font-bold hover:text-secondary transition-colors" href="shop.html">Collections</a>
-      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors" href="shop.html?cat=club">Club Jerseys</a>
-      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors" href="shop.html?cat=national">National Kits</a>
-      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors" href="customizer.html">Customizer</a>
-      <a class="font-label-md text-xs uppercase tracking-widest text-secondary font-bold hover:text-primary transition-colors flex items-center gap-1" href="preorders.html">
+      <a class="font-label-md text-xs uppercase tracking-[0.18em] text-on-surface-variant hover:text-primary transition-colors font-medium" href="shop.html">Collections</a>
+      <a class="font-label-md text-xs uppercase tracking-[0.18em] text-on-surface-variant hover:text-primary transition-colors font-medium" href="shop.html?cat=club">Club Jerseys</a>
+      <a class="font-label-md text-xs uppercase tracking-[0.18em] text-on-surface-variant hover:text-primary transition-colors font-medium" href="shop.html?cat=national">National Kits</a>
+      <a class="font-label-md text-xs uppercase tracking-[0.18em] text-on-surface-variant hover:text-primary transition-colors font-medium" href="customizer.html">Customizer</a>
+      <a class="font-label-md text-xs uppercase tracking-[0.18em] text-secondary font-bold hover:text-primary transition-colors flex items-center gap-1" href="preorders.html">
         <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
       </a>
     </div>
 
-    <!-- Actions -->
-    <div class="flex items-center gap-3 md:gap-4 text-primary">
+    <div class="flex items-center gap-5 text-primary">
       <button aria-label="Search" onclick="openSearch()" class="hover:text-secondary transition-colors">
         <span class="material-symbols-outlined text-2xl">search</span>
       </button>
       <button aria-label="Shopping Bag" onclick="openCart()" class="hover:text-secondary transition-colors relative">
         <span class="material-symbols-outlined text-2xl">shopping_bag</span>
-        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-secondary text-on-secondary rounded-full w-5 h-5 flex items-center justify-center font-bold text-[11px]">0</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-primary text-on-primary rounded-full w-4 h-4 flex items-center justify-center font-bold text-[10px]">0</span>
       </button>
-      <a href="admin/login.html" title="Admin Portal" class="hover:text-secondary transition-colors hidden md:block">
-        <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
-      </a>
       <a href="account.html" aria-label="Account" class="hover:text-secondary transition-colors hidden md:block">
         <span class="material-symbols-outlined text-2xl">person</span>
       </a>
@@ -167,243 +166,383 @@
   </div>
 </nav>
 
-<main class="pt-16 md:pt-20">
+<main class="py-6 space-y-12 md:space-y-16">
 
-  <!-- ===== BOXED BANNER CAROUSEL (NOT FULL SCREEN - SLEEK & CONTAINERIZED) ===== -->
-  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-4 md:pt-6 pb-4">
-    <div class="relative w-full rounded-2xl md:rounded-3xl overflow-hidden ambient-shadow bg-surface-container-low group h-[220px] sm:h-[320px] md:h-[400px]" id="hero-carousel">
-      <div class="flex transition-transform duration-700 ease-in-out h-full w-full" id="carousel-slides" style="transform:translateX(0%)">
-        
-        <!-- Slide 1: Premium Jersey Banner -->
-        <div class="w-full h-full flex-shrink-0 relative">
-          <img alt="ZENVY Premium Quality Jerseys" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOvs28LKb83yfVDWG6B5q_40JnzM9p-jw0I_EdHbN_rgSWvuqeBvauvSTvj5gaHQ8r8on3wtEUIQkKaSACE4k0FQ_1Flq3gjtzYXIrOUxIDUrJHGGllTWXap31c0qMOeFwTp1b_bx6JheufKDk1jWhZEMY7CN30vmOS-T0JO_6OIsmO7m_cFuQeg4yvLvdW_rprgzkJFP1nDUiMuCitbGQX0SDHt75mZ9UoU3JD-isLUejCLvQcGi1"/>
-          <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-          <div class="absolute inset-0 flex items-center p-6 md:p-12">
-            <div class="max-w-md text-white">
-              <span class="inline-block bg-brand-green/90 text-white font-label-md text-[10px] md:text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-2 md:mb-3 font-bold">Official Match Grade</span>
-              <h1 class="font-headline-lg text-xl sm:text-3xl md:text-4xl leading-tight font-black mb-2 text-white">PREMIUM QUALITY<br/><span class="text-brand-green">JERSEYS 2026</span></h1>
-              <p class="font-body-md text-xs md:text-sm text-white/80 mb-4 line-clamp-2">Authentic club and national team kits. Soft, breathable, DryTech performance fabric.</p>
-              <div class="flex gap-3">
-                <a href="shop.html" class="bg-brand-green text-white font-label-md text-xs uppercase px-5 py-2.5 hover:bg-emerald-700 transition-colors tracking-wider rounded-lg font-bold shadow-md">Shop Kits</a>
-                <a href="customizer.html" class="bg-white/20 backdrop-blur-md text-white font-label-md text-xs uppercase px-5 py-2.5 hover:bg-white/30 transition-colors tracking-wider rounded-lg font-bold border border-white/30">Custom Jersey</a>
-              </div>
-            </div>
+  <!-- ==================== 1. HERO SECTION (EDITORIAL SPLIT DESIGN) ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      
+      <!-- Left Hero Box -->
+      <div class="lg:col-span-7 bg-[#f4efe8] rounded-3xl p-8 md:p-14 flex flex-col justify-between ambient-shadow border border-outline-variant/40 min-h-[480px]">
+        <div>
+          <span class="font-label-md text-xs uppercase tracking-[0.25em] text-on-surface-variant font-bold block mb-4">NEW COLLECTION 2026</span>
+          <h1 class="font-serif-display text-4xl sm:text-5xl lg:text-6xl font-bold text-primary leading-[1.1] mb-6">
+            Elevate Your Matchday Style
+          </h1>
+          <p class="font-body-md text-sm md:text-base text-on-surface-variant max-w-lg mb-8 leading-relaxed">
+            Discover timeless authentic match jerseys, custom player kits, and elite sportswear designed for comfort, crafted for champions.
+          </p>
+          <div class="flex flex-wrap items-center gap-4">
+            <a href="shop.html" class="bg-[#111111] text-white font-label-md text-xs uppercase tracking-widest px-8 py-4 rounded-full font-bold hover:bg-secondary transition-all flex items-center gap-2 shadow-md">
+              <span>Shop Now</span>
+              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+            <a href="customizer.html" class="border border-primary/30 text-primary font-label-md text-xs uppercase tracking-widest px-7 py-4 rounded-full font-bold hover:bg-white transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">play_circle</span>
+              <span>Customizer Kit</span>
+            </a>
           </div>
         </div>
 
-        <!-- Slide 2: Club Edition -->
-        <div class="w-full h-full flex-shrink-0 relative">
-          <img alt="Real Madrid & Top Club Kits" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf"/>
-          <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-          <div class="absolute inset-0 flex items-center p-6 md:p-12">
-            <div class="max-w-md text-white">
-              <span class="inline-block bg-secondary text-white font-label-md text-[10px] md:text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-2 md:mb-3 font-bold">Pro Series</span>
-              <h2 class="font-headline-lg text-xl sm:text-3xl md:text-4xl leading-tight font-black mb-2 text-white">CHAMPIONS LEAGUE<br/>COLLECTION</h2>
-              <p class="font-body-md text-xs md:text-sm text-white/80 mb-4 line-clamp-2">Rep your favourite club with original badges, sleeves, and player names.</p>
-              <a href="shop.html?cat=club" class="inline-block bg-primary text-white font-label-md text-xs uppercase px-5 py-2.5 hover:bg-secondary transition-colors tracking-wider rounded-lg font-bold shadow-md">Explore Clubs</a>
+        <!-- Micro Features Footer -->
+        <div class="grid grid-cols-3 gap-2 pt-8 mt-8 border-t border-outline-variant/60 text-xs text-on-surface-variant">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-base">local_shipping</span>
+            <div>
+              <p class="font-bold text-primary">Free Shipping</p>
+              <p class="text-[11px] text-on-surface-variant/70">On orders over ৳3,000</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-base">package</span>
+            <div>
+              <p class="font-bold text-primary">Easy Returns</p>
+              <p class="text-[11px] text-on-surface-variant/70">7-day returns policy</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-base">verified</span>
+            <div>
+              <p class="font-bold text-primary">100% Authentic</p>
+              <p class="text-[11px] text-on-surface-variant/70">Official Crests & Badges</p>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- Controls -->
-      <button class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-black/70 transition-all z-20 opacity-0 group-hover:opacity-100" id="carousel-prev">
-        <span class="material-symbols-outlined text-base">chevron_left</span>
-      </button>
-      <button class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-black/70 transition-all z-20 opacity-0 group-hover:opacity-100" id="carousel-next">
-        <span class="material-symbols-outlined text-base">chevron_right</span>
-      </button>
+      <!-- Right Hero Visual Box -->
+      <div class="lg:col-span-5 relative rounded-3xl overflow-hidden min-h-[420px] lg:min-h-[540px] ambient-shadow border border-outline-variant/40 group">
+        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop" alt="ZENVY Jersey Model" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 text-white">
+          <span class="font-label-md text-xs uppercase tracking-widest text-amber-300 font-bold mb-1">PRO MATCHDAY FIT</span>
+          <h2 class="font-serif-display text-2xl font-bold">Real Madrid & PSG 2026 Special Drops</h2>
+        </div>
+        <!-- Slide numbers -->
+        <div class="absolute top-8 right-8 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-[11px] font-mono tracking-widest">
+          01 | 03
+        </div>
+      </div>
 
-      <!-- Dots -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        <button class="carousel-dot w-2.5 h-2.5 rounded-full bg-white transition-all scale-125" data-slide="0"></button>
-        <button class="carousel-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all" data-slide="1"></button>
+    </div>
+  </section>
+
+  <!-- ==================== 2. CIRCULAR CATEGORY AVATARS STRIP ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="bg-white rounded-3xl p-6 md:p-8 ambient-shadow border border-outline-variant/40">
+      <div class="flex items-center justify-between overflow-x-auto no-scrollbar gap-6 md:gap-10 py-2">
+        
+        <a href="shop.html?cat=club" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">Club Kits</span>
+        </a>
+
+        <a href="shop.html?cat=national" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1518604666860-9ed391f76460?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">National Teams</span>
+        </a>
+
+        <a href="customizer.html" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">Custom Printing</span>
+        </a>
+
+        <a href="shop.html?cat=tshirts" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">T-Shirts & Polos</span>
+        </a>
+
+        <a href="shop.html?cat=hoodies" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">Jackets & Hoodies</span>
+        </a>
+
+        <a href="shop.html?cat=accessories" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden p-1 border-2 border-transparent group-hover:border-primary transition-all">
+            <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover rounded-full"/>
+          </div>
+          <span class="font-label-md text-xs font-bold text-primary group-hover:text-secondary transition-colors">Caps & Socks</span>
+        </a>
+
+        <a href="shop.html?cat=sale" class="flex flex-col items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#111111] text-white flex items-center justify-center font-headline-md font-black text-sm tracking-widest shadow-lg group-hover:scale-105 transition-transform">
+            SALE
+          </div>
+          <span class="font-label-md text-xs font-bold text-error">Up to 40% Off</span>
+        </a>
+
       </div>
     </div>
   </section>
 
-  <!-- ===== CLUB SELECTION SECTION ("Shop Your Favourite Club") ===== -->
-  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-6 text-center">
-    <!-- Green Pill Button Header -->
-    <div class="mb-6">
-      <a href="shop.html?cat=club" class="inline-flex items-center gap-2 bg-brand-green text-white font-headline-md text-sm md:text-base px-6 py-2.5 rounded-full font-bold shadow-md hover:bg-emerald-700 transition-all transform hover:-translate-y-0.5">
-        <span>Shop Your Favourite Club</span>
+  <!-- ==================== 3. SHOP BY CATEGORY GRID ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <span class="font-label-md text-xs uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-1">SHOP BY CATEGORY</span>
+        <h2 class="font-serif-display text-3xl md:text-4xl font-bold text-primary">Find Your Perfect Style</h2>
+      </div>
+      <a href="shop.html" class="font-label-md text-xs uppercase tracking-widest text-primary hover:text-secondary font-bold flex items-center gap-1 transition-colors">
+        <span>View All Categories</span>
         <span class="material-symbols-outlined text-base">arrow_forward</span>
       </a>
     </div>
 
-    <!-- Club Cards Carousel / Grid -->
-    <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-1 justify-start md:justify-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       
-      <!-- Liverpool -->
-      <a href="shop.html?search=Liverpool" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-red-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" alt="Liverpool" class="w-full h-full object-contain"/>
+      <!-- Card 1 -->
+      <a href="shop.html?cat=club" class="relative rounded-3xl overflow-hidden h-96 group ambient-shadow border border-outline-variant/40">
+        <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end text-white">
+          <h3 class="font-serif-display text-2xl font-bold mb-1">Club Jerseys Collection</h3>
+          <span class="font-label-md text-xs font-bold uppercase tracking-wider text-amber-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Explore Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </span>
         </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">Liverpool</span>
       </a>
 
-      <!-- Manchester United -->
-      <a href="shop.html?search=Man%20Utd" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-red-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X" alt="Manchester United" class="w-full h-full object-contain"/>
+      <!-- Card 2 -->
+      <a href="shop.html?cat=national" class="relative rounded-3xl overflow-hidden h-96 group ambient-shadow border border-outline-variant/40">
+        <img src="https://images.unsplash.com/photo-1518604666860-9ed391f76460?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end text-white">
+          <h3 class="font-serif-display text-2xl font-bold mb-1">National Teams Collection</h3>
+          <span class="font-label-md text-xs font-bold uppercase tracking-wider text-amber-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Explore Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </span>
         </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">Man United</span>
       </a>
 
-      <!-- Manchester City -->
-      <a href="shop.html?search=Man%20City" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-sky-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOvs28LKb83yfVDWG6B5q_40JnzM9p-jw0I_EdHbN_rgSWvuqeBvauvSTvj5gaHQ8r8on3wtEUIQkKaSACE4k0FQ_1Flq3gjtzYXIrOUxIDUrJHGGllTWXap31c0qMOeFwTp1b_bx6JheufKDk1jWhZEMY7CN30vmOS-T0JO_6OIsmO7m_cFuQeg4yvLvdW_rprgzkJFP1nDUiMuCitbGQX0SDHt75mZ9UoU3JD-isLUejCLvQcGi1" alt="Manchester City" class="w-full h-full object-contain"/>
+      <!-- Card 3 -->
+      <a href="customizer.html" class="relative rounded-3xl overflow-hidden h-96 group ambient-shadow border border-outline-variant/40">
+        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end text-white">
+          <h3 class="font-serif-display text-2xl font-bold mb-1">Custom Player Kits & Name</h3>
+          <span class="font-label-md text-xs font-bold uppercase tracking-wider text-amber-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Explore Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </span>
         </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">Man City</span>
       </a>
 
-      <!-- PSG -->
-      <a href="shop.html?search=PSG" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-blue-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="PSG" class="w-full h-full object-contain"/>
+      <!-- Card 4 -->
+      <a href="shop.html?cat=accessories" class="relative rounded-3xl overflow-hidden h-96 group ambient-shadow border border-outline-variant/40">
+        <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end text-white">
+          <h3 class="font-serif-display text-2xl font-bold mb-1">Caps & Match Accessories</h3>
+          <span class="font-label-md text-xs font-bold uppercase tracking-wider text-amber-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Explore Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </span>
         </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">PSG</span>
-      </a>
-
-      <!-- Chelsea -->
-      <a href="shop.html?search=Chelsea" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-blue-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf" alt="Chelsea" class="w-full h-full object-contain"/>
-        </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">Chelsea</span>
-      </a>
-
-      <!-- Real Madrid -->
-      <a href="shop.html?search=Real%20Madrid" class="flex-shrink-0 w-28 md:w-36 bg-white rounded-2xl p-4 ambient-shadow border border-outline-variant/40 hover:border-brand-green transition-all hover:-translate-y-1 group text-center">
-        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2 flex items-center justify-center bg-purple-50 rounded-xl p-2 group-hover:scale-110 transition-transform">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Real Madrid" class="w-full h-full object-contain"/>
-        </div>
-        <span class="font-headline-md text-xs md:text-sm text-primary font-bold block truncate">Real Madrid</span>
       </a>
 
     </div>
   </section>
 
-  <!-- ===== FLASH SALES SECTION (WITH DISCOUNT BADGES) ===== -->
-  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8">
-    <div class="bg-surface-container-low/60 rounded-3xl p-6 md:p-8 border border-outline-variant/40">
+  <!-- ==================== 4. PROMO BANNERS SECTION ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       
-      <!-- Section Title -->
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="font-headline-lg text-xl md:text-2xl text-primary font-bold flex items-center gap-2">
-          <span>🎉</span> Flash Sales <span>🎉</span>
-        </h2>
-        <a href="shop.html" class="font-label-md text-xs uppercase tracking-widest text-secondary font-bold hover:underline">See All Deals</a>
+      <!-- Banner 1 -->
+      <div class="bg-[#f0ebe3] rounded-3xl p-8 md:p-12 flex flex-col justify-between min-h-[320px] relative overflow-hidden ambient-shadow border border-outline-variant/40">
+        <div class="max-w-xs z-10">
+          <span class="font-label-md text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-2">LIMITED TIME OFFER</span>
+          <h3 class="font-serif-display text-3xl font-bold text-primary mb-4 leading-tight">Matchday Sale<br/>Up to 40% Off</h3>
+          <a href="shop.html?cat=sale" class="inline-block bg-[#111111] text-white font-label-md text-xs uppercase tracking-widest px-6 py-3.5 rounded-full font-bold hover:bg-secondary transition-colors">
+            Shop The Sale →
+          </a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=400&auto=format&fit=crop" class="absolute -right-10 -bottom-10 w-64 h-64 object-cover rounded-full opacity-80 mix-blend-multiply"/>
       </div>
 
-      <!-- Flash Sale Products Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <!-- Banner 2 -->
+      <div class="bg-[#e8e4dc] rounded-3xl p-8 md:p-12 flex flex-col justify-between min-h-[320px] relative overflow-hidden ambient-shadow border border-outline-variant/40">
+        <div class="max-w-xs z-10">
+          <span class="font-label-md text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-2">NEW ARRIVALS</span>
+          <h3 class="font-serif-display text-3xl font-bold text-primary mb-4 leading-tight">Official 2026 Kits<br/>Just Landed</h3>
+          <a href="preorders.html" class="inline-block bg-[#111111] text-white font-label-md text-xs uppercase tracking-widest px-6 py-3.5 rounded-full font-bold hover:bg-secondary transition-colors">
+            Explore New In →
+          </a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=400&auto=format&fit=crop" class="absolute -right-10 -bottom-10 w-64 h-64 object-cover rounded-full opacity-80 mix-blend-multiply"/>
+      </div>
 
-        <!-- Card 1: Bayern / Real Madrid -->
-        <div class="group bg-white rounded-2xl overflow-hidden ambient-shadow border border-outline-variant/40 flex flex-col transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 sm:h-64 bg-surface-container-low overflow-hidden">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" alt="Bayern Munich Special Kit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-            <!-- Discount Badge -->
-            <div class="absolute top-2 left-2 bg-error text-white font-label-md text-[11px] font-bold px-2 py-0.5 rounded">
-              -21%
-            </div>
-            <button class="wish-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error" onclick="toggleWishlist(this, 1)">
-              <span class="material-symbols-outlined text-base">favorite</span>
-            </button>
+    </div>
+  </section>
+
+  <!-- ==================== 5. BEST SELLERS PRODUCT GRID ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <span class="font-label-md text-xs uppercase tracking-[0.2em] text-on-surface-variant font-bold block mb-1">BEST SELLERS</span>
+        <h2 class="font-serif-display text-3xl md:text-4xl font-bold text-primary">Our Most Loved Picks</h2>
+      </div>
+      <a href="shop.html" class="font-label-md text-xs uppercase tracking-widest text-primary hover:text-secondary font-bold flex items-center gap-1 transition-colors">
+        <span>View All Products</span>
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+      
+      <!-- Product 1 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Argentina 2026 Home</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">Authentic Match Jersey</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 8,500</span>
+            <button onclick="quickAddToCart(1,'Argentina 2026 Home',8500,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">+ Bag</button>
           </div>
-          <div class="p-4 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-headline-md text-sm md:text-base font-bold text-primary truncate">Bayern Munich Home 25/26</h3>
-              <p class="font-body-md text-xs text-on-surface-variant mb-2">Match Grade DryTech</p>
-            </div>
-            <div class="flex items-end justify-between mt-3 pt-2 border-t border-outline-variant/40">
-              <div>
-                <span class="font-headline-md text-sm md:text-base font-bold text-primary">৳ 2,450</span>
-                <span class="font-caption text-xs line-through text-on-surface-variant ml-1">৳ 3,100</span>
-              </div>
-              <button onclick="quickAddToCart(1,'Bayern Munich Home',2450,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="bg-primary text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg hover:bg-secondary transition-colors">Add</button>
-            </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTN8u0QZfPSt4XgA0YxM2sJ3W8zR33V_Hnd_63xJd_97X8Z5Z4x7N-gG3uJb7Qn4-rE4d4Y0vE6o5e2r9wM8K8vC_v8sA6f3R0q2eG9bH7cD-kS2mN1xZ4yP3wL9" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Real Madrid Home 26</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">Official Club Kit</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 6,800</span>
+            <button onclick="quickAddToCart(2,'Real Madrid Home 26',6800,'https://lh3.googleusercontent.com/aida-public/AB6AXuDTN8u0QZfPSt4XgA0YxM2sJ3W8zR33V_Hnd_63xJd_97X8Z5Z4x7N-gG3uJb7Qn4-rE4d4Y0vE6o5e2r9wM8K8vC_v8sA6f3R0q2eG9bH7cD-kS2mN1xZ4yP3wL9')" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">+ Bag</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7zX4X0-Yw_E7Y9h8k1-M_Qy6lP2XbV6H-R8zD_N4x8K2vC9mN7bA0eR4tY5uP3sL_2kH9fL7m8N" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Barcelona Match Kit</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">Authentic Edition</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 7,500</span>
+            <button onclick="quickAddToCart(3,'Barcelona Match Kit',7500,'https://lh3.googleusercontent.com/aida-public/AB6AXuC7zX4X0-Yw_E7Y9h8k1-M_Qy6lP2XbV6H-R8zD_N4x8K2vC9mN7bA0eR4tY5uP3sL_2kH9fL7m8N')" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">+ Bag</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Germany Home Kit</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">Stadium Edition</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 6,200</span>
+            <button onclick="quickAddToCart(4,'Germany Home Kit',6200,'https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d')" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">+ Bag</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Custom Name Shirt</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">Personalized Jersey</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 2,500</span>
+            <a href="customizer.html" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">Custom</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant/40 flex flex-col justify-between group">
+        <div class="relative rounded-2xl overflow-hidden aspect-square mb-3 bg-surface-container-low">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          <button class="absolute top-2.5 right-2.5 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">favorite</span></button>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-xs font-bold text-primary truncate">Pro Training Top</h4>
+          <p class="font-caption text-[11px] text-on-surface-variant mb-1">DryTech Performance</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-label-md text-sm font-bold text-primary">৳ 4,200</span>
+            <button onclick="quickAddToCart(6,'Pro Training Top',4200,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="bg-[#111111] text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg font-bold hover:bg-secondary transition-colors">+ Bag</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 6. VALUE PROPOSITION STRIP ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="bg-[#f0ebe3] rounded-3xl p-8 md:p-10 ambient-shadow border border-outline-variant/40">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center md:text-left">
+        
+        <div class="flex items-center gap-4 p-2">
+          <span class="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-2xl">local_shipping</span>
+          </span>
+          <div>
+            <h4 class="font-headline-md text-sm font-bold text-primary">Free Shipping</h4>
+            <p class="font-caption text-xs text-on-surface-variant">On all orders over ৳ 3,000</p>
           </div>
         </div>
 
-        <!-- Card 2: Juventus -->
-        <div class="group bg-white rounded-2xl overflow-hidden ambient-shadow border border-outline-variant/40 flex flex-col transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 sm:h-64 bg-surface-container-low overflow-hidden">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X" alt="Juventus Home Kit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-            <div class="absolute top-2 left-2 bg-error text-white font-label-md text-[11px] font-bold px-2 py-0.5 rounded">
-              -9%
-            </div>
-            <button class="wish-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error" onclick="toggleWishlist(this, 2)">
-              <span class="material-symbols-outlined text-base">favorite</span>
-            </button>
-          </div>
-          <div class="p-4 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-headline-md text-sm md:text-base font-bold text-primary truncate">Juventus Home Edition</h3>
-              <p class="font-body-md text-xs text-on-surface-variant mb-2">Stadium Edition</p>
-            </div>
-            <div class="flex items-end justify-between mt-3 pt-2 border-t border-outline-variant/40">
-              <div>
-                <span class="font-headline-md text-sm md:text-base font-bold text-primary">৳ 2,250</span>
-                <span class="font-caption text-xs line-through text-on-surface-variant ml-1">৳ 2,480</span>
-              </div>
-              <button onclick="quickAddToCart(2,'Juventus Home Edition',2250,'https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X')" class="bg-primary text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg hover:bg-secondary transition-colors">Add</button>
-            </div>
+        <div class="flex items-center gap-4 p-2">
+          <span class="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-2xl">package</span>
+          </span>
+          <div>
+            <h4 class="font-headline-md text-sm font-bold text-primary">Easy Returns</h4>
+            <p class="font-caption text-xs text-on-surface-variant">7-day hassle-free returns</p>
           </div>
         </div>
 
-        <!-- Card 3: Real Madrid Away -->
-        <div class="group bg-white rounded-2xl overflow-hidden ambient-shadow border border-outline-variant/40 flex flex-col transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 sm:h-64 bg-surface-container-low overflow-hidden">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf" alt="Real Madrid Away" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-            <div class="absolute top-2 left-2 bg-error text-white font-label-md text-[11px] font-bold px-2 py-0.5 rounded">
-              -14%
-            </div>
-            <button class="wish-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error" onclick="toggleWishlist(this, 3)">
-              <span class="material-symbols-outlined text-base">favorite</span>
-            </button>
-          </div>
-          <div class="p-4 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-headline-md text-sm md:text-base font-bold text-primary truncate">Real Madrid Away 25/26</h3>
-              <p class="font-body-md text-xs text-on-surface-variant mb-2">Authentic Gold Trim</p>
-            </div>
-            <div class="flex items-end justify-between mt-3 pt-2 border-t border-outline-variant/40">
-              <div>
-                <span class="font-headline-md text-sm md:text-base font-bold text-primary">৳ 2,650</span>
-                <span class="font-caption text-xs line-through text-on-surface-variant ml-1">৳ 3,080</span>
-              </div>
-              <button onclick="quickAddToCart(3,'Real Madrid Away',2650,'https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf')" class="bg-primary text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg hover:bg-secondary transition-colors">Add</button>
-            </div>
+        <div class="flex items-center gap-4 p-2">
+          <span class="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-2xl">shield</span>
+          </span>
+          <div>
+            <h4 class="font-headline-md text-sm font-bold text-primary">Secure Payment</h4>
+            <p class="font-caption text-xs text-on-surface-variant">bKash, Nagad, Rocket & COD</p>
           </div>
         </div>
 
-        <!-- Card 4: Al Nassr / Special Edition -->
-        <div class="group bg-white rounded-2xl overflow-hidden ambient-shadow border border-outline-variant/40 flex flex-col transition-all duration-300 hover:-translate-y-1">
-          <div class="relative h-48 sm:h-64 bg-surface-container-low overflow-hidden">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Al Nassr Special Edition" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-            <div class="absolute top-2 left-2 bg-error text-white font-label-md text-[11px] font-bold px-2 py-0.5 rounded">
-              -18%
-            </div>
-            <button class="wish-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error" onclick="toggleWishlist(this, 4)">
-              <span class="material-symbols-outlined text-base">favorite</span>
-            </button>
-          </div>
-          <div class="p-4 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-headline-md text-sm md:text-base font-bold text-primary truncate">Al Nassr KAFD Special Kit</h3>
-              <p class="font-body-md text-xs text-on-surface-variant mb-2">Player Edition #7</p>
-            </div>
-            <div class="flex items-end justify-between mt-3 pt-2 border-t border-outline-variant/40">
-              <div>
-                <span class="font-headline-md text-sm md:text-base font-bold text-primary">৳ 2,550</span>
-                <span class="font-caption text-xs line-through text-on-surface-variant ml-1">৳ 3,100</span>
-              </div>
-              <button onclick="quickAddToCart(4,'Al Nassr KAFD Special Kit',2550,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="bg-primary text-white font-label-md text-[11px] uppercase px-3 py-1.5 rounded-lg hover:bg-secondary transition-colors">Add</button>
-            </div>
+        <div class="flex items-center gap-4 p-2">
+          <span class="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-2xl">support_agent</span>
+          </span>
+          <div>
+            <h4 class="font-headline-md text-sm font-bold text-primary">24/7 Support</h4>
+            <p class="font-caption text-xs text-on-surface-variant">We're here to help anytime</p>
           </div>
         </div>
 
@@ -411,107 +550,105 @@
     </div>
   </section>
 
-  <!-- ===== CUSTOMIZER CTA ===== -->
-  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8">
-    <div class="rounded-3xl bg-surface-container-low p-6 md:p-12 border border-outline-variant/40 flex flex-col md:flex-row items-center gap-8">
-      <div class="flex-1 text-center md:text-left">
-        <span class="font-label-md text-xs uppercase tracking-widest text-brand-green mb-2 block font-bold">Build Yours</span>
-        <h2 class="font-headline-lg text-2xl md:text-3xl mb-3 text-primary font-black">DESIGN YOUR OWN JERSEY</h2>
-        <p class="font-body-md text-sm md:text-base text-on-surface-variant mb-6 max-w-md mx-auto md:mx-0">Select colors, add custom name & number, pick sleeve patches — get a 100% unique kit delivered to your door.</p>
-        <a href="customizer.html" class="inline-block bg-brand-green text-white font-label-md text-xs uppercase px-8 py-3.5 hover:bg-emerald-700 transition-colors tracking-widest rounded-xl font-bold shadow-md w-full sm:w-auto">Start Customizing</a>
+  <!-- ==================== 7. NEWSLETTER SUBSCRIPTION ==================== -->
+  <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="bg-[#ebe6de] rounded-3xl overflow-hidden ambient-shadow border border-outline-variant/40 grid grid-cols-1 lg:grid-cols-12 items-center">
+      
+      <div class="lg:col-span-5 h-64 lg:h-full relative min-h-[300px]">
+        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover"/>
       </div>
-      <div class="flex-1 flex justify-center w-full">
-        <div class="relative w-full max-w-xs h-56 rounded-2xl overflow-hidden ambient-shadow border border-outline-variant/40">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Customizer" class="w-full h-full object-cover"/>
-          <div class="absolute inset-0 bg-gradient-to-br from-brand-green/20 to-transparent"></div>
-        </div>
+
+      <div class="lg:col-span-7 p-8 md:p-14">
+        <span class="font-label-md text-xs uppercase tracking-[0.25em] text-on-surface-variant font-bold block mb-2">GET 10% OFF YOUR FIRST ORDER</span>
+        <h2 class="font-serif-display text-3xl md:text-4xl font-bold text-primary mb-4">Join The ZENVY Club</h2>
+        <p class="font-body-md text-sm text-on-surface-variant max-w-md mb-8">
+          Sign up for exclusive offers, official kit drop alerts, custom printing discounts, and matchday style inspiration.
+        </p>
+
+        <form onsubmit="event.preventDefault(); alert('Thank you for joining the ZENVY Club!');" class="flex flex-col sm:flex-row gap-3 max-w-md">
+          <input type="email" placeholder="Enter your email address" required class="flex-1 bg-white border border-outline-variant rounded-full px-6 py-3.5 text-sm font-body-md outline-none focus:border-primary"/>
+          <button type="submit" class="bg-[#111111] text-white font-label-md text-xs uppercase tracking-widest px-8 py-3.5 rounded-full font-bold hover:bg-secondary transition-colors">
+            Subscribe
+          </button>
+        </form>
       </div>
+
     </div>
   </section>
 
 </main>
 
-<!-- ===== FOOTER ===== -->
-<footer class="bg-white border-t border-outline-variant/60 py-12 md:py-16 mt-12">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-8 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-    <div class="col-span-1 text-center md:text-left">
-      <a class="font-headline-lg text-2xl font-black text-primary block mb-3" href="index.html">ZENVY</a>
-      <p class="font-body-md text-sm text-on-surface-variant mb-4">Precision engineered performance wear for champions.</p>
-      <div class="flex gap-4 justify-center md:justify-start">
-        <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="#"><span class="material-symbols-outlined text-xl">share</span></a>
-        <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="#"><span class="material-symbols-outlined text-xl">language</span></a>
+<!-- ==================== 8. DARK LUXURY FOOTER ==================== -->
+<footer class="bg-[#111111] text-white pt-16 pb-12 mt-16 border-t border-white/10">
+  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-white/10">
+      
+      <!-- Col 1: Brand Info -->
+      <div class="lg:col-span-2 space-y-4">
+        <h3 class="font-serif-display text-3xl font-bold tracking-tight text-white">ZENVY</h3>
+        <p class="font-body-md text-xs text-white/60 max-w-sm leading-relaxed">
+          Timeless sportswear for every matchday moment. Designed for performance, crafted for champions. Premium club jerseys & custom printing across Bangladesh.
+        </p>
+        <div class="flex items-center gap-4 text-white/70 pt-2">
+          <a href="#" class="hover:text-white transition-colors">FB</a>
+          <a href="#" class="hover:text-white transition-colors">IG</a>
+          <a href="#" class="hover:text-white transition-colors">YT</a>
+          <a href="#" class="hover:text-white transition-colors">TK</a>
+        </div>
+      </div>
+
+      <!-- Col 2: Shop -->
+      <div class="space-y-3">
+        <h4 class="font-label-md text-xs uppercase tracking-widest text-white/40 font-bold">Shop</h4>
+        <ul class="space-y-2 text-xs text-white/70">
+          <li><a href="shop.html" class="hover:text-white transition-colors">All Products</a></li>
+          <li><a href="shop.html?cat=club" class="hover:text-white transition-colors">Club Jerseys</a></li>
+          <li><a href="shop.html?cat=national" class="hover:text-white transition-colors">National Kits</a></li>
+          <li><a href="customizer.html" class="hover:text-white transition-colors">Customizer Kit</a></li>
+          <li><a href="preorders.html" class="hover:text-white transition-colors">Preorders</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Customer Care -->
+      <div class="space-y-3">
+        <h4 class="font-label-md text-xs uppercase tracking-widest text-white/40 font-bold">Customer Care</h4>
+        <ul class="space-y-2 text-xs text-white/70">
+          <li><a href="#" class="hover:text-white transition-colors">Contact Support</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Shipping & Delivery</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Returns & Exchanges</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Size Guide</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">bKash / Nagad Guide</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: About Us -->
+      <div class="space-y-3">
+        <h4 class="font-label-md text-xs uppercase tracking-widest text-white/40 font-bold">About Us</h4>
+        <ul class="space-y-2 text-xs text-white/70">
+          <li><a href="#" class="hover:text-white transition-colors">Our Story</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Craftsmanship</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Sustainability</a></li>
+          <li><a href="admin/login.html" class="hover:text-white transition-colors">Admin Portal</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-white/40 gap-4">
+      <p>© 2026 ZENVY SPORTSWEAR. All rights reserved.</p>
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
       </div>
     </div>
-    <div class="flex flex-col gap-2.5 items-center md:items-start text-sm">
-      <h4 class="font-label-md text-xs uppercase tracking-widest text-primary mb-1 font-bold">Shop</h4>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="shop.html?cat=club">Club Jerseys</a>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="shop.html?cat=national">National Kits</a>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="customizer.html">Customizer</a>
-      <a class="text-secondary font-bold hover:text-primary transition-colors flex items-center gap-1" href="preorders.html">
-        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
-      </a>
-    </div>
-    <div class="flex flex-col gap-2.5 items-center md:items-start text-sm">
-      <h4 class="font-label-md text-xs uppercase tracking-widest text-primary mb-1 font-bold">Support</h4>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="contact.html">Contact Us</a>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="contact.html#shipping">Shipping Info</a>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="contact.html#returns">Returns</a>
-    </div>
-    <div class="flex flex-col gap-2.5 items-center md:items-start text-sm">
-      <h4 class="font-label-md text-xs uppercase tracking-widest text-primary mb-1 font-bold">Admin & Portal</h4>
-      <a class="text-secondary font-bold hover:text-primary underline transition-colors" href="admin/login.html">Admin Portal Login</a>
-      <a class="text-on-surface-variant hover:text-brand-green transition-colors" href="account.html">Customer Dashboard</a>
-    </div>
-  </div>
-  <div class="mt-12 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center pt-6 border-t border-outline-variant/30 text-xs text-on-surface-variant gap-2">
-    <p class="uppercase tracking-widest">© 2026 ZENVY SPORTSWEAR. ALL RIGHTS RESERVED.</p>
-    <p>Currency: BDT (৳) | Location: Bangladesh</p>
   </div>
 </footer>
 
-<!-- ===== TOAST ===== -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-primary text-on-primary px-6 py-3.5 rounded-xl font-label-md text-sm shadow-xl flex items-center gap-3">
-  <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
-  <span id="toast-msg">Added to bag!</span>
-</div>
-
 <script>
-// Carousel script
-document.addEventListener('DOMContentLoaded', () => {
-  const slidesContainer = document.getElementById('carousel-slides');
-  const prevBtn = document.getElementById('carousel-prev');
-  const nextBtn = document.getElementById('carousel-next');
-  const dots = document.querySelectorAll('.carousel-dot');
-  let currentSlide = 0;
-  const totalSlides = 2;
-  let interval;
-
-  function updateSlider() {
-    if (!slidesContainer) return;
-    slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-    dots.forEach((dot, i) => {
-      dot.className = i === currentSlide
-        ? 'carousel-dot w-2.5 h-2.5 rounded-full bg-white transition-all scale-125'
-        : 'carousel-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all';
-    });
-  }
-  function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
-  function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSlider(); }
-  function startAutoPlay() { interval = setInterval(nextSlide, 5000); }
-  function resetAutoPlay() { clearInterval(interval); startAutoPlay(); }
-
-  if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
-  if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { currentSlide = i; updateSlider(); resetAutoPlay(); }));
-  startAutoPlay();
-});
-
-// Cart & state
-let cart = JSON.parse(localStorage.getItem('zenvy_cart') || JSON.parse(localStorage.getItem('apex_cart') || '[]') || '[]');
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
 
 function saveCart() {
   localStorage.setItem('zenvy_cart', JSON.stringify(cart));
-  localStorage.setItem('apex_cart', JSON.stringify(cart));
   updateCartCount();
 }
 
@@ -523,98 +660,58 @@ function updateCartCount() {
   else { badge.classList.add('hidden'); }
 }
 
-function quickAddToCart(id, name, price, img, size='M') {
-  const existing = cart.find(i => i.id === id && i.size === size);
-  if (existing) existing.qty = (existing.qty || 1) + 1;
-  else cart.push({ id, name, price, img, size, qty: 1 });
+function quickAddToCart(id, name, price, img) {
+  const ex = cart.find(i => i.id === id);
+  if (ex) ex.qty = (ex.qty || 1) + 1;
+  else cart.push({ id, name, price, img, size: 'M', qty: 1 });
   saveCart();
-  showToast(`${name} added to bag!`);
-  renderCartItems();
+  openCart();
 }
 
-function renderCartItems() {
+function openCart() {
   const list = document.getElementById('cart-list');
   const empty = document.getElementById('cart-empty');
   const footer = document.getElementById('cart-footer');
   const subtotalEl = document.getElementById('cart-subtotal');
   if (!list) return;
+
   if (cart.length === 0) {
-    list.classList.add('hidden');
-    empty.classList.remove('hidden');
-    footer.classList.add('hidden');
+    list.classList.add('hidden'); empty.classList.remove('hidden'); footer.classList.add('hidden');
   } else {
-    empty.classList.add('hidden');
-    list.classList.remove('hidden');
-    footer.classList.remove('hidden');
+    empty.classList.add('hidden'); list.classList.remove('hidden'); footer.classList.remove('hidden');
     let subtotal = 0;
     list.innerHTML = cart.map(item => {
       const itemPrice = (item.price || 0) * (item.qty || 1);
       subtotal += itemPrice;
       return `<div class="flex gap-4 py-3 border-b border-outline-variant/40">
-        <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg bg-surface-container-low flex-shrink-0" onerror="this.style.background='#eee'"/>
+        <img src="${item.img}" class="w-16 h-16 object-cover rounded-xl bg-surface-container-low flex-shrink-0"/>
         <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start mb-1">
-            <span class="font-headline-md text-sm text-primary font-bold truncate">${item.name}</span>
-            <button onclick="removeFromCart(${item.id},'${item.size}')" class="text-on-surface-variant hover:text-error ml-2 flex-shrink-0"><span class="material-symbols-outlined text-base">close</span></button>
-          </div>
-          <p class="font-body-md text-xs text-on-surface-variant mb-2">Size: ${item.size || 'M'}</p>
-          <div class="flex justify-between items-center">
-            <span class="font-label-md text-xs font-bold">Qty: ${item.qty || 1}</span>
-            <span class="font-label-md text-sm font-bold text-primary">৳ ${itemPrice.toLocaleString()}</span>
-          </div>
+          <p class="font-headline-md text-sm font-bold text-primary truncate">${item.name}</p>
+          <p class="font-caption text-xs text-on-surface-variant">Size: ${item.size || 'M'} · Qty: ${item.qty || 1}</p>
+          <p class="font-label-md text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
         </div>
       </div>`;
     }).join('');
     subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
   }
-}
-
-function removeFromCart(id, size) {
-  cart = cart.filter(i => !(i.id === id && i.size === size));
-  saveCart(); renderCartItems();
-}
-
-// Search
-function openSearch() { document.getElementById('search-overlay').classList.add('open'); document.getElementById('search-input').focus(); }
-function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); }
-function liveSearch(val) {
-  const res = document.getElementById('search-results');
-  if (!val.trim()) { res.innerHTML = ''; return; }
-  const term = val.toLowerCase();
-  const matches = [
-    { name: 'Real Madrid Home Kit 25/26', cat: 'Club Jerseys', price: '৳ 2,650' },
-    { name: 'Barcelona Stadium Jersey', cat: 'Club Jerseys', price: '৳ 2,450' },
-    { name: 'Argentina 3-Star Match Jersey', cat: 'National Kits', price: '৳ 8,500' },
-    { name: 'PSG Home Shirt 2026', cat: 'Club Jerseys', price: '৳ 2,350' },
-    { name: 'Liverpool Home Kit', cat: 'Club Jerseys', price: '৳ 2,400' },
-    { name: 'Manchester United Jersey', cat: 'Club Jerseys', price: '৳ 2,500' }
-  ].filter(m => m.name.toLowerCase().includes(term) || m.cat.toLowerCase().includes(term));
-
-  res.innerHTML = matches.map(m => `
-    <a href="shop.html?search=${encodeURIComponent(m.name)}" class="flex justify-between items-center p-3 rounded-xl hover:bg-surface-container-low transition-colors">
-      <div>
-        <p class="font-headline-md text-sm font-bold text-primary">${m.name}</p>
-        <p class="font-caption text-xs text-on-surface-variant">${m.cat}</p>
-      </div>
-      <span class="font-label-md text-xs font-bold text-primary">${m.price}</span>
-    </a>
-  `).join('');
-}
-
-// Cart Drawer
-function openCart() {
-  renderCartItems();
   document.getElementById('cart-drawer').classList.add('open');
   document.getElementById('cart-overlay').style.opacity = '1';
   document.getElementById('cart-overlay').style.pointerEvents = 'all';
 }
+
 function closeCart() {
   document.getElementById('cart-drawer').classList.remove('open');
   document.getElementById('cart-overlay').style.opacity = '0';
   document.getElementById('cart-overlay').style.pointerEvents = 'none';
 }
 
-// Mobile Menu
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+}
+
 function openMobileMenu() {
   document.getElementById('mobile-menu').classList.add('open');
   document.getElementById('mobile-overlay').style.opacity = '1';
@@ -626,24 +723,6 @@ function closeMobileMenu() {
   document.getElementById('mobile-overlay').style.pointerEvents = 'none';
 }
 
-// Wishlist
-let wishlist = JSON.parse(localStorage.getItem('apex_wishlist') || '[]');
-function toggleWishlist(btn, id) {
-  const idx = wishlist.indexOf(id);
-  if (idx === -1) { wishlist.push(id); btn.classList.add('active'); showToast('Added to wishlist!'); }
-  else { wishlist.splice(idx, 1); btn.classList.remove('active'); showToast('Removed from wishlist'); }
-  localStorage.setItem('apex_wishlist', JSON.stringify(wishlist));
-}
-
-// Toast
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); closeCart(); closeMobileMenu(); } });
 updateCartCount();
 </script>
 </body>

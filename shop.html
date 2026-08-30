@@ -80,21 +80,22 @@
 <div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
 <aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
   <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <a href="index.html" class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZENVY</a>
+    <a href="index.html" class="font-serif-display text-2xl font-bold tracking-tight text-primary">ZENVY</a>
     <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
   </div>
   <nav class="flex-1 px-6 py-6 flex flex-col gap-6">
-    <a href="shop.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary">Collections</a>
-    <a href="shop.html?cat=performance" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Performance</a>
+    <a href="shop.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold">Collections</a>
+    <a href="shop.html?cat=club" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Club Jerseys</a>
+    <a href="shop.html?cat=national" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">National Kits</a>
     <a href="customizer.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Customizer</a>
-    <a href="account.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">My Account</a>
+    <a href="preorders.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Preorders</a>
   </nav>
 </aside>
 
 <!-- NAV -->
-<nav class="fixed w-full top-0 left-0 z-50 bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.05)] border-b border-transparent">
+<nav class="fixed w-full top-0 left-0 z-50 bg-[#f8f6f2]/90 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.03)] border-b border-outline-variant/60">
   <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
-    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
+    <a class="font-serif-display text-3xl font-bold tracking-tight text-primary" href="index.html">ZENVY</a>
     <div class="hidden md:flex gap-8 items-center">
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="shop.html">Collections</a>
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors pb-1" href="shop.html?cat=performance">Performance</a>

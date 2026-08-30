@@ -88,7 +88,7 @@
     </div>
   </div>
 
-  <!-- NAVIGATION TABS -->
+  <!-- TAB NAVIGATION -->
   <div class="flex gap-2 border-b border-outline-variant mb-6 overflow-x-auto pb-1">
     <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn active font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">receipt_long</span> Orders & Payments
@@ -99,9 +99,38 @@
     <button onclick="switchTab('products')" id="tab-products" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">app_registration</span> Products
     </button>
+    <button onclick="switchTab('admins')" id="tab-admins" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-base">admin_panel_settings</span> Manage Admins
+    </button>
     <button onclick="switchTab('brand')" id="tab-brand" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">settings</span> Brand Settings
     </button>
+  </div>
+
+  <!-- TAB CONTENT 4: MANAGE ADMINS -->
+  <div id="content-admins" class="hidden bg-white rounded-xl p-6 ambient-shadow border border-outline-variant/40 max-w-2xl">
+    <h2 class="font-headline-md text-lg text-primary mb-2">Grant Admin Access</h2>
+    <p class="font-body-md text-xs text-on-surface-variant mb-6">Enter any Gmail address to authorize it for 1-click Google Admin sign in.</p>
+    
+    <div class="bg-surface-container-low p-4 rounded-xl mb-6">
+      <div class="field-wrap mb-3">
+        <label>Gmail / Email Address *</label>
+        <input type="email" id="new-admin-email" placeholder="yourname@gmail.com"/>
+      </div>
+      <button onclick="handleGrantAdmin()" class="bg-primary text-on-primary font-label-md text-xs uppercase px-6 py-3 hover:bg-secondary transition-colors tracking-widest rounded-lg font-bold flex items-center gap-2">
+        <span class="material-symbols-outlined text-base">add_moderator</span> Grant Admin Rights in Firebase
+      </button>
+    </div>
+
+    <div class="border-t border-outline-variant/40 pt-4">
+      <h3 class="font-headline-md text-sm text-primary font-bold mb-2">Authorized Admin Emails</h3>
+      <div class="space-y-2 text-xs text-on-surface-variant font-mono">
+        <p class="p-2.5 bg-surface-container-low rounded-lg flex items-center gap-2">
+          <span class="material-symbols-outlined text-base text-brand-green">verified</span> admin@zenvy.com (Default Master Admin)
+        </p>
+        <div id="admins-list"></div>
+      </div>
+    </div>
   </div>
 
   <!-- TAB CONTENT 1: ORDERS -->
@@ -258,7 +287,7 @@
 </div>
 
 <script type="module">
-import { requireAdmin, logout } from '../js/auth.js';
+import { requireAdmin, logout, grantAdminAccess } from '../js/auth.js';
 import { adminGetOrders, updateOrderStatus } from '../js/orders.js';
 import { adminGetPreorders, updatePreorderStatus, seedDemoPreorders } from '../js/preorders.js';
 import { adminGetProducts, adminSaveProduct, adminDeleteProduct } from '../js/products.js';
@@ -273,12 +302,38 @@ requireAdmin().then(() => {
 });
 
 window.switchTab = function(tabName) {
-  ['orders','preorders','products','brand'].forEach(t => {
-    document.getElementById('tab-' + t).className = t === tabName
-      ? 'tab-btn active font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant font-bold flex items-center gap-1.5'
-      : 'tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5';
-    document.getElementById('content-' + t).classList.toggle('hidden', t !== tabName);
+  ['orders','preorders','products','admins','brand'].forEach(t => {
+    const btn = document.getElementById('tab-' + t);
+    const content = document.getElementById('content-' + t);
+    if (btn) {
+      btn.className = t === tabName
+        ? 'tab-btn active font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant font-bold flex items-center gap-1.5'
+        : 'tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5';
+    }
+    if (content) {
+      content.classList.toggle('hidden', t !== tabName);
+    }
   });
+};
+
+window.handleGrantAdmin = async function() {
+  const emailInput = document.getElementById('new-admin-email');
+  const email = emailInput.value.trim();
+  if (!email || !email.includes('@')) {
+    alert('Please enter a valid Gmail / Email address.');
+    return;
+  }
+  const ok = await grantAdminAccess(email);
+  if (ok) {
+    alert('✅ Admin access granted to ' + email + '!\nThey can now sign in with Google 1-click login.');
+    emailInput.value = '';
+    const list = document.getElementById('admins-list');
+    if (list) {
+      list.innerHTML += `<p class="p-2.5 bg-surface-container-low rounded-lg flex items-center gap-2 text-primary font-bold"><span class="material-symbols-outlined text-base text-secondary">verified</span> ${email} (Granted)</p>`;
+    }
+  } else {
+    alert('Could not grant admin access. Please check network/Firebase permissions.');
+  }
 };
 
 // ---- Load Orders ----

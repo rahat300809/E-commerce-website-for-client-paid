@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Account – ZENVY</title>
+<meta name="description" content="Manage your ZENVY profile, track orders, and view preorders."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{colors:{"background":"#fbf9f8","surface-variant":"#e4e2e2","primary-container":"#1c1b1b","on-primary":"#ffffff","error":"#ba1a1a","on-surface":"#1b1c1c","secondary":"#003ec6","surface-container-low":"#f5f3f3","on-surface-variant":"#444748","secondary-container":"#0052fe","on-secondary":"#ffffff","surface":"#fbf9f8","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7","brand-green":"#00a83f"},fontFamily:{"body-lg":["Inter"],"label-md":["Inter"],"headline-md":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]}}}}
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.05);}
+  .field-wrap{position:relative;margin-bottom:18px;}
+  .field-wrap input{width:100%;border:1px solid #c4c7c7;border-radius:10px;padding:12px 16px;font-family:Inter;font-size:15px;outline:none;background:#fff;}
+  .field-wrap input:focus{border-color:#003ec6;border-width:2px;}
+  .field-wrap label{display:block;font-family:Inter;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#444748;margin-bottom:5px;}
+</style>
+</head>
+<body class="bg-surface-container-low text-on-surface antialiased min-h-screen font-body-md flex flex-col justify-between">
+
+<!-- NAV -->
+<nav class="bg-white border-b border-outline-variant/60 sticky top-0 z-50">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 md:h-20 max-w-container-max mx-auto">
+    <a href="index.html" class="font-headline-md text-2xl font-black tracking-tighter text-primary">ZENVY</a>
+    <div class="flex items-center gap-4">
+      <a href="shop.html" class="font-label-md text-xs uppercase tracking-wider text-on-surface-variant hover:text-primary">Shop</a>
+      <a href="preorders.html" class="font-label-md text-xs uppercase tracking-wider text-secondary font-bold">Preorders</a>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-10 flex-1 w-full">
+
+  <!-- ===== LOGGED OUT STATE (SIGN IN / GOOGLE LOGIN) ===== -->
+  <div id="auth-box" class="max-w-md mx-auto bg-white rounded-3xl p-8 md:p-10 ambient-shadow border border-outline-variant/40">
+    <div class="text-center mb-8">
+      <span class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center mx-auto mb-3 text-primary">
+        <span class="material-symbols-outlined text-3xl">person</span>
+      </span>
+      <h1 class="font-headline-lg text-2xl text-primary font-bold">Welcome to ZENVY</h1>
+      <p class="font-body-md text-sm text-on-surface-variant mt-1">Sign in to track orders, manage preorders & profile.</p>
+    </div>
+
+    <!-- Error message -->
+    <div id="auth-error" class="hidden bg-error-container text-error rounded-xl p-3.5 mb-5 text-xs font-bold flex items-center gap-2">
+      <span class="material-symbols-outlined text-base">error</span>
+      <span id="auth-error-msg">Authentication failed</span>
+    </div>
+
+    <!-- GOOGLE 1-CLICK LOGIN BUTTON -->
+    <button onclick="handleGoogleLogin()" class="w-full bg-white border border-outline-variant hover:bg-surface-container-low text-primary font-label-md text-sm px-6 py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all ambient-shadow mb-6">
+      <svg class="w-5 h-5" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="flex items-center gap-3 mb-6">
+      <hr class="flex-1 border-outline-variant/60"/>
+      <span class="font-caption text-xs uppercase tracking-wider text-on-surface-variant">or sign in with email</span>
+      <hr class="flex-1 border-outline-variant/60"/>
+    </div>
+
+    <!-- Email Login Form -->
+    <form onsubmit="handleEmailLogin(event)">
+      <div class="field-wrap">
+        <label>Email Address</label>
+        <input type="email" id="user-email" required placeholder="you@example.com"/>
+      </div>
+      <div class="field-wrap">
+        <label>Password</label>
+        <input type="password" id="user-password" required placeholder="••••••••"/>
+      </div>
+      <button type="submit" id="email-btn" class="w-full bg-primary text-on-primary font-label-md text-sm uppercase px-6 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-xl font-bold">
+        Sign In
+      </button>
+    </form>
+  </div>
+
+  <!-- ===== LOGGED IN PROFILE DASHBOARD ===== -->
+  <div id="profile-box" class="hidden max-w-4xl mx-auto space-y-6">
+    
+    <!-- User Banner Card -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 ambient-shadow border border-outline-variant/40 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-4 text-center sm:text-left">
+        <img id="u-photo" src="https://ui-avatars.com/api/?name=User&background=000&color=fff" class="w-16 h-16 rounded-full object-cover border-2 border-primary shadow"/>
+        <div>
+          <h2 id="u-name" class="font-headline-lg text-xl text-primary font-bold">User Name</h2>
+          <p id="u-email" class="font-body-md text-xs text-on-surface-variant">user@example.com</p>
+          <span id="u-role-badge" class="inline-block bg-surface-container-low text-primary font-label-md text-[10px] uppercase tracking-widest px-2.5 py-0.5 rounded-full mt-1 font-bold border border-outline-variant">Customer</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a id="admin-portal-link" href="admin/index.html" class="hidden bg-secondary text-white font-label-md text-xs uppercase px-5 py-3 rounded-xl font-bold hover:bg-primary transition-colors flex items-center gap-1.5 shadow">
+          <span class="material-symbols-outlined text-base">admin_panel_settings</span> Admin Dashboard
+        </a>
+        <button onclick="handleLogout()" class="border border-outline-variant text-error hover:bg-error-container/20 font-label-md text-xs uppercase px-5 py-3 rounded-xl font-bold transition-colors">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders Overview -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 ambient-shadow border border-outline-variant/40">
+      <h3 class="font-headline-md text-lg text-primary mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary">shopping_bag</span> My Orders & Preorders
+      </h3>
+      <div id="user-orders-list" class="space-y-3">
+        <p class="text-xs text-on-surface-variant py-4 text-center">No recent orders found on this account.</p>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-white border-t border-outline-variant/60 py-8 text-center text-xs text-on-surface-variant">
+  <p>© 2026 ZENVY SPORTSWEAR. All rights reserved.</p>
+</footer>
+
+<script type="module">
+import { initAuth, loginWithGoogle, adminLogin, logout } from './js/auth.js';
+
+window.handleLogout = logout;
+
+initAuth(({ user, isAdmin }) => {
+  const authBox = document.getElementById('auth-box');
+  const profileBox = document.getElementById('profile-box');
+
+  if (user) {
+    authBox.classList.add('hidden');
+    profileBox.classList.remove('hidden');
+
+    document.getElementById('u-name').textContent = user.displayName || user.email?.split('@')[0] || 'Member';
+    document.getElementById('u-email').textContent = user.email || '';
+    document.getElementById('u-photo').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || 'U')}&background=000&color=fff`;
+
+    const badge = document.getElementById('u-role-badge');
+    const adminLink = document.getElementById('admin-portal-link');
+
+    if (isAdmin) {
+      badge.textContent = 'STORE ADMIN';
+      badge.className = 'inline-block bg-secondary text-white font-label-md text-[10px] uppercase tracking-widest px-2.5 py-0.5 rounded-full mt-1 font-bold';
+      adminLink.classList.remove('hidden');
+    } else {
+      badge.textContent = 'CUSTOMER';
+    }
+  } else {
+    authBox.classList.remove('hidden');
+    profileBox.classList.add('hidden');
+  }
+});
+
+// Google 1-Click Login
+window.handleGoogleLogin = async function() {
+  const errBox = document.getElementById('auth-error');
+  const errText = document.getElementById('auth-error-msg');
+  errBox.classList.add('hidden');
+
+  const res = await loginWithGoogle();
+  if (!res.success) {
+    errText.textContent = res.error || 'Google login failed.';
+    errBox.classList.remove('hidden');
+  }
+};
+
+// Email Login
+window.handleEmailLogin = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('user-email').value.trim();
+  const password = document.getElementById('user-password').value;
+  const errBox = document.getElementById('auth-error');
+  const errText = document.getElementById('auth-error-msg');
+  errBox.classList.add('hidden');
+
+  const res = await adminLogin(email, password);
+  if (!res.success) {
+    errText.textContent = res.error || 'Login failed.';
+    errBox.classList.remove('hidden');
+  }
+};
+</script>
+</body>
+</html>

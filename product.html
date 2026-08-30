@@ -3,352 +3,322 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Product Detail - ZENVY</title>
+<title>Club Jersey 2026 – ZENVY</title>
+<meta name="description" content="Official ZENVY Club Jersey 2026. Engineered for peak performance with breathable mesh and aerodynamic cut."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-  tailwind.config={darkMode:"class",theme:{extend:{colors:{"background":"#fbf9f8","on-error-container":"#93000a","surface-dim":"#dbdad9","inverse-primary":"#c8c6c5","tertiary-container":"#191c1d","inverse-surface":"#303031","primary-container":"#1c1b1b","on-primary":"#ffffff","inverse-on-surface":"#f2f0f0","on-secondary-fixed":"#001452","on-primary-container":"#858383","surface-container-lowest":"#ffffff","secondary-fixed-dim":"#b7c4ff","surface-container-highest":"#e4e2e2","error":"#ba1a1a","error-container":"#ffdad6","primary-fixed":"#e5e2e1","on-surface":"#1b1c1c","secondary":"#003ec6","tertiary-fixed":"#e1e3e4","surface-container-low":"#f5f3f3","surface-tint":"#5f5e5e","on-surface-variant":"#444748","secondary-container":"#0052fe","on-tertiary":"#ffffff","on-secondary":"#ffffff","secondary-fixed":"#dde1ff","surface":"#fbf9f8","surface-container":"#efeded","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7","on-background":"#1b1c1c","on-primary-fixed":"#1c1b1b","tertiary":"#000000","on-secondary-container":"#dfe3ff","surface-container-high":"#e9e8e7","surface-bright":"#fbf9f8","on-error":"#ffffff"},spacing:{"margin-desktop":"64px","margin-mobile":"16px","unit":"8px","gutter":"24px","container-max":"1440px"},fontFamily:{"body-lg":["Inter"],"caption":["Inter"],"display-lg":["Montserrat"],"label-md":["Inter"],"headline-md":["Montserrat"],"display-lg-mobile":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]},fontSize:{"body-lg":["18px",{lineHeight:"28px",fontWeight:"400"}],"caption":["12px",{lineHeight:"16px",fontWeight:"400"}],"display-lg":["64px",{lineHeight:"72px",letterSpacing:"-0.02em",fontWeight:"800"}],"label-md":["14px",{lineHeight:"20px",letterSpacing:"0.05em",fontWeight:"600"}],"headline-md":["24px",{lineHeight:"32px",fontWeight:"700"}],"display-lg-mobile":["40px",{lineHeight:"48px",letterSpacing:"-0.02em",fontWeight:"800"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.01em",fontWeight:"700"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}}
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#f8f9fa",
+          "surface": "#ffffff",
+          "primary": "#000000",
+          "secondary": "#003ec6",
+          "on-surface": "#1b1c1c",
+          "on-surface-variant": "#5f6368",
+          "outline-variant": "#e2e8f0"
+        },
+        fontFamily: {
+          "sans": ["Inter", "sans-serif"],
+          "display": ["Montserrat", "sans-serif"]
+        }
+      }
+    }
+  }
 </script>
 <style>
-  .glass-nav{background-color:rgba(255,255,255,0.8);backdrop-filter:blur(20px);}
-  .ambient-shadow{box-shadow:0 20px 40px rgba(0,0,0,0.05);}
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.04);}
+  .thumb-btn.active{border-color:#000;border-width:2px;}
+  .size-btn.active{background:#000;color:#fff;border-color:#000;}
+  .color-btn.active{outline:2px solid #000;outline-offset:2px;}
+  .tab-btn.active{border-bottom:2px solid #000;color:#000;font-weight:700;}
   #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
   #cart-drawer.open{transform:translateX(0);}
-  #mobile-menu{transform:translateX(-100%);transition:transform .3s ease;}
-  #mobile-menu.open{transform:translateX(0);}
-  #toast{transform:translateY(100px);opacity:0;transition:all .3s;}
-  #toast.show{transform:translateY(0);opacity:1;}
-  .size-btn{border:1px solid #c4c7c7;padding:8px 16px;cursor:pointer;font-family:Inter;font-size:14px;transition:all .2s;}
-  .size-btn:hover,.size-btn.active{background:#000;color:#fff;border-color:#000;}
-  .size-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
-  .thumb{border:2px solid transparent;cursor:pointer;transition:border-color .2s;border-radius:8px;overflow:hidden;}
-  .thumb.active{border-color:#000;}
-  .qty-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #c4c7c7;cursor:pointer;font-size:18px;}
-  .qty-btn:hover{background:#f5f3f3;}
-  .qty-input{width:56px;height:40px;border-top:1px solid #c4c7c7;border-bottom:1px solid #c4c7c7;text-align:center;font-family:Inter;font-size:16px;outline:none;}
-  .wish-btn.active span{font-variation-settings:'FILL' 1;color:#ba1a1a;}
-  .tab-btn.active{border-bottom:2px solid #000;color:#000;}
 </style>
 </head>
-<body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
+<body class="bg-[#f8f9fa] text-[#1b1c1c] antialiased min-h-screen font-sans flex flex-col justify-between">
 
-<!-- CART DRAWER -->
+<!-- NAV -->
+<nav class="bg-white border-b border-outline-variant sticky top-0 z-50">
+  <div class="max-w-[1340px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
+    <a href="index.html" class="font-display text-2xl font-black tracking-tight text-primary">ZENVY</a>
+    
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+      <a href="index.html" class="text-on-surface-variant hover:text-primary">Home</a>
+      <a href="shop.html" class="text-secondary font-bold border-b-2 border-secondary pb-1">Shop</a>
+      <a href="shop.html?cat=club" class="text-on-surface-variant hover:text-primary">Men</a>
+      <a href="shop.html?cat=national" class="text-on-surface-variant hover:text-primary">Women</a>
+      <a href="customizer.html" class="text-on-surface-variant hover:text-primary">Customizer</a>
+      <a href="preorders.html" class="text-on-surface-variant hover:text-primary">Preorders</a>
+    </div>
+
+    <div class="flex items-center gap-5">
+      <button aria-label="Cart" onclick="openCart()" class="text-on-surface-variant hover:text-primary relative">
+        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-primary text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">person</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== CART DRAWER ===== -->
 <div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
 <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
   <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <h2 class="font-headline-md text-headline-md text-primary">Your Bag</h2>
+    <h2 class="font-display text-xl font-bold text-primary">Your Bag</h2>
     <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
   </div>
   <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
     <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
-      <span class="material-symbols-outlined text-6xl text-on-surface-variant/40 mb-4">shopping_bag</span>
-      <p class="font-headline-md text-headline-md text-primary mb-2">Your bag is empty</p>
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
+      <p class="font-display text-lg text-primary font-bold mb-2">Your bag is empty</p>
     </div>
     <div id="cart-list" class="hidden space-y-4"></div>
   </div>
   <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
     <div class="flex justify-between items-center mb-4">
-      <span class="font-body-lg text-body-lg text-on-surface-variant">Subtotal</span>
-      <span id="cart-subtotal" class="font-headline-md text-headline-md text-primary">৳ 0</span>
+      <span class="text-sm font-semibold text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-display text-lg font-bold text-primary">৳ 0</span>
     </div>
-    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest text-center mb-3">Checkout</a>
-    <button onclick="closeCart()" class="block w-full border border-primary text-primary font-label-md text-label-md uppercase px-8 py-4 tracking-widest text-center">Continue Shopping</button>
+    <a href="checkout.html" class="block w-full bg-primary text-white text-xs uppercase tracking-widest px-8 py-3.5 hover:bg-secondary transition-colors text-center rounded-xl font-bold">Checkout Securely</a>
   </div>
 </aside>
 
-<!-- MOBILE MENU -->
-<div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
-<aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
-  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <a href="index.html" class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZENVY</a>
-    <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
-  </div>
-  <nav class="flex-1 px-6 py-6 flex flex-col gap-6">
-    <a href="shop.html" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Collections</a>
-    <a href="customizer.html" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary">Customizer</a>
-  </nav>
-</aside>
+<main class="max-w-[1340px] mx-auto px-4 md:px-8 py-8 w-full flex-1">
 
-<!-- NAV -->
-<nav class="fixed w-full top-0 left-0 z-50 bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
-  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
-    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
-    <div class="hidden md:flex gap-8 items-center">
-      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors" href="shop.html">Collections</a>
-      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors" href="shop.html?cat=performance">Performance</a>
-      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors" href="customizer.html">Customizer</a>
-    </div>
-    <div class="flex items-center gap-4 text-primary">
-      <button onclick="openCart()" class="hover:text-secondary transition-colors relative">
-        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">shopping_bag</span>
-        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-secondary text-on-secondary rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center font-bold">0</span>
-      </button>
-      <a href="account.html" class="hover:text-secondary hidden md:block"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">person</span></a>
-      <button onclick="openMobileMenu()" class="md:hidden"><span class="material-symbols-outlined">menu</span></button>
-    </div>
-  </div>
-</nav>
-
-<main class="pt-20">
-  <!-- Breadcrumb -->
-  <div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-5 flex items-center gap-2">
-    <a href="index.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Home</a>
-    <span class="font-caption text-caption text-on-surface-variant">/</span>
-    <a href="shop.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Collections</a>
-    <span class="font-caption text-caption text-on-surface-variant">/</span>
-    <span class="font-caption text-caption text-primary" id="breadcrumb-name">Product</span>
+  <!-- BREADCRUMB (MATCHING SCREENSHOT 4) -->
+  <div class="flex items-center gap-2 text-xs text-on-surface-variant mb-6 font-semibold">
+    <a href="index.html" class="hover:underline">Home</a>
+    <span>›</span>
+    <a href="shop.html" class="hover:underline">Men</a>
+    <span>›</span>
+    <span class="text-primary font-bold">Club Jersey 2026</span>
   </div>
 
-  <!-- Product Detail -->
-  <section class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-      <!-- Images -->
-      <div>
-        <div class="rounded-xl overflow-hidden ambient-shadow mb-4 h-[500px] bg-surface-container-low">
-          <img id="main-img" alt="" class="w-full h-full object-cover"/>
-        </div>
-        <div class="flex gap-3 overflow-x-auto pb-2" id="thumbnail-row"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+    <!-- ===== LEFT GALLERY: THUMBNAILS + MAIN VIEW (6 COLS) ===== -->
+    <div class="lg:col-span-6 flex flex-col sm:flex-row gap-4">
+      
+      <!-- Thumbnails Column -->
+      <div class="flex sm:flex-col gap-3 order-2 sm:order-1">
+        <button onclick="setMainImage(this, 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="thumb-btn active w-16 h-16 rounded-xl border border-outline-variant overflow-hidden bg-white p-1">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" class="w-full h-full object-contain"/>
+        </button>
+        <button onclick="setMainImage(this, 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d')" class="thumb-btn w-16 h-16 rounded-xl border border-outline-variant overflow-hidden bg-white p-1">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" class="w-full h-full object-contain"/>
+        </button>
       </div>
 
-      <!-- Info -->
-      <div class="md:sticky md:top-28">
-        <div class="flex justify-between items-start mb-2">
-          <div>
-            <span id="product-badge" class="hidden font-label-md text-label-md text-secondary uppercase tracking-widest mb-2 block"></span>
-            <h1 id="product-name" class="font-headline-lg text-headline-lg text-primary"></h1>
-            <p id="product-sub" class="font-body-md text-body-md text-on-surface-variant mt-1"></p>
-          </div>
-          <button class="wish-btn text-on-surface-variant hover:text-secondary mt-1" id="wishlist-btn" onclick="toggleWish()">
-            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 0">favorite</span>
+      <!-- Main Photo View Container -->
+      <div class="flex-1 bg-white rounded-3xl p-6 relative ambient-shadow border border-outline-variant min-h-[440px] flex items-center justify-center order-1 sm:order-2">
+        <div class="absolute top-4 left-4 flex gap-2">
+          <span class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">Elite Version</span>
+          <span class="bg-gray-100 text-gray-800 text-[11px] font-bold px-3 py-1 rounded-full">New Arrival</span>
+        </div>
+        <img id="product-main-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Club Jersey 2026" class="w-full h-full object-contain p-4 max-h-[460px]"/>
+      </div>
+
+    </div>
+
+    <!-- ===== RIGHT DETAILS (6 COLS - MATCHING SCREENSHOT 4) ===== -->
+    <div class="lg:col-span-6 space-y-6">
+      
+      <div>
+        <h1 class="font-display text-3xl font-black text-primary mb-2">Club Jersey 2026</h1>
+        <div class="flex items-center gap-2 text-xs font-bold text-amber-500 mb-3">
+          ★★★★★ <span class="text-on-surface-variant">(4.9 - 128 Reviews)</span>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span class="font-display text-3xl font-black text-primary">৳1,200</span>
+          <span class="text-sm font-semibold text-on-surface-variant line-through">৳1,500</span>
+        </div>
+      </div>
+
+      <!-- Color Selector -->
+      <div>
+        <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Color: Deep Navy</label>
+        <div class="flex items-center gap-3">
+          <button onclick="setColorSel(this, 'Deep Navy')" class="color-btn active w-7 h-7 rounded-full bg-[#0b1b3d] shadow"></button>
+          <button onclick="setColorSel(this, 'Red')" class="color-btn w-7 h-7 rounded-full bg-[#ba1a1a] shadow"></button>
+        </div>
+      </div>
+
+      <!-- Size Selector -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs uppercase font-bold text-on-surface-variant">Size</label>
+          <button onclick="alert('Size Guide:\nS: Chest 36-38\nM: Chest 38-40\nL: Chest 40-42\nXL: Chest 42-44')" class="text-xs text-secondary hover:underline font-bold">≈ Size Guide</button>
+        </div>
+        <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+          <button onclick="setSizeSel(this, 'S')" class="size-btn border border-outline-variant rounded-xl p-3 text-center">S</button>
+          <button onclick="setSizeSel(this, 'M')" class="size-btn active border border-outline-variant rounded-xl p-3 text-center">M</button>
+          <button onclick="setSizeSel(this, 'L')" class="size-btn border border-outline-variant rounded-xl p-3 text-center">L</button>
+          <button onclick="setSizeSel(this, 'XL')" class="size-btn border border-outline-variant rounded-xl p-3 text-center">XL</button>
+        </div>
+      </div>
+
+      <!-- Delivery Banner -->
+      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3 text-xs">
+        <span class="material-symbols-outlined text-secondary text-xl mt-0.5">local_shipping</span>
+        <div>
+          <p class="font-bold text-primary mb-0.5">Delivery to Bangladesh</p>
+          <p class="text-on-surface-variant font-medium">Estimated delivery: 3-5 business days. Free shipping over ৳3,000.</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Add to Cart & Buy Now) -->
+      <div class="space-y-3">
+        <div class="flex gap-3">
+          <button onclick="addToBag()" class="flex-1 bg-primary text-white font-bold text-sm px-6 py-4 rounded-xl hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-lg">
+            <span class="material-symbols-outlined text-base">shopping_bag</span>
+            <span>Add to Cart</span>
+          </button>
+          <button onclick="wishlistToggle(this)" class="w-14 h-14 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-error">
+            <span class="material-symbols-outlined text-2xl">favorite</span>
           </button>
         </div>
 
-        <p id="product-price" class="font-display-lg-mobile md:text-4xl font-black text-primary mt-4 mb-6"></p>
+        <button onclick="buyNow()" class="w-full bg-white border border-primary text-primary font-bold text-sm px-6 py-3.5 rounded-xl hover:bg-slate-50 transition-colors">
+          Buy Now
+        </button>
+      </div>
 
-        <!-- Rating -->
-        <div class="flex items-center gap-2 mb-6">
-          <div class="flex text-amber-400">★★★★☆</div>
-          <span class="font-body-md text-body-md text-on-surface-variant">4.2 (128 reviews)</span>
-        </div>
-
-        <!-- Size Selector -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-label-md text-label-md text-primary uppercase tracking-wider">Select Size</span>
-            <a href="#" class="font-label-md text-label-md text-secondary">Size Guide</a>
-          </div>
-          <div class="flex flex-wrap gap-2" id="size-selector">
-            <button class="size-btn" onclick="selectSize(this,'XS')">XS</button>
-            <button class="size-btn" onclick="selectSize(this,'S')">S</button>
-            <button class="size-btn active" onclick="selectSize(this,'M')">M</button>
-            <button class="size-btn" onclick="selectSize(this,'L')">L</button>
-            <button class="size-btn" onclick="selectSize(this,'XL')">XL</button>
-            <button class="size-btn" onclick="selectSize(this,'XXL')">XXL</button>
-          </div>
+      <!-- Tabbed Info (Description, Materials, Shipping) -->
+      <div class="border-t border-outline-variant pt-6">
+        <div class="flex gap-6 border-b border-outline-variant pb-2 mb-4 text-xs uppercase font-bold text-on-surface-variant">
+          <button onclick="switchTab('desc')" id="t-desc" class="tab-btn active pb-2">Description</button>
+          <button onclick="switchTab('mat')" id="t-mat" class="tab-btn pb-2">Materials</button>
+          <button onclick="switchTab('ship')" id="t-ship" class="tab-btn pb-2">Shipping</button>
         </div>
 
-        <!-- Quantity -->
-        <div class="mb-8">
-          <span class="font-label-md text-label-md text-primary uppercase tracking-wider block mb-3">Quantity</span>
-          <div class="flex items-center">
-            <button class="qty-btn" onclick="changeQtyLocal(-1)">−</button>
-            <span class="qty-input" id="qty-display">1</span>
-            <button class="qty-btn" onclick="changeQtyLocal(1)">+</button>
-          </div>
+        <div id="c-desc" class="text-xs text-on-surface-variant leading-relaxed space-y-2 font-medium">
+          <p>Experience peak performance with the Elite Version Club Jersey. Engineered with our proprietary breathable mesh and aerodynamic cut, this jersey offers unparalleled comfort and style for both the pitch and the streets.</p>
+          <ul class="list-disc pl-4 space-y-1 pt-1">
+            <li>Moisture-wicking AeroTech fabric</li>
+            <li>Athletic fit for reduced drag</li>
+            <li>Laser-cut ventilation holes</li>
+          </ul>
         </div>
 
-        <!-- CTA -->
-        <div class="flex gap-3 mb-8">
-          <button onclick="addCurrentToCart()" class="flex-1 bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest">Add to Bag</button>
-          <a href="customizer.html" class="border border-primary text-primary font-label-md text-label-md uppercase px-6 py-4 hover:bg-surface-container-low transition-colors tracking-widest whitespace-nowrap">Customize</a>
+        <div id="c-mat" class="hidden text-xs text-on-surface-variant leading-relaxed space-y-1 font-medium">
+          <p>100% Recycled AeroTech Polyester with DryTech Moisture Control technology.</p>
         </div>
 
-        <!-- Highlights -->
-        <div class="bg-surface-container-low rounded-xl p-6 mb-6 space-y-3">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1">verified</span>
-            <span class="font-body-md text-body-md">Official Licensed Product</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1">local_shipping</span>
-            <span class="font-body-md text-body-md">Free delivery across Bangladesh (over ৳3,000)</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1">replay</span>
-            <span class="font-body-md text-body-md">30-day easy returns</span>
-          </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="border-b border-outline-variant mb-6">
-          <div class="flex gap-8">
-            <button class="tab-btn active font-label-md text-label-md uppercase tracking-wider pb-4 text-primary" onclick="switchTab(this,'desc')">Description</button>
-            <button class="tab-btn font-label-md text-label-md uppercase tracking-wider pb-4 text-on-surface-variant hover:text-primary" onclick="switchTab(this,'specs')">Specs</button>
-            <button class="tab-btn font-label-md text-label-md uppercase tracking-wider pb-4 text-on-surface-variant hover:text-primary" onclick="switchTab(this,'reviews')">Reviews</button>
-          </div>
-        </div>
-        <div id="tab-desc" class="tab-panel">
-          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">This is an officially licensed product crafted with advanced performance fabric technology. The jersey features moisture-wicking DryTech material that keeps you cool and dry during intense matches. Ergonomic cut designed for maximum freedom of movement.</p>
-        </div>
-        <div id="tab-specs" class="tab-panel hidden">
-          <table class="w-full font-body-md text-body-md">
-            <tr class="border-b border-outline-variant"><td class="py-2 text-on-surface-variant">Material</td><td class="py-2 font-semibold">100% Recycled Polyester</td></tr>
-            <tr class="border-b border-outline-variant"><td class="py-2 text-on-surface-variant">Technology</td><td class="py-2 font-semibold">DryTech Moisture-Wicking</td></tr>
-            <tr class="border-b border-outline-variant"><td class="py-2 text-on-surface-variant">Fit</td><td class="py-2 font-semibold">Athletic Slim Fit</td></tr>
-            <tr class="border-b border-outline-variant"><td class="py-2 text-on-surface-variant">Care</td><td class="py-2 font-semibold">Machine wash cold, hang dry</td></tr>
-            <tr><td class="py-2 text-on-surface-variant">Origin</td><td class="py-2 font-semibold">Bangladesh</td></tr>
-          </table>
-        </div>
-        <div id="tab-reviews" class="tab-panel hidden">
-          <div class="space-y-6">
-            <div class="border-b border-outline-variant pb-6">
-              <div class="flex items-center gap-2 mb-2"><div class="flex text-amber-400 text-sm">★★★★★</div><span class="font-label-md text-label-md text-on-surface-variant">Rahul K.</span></div>
-              <p class="font-body-md text-body-md text-on-surface-variant">"Amazing quality. The fabric feels premium and the colors are vibrant. Exactly as pictured."</p>
-            </div>
-            <div class="border-b border-outline-variant pb-6">
-              <div class="flex items-center gap-2 mb-2"><div class="flex text-amber-400 text-sm">★★★★☆</div><span class="font-label-md text-label-md text-on-surface-variant">Musfique A.</span></div>
-              <p class="font-body-md text-body-md text-on-surface-variant">"Great fit and fast delivery. Would love more color options. Highly recommended."</p>
-            </div>
-          </div>
+        <div id="c-ship" class="hidden text-xs text-on-surface-variant leading-relaxed space-y-1 font-medium">
+          <p>Standard Bangladesh Delivery: 3-5 business days across all districts.</p>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Related Products -->
-  <section class="py-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-    <h2 class="font-headline-lg text-headline-lg text-primary mb-10">YOU MAY ALSO LIKE</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter" id="related-grid"></div>
-  </section>
+    </div>
+
+  </div>
+
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-background border-t border-outline-variant py-16">
-  <div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center pt-8">
-    <a class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
-    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant mt-4 md:mt-0">© 2026 ZENVY PERFORMANCE WEAR. ALL RIGHTS RESERVED.</p>
-  </div>
+<footer class="bg-white border-t border-outline-variant py-8 mt-12 text-center text-xs text-on-surface-variant">
+  <p>© 2026 ZENVY Sportswear. All rights reserved.</p>
 </footer>
 
-<!-- TOAST -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-primary text-on-primary px-6 py-4 rounded-xl font-label-md text-label-md shadow-xl flex items-center gap-3">
-  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span>
-  <span id="toast-msg">Added to bag!</span>
-</div>
-
 <script>
-const ALL_PRODUCTS = [
-  {id:1,name:"Argentina Home",sub:"Authentic Match Jersey",price:8500,cat:"national",badge:"New",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H","https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf","https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d"]},
-  {id:2,name:"Brazil Home",sub:"Stadium Edition",price:6200,cat:"national",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P","https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H"]},
-  {id:3,name:"Portugal Home",sub:"Authentic Match Jersey",price:8500,cat:"national",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X","https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P"]},
-  {id:4,name:"France Home",sub:"Champions Edition",price:8900,cat:"national",badge:"Hot",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuDOvs28LKb83yfVDWG6B5q_40JnzM9p-jw0I_EdHbN_rgSWvuqeBvauvSTvj5gaHQ8r8on3wtEUIQkKaSACE4k0FQ_1Flq3gjtzYXIrOUxIDUrJHGGllTWXap31c0qMOeFwTp1b_bx6JheufKDk1jWhZEMY7CN30vmOS-T0JO_6OIsmO7m_cFuQeg4yvLvdW_rprgzkJFP1nDUiMuCitbGQX0SDHt75mZ9UoU3JD-isLUejCLvQcGi1"]},
-  {id:5,name:"Spain Home",sub:"La Roja Edition",price:7800,cat:"national",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf"]},
-  {id:6,name:"Germany Home",sub:"Die Mannschaft Edition",price:7500,cat:"national",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d"]},
-];
+let selectedSize = 'M';
+let selectedColor = 'Deep Navy';
+let currentImg = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P';
+
+function setMainImage(btn, src) {
+  document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('product-main-img').src = src;
+  currentImg = src;
+}
+
+function setSizeSel(btn, size) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSize = size;
+}
+
+function setColorSel(btn, color) {
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedColor = color;
+}
+
+function switchTab(tab) {
+  ['desc','mat','ship'].forEach(t => {
+    document.getElementById('t-' + t).className = t === tab ? 'tab-btn active pb-2' : 'tab-btn pb-2';
+    document.getElementById('c-' + t).classList.toggle('hidden', t !== tab);
+  });
+}
 
 let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
-let wishlist = JSON.parse(localStorage.getItem('zenvy_wishlist') || '[]');
-let selectedSize = 'M';
-let localQty = 1;
-let currentProduct = null;
 
-function saveCart(){localStorage.setItem('zenvy_cart',JSON.stringify(cart));updateCartCount();}
-function updateCartCount(){
-  const total=cart.reduce((s,i)=>s+i.qty,0);
-  const b=document.getElementById('cart-count');
-  if(total>0){b.textContent=total;b.classList.remove('hidden');}else b.classList.add('hidden');
-}
-
-function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function openCart(){renderCartItems();document.getElementById('cart-drawer').classList.add('open');document.getElementById('cart-overlay').style.cssText='opacity:1;pointer-events:all';}
-function closeCart(){document.getElementById('cart-drawer').classList.remove('open');document.getElementById('cart-overlay').style.cssText='opacity:0;pointer-events:none';}
-function openMobileMenu(){document.getElementById('mobile-menu').classList.add('open');document.getElementById('mobile-overlay').style.cssText='opacity:1;pointer-events:all';}
-function closeMobileMenu(){document.getElementById('mobile-menu').classList.remove('open');document.getElementById('mobile-overlay').style.cssText='opacity:0;pointer-events:none';}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeMobileMenu();}});
-
-function renderCartItems(){
-  const list=document.getElementById('cart-list'),empty=document.getElementById('cart-empty'),footer=document.getElementById('cart-footer'),sub=document.getElementById('cart-subtotal');
-  if(cart.length===0){list.classList.add('hidden');empty.classList.remove('hidden');footer.classList.add('hidden');}
-  else{
-    empty.classList.add('hidden');list.classList.remove('hidden');footer.classList.remove('hidden');
-    let total=0;
-    list.innerHTML=cart.map(item=>{total+=item.price*item.qty;return`<div class="flex gap-4 py-4 border-b border-outline-variant"><img src="${item.img}" class="w-20 h-20 object-cover rounded-lg flex-shrink-0"/><div class="flex-1"><div class="flex justify-between"><span class="font-bold text-primary">${item.name}</span><button onclick="removeFromCart(${item.id},'${item.size}')" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-base">close</span></button></div><p class="text-sm text-on-surface-variant mt-1">Size: ${item.size} · Qty: ${item.qty}</p><p class="font-bold text-primary mt-1">৳ ${(item.price*item.qty).toLocaleString()}</p></div></div>`;}).join('');
-    sub.textContent='৳ '+total.toLocaleString();
-  }
-}
-function removeFromCart(id,size){cart=cart.filter(i=>!(i.id===id&&i.size===size));saveCart();renderCartItems();}
-
-function selectSize(btn,size){
-  document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedSize=size;
-}
-
-function changeQtyLocal(d){
-  localQty=Math.max(1,localQty+d);
-  document.getElementById('qty-display').textContent=localQty;
-}
-
-function addCurrentToCart(){
-  if(!currentProduct) return;
-  const ex=cart.find(i=>i.id===currentProduct.id&&i.size===selectedSize);
-  if(ex) ex.qty+=localQty;
-  else cart.push({id:currentProduct.id,name:currentProduct.name,price:currentProduct.price,img:currentProduct.images[0],size:selectedSize,qty:localQty});
-  saveCart();
-  showToast(`${currentProduct.name} (${selectedSize}) added to bag!`);
+function addToBag() {
+  cart.push({
+    id: 'cj-2026',
+    name: 'Club Jersey 2026',
+    price: 1200,
+    size: selectedSize,
+    color: selectedColor,
+    img: currentImg,
+    qty: 1
+  });
+  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
   openCart();
 }
 
-function toggleWish(){
-  const btn=document.getElementById('wishlist-btn');
-  const id=currentProduct.id;
-  const idx=wishlist.indexOf(id);
-  if(idx===-1){wishlist.push(id);btn.classList.add('active');showToast('Added to wishlist!');}
-  else{wishlist.splice(idx,1);btn.classList.remove('active');showToast('Removed from wishlist');}
-  localStorage.setItem('apex_wishlist',JSON.stringify(wishlist));
+function buyNow() {
+  addToBag();
+  window.location.href = 'checkout.html';
 }
 
-function switchTab(btn,tab){
-  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.classList.add('text-on-surface-variant');b.classList.remove('text-primary');});
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
-  btn.classList.add('active','text-primary');
-  btn.classList.remove('text-on-surface-variant');
-  document.getElementById('tab-'+tab).classList.remove('hidden');
+function wishlistToggle(btn) {
+  btn.classList.toggle('text-red-600');
+  alert('Added to your wishlist!');
 }
 
-function setMainImg(src){document.getElementById('main-img').src=src;document.querySelectorAll('.thumb').forEach(t=>{t.classList.toggle('active',t.querySelector('img').src===src);});}
+function openCart() {
+  const list = document.getElementById('cart-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  if (!list) return;
 
-function loadProduct(){
-  const params=new URLSearchParams(window.location.search);
-  const id=parseInt(params.get('id'))||1;
-  currentProduct=ALL_PRODUCTS.find(p=>p.id===id)||ALL_PRODUCTS[0];
-
-  document.title=`${currentProduct.name} - ZENVY`;
-  document.getElementById('breadcrumb-name').textContent=currentProduct.name;
-  document.getElementById('product-name').textContent=currentProduct.name;
-  document.getElementById('product-sub').textContent=currentProduct.sub;
-  document.getElementById('product-price').textContent=`৳ ${currentProduct.price.toLocaleString()}`;
-  document.getElementById('main-img').src=currentProduct.images[0];
-  document.getElementById('main-img').alt=currentProduct.name;
-
-  if(currentProduct.badge){
-    const b=document.getElementById('product-badge');
-    b.textContent=currentProduct.badge;b.classList.remove('hidden');
+  if (cart.length === 0) {
+    list.classList.add('hidden'); empty.classList.remove('hidden'); footer.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden'); list.classList.remove('hidden'); footer.classList.remove('hidden');
+    let subtotal = 0;
+    list.innerHTML = cart.map(item => {
+      const itemPrice = (item.price || 0) * (item.qty || 1);
+      subtotal += itemPrice;
+      return `<div class="flex gap-4 py-3 border-b border-outline-variant">
+        <img src="${item.img}" class="w-14 h-14 object-contain rounded-xl bg-slate-100 flex-shrink-0"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm text-primary truncate">${item.name}</p>
+          <p class="text-xs text-on-surface-variant">Size: ${item.size || 'M'}</p>
+          <p class="text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
+        </div>
+      </div>`;
+    }).join('');
+    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
   }
-
-  // Thumbnails
-  const row=document.getElementById('thumbnail-row');
-  row.innerHTML=currentProduct.images.map((img,i)=>`<div class="thumb ${i===0?'active':''} w-24 h-24 flex-shrink-0" onclick="setMainImg('${img}')"><img src="${img}" class="w-full h-full object-cover"/></div>`).join('');
-
-  // Wishlist state
-  if(wishlist.includes(currentProduct.id)) document.getElementById('wishlist-btn').classList.add('active');
-
-  // Related
-  const related=ALL_PRODUCTS.filter(p=>p.id!==currentProduct.id).slice(0,4);
-  document.getElementById('related-grid').innerHTML=related.map(p=>`<div class="group cursor-pointer" onclick="window.location='product.html?id=${p.id}'"><div class="rounded-xl overflow-hidden h-52 bg-surface-container-low ambient-shadow mb-3"><img src="${p.images[0]}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/></div><h4 class="font-headline-md text-[16px] font-bold text-primary">${p.name}</h4><p class="font-body-md text-body-md text-on-surface-variant text-sm">${p.sub}</p><p class="font-label-md text-label-md font-bold text-primary mt-1">৳ ${p.price.toLocaleString()}</p></div>`).join('');
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
 }
 
-document.addEventListener('DOMContentLoaded',()=>{updateCartCount();loadProduct();});
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
 </script>
 </body>
 </html>

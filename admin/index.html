@@ -99,6 +99,9 @@
     <button onclick="switchTab('products')" id="tab-products" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">app_registration</span> Products
     </button>
+    <button onclick="switchTab('categories')" id="tab-categories" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-base">category</span> Categories
+    </button>
     <button onclick="switchTab('customizer')" id="tab-customizer" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">checkroom</span> Customizer & Patches
     </button>
@@ -108,6 +111,34 @@
     <button onclick="switchTab('brand')" id="tab-brand" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">settings</span> Brand Settings
     </button>
+  </div>
+
+  <!-- TAB CONTENT: CATEGORIES -->
+  <div id="content-categories" class="hidden bg-white rounded-xl ambient-shadow border border-outline-variant/40 overflow-hidden">
+    <div class="p-5 border-b border-outline-variant flex justify-between items-center">
+      <div>
+        <h2 class="font-headline-md text-lg text-primary">Category Management</h2>
+        <p class="font-body-md text-xs text-on-surface-variant">Manage product categories for jerseys, activewear, and accessories.</p>
+      </div>
+      <button onclick="openAddCategoryModal()" class="bg-primary text-on-primary font-label-md text-xs uppercase px-4 py-2 hover:bg-secondary transition-colors tracking-wider rounded-lg font-bold flex items-center gap-1">
+        <span class="material-symbols-outlined text-base">add</span> Add Category
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-surface-container-low text-xs uppercase font-bold text-on-surface-variant border-b border-outline-variant">
+          <tr>
+            <th class="p-4">Category Name</th>
+            <th class="p-4">Slug</th>
+            <th class="p-4">Display Order</th>
+            <th class="p-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="categories-tbody" class="divide-y divide-outline-variant/30">
+          <tr><td colspan="4" class="p-6 text-center text-on-surface-variant">Loading categories...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- TAB CONTENT: CUSTOMIZER & PATCHES -->
@@ -306,6 +337,24 @@
         <label>Product Name *</label>
         <input type="text" id="p-name" required placeholder="Argentina 2026 Special Jersey"/>
       </div>
+      <div class="field-wrap">
+        <label>Category *</label>
+        <select id="p-category" required class="w-full border border-outline-variant rounded-xl p-3 text-sm font-bold">
+          <option value="Football Jerseys">⚽ Football Jerseys</option>
+          <option value="Cricket Jerseys">🏏 Cricket Jerseys</option>
+          <option value="Basketball Jerseys">🏀 Basketball Jerseys</option>
+          <option value="Club Jerseys">🏆 Club Jerseys</option>
+          <option value="National Team Jerseys">🌍 National Team Jerseys</option>
+          <option value="Custom Jerseys">👕 Custom Jerseys</option>
+          <option value="T-shirts">👕 T-shirts</option>
+          <option value="Polo Shirts">👔 Polo Shirts</option>
+          <option value="Hoodies">🧥 Hoodies & Jackets</option>
+          <option value="Pants">🩳 Pants & Shorts</option>
+          <option value="Caps">🧢 Caps & Socks</option>
+          <option value="Accessories">🎒 Accessories</option>
+        </select>
+      </div>
+
       <div class="grid grid-cols-2 gap-3">
         <div class="field-wrap">
           <label>Base Price (৳) *</label>
@@ -316,23 +365,83 @@
           <input type="number" id="p-preprice" placeholder="7500"/>
         </div>
       </div>
+
       <div class="field-wrap">
         <label>Status</label>
-        <select id="p-status">
+        <select id="p-status" class="w-full border border-outline-variant rounded-xl p-3 text-sm">
           <option value="IN_STOCK">In Stock</option>
           <option value="PREORDER">Preorder</option>
         </select>
       </div>
+
       <div class="field-wrap">
         <label>Expected Delivery Date (if Preorder)</label>
         <input type="text" id="p-delivery" placeholder="15 November 2026"/>
       </div>
-      <div class="field-wrap">
-        <label>Image URL</label>
-        <input type="url" id="p-image" placeholder="https://..."/>
+
+      <!-- DUAL IMAGE SOURCE SYSTEM (UPLOAD & URL LINK) -->
+      <div class="border border-outline-variant/60 rounded-2xl p-4 bg-surface-container-low mb-4">
+        <label class="font-label-md text-xs uppercase tracking-wider text-primary font-bold block mb-2">Product Image (Choose Source)</label>
+        
+        <!-- File Upload Option -->
+        <div class="mb-3">
+          <label class="font-label-md text-[11px] text-on-surface-variant font-bold block mb-1">📁 Upload Image File</label>
+          <input type="file" id="p-image-file" accept="image/*" onchange="handleImageFileSelected(event)" class="w-full text-xs text-on-surface bg-white border border-outline-variant rounded-xl p-2.5"/>
+        </div>
+
+        <div class="flex items-center gap-2 my-2">
+          <hr class="flex-1 border-outline-variant"/>
+          <span class="font-caption text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">OR</span>
+          <hr class="flex-1 border-outline-variant"/>
+        </div>
+
+        <!-- URL Link Option -->
+        <div>
+          <label class="font-label-md text-[11px] text-on-surface-variant font-bold block mb-1">🔗 Image Web Link (URL)</label>
+          <input type="url" id="p-image" placeholder="https://..." oninput="updateImagePreview(this.value)" class="w-full border border-outline-variant rounded-xl p-2.5 text-xs bg-white"/>
+        </div>
+
+        <!-- Live Preview Thumbnail -->
+        <div id="image-preview-container" class="hidden mt-3 pt-3 border-t border-outline-variant/40 flex items-center gap-3">
+          <img id="p-image-preview" src="" alt="Preview" class="w-16 h-16 object-cover rounded-xl border border-outline-variant shadow"/>
+          <div>
+            <p class="font-label-md text-xs font-bold text-primary">Image Loaded</p>
+            <p class="font-caption text-[11px] text-brand-green font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">check_circle</span> Ready to save
+            </p>
+          </div>
+        </div>
       </div>
-      <button type="submit" class="w-full bg-primary text-on-primary font-label-md text-xs uppercase px-6 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-lg font-bold mt-2">
+
+      <button type="submit" id="save-product-btn" class="w-full bg-primary text-on-primary font-label-md text-xs uppercase px-6 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-xl font-bold mt-2">
         Save Product
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ADD CATEGORY MODAL -->
+<div id="category-modal" class="hidden fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-md p-6 ambient-shadow">
+    <div class="flex justify-between items-center mb-4 border-b border-outline-variant pb-3">
+      <h3 class="font-headline-md text-lg text-primary">Add New Category</h3>
+      <button onclick="closeCategoryModal()"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="handleSaveCategory(event)">
+      <div class="field-wrap">
+        <label>Category Name *</label>
+        <input type="text" id="cat-name" required placeholder="e.g. Cricket Jerseys"/>
+      </div>
+      <div class="field-wrap">
+        <label>Category Slug (optional)</label>
+        <input type="text" id="cat-slug" placeholder="e.g. cricket-jerseys"/>
+      </div>
+      <div class="field-wrap">
+        <label>Display Order</label>
+        <input type="number" id="cat-order" value="1"/>
+      </div>
+      <button type="submit" class="w-full bg-primary text-on-primary font-label-md text-xs uppercase px-6 py-3.5 hover:bg-secondary transition-colors tracking-widest rounded-xl font-bold mt-2">
+        Save Category
       </button>
     </form>
   </div>
@@ -342,7 +451,7 @@
 import { requireAdmin, logout, grantAdminAccess } from '../js/auth.js';
 import { adminGetOrders, updateOrderStatus } from '../js/orders.js';
 import { adminGetPreorders, updatePreorderStatus, seedDemoPreorders } from '../js/preorders.js';
-import { adminGetProducts, adminSaveProduct, adminDeleteProduct } from '../js/products.js';
+import { adminGetProducts, adminSaveProduct, adminDeleteProduct, adminGetCategories, adminSaveCategory, adminDeleteCategory } from '../js/products.js';
 
 window.handleLogout = logout;
 
@@ -351,10 +460,11 @@ requireAdmin().then(() => {
   loadOrdersData();
   loadPreordersData();
   loadProductsData();
+  loadCategoriesData();
 });
 
 window.switchTab = function(tabName) {
-  ['orders','preorders','products','customizer','admins','brand'].forEach(t => {
+  ['orders','preorders','products','categories','customizer','admins','brand'].forEach(t => {
     const btn = document.getElementById('tab-' + t);
     const content = document.getElementById('content-' + t);
     if (btn) {
@@ -399,6 +509,84 @@ window.handleGrantAdmin = async function() {
     }
   } else {
     alert('Could not grant admin access. Please check network/Firebase permissions.');
+  }
+};
+
+// ---- File Upload & Image Preview ----
+window.handleImageFileSelected = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    document.getElementById('p-image').value = dataUrl;
+    updateImagePreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+};
+
+window.updateImagePreview = function(url) {
+  const container = document.getElementById('image-preview-container');
+  const img = document.getElementById('p-image-preview');
+  if (url && url.length > 5) {
+    img.src = url;
+    container.classList.remove('hidden');
+  } else {
+    container.classList.add('hidden');
+  }
+};
+
+// ---- Load Categories ----
+async function loadCategoriesData() {
+  const tbody = document.getElementById('categories-tbody');
+  const select = document.getElementById('p-category');
+  try {
+    const categories = await adminGetCategories();
+    if (!categories || categories.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-on-surface-variant">No categories found. Click 'Add Category' to create one.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = categories.map(c => `
+      <tr class="hover:bg-surface-container-low">
+        <td class="p-4 font-bold text-primary">${c.name}</td>
+        <td class="p-4 font-mono text-xs text-on-surface-variant">${c.slug || c.name.toLowerCase().replace(/\s+/g, '-')}</td>
+        <td class="p-4 text-xs font-bold text-secondary">${c.displayOrder || 1}</td>
+        <td class="p-4">
+          <button onclick="handleDeleteCategory('${c.id}')" class="text-error hover:underline text-xs font-bold">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Populate Product Modal category dropdown dynamically
+    if (select) {
+      select.innerHTML = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    }
+  } catch (e) {
+    console.warn('loadCategoriesData error:', e);
+  }
+}
+
+window.openAddCategoryModal = function() { document.getElementById('category-modal').classList.remove('hidden'); };
+window.closeCategoryModal = function() { document.getElementById('category-modal').classList.add('hidden'); };
+
+window.handleSaveCategory = async function(e) {
+  e.preventDefault();
+  const name = document.getElementById('cat-name').value.trim();
+  const slug = document.getElementById('cat-slug').value.trim() || name.toLowerCase().replace(/\s+/g, '-');
+  const order = Number(document.getElementById('cat-order').value) || 1;
+
+  await adminSaveCategory(null, { name, slug, displayOrder: order, isActive: true });
+  alert('Category "' + name + '" saved!');
+  closeCategoryModal();
+  loadCategoriesData();
+};
+
+window.handleDeleteCategory = async function(id) {
+  if (confirm('Delete this category?')) {
+    await adminDeleteCategory(id);
+    loadCategoriesData();
   }
 };
 
@@ -511,7 +699,7 @@ async function loadProductsData() {
           <img src="${(p.images && p.images[0]) || ''}" class="w-10 h-10 object-cover rounded bg-surface-container" onerror="this.style.background='#eee'"/>
           <span class="font-bold text-primary">${p.name}</span>
         </td>
-        <td class="p-4 text-xs text-on-surface-variant">${p.categoryId || 'Jerseys'}</td>
+        <td class="p-4 text-xs text-on-surface-variant font-bold">${p.categoryId || 'Jerseys'}</td>
         <td class="p-4 font-bold text-primary">৳ ${(p.basePrice || 0).toLocaleString()}</td>
         <td class="p-4 text-secondary font-bold">৳ ${(p.preorderPrice || p.basePrice || 0).toLocaleString()}</td>
         <td class="p-4">
@@ -530,12 +718,18 @@ async function loadProductsData() {
 }
 
 // Modal actions
-window.openAddProductModal = function() { document.getElementById('product-modal').classList.remove('hidden'); };
-window.closeProductModal = function() { document.getElementById('product-modal').classList.add('hidden'); };
+window.openAddProductModal = function() {
+  document.getElementById('product-modal').classList.remove('hidden');
+};
+window.closeProductModal = function() {
+  document.getElementById('product-modal').classList.add('hidden');
+  document.getElementById('image-preview-container').classList.add('hidden');
+};
 
 window.handleSaveProduct = async function(e) {
   e.preventDefault();
   const name = document.getElementById('p-name').value;
+  const categoryId = document.getElementById('p-category').value;
   const price = Number(document.getElementById('p-price').value);
   const preprice = Number(document.getElementById('p-preprice').value) || price;
   const status = document.getElementById('p-status').value;
@@ -543,12 +737,12 @@ window.handleSaveProduct = async function(e) {
   const image = document.getElementById('p-image').value || 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H';
 
   await adminSaveProduct(null, {
-    name, basePrice: price, preorderPrice: preprice, status,
+    name, categoryId, basePrice: price, preorderPrice: preprice, status,
     expectedDeliveryDate: delivery, isPublished: true,
     images: [image]
   });
 
-  alert('Product saved successfully!');
+  alert('Product "' + name + '" saved under category "' + categoryId + '"!');
   closeProductModal();
   loadProductsData();
 };

@@ -392,114 +392,19 @@
   </div>
 </section>
 
-<!-- ===== PREORDER DROPS ===== -->
-<section class="py-20 bg-primary text-on-primary relative overflow-hidden" id="preorder-drops">
-  <!-- Background texture -->
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-    <div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary-container rounded-full blur-2xl transform -translate-x-1/3 translate-y-1/3"></div>
-  </div>
-  <div class="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
-      <div>
-        <div class="inline-flex items-center gap-2 bg-secondary/20 border border-secondary/30 text-secondary-container px-4 py-2 rounded-full mb-4">
-          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
-          <span class="font-label-md text-label-md uppercase tracking-widest text-sm">Reserve Now</span>
-        </div>
-        <h2 class="font-headline-lg text-headline-lg md:text-[40px] md:leading-[48px] text-on-primary">UPCOMING DROPS<br/><span class="text-secondary-container opacity-80">OPEN PREORDERS</span></h2>
-        <p class="font-body-md text-body-md text-inverse-on-surface/70 mt-2">Limited slots — secure yours before they sell out.</p>
-      </div>
-      <a href="preorders.html" class="mt-6 md:mt-0 font-label-md text-label-md uppercase tracking-widest text-secondary-container hover:text-on-primary transition-colors border border-secondary-container/40 hover:border-on-primary px-6 py-3 rounded-lg inline-flex items-center gap-2">
-        View All Preorders
-        <span class="material-symbols-outlined text-base">arrow_forward</span>
-      </a>
-    </div>
-
-    <!-- Products grid -->
-    <div id="homepage-preorder-skeleton" class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse"></div>
-      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse delay-75"></div>
-      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse delay-150"></div>
-    </div>
-    <div id="homepage-preorder-grid" class="hidden grid grid-cols-1 md:grid-cols-3 gap-gutter"></div>
-
-    <!-- CTA Strip -->
-    <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-center">
-      <div class="flex items-center gap-2 text-inverse-on-surface/60">
-        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">lock</span>
-        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Secure Advance Payment</span>
-      </div>
-      <div class="hidden sm:block w-px h-6 bg-white/20"></div>
-      <div class="flex items-center gap-2 text-inverse-on-surface/60">
-        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">local_shipping</span>
-        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Guaranteed Delivery</span>
-      </div>
-      <div class="hidden sm:block w-px h-6 bg-white/20"></div>
-      <div class="flex items-center gap-2 text-inverse-on-surface/60">
-        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">refresh</span>
-        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Full Refund if Cancelled</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== CATEGORIES BANNER ===== -->
-<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-    <a href="shop.html?cat=mens" class="group relative rounded-xl overflow-hidden h-64 ambient-shadow block">
-      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf" alt="Men's Collection" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-      <div class="absolute bottom-6 left-6">
-        <p class="font-label-md text-label-md uppercase tracking-widest text-white/70 mb-1">Shop Now</p>
-        <h3 class="font-headline-md text-headline-md text-white">Men's Collection</h3>
-      </div>
-    </a>
-    <a href="shop.html?cat=womens" class="group relative rounded-xl overflow-hidden h-64 ambient-shadow block">
-      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Women's Collection" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-      <div class="absolute bottom-6 left-6">
-        <p class="font-label-md text-label-md uppercase tracking-widest text-white/70 mb-1">Shop Now</p>
-        <h3 class="font-headline-md text-headline-md text-white">Women's Collection</h3>
-      </div>
-    </a>
-  </div>
-</section>
-
-<!-- ===== PERFORMANCE STRIP ===== -->
-<section class="py-20 bg-primary text-on-primary">
-  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-      <div>
-        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">bolt</span>
-        <h3 class="font-headline-md text-headline-md mb-2">Moisture-Wicking</h3>
-        <p class="font-body-md text-body-md text-inverse-on-surface/70">Advanced DryTech fabric pulls sweat away from skin, keeping you cool and focused.</p>
-      </div>
-      <div>
-        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">verified</span>
-        <h3 class="font-headline-md text-headline-md mb-2">Official Licensed</h3>
-        <p class="font-body-md text-body-md text-inverse-on-surface/70">Authentic match jerseys with official team crests and performance specifications.</p>
-      </div>
-      <div>
-        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">local_shipping</span>
-        <h3 class="font-headline-md text-headline-md mb-2">Free Delivery</h3>
-        <p class="font-body-md text-body-md text-inverse-on-surface/70">Free shipping across Bangladesh on all orders over ৳ 3,000.</p>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- ===== CUSTOMIZER CTA ===== -->
 <section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-  <div class="rounded-2xl bg-surface-container-low p-12 md:p-20 flex flex-col md:flex-row items-center gap-12">
-    <div class="flex-1">
-      <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-4 block">Build Yours</span>
+  <div class="rounded-2xl bg-surface-container-low p-8 md:p-20 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+    <div class="flex-1 text-center md:text-left">
+      <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-3 block">Build Yours</span>
       <h2 class="font-headline-lg text-headline-lg mb-4 text-primary">DESIGN YOUR<br/>OWN JERSEY</h2>
-      <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-md">Choose colors, add your name and number, select fonts — get a fully custom jersey delivered to your door.</p>
-      <a href="customizer.html" class="inline-block bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest">Start Customizing</a>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-md mx-auto md:mx-0">Choose colors, add your name and number, select fonts — get a fully custom jersey delivered to your door.</p>
+      <a href="customizer.html" class="inline-block bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest w-full sm:w-auto">Start Customizing</a>
     </div>
-    <div class="flex-1 flex justify-center">
-      <div class="relative w-64 h-64 rounded-xl overflow-hidden ambient-shadow">
+    <div class="flex-1 flex justify-center w-full">
+      <div class="relative w-full max-w-xs h-64 rounded-xl overflow-hidden ambient-shadow">
         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Customizer" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-gradient-to-br from-secondary/20 to-transparent"></div>
       </div>
@@ -557,130 +462,6 @@
   <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span>
   <span id="toast-msg">Added to bag!</span>
 </div>
-
-<script type="module">
-// ===== PREORDER SECTION =====
-import { getPreorderProducts, formatExpectedDate } from './js/preorders.js';
-
-async function loadHomepagePreorders() {
-  const skeleton = document.getElementById('homepage-preorder-skeleton');
-  const grid = document.getElementById('homepage-preorder-grid');
-  const demoProducts = [
-    {
-      id: 'demo-1',
-      name: 'Argentina 2026 World Cup Special Edition',
-      description: 'Exclusive 2026 FIFA World Cup special edition jersey.',
-      basePrice: 9500, preorderPrice: 8500, compareAtPrice: 11000,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H'],
-      preorderMaxQty: 150, preorderSold: 38, expectedDeliveryDate: '15 November 2026'
-    },
-    {
-      id: 'demo-2',
-      name: 'Barcelona x Zenvy Home 2026/27',
-      description: 'Next-season Barcelona home jersey with DryTech Pro fabric.',
-      basePrice: 8200, preorderPrice: 7200, compareAtPrice: 9500,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P'],
-      preorderMaxQty: 100, preorderSold: 61, expectedDeliveryDate: '20 September 2026'
-    },
-    {
-      id: 'demo-3',
-      name: 'Bangladesh Cricket ODI Jersey 2026',
-      description: 'Official Bangladesh cricket ODI jersey for 2026 season.',
-      basePrice: 4500, preorderPrice: 3800, compareAtPrice: 5500,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X'],
-      preorderMaxQty: 200, preorderSold: 45, expectedDeliveryDate: '5 October 2026'
-    }
-  ];
-
-  try {
-    let products = await getPreorderProducts(3);
-    if (products.length === 0) products = demoProducts;
-    skeleton.classList.add('hidden');
-    grid.classList.remove('hidden');
-    grid.innerHTML = products.map(p => {
-      const img = (p.images && p.images[0]) || '';
-      const price = p.preorderPrice || p.basePrice || 0;
-      const compare = p.compareAtPrice || 0;
-      const sold = p.preorderSold || 0;
-      const max = p.preorderMaxQty || 0;
-      const remaining = max > 0 ? max - sold : null;
-      const pct = max > 0 ? Math.min(100, Math.round((sold / max) * 100)) : 0;
-      const deliveryDate = typeof p.expectedDeliveryDate === 'string' ? p.expectedDeliveryDate : formatExpectedDate(p.expectedDeliveryDate);
-      const savings = compare > price ? compare - price : 0;
-      return `
-      <div class="group relative flex flex-col bg-white/8 border border-white/10 rounded-xl overflow-hidden hover:bg-white/12 transition-all duration-300 hover:-translate-y-1">
-        <div class="relative h-64 overflow-hidden bg-white/5">
-          <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="${img}"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <div class="absolute top-4 left-4 flex flex-col gap-2">
-            <span class="inline-flex items-center gap-1 bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">
-              <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">schedule</span> Preorder
-            </span>
-            ${savings > 0 ? `<span class="bg-black/70 text-secondary-container font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">Save ৳${savings.toLocaleString()}</span>` : ''}
-          </div>
-          ${remaining !== null && remaining <= 20 ? `<div class="absolute bottom-3 left-3 right-3 bg-black/80 text-white rounded-lg px-3 py-1 text-center"><span class="font-label-md text-[11px] uppercase tracking-wider">⚡ Only ${remaining} slots left!</span></div>` : ''}
-        </div>
-        <div class="p-5 flex-1 flex flex-col">
-          <h3 class="font-headline-md text-[17px] leading-6 text-on-primary mb-1 line-clamp-1">${p.name}</h3>
-          <div class="flex items-center gap-1 text-secondary-container mb-3">
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">local_shipping</span>
-            <span class="font-caption text-caption opacity-80">Expected: <strong>${deliveryDate}</strong></span>
-          </div>
-          ${max > 0 ? `
-          <div class="mb-4">
-            <div class="flex justify-between mb-1">
-              <span class="font-caption text-caption text-inverse-on-surface/50">${sold} reserved</span>
-              <span class="font-caption text-caption ${remaining !== null && remaining <= 20 ? 'text-error' : 'text-secondary-container'} font-bold">${remaining !== null ? remaining + ' left' : '∞'}</span>
-            </div>
-            <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full ${pct > 80 ? 'bg-error' : 'bg-secondary'} rounded-full transition-all duration-700" style="width:${pct}%"></div>
-            </div>
-          </div>
-          ` : ''}
-          <div class="flex items-end justify-between mt-auto pt-3 border-t border-white/10">
-            <div>
-              <p class="font-headline-md text-headline-md text-on-primary">৳ ${price.toLocaleString()}</p>
-              ${compare > price ? `<p class="font-caption text-caption line-through text-inverse-on-surface/40">৳ ${compare.toLocaleString()}</p>` : ''}
-            </div>
-            <a href="preorders.html" class="font-label-md text-label-md uppercase px-4 py-2.5 bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-fixed transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1">
-              <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>
-              Pre-Order
-            </a>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    skeleton.classList.add('hidden');
-    grid.classList.remove('hidden');
-    grid.innerHTML = demoProducts.map(p => {
-      const img = (p.images && p.images[0]) || '';
-      const price = p.preorderPrice || p.basePrice || 0;
-      const sold = p.preorderSold || 0; const max = p.preorderMaxQty || 0;
-      const remaining = max > 0 ? max - sold : null;
-      const pct = max > 0 ? Math.min(100, Math.round((sold/max)*100)) : 0;
-      return `<div class="group flex flex-col bg-white/8 border border-white/10 rounded-xl overflow-hidden hover:bg-white/12 transition-all duration-300 hover:-translate-y-1">
-        <div class="relative h-64 overflow-hidden bg-white/5">
-          <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="${img}"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <div class="absolute top-4 left-4"><span class="inline-flex items-center gap-1 bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full"><span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">schedule</span> Preorder</span></div>
-        </div>
-        <div class="p-5 flex-1 flex flex-col">
-          <h3 class="font-headline-md text-[17px] leading-6 text-on-primary mb-1 line-clamp-1">${p.name}</h3>
-          <div class="flex items-center gap-1 text-secondary-container mb-3"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">local_shipping</span><span class="font-caption text-caption opacity-80">Expected: <strong>${p.expectedDeliveryDate}</strong></span></div>
-          ${max > 0 ? `<div class="mb-4"><div class="flex justify-between mb-1"><span class="font-caption text-caption text-inverse-on-surface/50">${sold} reserved</span><span class="font-caption text-caption text-secondary-container font-bold">${remaining} left</span></div><div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full" style="width:${pct}%"></div></div></div>` : ''}
-          <div class="flex items-end justify-between mt-auto pt-3 border-t border-white/10">
-            <p class="font-headline-md text-headline-md text-on-primary">৳ ${price.toLocaleString()}</p>
-            <a href="preorders.html" class="font-label-md text-label-md uppercase px-4 py-2.5 bg-secondary text-on-secondary hover:bg-primary transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span> Pre-Order</a>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-}
-
-loadHomepagePreorders();
-</script>
 
 <script>
 // ===== CAROUSEL =====

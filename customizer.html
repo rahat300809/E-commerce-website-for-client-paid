@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Customizer – ZENVY | Design Your Own Jersey</title>
+<meta name="description" content="Design your custom football & cricket jersey with custom name, number, sleeve options, and official UCL patches."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#fbf9f8",
+          "surface-variant": "#e4e2e2",
+          "primary-container": "#1c1b1b",
+          "on-primary": "#ffffff",
+          "error": "#ba1a1a",
+          "on-surface": "#1b1c1c",
+          "secondary": "#003ec6",
+          "surface-container-low": "#f5f3f3",
+          "on-surface-variant": "#444748",
+          "secondary-container": "#0052fe",
+          "on-secondary": "#ffffff",
+          "surface": "#fbf9f8",
+          "outline": "#747878",
+          "primary": "#000000",
+          "outline-variant": "#c4c7c7",
+          "brand-green": "#00a83f"
+        },
+        spacing: {
+          "margin-desktop": "64px",
+          "margin-mobile": "16px",
+          "container-max": "1320px"
+        },
+        fontFamily: {
+          "body-lg": ["Inter"],
+          "caption": ["Inter"],
+          "display-lg": ["Montserrat"],
+          "label-md": ["Inter"],
+          "headline-md": ["Montserrat"],
+          "headline-lg": ["Montserrat"],
+          "body-md": ["Inter"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.05);}
+  #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+  #cart-drawer.open{transform:translateX(0);}
+  #mobile-menu{transform:translateX(-100%);transition:transform .3s ease;}
+  #mobile-menu.open{transform:translateX(0);}
+  .sleeve-btn.active{border-color:#000;border-width:2px;background:#fff;}
+  .size-btn.active{background:#000;color:#fff;border-color:#000;}
+  .view-toggle.active{background:#000;color:#fff;}
+  .field-wrap input{width:100%;border:1px solid #c4c7c7;border-radius:10px;padding:12px 16px;font-family:Inter;font-size:14px;outline:none;background:#fff;transition:all .2s;}
+  .field-wrap input:focus{border-color:#003ec6;border-width:2px;}
+</style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <h2 class="font-headline-md text-xl text-primary">Your Bag</h2>
+    <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
+      <p class="font-headline-md text-lg text-primary mb-2">Your bag is empty</p>
+    </div>
+    <div id="cart-list" class="hidden space-y-4"></div>
+  </div>
+  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-body-lg text-base text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-headline-md text-lg text-primary font-bold">৳ 0</span>
+    </div>
+    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-xs uppercase px-8 py-3.5 hover:bg-secondary transition-colors tracking-widest text-center mb-3 rounded-lg font-bold">Checkout</a>
+  </div>
+</aside>
+
+<!-- ===== MOBILE MENU ===== -->
+<div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
+<aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <a href="index.html" class="font-headline-md text-2xl font-black tracking-tighter text-primary">ZENVY</a>
+    <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <nav class="flex-1 px-6 py-6 flex flex-col gap-5">
+    <a href="shop.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors">Collections</a>
+    <a href="shop.html?cat=performance" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors">Performance</a>
+    <a href="customizer.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-secondary font-bold">Customizer</a>
+    <a href="preorders.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1">
+      <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
+    </a>
+    <hr class="border-outline-variant"/>
+    <a href="account.html" onclick="closeMobileMenu()" class="font-label-md text-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors">My Account</a>
+  </nav>
+</aside>
+
+<!-- ===== TOP NAV ===== -->
+<nav class="fixed w-full top-0 left-0 z-50 bg-white/90 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] border-b border-outline-variant/40">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 md:h-20 max-w-container-max mx-auto">
+    <a class="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
+    <div class="hidden md:flex gap-8 items-center">
+      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors" href="shop.html">Collections</a>
+      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors" href="shop.html?cat=performance">Performance</a>
+      <a class="font-label-md text-xs uppercase tracking-widest text-secondary font-bold border-b-2 border-secondary pb-1" href="customizer.html">Customizer</a>
+      <a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1" href="preorders.html">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
+      </a>
+    </div>
+    <div class="flex items-center gap-4 text-primary">
+      <button aria-label="Shopping Bag" onclick="openCart()" class="hover:text-secondary transition-colors relative">
+        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-secondary text-on-secondary rounded-full w-5 h-5 flex items-center justify-center font-bold text-[11px]">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="hover:text-secondary transition-colors hidden md:block">
+        <span class="material-symbols-outlined text-2xl">person</span>
+      </a>
+      <button aria-label="Menu" onclick="openMobileMenu()" class="md:hidden hover:text-secondary transition-colors">
+        <span class="material-symbols-outlined text-2xl">menu</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-20 md:pt-24 pb-16">
+  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+
+    <!-- MAIN CUSTOMIZER GRID (MATCHING STITCH DESIGN EXACTLY) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- ===== LEFT PANEL: INTERACTIVE VISUALIZER (7 COLS) ===== -->
+      <div class="lg:col-span-7 bg-surface-container-low rounded-3xl p-6 md:p-12 flex flex-col items-center justify-between min-h-[520px] relative ambient-shadow border border-outline-variant/30">
+        
+        <!-- Jersey Canvas Visualizer -->
+        <div class="relative w-full max-w-md h-[380px] md:h-[420px] flex items-center justify-center">
+          
+          <!-- Jersey Image -->
+          <img id="jersey-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Custom Jersey Preview" class="w-full h-full object-contain filter drop-shadow-xl transition-all duration-300"/>
+
+          <!-- Dynamic Text Overlays (Render Name & Number) -->
+          <div id="jersey-overlay-back" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none pt-6">
+            <span id="preview-name" class="font-headline-lg uppercase text-xl md:text-2xl font-black text-amber-200 tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">SMITH</span>
+            <span id="preview-number" class="font-headline-lg text-6xl md:text-7xl font-black text-amber-200 tracking-tighter drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-none mt-1">10</span>
+          </div>
+
+          <!-- Dynamic Patch Badge (Render League Patch) -->
+          <div id="patch-badge" class="absolute top-1/2 right-8 transform -translate-y-1/2 bg-white/90 backdrop-blur-md border border-amber-300 rounded-full px-2.5 py-1 text-[11px] font-bold text-primary shadow-lg flex items-center gap-1">
+            <span>🏆</span> <span id="patch-label">UCL Starball</span>
+          </div>
+        </div>
+
+        <!-- Front / Back View Toggle Pills -->
+        <div class="bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-md flex gap-1 border border-outline-variant/40 mt-4">
+          <button onclick="toggleView('front')" id="btn-front" class="view-toggle px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all text-on-surface-variant">FRONT</button>
+          <button onclick="toggleView('back')" id="btn-back" class="view-toggle active px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all">BACK</button>
+        </div>
+
+      </div>
+
+      <!-- ===== RIGHT PANEL: CUSTOMIZATION CONTROLS (5 COLS) ===== -->
+      <div class="lg:col-span-5 bg-white rounded-3xl p-6 md:p-8 ambient-shadow border border-outline-variant/40">
+        
+        <!-- Header -->
+        <div class="mb-6">
+          <h1 class="font-headline-lg text-2xl md:text-3xl text-primary font-black mb-1">AeroPro Elite</h1>
+          <p class="font-body-md text-sm text-on-surface-variant">Custom Match Jersey</p>
+        </div>
+
+        <!-- 1. Size Selection -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-3">
+            <label class="font-label-md text-xs uppercase tracking-wider text-primary font-bold">Size</label>
+            <button onclick="alert('Size Guide:\nS: Chest 36-38\nM: Chest 38-40\nL: Chest 40-42\nXL: Chest 42-44\n2XL: Chest 44-46')" class="font-label-md text-xs text-secondary hover:underline">Size Guide</button>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <button onclick="selectSize(this, 'S')" class="size-btn py-3 border border-outline-variant rounded-xl font-label-md text-xs font-bold transition-all">S</button>
+            <button onclick="selectSize(this, 'M')" class="size-btn active py-3 border border-outline-variant rounded-xl font-label-md text-xs font-bold transition-all">M</button>
+            <button onclick="selectSize(this, 'L')" class="size-btn py-3 border border-outline-variant rounded-xl font-label-md text-xs font-bold transition-all">L</button>
+            <button onclick="selectSize(this, 'XL')" class="size-btn py-3 border border-outline-variant rounded-xl font-label-md text-xs font-bold transition-all">XL</button>
+            <button onclick="selectSize(this, '2XL')" class="size-btn py-3 border border-outline-variant rounded-xl font-label-md text-xs font-bold transition-all">2XL</button>
+          </div>
+        </div>
+
+        <!-- 2. Sleeve Length -->
+        <div class="mb-6">
+          <label class="font-label-md text-xs uppercase tracking-wider text-primary font-bold block mb-3">Sleeve Length</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="selectSleeve(this, 'half', 0)" class="sleeve-btn active border border-outline-variant rounded-xl p-3.5 text-left transition-all">
+              <p class="font-label-md text-xs font-bold text-primary">Half Sleeve</p>
+              <p class="font-caption text-[11px] text-on-surface-variant">Included</p>
+            </button>
+            <button onclick="selectSleeve(this, 'full', 300)" class="sleeve-btn border border-outline-variant rounded-xl p-3.5 text-left transition-all">
+              <p class="font-label-md text-xs font-bold text-primary">Full Sleeve</p>
+              <p class="font-caption text-[11px] text-secondary font-bold">+ ৳ 300</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Personalization -->
+        <div class="mb-6 space-y-3">
+          <label class="font-label-md text-xs uppercase tracking-wider text-primary font-bold block mb-1">Personalization</label>
+          
+          <!-- Name Input -->
+          <div class="relative flex items-center">
+            <input type="text" id="cust-name" placeholder="PLAYER NAME" value="SMITH" oninput="updatePreviewText()" class="w-full border border-outline-variant rounded-xl p-3.5 uppercase font-headline-md text-sm font-bold placeholder:text-on-surface-variant/50 pr-20"/>
+            <span class="absolute right-4 font-label-md text-xs font-bold text-secondary">+ ৳ 200</span>
+          </div>
+
+          <!-- Number Input -->
+          <div class="relative flex items-center">
+            <input type="text" id="cust-number" placeholder="NUMBER (0-99)" value="10" maxlength="2" oninput="updatePreviewText()" class="w-full border border-outline-variant rounded-xl p-3.5 uppercase font-headline-md text-sm font-bold placeholder:text-on-surface-variant/50 pr-20"/>
+            <span class="absolute right-4 font-label-md text-xs font-bold text-secondary">+ ৳ 150</span>
+          </div>
+
+          <!-- Patch Dropdown -->
+          <div class="field-wrap mb-0">
+            <label class="font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">League / Tournament Patch</label>
+            <select id="cust-patch" onchange="updatePrice()" class="w-full border border-outline-variant rounded-xl p-3.5 font-label-md text-xs font-bold text-primary">
+              <option value="none" data-price="0">No League Patch (Included)</option>
+              <option value="ucl" data-price="250" selected>🏆 UEFA Champions League (UCL Starball) (+ ৳ 250)</option>
+              <option value="epl" data-price="200">🦁 English Premier League (EPL) (+ ৳ 200)</option>
+              <option value="laliga" data-price="200">🇪🇸 La Liga (+ ৳ 200)</option>
+              <option value="worldcup" data-price="300">🏆 FIFA World Cup Champions Badge (+ ৳ 300)</option>
+              <option value="seriea" data-price="200">🇮🇹 Serie A TIM (+ ৳ 200)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Total Price & Add to Cart Button -->
+        <div class="border-t border-outline-variant/60 pt-5 mt-6">
+          <div class="flex justify-between items-center mb-5">
+            <span class="font-body-md text-sm text-on-surface-variant">Total Estimated Price</span>
+            <span id="total-price" class="font-headline-lg text-2xl text-primary font-black">৳ 2,750</span>
+          </div>
+
+          <button onclick="addCustomJerseyToCart()" class="w-full bg-primary text-on-primary font-label-md text-sm uppercase px-8 py-4 hover:bg-secondary transition-all tracking-widest rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
+            <span>ADD TO CART</span>
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- FOOTER STATEMENT -->
+    <div class="mt-16 text-center">
+      <h3 class="font-headline-lg text-xl md:text-2xl text-primary font-black uppercase tracking-wider">Engineered for Elites</h3>
+      <p class="font-body-md text-xs text-on-surface-variant mt-1">Official ZENVY Match Specification · Handcrafted Customization in Bangladesh</p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// State
+let basePrice = 1850;
+let selectedSize = 'M';
+let selectedSleeve = 'half';
+let sleeveExtra = 0;
+let currentView = 'back';
+
+function selectSize(btn, sz) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSize = sz;
+}
+
+function selectSleeve(btn, type, extra) {
+  document.querySelectorAll('.sleeve-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSleeve = type;
+  sleeveExtra = extra;
+  updatePrice();
+}
+
+function toggleView(view) {
+  currentView = view;
+  const overlay = document.getElementById('jersey-overlay-back');
+  const btnFront = document.getElementById('btn-front');
+  const btnBack = document.getElementById('btn-back');
+
+  if (view === 'front') {
+    btnFront.className = 'view-toggle active px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all';
+    btnBack.className = 'view-toggle px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all text-on-surface-variant';
+    overlay.style.opacity = '0.3';
+  } else {
+    btnBack.className = 'view-toggle active px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all';
+    btnFront.className = 'view-toggle px-6 py-2 rounded-full font-label-md text-xs font-bold transition-all text-on-surface-variant';
+    overlay.style.opacity = '1';
+  }
+}
+
+function updatePreviewText() {
+  const nameVal = document.getElementById('cust-name').value.trim() || 'SMITH';
+  const numVal = document.getElementById('cust-number').value.trim() || '10';
+  document.getElementById('preview-name').textContent = nameVal;
+  document.getElementById('preview-number').textContent = numVal;
+  updatePrice();
+}
+
+function updatePrice() {
+  const nameVal = document.getElementById('cust-name').value.trim();
+  const numVal = document.getElementById('cust-number').value.trim();
+  const patchSel = document.getElementById('cust-patch');
+  const patchOpt = patchSel.options[patchSel.selectedIndex];
+  const patchPrice = Number(patchOpt.getAttribute('data-price') || 0);
+
+  let namePrice = nameVal ? 200 : 0;
+  let numPrice = numVal ? 150 : 0;
+
+  const total = basePrice + sleeveExtra + namePrice + numPrice + patchPrice;
+  document.getElementById('total-price').textContent = '৳ ' + total.toLocaleString();
+
+  // Update patch badge preview
+  const patchBadge = document.getElementById('patch-badge');
+  const patchLabel = document.getElementById('patch-label');
+  if (patchSel.value === 'none') {
+    patchBadge.classList.add('hidden');
+  } else {
+    patchBadge.classList.remove('hidden');
+    patchLabel.textContent = patchOpt.text.split('(')[0].replace(/[🏆🦁🇪🇸🇮🇹]/g,'').trim();
+  }
+}
+
+// Cart integration
+let cart = JSON.parse(localStorage.getItem('apex_cart') || JSON.parse(localStorage.getItem('zenvy_cart') || '[]') || '[]');
+
+function saveCart() {
+  localStorage.setItem('apex_cart', JSON.stringify(cart));
+  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  updateCartCount();
+}
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + (i.qty || 1), 0);
+  const badge = document.getElementById('cart-count');
+  if (!badge) return;
+  if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+}
+
+function addCustomJerseyToCart() {
+  const nameVal = document.getElementById('cust-name').value.trim();
+  const numVal = document.getElementById('cust-number').value.trim();
+  const patchSel = document.getElementById('cust-patch');
+  const patchOpt = patchSel.options[patchSel.selectedIndex];
+  const patchPrice = Number(patchOpt.getAttribute('data-price') || 0);
+  const patchName = patchSel.value !== 'none' ? patchOpt.text.split('(')[0].trim() : null;
+
+  let namePrice = nameVal ? 200 : 0;
+  let numPrice = numVal ? 150 : 0;
+
+  const finalPrice = basePrice + sleeveExtra + namePrice + numPrice + patchPrice;
+
+  const customItem = {
+    id: 'custom-' + Date.now(),
+    name: 'AeroPro Elite Custom Jersey',
+    price: finalPrice,
+    size: selectedSize,
+    sleeve: selectedSleeve === 'full' ? 'Full Sleeve' : 'Half Sleeve',
+    customization: {
+      name: nameVal || null,
+      number: numVal || null,
+      patch: patchName
+    },
+    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P',
+    qty: 1
+  };
+
+  cart.push(customItem);
+  saveCart();
+  window.location.href = 'checkout.html';
+}
+
+function openCart() {
+  const list = document.getElementById('cart-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  if (!list) return;
+
+  if (cart.length === 0) {
+    list.classList.add('hidden'); empty.classList.remove('hidden'); footer.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden'); list.classList.remove('hidden'); footer.classList.remove('hidden');
+    let subtotal = 0;
+    list.innerHTML = cart.map(item => {
+      const itemPrice = (item.price || 0) * (item.qty || 1);
+      subtotal += itemPrice;
+      return `<div class="flex gap-4 py-3 border-b border-outline-variant/40">
+        <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg bg-surface-container-low flex-shrink-0"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-headline-md text-sm font-bold text-primary truncate">${item.name}</p>
+          ${item.customization?.name ? `<p class="font-caption text-xs text-secondary font-bold">${item.customization.name} #${item.customization.number || ''}</p>` : ''}
+          <p class="font-caption text-xs text-on-surface-variant">Size: ${item.size} · ${item.sleeve || 'Half'}</p>
+          <p class="font-label-md text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
+        </div>
+      </div>`;
+    }).join('');
+    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+  }
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
+}
+
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
+
+function openMobileMenu() {
+  document.getElementById('mobile-menu').classList.add('open');
+  document.getElementById('mobile-overlay').style.opacity = '1';
+  document.getElementById('mobile-overlay').style.pointerEvents = 'all';
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('mobile-overlay').style.opacity = '0';
+  document.getElementById('mobile-overlay').style.pointerEvents = 'none';
+}
+
+updatePrice();
+updateCartCount();
+</script>
+</body>
+</html>

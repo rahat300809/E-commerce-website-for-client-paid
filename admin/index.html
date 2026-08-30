@@ -99,12 +99,64 @@
     <button onclick="switchTab('products')" id="tab-products" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">app_registration</span> Products
     </button>
+    <button onclick="switchTab('customizer')" id="tab-customizer" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-base">checkroom</span> Customizer & Patches
+    </button>
     <button onclick="switchTab('admins')" id="tab-admins" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">admin_panel_settings</span> Manage Admins
     </button>
     <button onclick="switchTab('brand')" id="tab-brand" class="tab-btn font-label-md text-xs uppercase tracking-wider px-5 py-3 rounded-t-lg border border-b-0 border-outline-variant text-on-surface-variant hover:text-primary font-bold flex items-center gap-1.5">
       <span class="material-symbols-outlined text-base">settings</span> Brand Settings
     </button>
+  </div>
+
+  <!-- TAB CONTENT: CUSTOMIZER & PATCHES -->
+  <div id="content-customizer" class="hidden bg-white rounded-xl p-6 ambient-shadow border border-outline-variant/40 max-w-2xl">
+    <h2 class="font-headline-md text-lg text-primary mb-2">Customizer Options & Patch Pricing</h2>
+    <p class="font-body-md text-xs text-on-surface-variant mb-6">Manage add-on prices for custom player name, number printing, sleeve lengths, and league patches.</p>
+
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field-wrap">
+          <label>Player Name Price (৳)</label>
+          <input type="number" id="cz-name-price" value="200"/>
+        </div>
+        <div class="field-wrap">
+          <label>Number Printing Price (৳)</label>
+          <input type="number" id="cz-num-price" value="150"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label>Full Sleeve Extra Charge (৳)</label>
+        <input type="number" id="cz-sleeve-price" value="300"/>
+      </div>
+      
+      <div class="border-t border-outline-variant/40 pt-4">
+        <h3 class="font-headline-md text-sm text-primary font-bold mb-3">League Patch Prices (৳)</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="field-wrap">
+            <label>🏆 UCL Starball Patch</label>
+            <input type="number" id="cz-patch-ucl" value="250"/>
+          </div>
+          <div class="field-wrap">
+            <label>🦁 Premier League (EPL)</label>
+            <input type="number" id="cz-patch-epl" value="200"/>
+          </div>
+          <div class="field-wrap">
+            <label>🇪🇸 La Liga Patch</label>
+            <input type="number" id="cz-patch-laliga" value="200"/>
+          </div>
+          <div class="field-wrap">
+            <label>🏆 World Cup Badge</label>
+            <input type="number" id="cz-patch-wc" value="300"/>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveCustomizerPrices()" class="bg-primary text-on-primary font-label-md text-xs uppercase px-6 py-3 hover:bg-secondary transition-colors tracking-widest rounded-lg font-bold">
+        Save Customizer Prices
+      </button>
+    </div>
   </div>
 
   <!-- TAB CONTENT 4: MANAGE ADMINS -->
@@ -302,7 +354,7 @@ requireAdmin().then(() => {
 });
 
 window.switchTab = function(tabName) {
-  ['orders','preorders','products','admins','brand'].forEach(t => {
+  ['orders','preorders','products','customizer','admins','brand'].forEach(t => {
     const btn = document.getElementById('tab-' + t);
     const content = document.getElementById('content-' + t);
     if (btn) {
@@ -314,6 +366,20 @@ window.switchTab = function(tabName) {
       content.classList.toggle('hidden', t !== tabName);
     }
   });
+};
+
+window.saveCustomizerPrices = function() {
+  const prices = {
+    namePrice: Number(document.getElementById('cz-name-price').value) || 200,
+    numPrice: Number(document.getElementById('cz-num-price').value) || 150,
+    sleevePrice: Number(document.getElementById('cz-sleeve-price').value) || 300,
+    uclPatch: Number(document.getElementById('cz-patch-ucl').value) || 250,
+    eplPatch: Number(document.getElementById('cz-patch-epl').value) || 200,
+    laligaPatch: Number(document.getElementById('cz-patch-laliga').value) || 200,
+    wcPatch: Number(document.getElementById('cz-patch-wc').value) || 300
+  };
+  localStorage.setItem('zenvy_customizer_prices', JSON.stringify(prices));
+  alert('✅ Customizer pricing & patch charges saved successfully!');
 };
 
 window.handleGrantAdmin = async function() {

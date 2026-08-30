@@ -6,8 +6,6 @@
       "**/.*",
       "**/node_modules/**",
       "*.zip"
-    ],
-    "cleanUrls": true,
-    "trailingSlash": false
+    ]
   }
 }

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Apex Elite - Premium Sportswear | Bangladesh</title>
+<meta name="description" content="Apex Elite – precision engineered performance wear for the dedicated athlete. Shop national jerseys, performance gear, and custom sportswear."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-fixed-dim": "#c8c6c5",
+          "background": "#fbf9f8",
+          "on-error-container": "#93000a",
+          "surface-dim": "#dbdad9",
+          "surface-variant": "#e4e2e2",
+          "inverse-primary": "#c8c6c5",
+          "tertiary-container": "#191c1d",
+          "inverse-surface": "#303031",
+          "primary-container": "#1c1b1b",
+          "on-primary": "#ffffff",
+          "inverse-on-surface": "#f2f0f0",
+          "on-secondary-fixed": "#001452",
+          "on-primary-container": "#858383",
+          "surface-container-lowest": "#ffffff",
+          "on-primary-fixed-variant": "#474746",
+          "secondary-fixed-dim": "#b7c4ff",
+          "on-tertiary-fixed": "#191c1d",
+          "surface-container-highest": "#e4e2e2",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "primary-fixed": "#e5e2e1",
+          "on-surface": "#1b1c1c",
+          "secondary": "#003ec6",
+          "tertiary-fixed": "#e1e3e4",
+          "surface-container-low": "#f5f3f3",
+          "surface-tint": "#5f5e5e",
+          "on-surface-variant": "#444748",
+          "tertiary-fixed-dim": "#c5c7c8",
+          "on-tertiary-container": "#828485",
+          "secondary-container": "#0052fe",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "secondary-fixed": "#dde1ff",
+          "surface": "#fbf9f8",
+          "on-tertiary-fixed-variant": "#454748",
+          "surface-container": "#efeded",
+          "outline": "#747878",
+          "primary": "#000000",
+          "outline-variant": "#c4c7c7",
+          "on-background": "#1b1c1c",
+          "on-secondary-fixed-variant": "#0038b6",
+          "on-primary-fixed": "#1c1b1b",
+          "tertiary": "#000000",
+          "on-secondary-container": "#dfe3ff",
+          "surface-container-high": "#e9e8e7",
+          "surface-bright": "#fbf9f8",
+          "on-error": "#ffffff"
+        },
+        borderRadius: {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        spacing: {
+          "margin-desktop": "64px",
+          "margin-mobile": "16px",
+          "unit": "8px",
+          "gutter": "24px",
+          "container-max": "1440px"
+        },
+        fontFamily: {
+          "body-lg": ["Inter"],
+          "caption": ["Inter"],
+          "display-lg": ["Montserrat"],
+          "label-md": ["Inter"],
+          "headline-md": ["Montserrat"],
+          "display-lg-mobile": ["Montserrat"],
+          "headline-lg": ["Montserrat"],
+          "body-md": ["Inter"]
+        },
+        fontSize: {
+          "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+          "caption": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+          "display-lg": ["64px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+          "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+          "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+          "display-lg-mobile": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "800" }],
+          "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+          "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .glass-nav { background-color: rgba(255,255,255,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .ambient-shadow { box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+  .ambient-shadow-hover:hover { box-shadow: 0 30px 60px rgba(0,0,0,0.08); }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .cart-badge { min-width: 18px; height: 18px; font-size: 10px; }
+  /* Mobile menu */
+  #mobile-menu { transform: translateX(-100%); transition: transform 0.3s ease; }
+  #mobile-menu.open { transform: translateX(0); }
+  /* Cart drawer */
+  #cart-drawer { transform: translateX(100%); transition: transform 0.35s cubic-bezier(.4,0,.2,1); }
+  #cart-drawer.open { transform: translateX(0); }
+  /* Search overlay */
+  #search-overlay { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  #search-overlay.open { opacity: 1; pointer-events: all; }
+  /* Floating label */
+  .float-label-wrap { position: relative; }
+  .float-label-wrap input:focus + label,
+  .float-label-wrap input:not(:placeholder-shown) + label {
+    top: 4px; font-size: 11px; color: #003ec6;
+  }
+  .float-label-wrap label { position: absolute; left: 0; top: 50%; transform: translateY(-50%); transition: all .2s; pointer-events: none; color: #747878; }
+  .float-label-wrap input { border: none; border-bottom: 1px solid #c4c7c7; padding: 20px 0 4px; width: 100%; background: transparent; outline: none; }
+  .float-label-wrap input:focus { border-bottom: 2px solid #003ec6; }
+  /* Toast */
+  #toast { transform: translateY(100px); opacity: 0; transition: all .3s; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  /* Wishlist heart */
+  .wish-btn.active span { font-variation-settings: 'FILL' 1; color: #ba1a1a; }
+  /* Quantity selector */
+  .qty-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #c4c7c7; cursor: pointer; }
+  .qty-btn:hover { background: #f5f3f3; }
+  .qty-input { width: 48px; height: 32px; border-top: 1px solid #c4c7c7; border-bottom: 1px solid #c4c7c7; text-align: center; font-family: Inter; font-size: 14px; outline: none; }
+</style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
+
+<!-- ===== SEARCH OVERLAY ===== -->
+<div id="search-overlay" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex items-start pt-32 justify-center px-4">
+  <div class="w-full max-w-2xl">
+    <div class="relative flex items-center border-b-2 border-primary pb-4">
+      <span class="material-symbols-outlined text-on-surface-variant mr-4 text-3xl">search</span>
+      <input id="search-input" type="text" placeholder="Search jerseys, gear, accessories…" class="flex-1 text-2xl font-body-lg text-primary bg-transparent outline-none placeholder:text-on-surface-variant/50"/>
+      <button onclick="closeSearch()" class="ml-4 text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-3xl">close</span>
+      </button>
+    </div>
+    <div class="mt-8">
+      <p class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant mb-4">Trending</p>
+      <div class="flex flex-wrap gap-2">
+        <a href="shop.html?q=argentina" onclick="closeSearch()" class="px-4 py-2 border border-outline-variant rounded-full font-body-md text-body-md hover:border-secondary hover:text-secondary transition-colors">Argentina Home</a>
+        <a href="shop.html?q=brazil" onclick="closeSearch()" class="px-4 py-2 border border-outline-variant rounded-full font-body-md text-body-md hover:border-secondary hover:text-secondary transition-colors">Brazil Home</a>
+        <a href="shop.html?q=portugal" onclick="closeSearch()" class="px-4 py-2 border border-outline-variant rounded-full font-body-md text-body-md hover:border-secondary hover:text-secondary transition-colors">Portugal Home</a>
+        <a href="shop.html?q=performance" onclick="closeSearch()" class="px-4 py-2 border border-outline-variant rounded-full font-body-md text-body-md hover:border-secondary hover:text-secondary transition-colors">Performance Gear</a>
+        <a href="shop.html?q=custom" onclick="closeSearch()" class="px-4 py-2 border border-outline-variant rounded-full font-body-md text-body-md hover:border-secondary hover:text-secondary transition-colors">Custom Jerseys</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <h2 class="font-headline-md text-headline-md text-primary">Your Bag</h2>
+    <button onclick="closeCart()" class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
+    <!-- Cart items rendered by JS -->
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
+      <span class="material-symbols-outlined text-6xl text-on-surface-variant/40 mb-4">shopping_bag</span>
+      <p class="font-headline-md text-headline-md text-primary mb-2">Your bag is empty</p>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-6">Add some items to get started.</p>
+      <button onclick="closeCart(); window.location='shop.html'" class="bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest">Shop Now</button>
+    </div>
+    <div id="cart-list" class="hidden space-y-4"></div>
+  </div>
+  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-body-lg text-body-lg text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-headline-md text-headline-md text-primary">৳ 0</span>
+    </div>
+    <p class="font-caption text-caption text-on-surface-variant mb-4">Shipping and taxes calculated at checkout.</p>
+    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest text-center mb-3">Checkout</a>
+    <button onclick="closeCart()" class="block w-full border border-primary text-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-surface-container-low transition-colors tracking-widest text-center">Continue Shopping</button>
+  </div>
+</aside>
+
+<!-- ===== MOBILE MENU ===== -->
+<div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
+<aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <a href="index.html" class="font-headline-md text-headline-md font-black tracking-tighter text-primary">APEX ELITE</a>
+    <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <nav class="flex-1 px-6 py-6 flex flex-col gap-6">
+    <a href="shop.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">Collections</a>
+    <a href="shop.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">Collections</a>
+    <a href="shop.html?cat=performance" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">Performance</a>
+    <a href="customizer.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">Customizer</a>
+    <a href="preorders.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold hover:text-primary transition-colors flex items-center gap-1">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
+    </a>
+    <a href="shop.html?cat=community" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">Community</a>
+    <hr class="border-outline-variant"/>
+    <a href="account.html" onclick="closeMobileMenu()" class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors">My Account</a>
+  </nav>
+</aside>
+
+<!-- ===== TOP NAV ===== -->
+<nav class="fixed w-full top-0 left-0 z-50 bg-white/80 backdrop-blur-xl transition-all duration-500 ease-in-out shadow-[0_20px_40px_rgba(0,0,0,0.05)] border-b border-transparent">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
+    <!-- Brand -->
+    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">APEX ELITE</a>
+    <!-- Navigation Links (Desktop) -->
+    <div class="hidden md:flex gap-8 items-center">
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="shop.html">Collections</a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300 pb-1" href="shop.html?cat=performance">Performance</a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300 pb-1" href="customizer.html">Customizer</a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300 pb-1 flex items-center gap-1" href="preorders.html">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
+      </a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300 pb-1" href="shop.html?cat=community">Community</a>
+    </div>
+    <!-- Actions -->
+    <div class="flex items-center gap-4 text-primary">
+      <button aria-label="Search" onclick="openSearch()" class="hover:text-secondary transition-colors duration-300">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">search</span>
+      </button>
+      <button aria-label="Shopping Bag" onclick="openCart()" class="hover:text-secondary transition-colors duration-300 relative">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-secondary text-on-secondary rounded-full cart-badge flex items-center justify-center font-bold">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="hover:text-secondary transition-colors duration-300 hidden md:block">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">person</span>
+      </a>
+      <button aria-label="Menu" onclick="openMobileMenu()" class="md:hidden hover:text-secondary transition-colors duration-300">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">menu</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-20">
+
+<!-- ===== HERO CAROUSEL ===== -->
+<section class="relative w-full overflow-hidden bg-surface-container-low group h-[600px]" id="hero-carousel">
+  <div class="flex transition-transform duration-700 ease-in-out h-full w-full" id="carousel-slides" style="transform:translateX(0%)">
+    <!-- Slide 1 -->
+    <div class="w-full h-full flex-shrink-0 flex items-center justify-center relative">
+      <div class="absolute inset-0 z-0">
+        <img alt="New National Jersey Collection" class="w-full h-full object-cover object-center opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOvs28LKb83yfVDWG6B5q_40JnzM9p-jw0I_EdHbN_rgSWvuqeBvauvSTvj5gaHQ8r8on3wtEUIQkKaSACE4k0FQ_1Flq3gjtzYXIrOUxIDUrJHGGllTWXap31c0qMOeFwTp1b_bx6JheufKDk1jWhZEMY7CN30vmOS-T0JO_6OIsmO7m_cFuQeg4yvLvdW_rprgzkJFP1nDUiMuCitbGQX0SDHt75mZ9UoU3JD-isLUejCLvQcGi1"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop text-on-primary text-center">
+        <div class="max-w-2xl">
+          <span class="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed mb-4 block">New Arrival</span>
+          <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-6">THE NEW NATIONAL JERSEY COLLECTION</h1>
+          <p class="font-body-lg text-body-lg mb-8 text-inverse-on-surface/90 max-w-lg">Engineered for peak performance. Rep your nation with pride and unparalleled comfort on and off the pitch.</p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a href="shop.html" class="bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest">Shop Now</a>
+            <a href="shop.html?cat=national" class="bg-white/10 backdrop-blur-md border border-white/20 text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-white/20 transition-colors duration-300 tracking-widest">Explore Collection</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 2 -->
+    <div class="w-full h-full flex-shrink-0 flex items-center justify-center relative">
+      <div class="absolute inset-0 z-0">
+        <img alt="Performance Gear" class="w-full h-full object-cover object-center opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop text-on-primary text-center">
+        <div class="max-w-2xl">
+          <span class="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed mb-4 block">Pro Series</span>
+          <h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-6">ELITE PERFORMANCE GEAR</h2>
+          <p class="font-body-lg text-body-lg mb-8 text-inverse-on-surface/90 max-w-lg">Push your limits with our advanced moisture-wicking technology and ergonomic fits tailored for champions.</p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a href="shop.html?cat=performance" class="bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest">Shop Pro</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 3 -->
+    <div class="w-full h-full flex-shrink-0 flex items-center justify-center relative">
+      <div class="absolute inset-0 z-0">
+        <img alt="Classic Collection" class="w-full h-full object-cover object-center opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop text-on-primary text-center">
+        <div class="max-w-2xl">
+          <span class="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed mb-4 block">Heritage</span>
+          <h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-6">THE CLASSIC COLLECTION</h2>
+          <p class="font-body-lg text-body-lg mb-8 text-inverse-on-surface/90 max-w-lg">Timeless designs inspired by the legends of the game. Retro aesthetics meets modern athletic comfort.</p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a href="shop.html?cat=classic" class="bg-white/10 backdrop-blur-md border border-white/20 text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-white/20 transition-colors duration-300 tracking-widest">Discover Heritage</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Controls -->
+  <button class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/30 transition-all duration-300 z-20 opacity-0 group-hover:opacity-100" id="carousel-prev">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+  <button class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/30 transition-all duration-300 z-20 opacity-0 group-hover:opacity-100" id="carousel-next">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+  <!-- Pagination -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+    <button class="carousel-dot w-3 h-3 rounded-full bg-white transition-all duration-300 scale-125" data-slide="0"></button>
+    <button class="carousel-dot w-3 h-3 rounded-full bg-white/40 hover:bg-white/70 transition-all duration-300" data-slide="1"></button>
+    <button class="carousel-dot w-3 h-3 rounded-full bg-white/40 hover:bg-white/70 transition-all duration-300" data-slide="2"></button>
+  </div>
+</section>
+
+<!-- ===== FEATURED JERSEYS ===== -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+  <div class="flex justify-between items-end mb-12">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg mb-2 text-primary">FEATURED JERSEYS</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Top picks for the upcoming tournament season.</p>
+    </div>
+    <a class="font-label-md text-label-md uppercase tracking-widest text-secondary hover:underline decoration-2 underline-offset-4 hidden md:block" href="shop.html">View All</a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter" id="featured-grid">
+    <!-- Card 1: Argentina -->
+    <div class="group relative flex flex-col bg-surface rounded-xl overflow-hidden ambient-shadow transition-all duration-300 hover:-translate-y-2 ambient-shadow-hover cursor-pointer" onclick="window.location='product.html?id=1'">
+      <div class="relative h-[400px] w-full bg-surface-container-low overflow-hidden">
+        <img alt="Argentina Home Jersey" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H"/>
+        <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full">
+          <span class="font-label-md text-label-md text-primary">New</span>
+        </div>
+      </div>
+      <div class="p-6 bg-surface">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-md text-headline-md text-primary">Argentina Home</h3>
+          <button aria-label="Add to wishlist" class="wish-btn text-on-surface-variant hover:text-secondary" onclick="event.stopPropagation(); toggleWishlist(this, 1)">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">favorite</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4">Authentic Match Jersey</p>
+        <div class="flex justify-between items-center">
+          <p class="font-label-md text-label-md font-bold text-primary">৳ 8,500</p>
+          <button onclick="event.stopPropagation(); quickAddToCart(1,'Argentina Home',8500,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="font-label-md text-label-md uppercase px-4 py-2 bg-primary text-on-primary hover:bg-secondary transition-colors tracking-wider text-xs">Add to Bag</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2: Brazil -->
+    <div class="group relative flex flex-col bg-surface rounded-xl overflow-hidden ambient-shadow transition-all duration-300 hover:-translate-y-2 ambient-shadow-hover cursor-pointer" onclick="window.location='product.html?id=2'">
+      <div class="relative h-[400px] w-full bg-surface-container-low overflow-hidden">
+        <img alt="Brazil Home Jersey" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P"/>
+      </div>
+      <div class="p-6 bg-surface">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-md text-headline-md text-primary">Brazil Home</h3>
+          <button aria-label="Add to wishlist" class="wish-btn text-on-surface-variant hover:text-secondary" onclick="event.stopPropagation(); toggleWishlist(this, 2)">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">favorite</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4">Stadium Edition</p>
+        <div class="flex justify-between items-center">
+          <p class="font-label-md text-label-md font-bold text-primary">৳ 6,200</p>
+          <button onclick="event.stopPropagation(); quickAddToCart(2,'Brazil Home',6200,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="font-label-md text-label-md uppercase px-4 py-2 bg-primary text-on-primary hover:bg-secondary transition-colors tracking-wider text-xs">Add to Bag</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 3: Portugal -->
+    <div class="group relative flex flex-col bg-surface rounded-xl overflow-hidden ambient-shadow transition-all duration-300 hover:-translate-y-2 ambient-shadow-hover cursor-pointer" onclick="window.location='product.html?id=3'">
+      <div class="relative h-[400px] w-full bg-surface-container-low overflow-hidden">
+        <img alt="Portugal Home Jersey" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X"/>
+      </div>
+      <div class="p-6 bg-surface">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-md text-headline-md text-primary">Portugal Home</h3>
+          <button aria-label="Add to wishlist" class="wish-btn text-on-surface-variant hover:text-secondary" onclick="event.stopPropagation(); toggleWishlist(this, 3)">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">favorite</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4">Authentic Match Jersey</p>
+        <div class="flex justify-between items-center">
+          <p class="font-label-md text-label-md font-bold text-primary">৳ 8,500</p>
+          <button onclick="event.stopPropagation(); quickAddToCart(3,'Portugal Home',8500,'https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X')" class="font-label-md text-label-md uppercase px-4 py-2 bg-primary text-on-primary hover:bg-secondary transition-colors tracking-wider text-xs">Add to Bag</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-8 text-center md:hidden">
+    <a class="font-label-md text-label-md uppercase tracking-widest text-secondary hover:underline decoration-2 underline-offset-4" href="shop.html">View All Jerseys</a>
+  </div>
+</section>
+
+<!-- ===== PREORDER DROPS ===== -->
+<section class="py-20 bg-primary text-on-primary relative overflow-hidden" id="preorder-drops">
+  <!-- Background texture -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary-container rounded-full blur-2xl transform -translate-x-1/3 translate-y-1/3"></div>
+  </div>
+  <div class="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-secondary/20 border border-secondary/30 text-secondary-container px-4 py-2 rounded-full mb-4">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+          <span class="font-label-md text-label-md uppercase tracking-widest text-sm">Reserve Now</span>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg md:text-[40px] md:leading-[48px] text-on-primary">UPCOMING DROPS<br/><span class="text-secondary-container opacity-80">OPEN PREORDERS</span></h2>
+        <p class="font-body-md text-body-md text-inverse-on-surface/70 mt-2">Limited slots — secure yours before they sell out.</p>
+      </div>
+      <a href="preorders.html" class="mt-6 md:mt-0 font-label-md text-label-md uppercase tracking-widest text-secondary-container hover:text-on-primary transition-colors border border-secondary-container/40 hover:border-on-primary px-6 py-3 rounded-lg inline-flex items-center gap-2">
+        View All Preorders
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+    </div>
+
+    <!-- Products grid -->
+    <div id="homepage-preorder-skeleton" class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse"></div>
+      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse delay-75"></div>
+      <div class="rounded-xl overflow-hidden bg-white/5 border border-white/10 h-80 animate-pulse delay-150"></div>
+    </div>
+    <div id="homepage-preorder-grid" class="hidden grid grid-cols-1 md:grid-cols-3 gap-gutter"></div>
+
+    <!-- CTA Strip -->
+    <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-center">
+      <div class="flex items-center gap-2 text-inverse-on-surface/60">
+        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">lock</span>
+        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Secure Advance Payment</span>
+      </div>
+      <div class="hidden sm:block w-px h-6 bg-white/20"></div>
+      <div class="flex items-center gap-2 text-inverse-on-surface/60">
+        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">local_shipping</span>
+        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Guaranteed Delivery</span>
+      </div>
+      <div class="hidden sm:block w-px h-6 bg-white/20"></div>
+      <div class="flex items-center gap-2 text-inverse-on-surface/60">
+        <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings:'FILL' 1">refresh</span>
+        <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Full Refund if Cancelled</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATEGORIES BANNER ===== -->
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+    <a href="shop.html?cat=mens" class="group relative rounded-xl overflow-hidden h-64 ambient-shadow block">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0L9EGgMDJiLCWVUKjdzgnYYKIMfmuXGrfm7-s7uC-g23tKgFhEyQsZ0yZtGKEuPOFBzR0gelZWFq-PuI1YZr2hB5dZ3o4PuB7EUig5jta9tbKP_FXeH_LhwFtG9DZ8HUGfv4ZkEuxykLfxO93tYn1QsWmRkkk19FqpK_8tqNWK4z3RG9uSEuT4R_JZ7StJEcegdljd2Zb3G8wk6BeVAIYw0YThKaYRDavr7aL-pKp05WEJhpIGIMf" alt="Men's Collection" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+      <div class="absolute bottom-6 left-6">
+        <p class="font-label-md text-label-md uppercase tracking-widest text-white/70 mb-1">Shop Now</p>
+        <h3 class="font-headline-md text-headline-md text-white">Men's Collection</h3>
+      </div>
+    </a>
+    <a href="shop.html?cat=womens" class="group relative rounded-xl overflow-hidden h-64 ambient-shadow block">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Women's Collection" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+      <div class="absolute bottom-6 left-6">
+        <p class="font-label-md text-label-md uppercase tracking-widest text-white/70 mb-1">Shop Now</p>
+        <h3 class="font-headline-md text-headline-md text-white">Women's Collection</h3>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ===== PERFORMANCE STRIP ===== -->
+<section class="py-20 bg-primary text-on-primary">
+  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+      <div>
+        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">bolt</span>
+        <h3 class="font-headline-md text-headline-md mb-2">Moisture-Wicking</h3>
+        <p class="font-body-md text-body-md text-inverse-on-surface/70">Advanced DryTech fabric pulls sweat away from skin, keeping you cool and focused.</p>
+      </div>
+      <div>
+        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">verified</span>
+        <h3 class="font-headline-md text-headline-md mb-2">Official Licensed</h3>
+        <p class="font-body-md text-body-md text-inverse-on-surface/70">Authentic match jerseys with official team crests and performance specifications.</p>
+      </div>
+      <div>
+        <span class="material-symbols-outlined text-5xl text-secondary-container mb-4 block" style="font-variation-settings:'FILL' 1">local_shipping</span>
+        <h3 class="font-headline-md text-headline-md mb-2">Free Delivery</h3>
+        <p class="font-body-md text-body-md text-inverse-on-surface/70">Free shipping across Bangladesh on all orders over ৳ 3,000.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CUSTOMIZER CTA ===== -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+  <div class="rounded-2xl bg-surface-container-low p-12 md:p-20 flex flex-col md:flex-row items-center gap-12">
+    <div class="flex-1">
+      <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-4 block">Build Yours</span>
+      <h2 class="font-headline-lg text-headline-lg mb-4 text-primary">DESIGN YOUR<br/>OWN JERSEY</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-md">Choose colors, add your name and number, select fonts — get a fully custom jersey delivered to your door.</p>
+      <a href="customizer.html" class="inline-block bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors duration-300 tracking-widest">Start Customizing</a>
+    </div>
+    <div class="flex-1 flex justify-center">
+      <div class="relative w-64 h-64 rounded-xl overflow-hidden ambient-shadow">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Customizer" class="w-full h-full object-cover"/>
+        <div class="absolute inset-0 bg-gradient-to-br from-secondary/20 to-transparent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-background border-t border-outline-variant py-16">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-8 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+    <div class="col-span-1 mb-8 md:mb-0 text-center md:text-left">
+      <a class="font-headline-lg text-headline-lg font-black text-primary block mb-4" href="index.html">APEX ELITE</a>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-6">Precision engineered performance wear for the dedicated athlete.</p>
+      <div class="flex gap-4 justify-center md:justify-start">
+        <a class="text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#"><span class="material-symbols-outlined">share</span></a>
+        <a class="text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#"><span class="material-symbols-outlined">language</span></a>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 items-center md:items-start">
+      <h4 class="font-label-md text-label-md uppercase tracking-widest text-primary mb-2">Shop</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="shop.html?cat=mens">Men's</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="shop.html?cat=womens">Women's</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="shop.html?cat=accessories">Accessories</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="customizer.html">Customizer</a>
+      <a class="font-body-md text-body-md text-secondary font-bold hover:text-primary transition-colors duration-300 flex items-center gap-1" href="preorders.html">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>Preorders
+      </a>
+    </div>
+    <div class="flex flex-col gap-4 items-center md:items-start">
+      <h4 class="font-label-md text-label-md uppercase tracking-widest text-primary mb-2">Support</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="contact.html">Contact Us</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="contact.html#shipping">Shipping Info</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="contact.html#returns">Returns</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-300" href="contact.html#size">Size Guide</a>
+    </div>
+    <div class="flex flex-col gap-4 items-center md:items-start">
+      <h4 class="font-label-md text-label-md uppercase tracking-widest text-primary mb-2">Legal & More</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary underline decoration-2 underline-offset-4 transition-colors duration-300" href="#">Sustainability</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary underline decoration-2 underline-offset-4 transition-colors duration-300" href="#">Privacy Policy</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary underline decoration-2 underline-offset-4 transition-colors duration-300" href="#">Terms of Service</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary underline decoration-2 underline-offset-4 transition-colors duration-300" href="#">Press</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary underline decoration-2 underline-offset-4 transition-colors duration-300" href="#">Retailers</a>
+    </div>
+  </div>
+  <div class="mt-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center pt-8 border-t border-outline-variant/30">
+    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant mb-4 md:mb-0">© 2024 APEX ELITE PERFORMANCE. ALL RIGHTS RESERVED.</p>
+    <p class="font-caption text-caption text-on-surface-variant">Currency: BDT (৳) | Location: Bangladesh</p>
+  </div>
+</footer>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-primary text-on-primary px-6 py-4 rounded-xl font-label-md text-label-md shadow-xl flex items-center gap-3">
+  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span>
+  <span id="toast-msg">Added to bag!</span>
+</div>
+
+<script type="module">
+// ===== PREORDER SECTION =====
+import { getPreorderProducts, formatExpectedDate } from './js/preorders.js';
+
+async function loadHomepagePreorders() {
+  const skeleton = document.getElementById('homepage-preorder-skeleton');
+  const grid = document.getElementById('homepage-preorder-grid');
+  const demoProducts = [
+    {
+      id: 'demo-1',
+      name: 'Argentina 2026 World Cup Special Edition',
+      description: 'Exclusive 2026 FIFA World Cup special edition jersey.',
+      basePrice: 9500, preorderPrice: 8500, compareAtPrice: 11000,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H'],
+      preorderMaxQty: 150, preorderSold: 38, expectedDeliveryDate: '15 November 2026'
+    },
+    {
+      id: 'demo-2',
+      name: 'Barcelona x Zenvy Home 2026/27',
+      description: 'Next-season Barcelona home jersey with DryTech Pro fabric.',
+      basePrice: 8200, preorderPrice: 7200, compareAtPrice: 9500,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P'],
+      preorderMaxQty: 100, preorderSold: 61, expectedDeliveryDate: '20 September 2026'
+    },
+    {
+      id: 'demo-3',
+      name: 'Bangladesh Cricket ODI Jersey 2026',
+      description: 'Official Bangladesh cricket ODI jersey for 2026 season.',
+      basePrice: 4500, preorderPrice: 3800, compareAtPrice: 5500,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X'],
+      preorderMaxQty: 200, preorderSold: 45, expectedDeliveryDate: '5 October 2026'
+    }
+  ];
+
+  try {
+    let products = await getPreorderProducts(3);
+    if (products.length === 0) products = demoProducts;
+    skeleton.classList.add('hidden');
+    grid.classList.remove('hidden');
+    grid.innerHTML = products.map(p => {
+      const img = (p.images && p.images[0]) || '';
+      const price = p.preorderPrice || p.basePrice || 0;
+      const compare = p.compareAtPrice || 0;
+      const sold = p.preorderSold || 0;
+      const max = p.preorderMaxQty || 0;
+      const remaining = max > 0 ? max - sold : null;
+      const pct = max > 0 ? Math.min(100, Math.round((sold / max) * 100)) : 0;
+      const deliveryDate = typeof p.expectedDeliveryDate === 'string' ? p.expectedDeliveryDate : formatExpectedDate(p.expectedDeliveryDate);
+      const savings = compare > price ? compare - price : 0;
+      return `
+      <div class="group relative flex flex-col bg-white/8 border border-white/10 rounded-xl overflow-hidden hover:bg-white/12 transition-all duration-300 hover:-translate-y-1">
+        <div class="relative h-64 overflow-hidden bg-white/5">
+          <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="${img}"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          <div class="absolute top-4 left-4 flex flex-col gap-2">
+            <span class="inline-flex items-center gap-1 bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">schedule</span> Preorder
+            </span>
+            ${savings > 0 ? `<span class="bg-black/70 text-secondary-container font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">Save ৳${savings.toLocaleString()}</span>` : ''}
+          </div>
+          ${remaining !== null && remaining <= 20 ? `<div class="absolute bottom-3 left-3 right-3 bg-black/80 text-white rounded-lg px-3 py-1 text-center"><span class="font-label-md text-[11px] uppercase tracking-wider">⚡ Only ${remaining} slots left!</span></div>` : ''}
+        </div>
+        <div class="p-5 flex-1 flex flex-col">
+          <h3 class="font-headline-md text-[17px] leading-6 text-on-primary mb-1 line-clamp-1">${p.name}</h3>
+          <div class="flex items-center gap-1 text-secondary-container mb-3">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">local_shipping</span>
+            <span class="font-caption text-caption opacity-80">Expected: <strong>${deliveryDate}</strong></span>
+          </div>
+          ${max > 0 ? `
+          <div class="mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="font-caption text-caption text-inverse-on-surface/50">${sold} reserved</span>
+              <span class="font-caption text-caption ${remaining !== null && remaining <= 20 ? 'text-error' : 'text-secondary-container'} font-bold">${remaining !== null ? remaining + ' left' : '∞'}</span>
+            </div>
+            <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div class="h-full ${pct > 80 ? 'bg-error' : 'bg-secondary'} rounded-full transition-all duration-700" style="width:${pct}%"></div>
+            </div>
+          </div>
+          ` : ''}
+          <div class="flex items-end justify-between mt-auto pt-3 border-t border-white/10">
+            <div>
+              <p class="font-headline-md text-headline-md text-on-primary">৳ ${price.toLocaleString()}</p>
+              ${compare > price ? `<p class="font-caption text-caption line-through text-inverse-on-surface/40">৳ ${compare.toLocaleString()}</p>` : ''}
+            </div>
+            <a href="preorders.html" class="font-label-md text-label-md uppercase px-4 py-2.5 bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-fixed transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>
+              Pre-Order
+            </a>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    skeleton.classList.add('hidden');
+    grid.classList.remove('hidden');
+    grid.innerHTML = demoProducts.map(p => {
+      const img = (p.images && p.images[0]) || '';
+      const price = p.preorderPrice || p.basePrice || 0;
+      const sold = p.preorderSold || 0; const max = p.preorderMaxQty || 0;
+      const remaining = max > 0 ? max - sold : null;
+      const pct = max > 0 ? Math.min(100, Math.round((sold/max)*100)) : 0;
+      return `<div class="group flex flex-col bg-white/8 border border-white/10 rounded-xl overflow-hidden hover:bg-white/12 transition-all duration-300 hover:-translate-y-1">
+        <div class="relative h-64 overflow-hidden bg-white/5">
+          <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="${img}"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          <div class="absolute top-4 left-4"><span class="inline-flex items-center gap-1 bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full"><span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">schedule</span> Preorder</span></div>
+        </div>
+        <div class="p-5 flex-1 flex flex-col">
+          <h3 class="font-headline-md text-[17px] leading-6 text-on-primary mb-1 line-clamp-1">${p.name}</h3>
+          <div class="flex items-center gap-1 text-secondary-container mb-3"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">local_shipping</span><span class="font-caption text-caption opacity-80">Expected: <strong>${p.expectedDeliveryDate}</strong></span></div>
+          ${max > 0 ? `<div class="mb-4"><div class="flex justify-between mb-1"><span class="font-caption text-caption text-inverse-on-surface/50">${sold} reserved</span><span class="font-caption text-caption text-secondary-container font-bold">${remaining} left</span></div><div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full" style="width:${pct}%"></div></div></div>` : ''}
+          <div class="flex items-end justify-between mt-auto pt-3 border-t border-white/10">
+            <p class="font-headline-md text-headline-md text-on-primary">৳ ${price.toLocaleString()}</p>
+            <a href="preorders.html" class="font-label-md text-label-md uppercase px-4 py-2.5 bg-secondary text-on-secondary hover:bg-primary transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span> Pre-Order</a>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+loadHomepagePreorders();
+</script>
+
+<script>
+// ===== CAROUSEL =====
+document.addEventListener('DOMContentLoaded', () => {
+  const slidesContainer = document.getElementById('carousel-slides');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  const dots = document.querySelectorAll('.carousel-dot');
+  let currentSlide = 0;
+  const totalSlides = 3;
+  let interval;
+
+  function updateSlider() {
+    slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((dot, i) => {
+      dot.className = i === currentSlide
+        ? 'carousel-dot w-3 h-3 rounded-full bg-white transition-all duration-300 scale-125'
+        : 'carousel-dot w-3 h-3 rounded-full bg-white/40 hover:bg-white/70 transition-all duration-300';
+    });
+  }
+  function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
+  function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSlider(); }
+  function startAutoPlay() { interval = setInterval(nextSlide, 5000); }
+  function resetAutoPlay() { clearInterval(interval); startAutoPlay(); }
+
+  nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+  prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { currentSlide = i; updateSlider(); resetAutoPlay(); }));
+  startAutoPlay();
+});
+
+// ===== CART STATE =====
+let cart = JSON.parse(localStorage.getItem('apex_cart') || '[]');
+
+function saveCart() { localStorage.setItem('apex_cart', JSON.stringify(cart)); updateCartCount(); }
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  const badge = document.getElementById('cart-count');
+  if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+}
+
+function quickAddToCart(id, name, price, img, size='M') {
+  const existing = cart.find(i => i.id === id && i.size === size);
+  if (existing) existing.qty++;
+  else cart.push({ id, name, price, img, size, qty: 1 });
+  saveCart();
+  showToast(`${name} added to bag!`);
+  renderCartItems();
+}
+
+function renderCartItems() {
+  const list = document.getElementById('cart-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  if (cart.length === 0) {
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+    footer.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden');
+    list.classList.remove('hidden');
+    footer.classList.remove('hidden');
+    let subtotal = 0;
+    list.innerHTML = cart.map(item => {
+      subtotal += item.price * item.qty;
+      return `<div class="flex gap-4 py-4 border-b border-outline-variant">
+        <img src="${item.img}" class="w-20 h-20 object-cover rounded-lg bg-surface-container-low flex-shrink-0"/>
+        <div class="flex-1">
+          <div class="flex justify-between items-start mb-1">
+            <span class="font-headline-md text-[16px] text-primary">${item.name}</span>
+            <button onclick="removeFromCart(${item.id},'${item.size}')" class="text-on-surface-variant hover:text-error ml-2"><span class="material-symbols-outlined text-base">close</span></button>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant mb-2">Size: ${item.size}</p>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center">
+              <button class="qty-btn" onclick="changeQty(${item.id},'${item.size}',-1)">−</button>
+              <span class="qty-input font-label-md">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${item.id},'${item.size}',1)">+</button>
+            </div>
+            <span class="font-label-md text-label-md font-bold text-primary">৳ ${(item.price * item.qty).toLocaleString()}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+  }
+}
+
+function removeFromCart(id, size) {
+  cart = cart.filter(i => !(i.id === id && i.size === size));
+  saveCart(); renderCartItems();
+}
+
+function changeQty(id, size, delta) {
+  const item = cart.find(i => i.id === id && i.size === size);
+  if (item) { item.qty = Math.max(1, item.qty + delta); saveCart(); renderCartItems(); }
+}
+
+// ===== SEARCH =====
+function openSearch() { document.getElementById('search-overlay').classList.add('open'); document.getElementById('search-input').focus(); }
+function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); closeCart(); closeMobileMenu(); } });
+
+// ===== CART DRAWER =====
+function openCart() {
+  renderCartItems();
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
+}
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
+
+// ===== MOBILE MENU =====
+function openMobileMenu() {
+  document.getElementById('mobile-menu').classList.add('open');
+  document.getElementById('mobile-overlay').style.opacity = '1';
+  document.getElementById('mobile-overlay').style.pointerEvents = 'all';
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('mobile-overlay').style.opacity = '0';
+  document.getElementById('mobile-overlay').style.pointerEvents = 'none';
+}
+
+// ===== WISHLIST =====
+let wishlist = JSON.parse(localStorage.getItem('apex_wishlist') || '[]');
+function toggleWishlist(btn, id) {
+  const idx = wishlist.indexOf(id);
+  if (idx === -1) { wishlist.push(id); btn.classList.add('active'); showToast('Added to wishlist!'); }
+  else { wishlist.splice(idx, 1); btn.classList.remove('active'); showToast('Removed from wishlist'); }
+  localStorage.setItem('apex_wishlist', JSON.stringify(wishlist));
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// Init
+updateCartCount();
+// Apply saved wishlist states
+wishlist.forEach(id => {
+  const btns = document.querySelectorAll('.wish-btn');
+  btns.forEach(btn => { if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`,${id}`)) btn.classList.add('active'); });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Login – ZENVY Portal</title>
+<meta name="description" content="ZENVY Admin Portal Login"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{colors:{"background":"#fbf9f8","surface-variant":"#e4e2e2","primary-container":"#1c1b1b","on-primary":"#ffffff","error":"#ba1a1a","error-container":"#ffdad6","on-surface":"#1b1c1c","secondary":"#003ec6","surface-container-low":"#f5f3f3","on-surface-variant":"#444748","secondary-container":"#0052fe","on-secondary":"#ffffff","surface":"#fbf9f8","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7"},fontFamily:{"body-lg":["Inter"],"label-md":["Inter"],"headline-md":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]}}}}
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 20px 40px rgba(0,0,0,0.06);}
+  .field-wrap{position:relative;margin-bottom:20px;}
+  .field-wrap input{width:100%;border:1px solid #c4c7c7;border-radius:10px;padding:14px 16px;font-family:Inter;font-size:15px;outline:none;background:#fff;transition:border-color .2s;}
+  .field-wrap input:focus{border-color:#003ec6;border-width:2px;}
+  .field-wrap label{display:block;font-family:Inter;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#444748;margin-bottom:6px;}
+</style>
+</head>
+<body class="bg-surface-container-low text-on-surface antialiased min-h-screen flex items-center justify-center p-4 font-body-md">
+
+<div class="w-full max-w-md bg-white rounded-2xl p-8 md:p-10 ambient-shadow">
+  <!-- Brand Header -->
+  <div class="text-center mb-8">
+    <a href="../index.html" class="font-headline-lg text-3xl font-black tracking-tighter text-primary block mb-2">ZENVY</a>
+    <span class="inline-flex items-center gap-1.5 bg-secondary/10 text-secondary font-label-md text-xs uppercase tracking-widest px-3 py-1 rounded-full font-bold">
+      <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+      Admin Portal
+    </span>
+  </div>
+
+  <h2 class="font-headline-md text-xl text-primary mb-2 text-center">Admin Sign In</h2>
+  <p class="font-body-md text-sm text-on-surface-variant text-center mb-6">Manage products, preorders, orders, and store settings.</p>
+
+  <!-- Error alert -->
+  <div id="login-error" class="hidden bg-error-container text-error rounded-xl p-4 mb-5 text-sm flex items-center gap-2">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span id="error-text">Login failed</span>
+  </div>
+
+  <!-- Quick Info Box -->
+  <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 mb-6 text-xs text-on-surface-variant">
+    <p class="font-bold text-primary mb-1">🔑 Quick Admin Credentials:</p>
+    <p>Email: <code class="text-secondary bg-white px-1.5 py-0.5 rounded border border-outline-variant font-mono">admin@zenvy.com</code></p>
+    <p class="mt-1">Password: <code class="text-secondary bg-white px-1.5 py-0.5 rounded border border-outline-variant font-mono">admin123</code></p>
+  </div>
+
+  <!-- Form -->
+  <form id="admin-login-form" onsubmit="handleLogin(event)">
+    <div class="field-wrap">
+      <label for="admin-email">Admin Email</label>
+      <input type="email" id="admin-email" value="admin@zenvy.com" required placeholder="admin@zenvy.com"/>
+    </div>
+    <div class="field-wrap">
+      <label for="admin-password">Password</label>
+      <input type="password" id="admin-password" value="admin123" required placeholder="••••••••"/>
+    </div>
+    <button type="submit" id="submit-btn" class="w-full bg-primary text-on-primary font-label-md text-sm uppercase px-6 py-4 hover:bg-secondary transition-colors tracking-widest rounded-xl font-bold flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined text-lg">lock</span>
+      Sign In to Dashboard
+    </button>
+  </form>
+
+  <div class="mt-8 text-center border-t border-outline-variant/40 pt-6">
+    <a href="../index.html" class="font-label-md text-xs text-on-surface-variant hover:text-secondary inline-flex items-center gap-1">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Storefront
+    </a>
+  </div>
+</div>
+
+<script type="module">
+import { adminLogin } from '../js/auth.js';
+
+window.handleLogin = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const btn = document.getElementById('submit-btn');
+  const errBox = document.getElementById('login-error');
+  const errText = document.getElementById('error-text');
+
+  errBox.classList.add('hidden');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-outlined text-lg animate-spin">progress_activity</span> Signing in...`;
+
+  try {
+    const res = await adminLogin(email, password);
+    if (res.success) {
+      window.location.href = 'index.html';
+    } else {
+      errText.textContent = res.error || 'Invalid admin credentials.';
+      errBox.classList.remove('hidden');
+    }
+  } catch (err) {
+    errText.textContent = err.message || 'Login failed. Please try again.';
+    errBox.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span class="material-symbols-outlined text-lg">lock</span> Sign In to Dashboard`;
+  }
+};
+</script>
+</body>
+</html>

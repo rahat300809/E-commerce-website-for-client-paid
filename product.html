@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Product Detail - Apex Elite</title>
+<title>Product Detail - ZENVY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -60,7 +60,7 @@
 <div id="mobile-overlay" class="fixed inset-0 z-[80] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeMobileMenu()"></div>
 <aside id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-[85] bg-white flex flex-col shadow-2xl">
   <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <a href="index.html" class="font-headline-md text-headline-md font-black tracking-tighter text-primary">APEX ELITE</a>
+    <a href="index.html" class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZENVY</a>
     <button onclick="closeMobileMenu()"><span class="material-symbols-outlined">close</span></button>
   </div>
   <nav class="flex-1 px-6 py-6 flex flex-col gap-6">
@@ -72,7 +72,7 @@
 <!-- NAV -->
 <nav class="fixed w-full top-0 left-0 z-50 bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
   <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
-    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">APEX ELITE</a>
+    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
     <div class="hidden md:flex gap-8 items-center">
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors" href="shop.html">Collections</a>
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors" href="shop.html?cat=performance">Performance</a>
@@ -225,8 +225,8 @@
 <!-- FOOTER -->
 <footer class="bg-background border-t border-outline-variant py-16">
   <div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center pt-8">
-    <a class="font-headline-md text-headline-md font-black text-primary" href="index.html">APEX ELITE</a>
-    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant mt-4 md:mt-0">© 2024 APEX ELITE PERFORMANCE. ALL RIGHTS RESERVED.</p>
+    <a class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
+    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant mt-4 md:mt-0">© 2026 ZENVY PERFORMANCE WEAR. ALL RIGHTS RESERVED.</p>
   </div>
 </footer>
 
@@ -323,7 +323,7 @@ function loadProduct(){
   const id=parseInt(params.get('id'))||1;
   currentProduct=ALL_PRODUCTS.find(p=>p.id===id)||ALL_PRODUCTS[0];
 
-  document.title=`${currentProduct.name} - Apex Elite`;
+  document.title=`${currentProduct.name} - ZENVY`;
   document.getElementById('breadcrumb-name').textContent=currentProduct.name;
   document.getElementById('product-name').textContent=currentProduct.name;
   document.getElementById('product-sub').textContent=currentProduct.sub;

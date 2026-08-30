@@ -246,13 +246,13 @@ const ALL_PRODUCTS = [
   {id:6,name:"Germany Home",sub:"Die Mannschaft Edition",price:7500,cat:"national",images:["https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d"]},
 ];
 
-let cart = JSON.parse(localStorage.getItem('apex_cart')||'[]');
-let wishlist = JSON.parse(localStorage.getItem('apex_wishlist')||'[]');
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+let wishlist = JSON.parse(localStorage.getItem('zenvy_wishlist') || '[]');
 let selectedSize = 'M';
 let localQty = 1;
 let currentProduct = null;
 
-function saveCart(){localStorage.setItem('apex_cart',JSON.stringify(cart));updateCartCount();}
+function saveCart(){localStorage.setItem('zenvy_cart',JSON.stringify(cart));updateCartCount();}
 function updateCartCount(){
   const total=cart.reduce((s,i)=>s+i.qty,0);
   const b=document.getElementById('cart-count');

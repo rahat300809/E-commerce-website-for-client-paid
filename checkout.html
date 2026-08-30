@@ -453,10 +453,9 @@
 import { createOrder, validateCoupon } from './js/orders.js';
 
 // ---- State ----
-let cart = JSON.parse(localStorage.getItem('apex_cart') || JSON.parse(localStorage.getItem('zenvy_cart') || '[]') || '[]');
-// Try both cart keys for compatibility
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || JSON.parse(localStorage.getItem('apex_cart') || '[]') || '[]');
 if (!cart || cart.length === 0) {
-  cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+  cart = JSON.parse(localStorage.getItem('apex_cart') || '[]');
 }
 let currentStep = 1;
 let discount = 0;

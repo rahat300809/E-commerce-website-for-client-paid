@@ -507,11 +507,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Cart & state
-let cart = JSON.parse(localStorage.getItem('apex_cart') || JSON.parse(localStorage.getItem('zenvy_cart') || '[]') || '[]');
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || JSON.parse(localStorage.getItem('apex_cart') || '[]') || '[]');
 
 function saveCart() {
-  localStorage.setItem('apex_cart', JSON.stringify(cart));
   localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  localStorage.setItem('apex_cart', JSON.stringify(cart));
   updateCartCount();
 }
 

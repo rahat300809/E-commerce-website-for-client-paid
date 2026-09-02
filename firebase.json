@@ -1,0 +1,19 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "prisma/**",
+      "src/**",
+      "tsconfig.json",
+      "next.config.js",
+      "package.json",
+      "package-lock.json"
+    ]
+  }
+}

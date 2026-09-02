@@ -1,0 +1,388 @@
+// Prisma Schema for ZENVY E-Commerce Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  ONLINE_PAYMENT
+  MFS_MOBILE
+  CARD
+}
+
+enum PreorderStatus {
+  AVAILABLE
+  SOLDOUT
+  CLOSED
+}
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  role          Role       @default(CUSTOMER)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  carts         Cart[]
+  wishlists     Wishlist[]
+  reviews       Review[]
+  returns       Return[]
+}
+
+model BrandSettings {
+  id               String   @id @default("singleton")
+  brandName        String   @default("ZENVY")
+  logoUrl          String   @default("/logo.png")
+  faviconUrl       String   @default("/favicon.ico")
+  tagline          String   @default("The New Era of Performance")
+  description      String   @default("Elevating performance wear through editorial design and technical precision.")
+  phone            String   @default("+880 1700-000000")
+  email            String   @default("support@zenvy.com")
+  socialInstagram  String   @default("https://instagram.com/zenvy")
+  socialTwitter    String   @default("https://twitter.com/zenvy")
+  socialTikTok     String   @default("https://tiktok.com/@zenvy")
+  updatedAt        DateTime @updatedAt
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  imageUrl     String?
+  mobileImgUrl String?
+  displayOrder Int           @default(0)
+  isActive     Boolean       @default(true)
+  isFeatured   Boolean       @default(false)
+  seoTitle     String?
+  seoDesc      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  subcategories Subcategory[]
+  products      Product[]
+}
+
+model Subcategory {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    Product[]
+}
+
+model Collection {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id               String        @id @default(uuid())
+  name             String
+  slug             String        @unique
+  sku              String        @unique
+  description      String
+  shortDesc        String?
+  basePrice        Float
+  salePrice        Float?
+  costPrice        Float?
+  discountPercent  Float?
+  stock            Int           @default(0)
+  lowStockAlert    Int           @default(5)
+  isNewArrival     Boolean       @default(false)
+  isBestSeller     Boolean       @default(false)
+  isFeatured       Boolean       @default(false)
+  isLimited        Boolean       @default(false)
+  isPreorder       Boolean       @default(false)
+  isPublished      Boolean       @default(true)
+
+  categoryId       String?
+  category         Category?     @relation(fields: [categoryId], references: [id])
+  subcategoryId    String?
+  subcategory      Subcategory?  @relation(fields: [subcategoryId], references: [id])
+  collectionId     String?
+  collection       Collection?   @relation(fields: [collectionId], references: [id])
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  images           ProductImage[]
+  variants         ProductVariant[]
+  preorder         Preorder?
+  reviews          Review[]
+  orderItems       OrderItem[]
+  cartItems        CartItem[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String   @unique
+  size      String
+  color     String
+  sleeve    String   @default("Short Sleeve")
+  stock     Int      @default(10)
+  price     Float
+}
+
+model Size {
+  id           String   @id @default(uuid())
+  code         String   @unique // S, M, L, XL, etc.
+  name         String
+  displayOrder Int      @default(0)
+  isEnabled    Boolean  @default(true)
+}
+
+model Color {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  hexCode   String
+  isEnabled Boolean  @default(true)
+}
+
+model SleeveType {
+  id              String   @id @default(uuid())
+  name            String   @unique // Short Sleeve, Long Sleeve
+  additionalPrice Float    @default(0)
+  isEnabled       Boolean  @default(true)
+}
+
+model Patch {
+  id           String   @id @default(uuid())
+  name         String   @unique // UEFA Champions League, Premier League
+  imageUrl     String?
+  description  String?
+  price        Float    @default(0)
+  isEnabled    Boolean  @default(true)
+  displayOrder Int      @default(0)
+}
+
+model Preorder {
+  id           String         @id @default(uuid())
+  productId    String         @unique
+  product      Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  preorderPrice Float
+  expectedArrival DateTime
+  maxCapacity  Int            @default(100)
+  soldCount    Int            @default(0)
+  status       PreorderStatus @default(AVAILABLE)
+  createdAt    DateTime       @default(now())
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+}
+
+model CartItem {
+  id               String   @id @default(uuid())
+  cartId           String
+  cart             Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id])
+  size             String
+  color            String   @default("Standard")
+  sleeve           String   @default("Short Sleeve")
+  patchName        String?
+  customName       String?
+  customNumber     String?
+  quantity         Int      @default(1)
+  priceSnapshot    Float
+  createdAt        DateTime @default(now())
+}
+
+model Wishlist {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     WishlistItem[]
+}
+
+model WishlistItem {
+  id         String   @id @default(uuid())
+  wishlistId String
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  productId  String
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id])
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+  city            String
+  postalCode      String
+  country         String        @default("Bangladesh")
+
+  subtotal        Float
+  customFee       Float         @default(0)
+  shippingFee     Float         @default(0)
+  discountTotal   Float         @default(0)
+  totalAmount     Float
+
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items           OrderItem[]
+  payment         Payment?
+}
+
+model OrderItem {
+  id            String   @id @default(uuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  productName   String
+  size          String
+  sleeve        String
+  patchName     String?
+  customName    String?
+  customNumber  String?
+  unitPrice     Float
+  quantity      Int
+  totalPrice    Float
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  transactionId String?
+  amount        Float
+  gateway       String        @default("COD")
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+}
+
+model Coupon {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  discount    Float    // percentage or fixed amount
+  isPercent   Boolean  @default(true)
+  minOrder    Float    @default(0)
+  maxDiscount Float?
+  usageLimit  Int      @default(100)
+  usedCount   Int      @default(0)
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  street      String
+  city        String
+  postalCode  String
+  isDefault   Boolean  @default(false)
+}
+
+model PromotionalBanner {
+  id           String   @id @default(uuid())
+  title        String
+  subtitle     String?
+  desktopImg   String
+  mobileImg    String?
+  ctaText      String   @default("Shop Now")
+  destination  String   @default("/shop")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int      @default(5)
+  comment   String
+  isApproved Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Return {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  orderId     String
+  reason      String
+  status      String   @default("REQUESTED")
+  createdAt   DateTime @default(now())
+}

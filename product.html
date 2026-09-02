@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZENVY AeroKnit Pro Jersey | ZENVY Elite Performance</title>
+  
+  <!-- Tailwind CSS with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "primary-container": "#1c1b1c",
+            "secondary": "#5c5f61",
+            "secondary-container": "#e1e2e6",
+            "background": "#ffffff",
+            "surface": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f6f7",
+            "surface-container": "#f0f0f2",
+            "surface-container-high": "#e8e8e8",
+            "outline": "#77777b",
+            "outline-variant": "#e2e2e6",
+            "zenvy-gray": "#F3F3F4",
+          },
+          fontFamily: {
+            "headline": ["Hanken Grotesk", "sans-serif"],
+            "body": ["DM Sans", "sans-serif"],
+            "mono-ui": ["Geist", "monospace"],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
+      color: #111111;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .jersey-canvas-container {
+      position: relative;
+      background: #f4f4f6;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 480px;
+    }
+    
+    /* Interactive 3D Preview pill */
+    .preview-pill {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .preview-pill:hover {
+      background: rgba(255, 255, 255, 0.98);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Size button active / default */
+    .size-btn {
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      color: #1f2937;
+      transition: all 0.15s ease;
+    }
+    .size-btn:hover:not(:disabled) {
+      border-color: #111827;
+      background: #f9fafb;
+    }
+    .size-btn.active {
+      border: 2px solid #000000;
+      color: #000000;
+      font-weight: 700;
+      background: #ffffff;
+    }
+    .size-btn:disabled {
+      color: #d1d5db;
+      background: #f9fafb;
+      border-color: #f3f4f6;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+
+    /* Sleeve Card */
+    .sleeve-card {
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sleeve-card:hover {
+      border-color: #9ca3af;
+    }
+    .sleeve-card.active {
+      border: 2px solid #000000;
+      background: #ffffff;
+    }
+
+    /* Toggle switch */
+    .custom-switch-input:checked ~ .custom-switch-track {
+      background-color: #000000;
+    }
+    .custom-switch-input:checked ~ .custom-switch-track .custom-switch-thumb {
+      transform: translateX(18px);
+    }
+
+    /* Overlay Badge text on 2D jersey preview */
+    .jersey-custom-name {
+      font-family: 'Hanken Grotesk', sans-serif;
+      letter-spacing: 0.15em;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #111827;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    }
+    .jersey-custom-number {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 900;
+      color: #111827;
+      line-height: 1;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    }
+
+    /* Toast */
+    .toast-anim {
+      animation: toastSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes toastSlideUp {
+      from { transform: translate(-50%, 20px); opacity: 0; }
+      to   { transform: translate(-50%, 0);    opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER NAVIGATION (Matches Given Design)
+  ════════════════════════════════════════════ -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <span class="font-headline font-black text-2xl tracking-[0.18em] text-black">ZENVY</span>
+      </a>
+
+      <!-- Center Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="index.html" class="text-gray-600 hover:text-black transition-colors">Home</a>
+        <a href="index.html#shop" class="text-gray-600 hover:text-black transition-colors">Shop</a>
+        <a href="index.html#customizer" class="text-gray-600 hover:text-black transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span> Custom Studio
+        </a>
+      </nav>
+
+      <!-- Right Icons -->
+      <div class="flex items-center gap-4">
+        <button class="text-gray-700 hover:text-black transition-colors p-1" title="Account">
+          <span class="material-symbols-outlined text-[22px]">person</span>
+        </button>
+        <button class="text-gray-700 hover:text-black transition-colors p-1" title="Wishlist">
+          <span class="material-symbols-outlined text-[22px]">favorite</span>
+        </button>
+        <button onclick="toggleCartModal()" class="relative text-gray-700 hover:text-black transition-colors p-1" title="Shopping Cart">
+          <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
+          <span id="header-cart-badge" class="absolute -top-1 -right-1 bg-black text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN PRODUCT DETAIL VIEW
+  ════════════════════════════════════════════ -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+      
+      <!-- ─────────────────────────────────────────
+           LEFT COLUMN: VISUAL GALLERY & 3D PREVIEW
+      ────────────────────────────────────────── -->
+      <div class="lg:col-span-7 flex flex-col gap-5">
+        
+        <!-- Main Large Preview Container -->
+        <div class="jersey-canvas-container group cursor-pointer" id="main-view-container" onclick="open3DModal()">
+          
+          <!-- Jersey Display Artwork (Front / Back / 3D Angles) -->
+          <div class="relative w-full h-[420px] md:h-[500px] flex items-center justify-center p-8">
+            
+            <!-- Cutout Jersey Image -->
+            <img id="main-product-img" 
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA" 
+                 alt="ZENVY AeroKnit Pro Jersey" 
+                 class="max-h-[380px] md:max-h-[440px] w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.12)] transition-transform duration-500 group-hover:scale-105"/>
+
+            <!-- Real-time Customization Overlay for Name & Number (Back View) -->
+            <div id="live-custom-text-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden" style="top: -15px;">
+              <span id="live-overlay-name" class="jersey-custom-name text-xs md:text-sm tracking-widest text-black/80 font-black">R. CHANDLER</span>
+              <span id="live-overlay-number" class="jersey-custom-number text-5xl md:text-6xl text-black/85 font-black mt-0.5">24</span>
+            </div>
+
+            <!-- Sleeve Patch Badge Overlay (if selected) -->
+            <div id="live-patch-overlay" class="absolute right-[22%] top-[38%] hidden pointer-events-none">
+              <span class="bg-black/90 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow">UCL STARBALL</span>
+            </div>
+
+          </div>
+
+          <!-- Bottom Right Pill: "Interactive 3D Preview" -->
+          <button type="button" 
+                  onclick="event.stopPropagation(); open3DModal()"
+                  class="preview-pill absolute bottom-5 right-5 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-gray-800 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">3d_rotation</span>
+            <span>Interactive 3D Preview</span>
+          </button>
+
+          <!-- Top-Left View Switcher Tags -->
+          <div class="absolute top-4 left-4 flex gap-2">
+            <button type="button" onclick="event.stopPropagation(); setAngleView('front')" id="view-front-btn" class="text-[11px] font-bold px-3 py-1 rounded-full bg-white/90 shadow-sm text-black">Front</button>
+            <button type="button" onclick="event.stopPropagation(); setAngleView('back')" id="view-back-btn" class="text-[11px] font-bold px-3 py-1 rounded-full bg-black/10 text-gray-700 hover:bg-white/80">Back</button>
+            <button type="button" onclick="event.stopPropagation(); setAngleView('detail')" id="view-detail-btn" class="text-[11px] font-bold px-3 py-1 rounded-full bg-black/10 text-gray-700 hover:bg-white/80">Fabric</button>
+          </div>
+
+        </div>
+
+        <!-- Secondary Gallery Grid (2 Thumbnails matching the screenshot) -->
+        <div class="grid grid-cols-2 gap-4">
+          
+          <!-- Thumbnail 1: Back Name / Number Detail -->
+          <div onclick="setAngleView('back')" id="thumb-back" class="bg-[#f4f4f6] rounded-2xl p-4 h-48 md:h-56 flex flex-col items-center justify-center cursor-pointer border-2 border-transparent hover:border-black/20 transition-all group relative overflow-hidden">
+            <div class="w-full h-full flex flex-col items-center justify-center bg-white/40 rounded-xl p-3">
+              <span class="text-[10px] font-mono-ui font-bold text-gray-400 mb-1">NAME & NUMBER VIEW</span>
+              <div class="text-center">
+                <div id="thumb-name-preview" class="font-headline font-black text-sm tracking-wider text-black">R. CHANDLER</div>
+                <div id="thumb-number-preview" class="font-headline font-black text-4xl text-black">24</div>
+              </div>
+            </div>
+            <span class="absolute bottom-2 left-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Custom Print View</span>
+          </div>
+
+          <!-- Thumbnail 2: Fabric / Stitch Detail -->
+          <div onclick="setAngleView('detail')" id="thumb-detail" class="bg-[#f4f4f6] rounded-2xl p-4 h-48 md:h-56 flex flex-col items-center justify-center cursor-pointer border-2 border-transparent hover:border-black/20 transition-all group relative overflow-hidden">
+            <div class="w-full h-full flex flex-col items-center justify-center bg-white/40 rounded-xl p-3 text-center">
+              <span class="text-[10px] font-mono-ui font-bold text-gray-400 mb-1">PRO-KNIT TEXTURE</span>
+              <div class="font-headline font-black text-xl tracking-widest text-gray-800">ZENVY</div>
+              <div class="text-[10px] font-bold tracking-widest text-gray-500 uppercase mt-0.5">CUSTOM WEAVE</div>
+            </div>
+            <span class="absolute bottom-2 left-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Fabric Quality</span>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ─────────────────────────────────────────
+           RIGHT COLUMN: PRODUCT DETAILS & OPTIONS
+      ────────────────────────────────────────── -->
+      <div class="lg:col-span-5 flex flex-col gap-6">
+        
+        <!-- Category & Stock Subheading -->
+        <div>
+          <div class="text-[11px] font-mono-ui font-bold tracking-[0.14em] text-gray-500 uppercase mb-1 flex items-center gap-2">
+            <span id="pd-category-tag">MEN'S FOOTBALL</span>
+            <span>•</span>
+            <span id="pd-stock-tag" class="text-emerald-700 font-bold">IN STOCK</span>
+          </div>
+
+          <!-- Product Title -->
+          <h1 id="pd-title" class="font-headline text-3xl md:text-4xl font-extrabold text-black tracking-tight">
+            ZENVY AeroKnit Pro Jersey
+          </h1>
+
+          <!-- Reviews Rating -->
+          <div class="flex items-center gap-3 mt-2">
+            <div class="flex text-black text-sm">
+              <span class="material-symbols-outlined text-[18px]">star</span>
+              <span class="material-symbols-outlined text-[18px]">star</span>
+              <span class="material-symbols-outlined text-[18px]">star</span>
+              <span class="material-symbols-outlined text-[18px]">star</span>
+              <span class="material-symbols-outlined text-[18px]">star_half</span>
+            </div>
+            <a href="#reviews" onclick="showReviewsAlert()" class="text-xs text-gray-500 underline hover:text-black font-medium">128 Reviews</a>
+          </div>
+
+          <!-- Price Display -->
+          <div class="mt-4 flex items-baseline gap-3">
+            <span id="pd-base-price" class="font-headline font-bold text-3xl text-black">$120.00</span>
+            <span id="pd-original-price" class="font-mono-ui text-sm text-gray-400 line-through hidden">$150.00</span>
+          </div>
+        </div>
+
+        <hr class="border-gray-100"/>
+
+        <!-- ── 1. SELECT SIZE ── -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase">
+              SELECT SIZE
+            </label>
+            <button type="button" onclick="openSizeGuideModal()" class="text-xs text-gray-500 underline hover:text-black font-medium">
+              Size Guide
+            </button>
+          </div>
+
+          <!-- Size Buttons (Populated dynamically from DB or default) -->
+          <div id="size-options-container" class="grid grid-cols-5 gap-2">
+            <button type="button" onclick="selectSize('S', this)" class="size-btn py-3 rounded-lg text-xs font-semibold text-center">S</button>
+            <button type="button" onclick="selectSize('M', this)" class="size-btn active py-3 rounded-lg text-xs font-semibold text-center">M</button>
+            <button type="button" onclick="selectSize('L', this)" class="size-btn py-3 rounded-lg text-xs font-semibold text-center">L</button>
+            <button type="button" onclick="selectSize('XL', this)" class="size-btn py-3 rounded-lg text-xs font-semibold text-center">XL</button>
+            <button type="button" disabled class="size-btn py-3 rounded-lg text-xs font-semibold text-center">2XL</button>
+          </div>
+        </div>
+
+        <!-- ── 2. SLEEVE STYLE ── -->
+        <div>
+          <label class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase block mb-3">
+            SLEEVE STYLE
+          </label>
+
+          <!-- 2 Cards (Short Sleeve vs Long Sleeve) -->
+          <div id="sleeve-options-container" class="grid grid-cols-2 gap-3">
+            
+            <div onclick="selectSleeve('short', 0, this)" class="sleeve-card active flex flex-col justify-center">
+              <div class="text-xs font-bold text-black">Short Sleeve</div>
+              <div class="text-[11px] text-gray-500 mt-0.5">Included</div>
+            </div>
+
+            <div onclick="selectSleeve('long', 15, this)" class="sleeve-card flex flex-col justify-center">
+              <div class="text-xs font-bold text-black">Long Sleeve</div>
+              <div class="text-[11px] text-gray-500 mt-0.5">+$15.00</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── 3. QUANTITY SELECTOR ── -->
+        <div class="flex items-center justify-between py-2 border-y border-gray-100">
+          <span class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase">QUANTITY</span>
+          <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <button type="button" onclick="changeQty(-1)" class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 text-sm font-bold transition-colors">−</button>
+            <span id="pd-qty-display" class="px-4 py-1.5 text-xs font-mono-ui font-bold text-black min-w-[36px] text-center">1</span>
+            <button type="button" onclick="changeQty(1)" class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 text-sm font-bold transition-colors">+</button>
+          </div>
+        </div>
+
+        <!-- ── 4. PERSONALIZATION (+$20.00) ACCORDION/TOGGLE ── -->
+        <div class="bg-[#f9fafb] border border-gray-200/80 rounded-xl p-4 transition-all">
+          
+          <div class="flex items-center justify-between cursor-pointer" onclick="togglePersonalization()">
+            <div>
+              <span class="text-xs font-bold text-black tracking-wide">PERSONALIZATION</span>
+              <span id="personalize-cost-tag" class="text-xs text-gray-500 font-medium ml-1.5">(+$20.00)</span>
+            </div>
+            
+            <!-- Toggle Switch -->
+            <label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
+              <input type="checkbox" id="personalize-toggle" onchange="onPersonalizeToggleChange(this.checked)" class="sr-only custom-switch-input"/>
+              <div class="custom-switch-track w-11 h-6 bg-gray-200 rounded-full transition-colors relative">
+                <div class="custom-switch-thumb w-5 h-5 bg-white rounded-full shadow absolute left-0.5 top-0.5 transition-transform duration-200"></div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Expandable Personalization Fields -->
+          <div id="personalization-fields" class="mt-4 pt-4 border-t border-gray-200 flex flex-col gap-4 hidden">
+            
+            <!-- Name Input -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-bold text-gray-700 uppercase">Player / Custom Name</label>
+                <span class="text-[10px] text-gray-400">Max 12 chars</span>
+              </div>
+              <input type="text" 
+                     id="custom-name-input" 
+                     maxlength="12" 
+                     value="R. CHANDLER" 
+                     oninput="updateCustomName(this.value)"
+                     placeholder="e.g. RONALDO" 
+                     class="w-full text-xs px-3 py-2.5 bg-white border border-gray-300 rounded-lg uppercase tracking-wider font-bold focus:outline-none focus:border-black"/>
+            </div>
+
+            <!-- Number Input -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-bold text-gray-700 uppercase">Squad Number</label>
+                <span class="text-[10px] text-gray-400">0 - 99</span>
+              </div>
+              <input type="number" 
+                     id="custom-number-input" 
+                     min="0" 
+                     max="99" 
+                     value="24" 
+                     oninput="updateCustomNumber(this.value)"
+                     placeholder="e.g. 7" 
+                     class="w-full text-xs px-3 py-2.5 bg-white border border-gray-300 rounded-lg font-bold focus:outline-none focus:border-black"/>
+            </div>
+
+            <!-- Patches Selection (UCL, Premier League, Respect, etc.) -->
+            <div>
+              <label class="text-[11px] font-bold text-gray-700 uppercase block mb-2">Tournament Sleeve Patches</label>
+              <div id="patches-list-container" class="grid grid-cols-1 gap-2">
+                <!-- Populated dynamically from DB -->
+                <label class="flex items-center justify-between p-2.5 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-gray-400 transition-all text-xs">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" name="patch" value="ucl" data-price="8" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
+                    <span class="font-medium text-gray-800">UEFA Champions League Starball</span>
+                  </div>
+                  <span class="font-mono-ui text-gray-600 font-bold">+$8.00</span>
+                </label>
+                
+                <label class="flex items-center justify-between p-2.5 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-gray-400 transition-all text-xs">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" name="patch" value="respect" data-price="5" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
+                    <span class="font-medium text-gray-800">UEFA Foundation / Respect Patch</span>
+                  </div>
+                  <span class="font-mono-ui text-gray-600 font-bold">+$5.00</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Custom Logo/Crest upload -->
+            <div id="custom-logo-section">
+              <label class="text-[11px] font-bold text-gray-700 uppercase block mb-1">Custom Team Crest / Logo (Optional)</label>
+              <div class="flex items-center gap-3">
+                <input type="file" id="logo-file-input" accept="image/*" onchange="handleLogoUpload(event)" class="text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"/>
+                <span id="logo-status" class="text-[11px] text-emerald-600 font-medium hidden">✓ Uploaded</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ── 5. TOTAL & ADD TO CART ── -->
+        <div class="pt-2">
+          
+          <div class="flex items-baseline justify-between mb-4">
+            <span class="font-headline font-bold text-lg text-black">Total:</span>
+            <span id="pd-final-total" class="font-headline font-black text-2xl text-black">$120.00</span>
+          </div>
+
+          <!-- Big Add to Cart Button -->
+          <button type="button" 
+                  id="add-to-cart-btn"
+                  onclick="handleAddToCart()" 
+                  class="w-full bg-black text-white hover:bg-neutral-800 active:scale-[0.99] font-headline font-bold text-sm tracking-wider uppercase py-4 rounded-full flex items-center justify-center gap-2 shadow-lg shadow-black/10 transition-all">
+            <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+            <span>Add to Cart</span>
+          </button>
+
+          <!-- Free Shipping & 30-Day Returns Badges -->
+          <div class="flex items-center justify-center gap-6 mt-4 text-xs text-gray-500 font-medium">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-gray-700">local_shipping</span>
+              <span>Free Shipping</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-gray-700">restart_alt</span>
+              <span>30-Day Returns</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ═══════════════════════════════════════════
+       INTERACTIVE 3D PREVIEW MODAL
+  ════════════════════════════════════════════ -->
+  <div id="modal-3d" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 relative overflow-hidden shadow-2xl animate-slide-up">
+      
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="font-headline font-bold text-lg text-black">Interactive 3D Customizer</h3>
+          <p class="text-xs text-gray-500">Rotate and inspect custom name, sleeve, and badge details.</p>
+        </div>
+        <button onclick="close3DModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">✕</button>
+      </div>
+
+      <!-- 3D Canvas / Rotatable Interactive View -->
+      <div class="bg-[#f5f5f7] rounded-2xl h-80 flex flex-col items-center justify-center relative select-none" id="rotatable-container">
+        
+        <img id="modal-3d-img" 
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA" 
+             class="h-64 object-contain transition-all duration-300 drop-shadow-xl" 
+             alt="3D Jersey"/>
+
+        <div id="modal-3d-custom-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden">
+          <span id="modal-3d-name" class="jersey-custom-name text-sm text-black font-black">R. CHANDLER</span>
+          <span id="modal-3d-number" class="jersey-custom-number text-5xl text-black font-black">24</span>
+        </div>
+
+        <!-- 360 Rotation Controls -->
+        <div class="absolute bottom-4 flex items-center gap-3 bg-white/90 px-4 py-1.5 rounded-full shadow border border-gray-200 text-xs font-semibold">
+          <button onclick="rotateModalView('front')" class="px-2 py-1 hover:text-black">Front 0°</button>
+          <span>•</span>
+          <button onclick="rotateModalView('side')" class="px-2 py-1 hover:text-black">Side 90°</button>
+          <span>•</span>
+          <button onclick="rotateModalView('back')" class="px-2 py-1 hover:text-black font-bold">Back 180°</button>
+        </div>
+
+      </div>
+
+      <div class="mt-4 flex justify-between items-center">
+        <div class="text-xs text-gray-500">
+          Size: <strong id="modal-preview-size" class="text-black">M</strong> • 
+          Sleeve: <strong id="modal-preview-sleeve" class="text-black">Short</strong> • 
+          Print: <strong id="modal-preview-print" class="text-black">None</strong>
+        </div>
+        <button onclick="close3DModal()" class="bg-black text-white text-xs font-bold px-6 py-2 rounded-full">Done</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SIZE GUIDE MODAL
+  ════════════════════════════════════════════ -->
+  <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl animate-slide-up">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-headline font-bold text-lg text-black">ZENVY Official Size Guide</h3>
+        <button onclick="closeSizeGuideModal()" class="text-gray-500 hover:text-black">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4">Athletic pro fit. If you prefer a relaxed fit, we recommend ordering one size up.</p>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-gray-100 text-gray-700 font-mono-ui uppercase">
+            <tr>
+              <th class="p-2.5">Size</th>
+              <th class="p-2.5">Chest (in)</th>
+              <th class="p-2.5">Length (in)</th>
+              <th class="p-2.5">Fit</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr><td class="p-2.5 font-bold">S</td><td class="p-2.5">36 - 38</td><td class="p-2.5">27.5</td><td class="p-2.5">Slim</td></tr>
+            <tr class="bg-gray-50"><td class="p-2.5 font-bold">M</td><td class="p-2.5">38 - 40</td><td class="p-2.5">28.5</td><td class="p-2.5">Standard</td></tr>
+            <tr><td class="p-2.5 font-bold">L</td><td class="p-2.5">40 - 42</td><td class="p-2.5">29.5</td><td class="p-2.5">Standard</td></tr>
+            <tr class="bg-gray-50"><td class="p-2.5 font-bold">XL</td><td class="p-2.5">42 - 44</td><td class="p-2.5">30.5</td><td class="p-2.5">Relaxed</td></tr>
+            <tr><td class="p-2.5 font-bold">2XL</td><td class="p-2.5">44 - 46</td><td class="p-2.5">31.5</td><td class="p-2.5">Relaxed</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-5 text-right">
+        <button onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-5 py-2 rounded-full">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== SHOPPING CART DRAWER ==================== -->
+  <div id="cart-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300 opacity-0">
+    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto"></div>
+    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transform translate-x-full transition-transform duration-300 ease-out z-10">
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-black text-2xl">shopping_bag</span>
+          <h2 class="font-headline text-lg font-bold tracking-tight text-black">YOUR BAG</h2>
+          <span id="product-drawer-count" class="bg-black text-white text-[11px] font-mono-ui font-bold px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <button onclick="toggleCartDrawer(false)" class="p-2 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Drawer Items List -->
+      <div id="product-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="p-6 bg-gray-50/80 border-t border-gray-100 space-y-3">
+        <div class="flex justify-between text-xs text-gray-500 font-medium">
+          <span>Subtotal</span>
+          <span id="product-drawer-subtotal" class="font-mono-ui font-bold text-black">৳0</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 font-medium">
+          <span>Shipping</span>
+          <span class="text-emerald-600 font-bold">Calculated at Checkout</span>
+        </div>
+        <div class="flex justify-between text-base font-bold text-black pt-2 border-t border-gray-200">
+          <span>Total</span>
+          <span id="product-drawer-total" class="font-mono-ui">৳0</span>
+        </div>
+
+        <button onclick="proceedProductToCheckout()" class="w-full bg-black text-white py-4 rounded-full font-headline text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-xl flex justify-center items-center gap-2 font-bold mt-2">
+          PROCEED TO CHECKOUT
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       NOTIFICATION TOAST
+  ════════════════════════════════════════════ -->
+  <div id="product-toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-3 text-xs font-medium hidden toast-anim">
+    <span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
+    <span id="toast-message">Added to Cart!</span>
+    <button onclick="toggleCartDrawer(true)" class="underline font-bold text-white ml-2 bg-transparent border-none cursor-pointer">View Cart</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER (Matches Given Design)
+  ════════════════════════════════════════════ -->
+  <footer class="bg-[#fbfbfb] border-t border-gray-100 py-14 sm:py-16 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-12 border-b border-gray-200/60">
+        
+        <!-- Column 1: Brand & Tagline -->
+        <div class="md:col-span-5 flex flex-col justify-between">
+          <div>
+            <a href="index.html" class="font-headline font-black text-2xl tracking-[0.18em] text-black">ZENVY</a>
+            <p class="font-body text-xs sm:text-sm text-gray-500 leading-relaxed mt-4 max-w-sm">
+              Elevating athletic performance through premium design and technical innovation. The ethereal-technical standard.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+            <span>Official Global Performance Wear</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Links -->
+        <div class="md:col-span-3">
+          <h4 class="font-headline font-bold text-xs uppercase tracking-widest text-black mb-4">LINKS</h4>
+          <ul class="flex flex-col gap-2.5 text-xs sm:text-sm text-gray-500 font-medium">
+            <li><a href="javascript:void(0)" onclick="alert('ZENVY Privacy Policy: We protect customer data using enterprise encryption.')" class="hover:text-black transition-colors">Privacy Policy</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('ZENVY Terms of Service: Standard e-commerce terms apply.')" class="hover:text-black transition-colors">Terms of Service</a></li>
+            <li><a href="javascript:void(0)" onclick="openSizeGuideModal()" class="hover:text-black transition-colors">Size Guide</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Shipping Information:\n\nInside Dhaka: Delivered within 24\u201348 hours.\nOutside Dhaka (All Bangladesh): 2\u20133 business days via Steadfast / Pathao courier.\n\nDelivery charge is shown at checkout based on your location.')" class="hover:text-black transition-colors">Shipping</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Returns Policy: 30-day hassle-free returns on all unworn items.')" class="hover:text-black transition-colors">Returns</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Support: Reach our concierge team at support@zenvy.com')" class="hover:text-black transition-colors">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Connect (Social Links with Facebook, Instagram, Twitter, TikTok, YouTube) -->
+        <div class="md:col-span-4">
+          <h4 class="font-headline font-bold text-xs uppercase tracking-widest text-black mb-4">CONNECT</h4>
+          <ul class="flex flex-col gap-2.5 text-xs sm:text-sm text-gray-500 font-medium">
+            <li>
+              <a id="footer-social-fb" href="https://facebook.com/zenvy" target="_blank" rel="noopener" class="hover:text-black transition-colors flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-black transition-colors fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <span>Facebook</span>
+              </a>
+            </li>
+            <li>
+              <a id="footer-social-ig" href="https://instagram.com/zenvy" target="_blank" rel="noopener" class="hover:text-black transition-colors flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-black transition-colors fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                <span>Instagram</span>
+              </a>
+            </li>
+            <li>
+              <a id="footer-social-x" href="https://twitter.com/zenvy" target="_blank" rel="noopener" class="hover:text-black transition-colors flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-black transition-colors fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <span>Twitter / X</span>
+              </a>
+            </li>
+            <li>
+              <a id="footer-social-tiktok" href="https://tiktok.com/@zenvy" target="_blank" rel="noopener" class="hover:text-black transition-colors flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-black transition-colors fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                <span>TikTok</span>
+              </a>
+            </li>
+            <li>
+              <a id="footer-social-yt" href="https://youtube.com/@zenvy" target="_blank" rel="noopener" class="hover:text-black transition-colors flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-black transition-colors fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>YouTube</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom Copyright Row -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+        <div>
+          © 2026 ZENVY Sports Fashion. All rights reserved.
+        </div>
+        <div class="flex items-center gap-6">
+          <span class="hover:text-gray-600 cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to Top ↑</span>
+          <span>•</span>
+          <span class="font-mono-ui font-bold text-gray-500">CURRENCY: USD ($)</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ═══════════════════════════════════════════
+       JAVASCRIPT APP LOGIC & DB CONNECTION
+  ════════════════════════════════════════════ -->
+  <!-- Firebase Integration -->
+  <script type="module" src="firebase-config.js"></script>
+  <script src="admin-db.js"></script>
+  <script>
+    // ─────────────────────────────────────────
+    // Product State
+    // ─────────────────────────────────────────
+    const productState = {
+      product: null,
+      basePrice: 120.00,
+      selectedSize: 'M',
+      selectedSleeve: 'short',
+      sleevePrice: 0.00,
+      quantity: 1,
+      isPersonalized: false,
+      personalizeFee: 20.00,
+      customName: 'R. CHANDLER',
+      customNumber: '24',
+      patchPrice: 0.00,
+      selectedPatches: [],
+      currentAngle: 'front',
+      currencySymbol: '$',
+      currencyRate: 1
+    };
+
+    // Images for different angles
+    const ANGLE_IMAGES = {
+      front: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA',
+      back: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA',
+      detail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBxiz7UEkmkpxVSO5BuCiXQdztqSvXyX6w3QZrV0AZ1UtH39sH5MpR3zmgfko4Sl_R2Hg8u-Uy6hePpjZNthnGo4Dqi2SwdGBynkP4Q5OJGeHwvzTsVzaTgDo1CV8KzYvGHzWMK3sGJho6P_pgsaq9bWB7v85VYJQfOTn5nmgSL6DR-WMMJwPQmbfBp51AtpSWIsHJHuLXLBJG7xJAlg9iQZhpvkZ5jccDDUw-7IG4xhcYX_8mATdvtKA'
+    };
+
+    // ─────────────────────────────────────────
+    // Initialization
+    // ─────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDataFromAdminDB();
+      calculateLiveTotal();
+      updateCartBadge();
+    });
+
+    // ─────────────────────────────────────────
+    // Load Product & Config from admin-db.js
+    // ─────────────────────────────────────────
+    function loadDataFromAdminDB() {
+      // Check query params for product id, slug, or details
+      const urlParams = new URLSearchParams(window.location.search);
+      const prodId = urlParams.get('id');
+      const prodSlug = urlParams.get('slug');
+      const paramName = urlParams.get('name');
+      const paramPrice = urlParams.get('price');
+      const paramImage = urlParams.get('image');
+      const paramCat = urlParams.get('category');
+      const paramBadge = urlParams.get('badge');
+
+      let targetProduct = null;
+
+      if (typeof DB !== 'undefined') {
+        const allProducts = DB.products.all();
+        if (prodId) {
+          targetProduct = DB.products.byId(prodId);
+        }
+        if (!targetProduct && prodSlug) {
+          targetProduct = allProducts.find(p => p.slug === prodSlug);
+        }
+        if (!targetProduct && paramName) {
+          targetProduct = allProducts.find(p => p.name.toLowerCase() === paramName.toLowerCase());
+        }
+
+        // If still not found but query params provided details, create dynamic product object
+        if (!targetProduct && paramName) {
+          targetProduct = {
+            id: prodId || ('custom_' + Date.now()),
+            name: paramName,
+            basePrice: parseFloat(paramPrice) || 1450,
+            salePrice: parseFloat(paramPrice) || 1450,
+            categoryName: paramCat || "Men's Football",
+            images: [{ url: paramImage || ANGLE_IMAGES.front, alt: paramName }],
+            stock: 30,
+            isPublished: true,
+            isPreorder: paramBadge && paramBadge.toLowerCase().includes('pre')
+          };
+        }
+
+        // Default fallback if no specific product requested
+        if (!targetProduct) {
+          targetProduct = allProducts[0] || {
+            id: '101',
+            name: 'Aura Strike Pro Jersey',
+            basePrice: 1450,
+            salePrice: 1450,
+            categoryName: "Men's Football",
+            images: [{ url: ANGLE_IMAGES.front, alt: 'Aura Strike Pro' }],
+            stock: 45
+          };
+        }
+
+        // Read dynamic customization settings from Admin DB
+        const cs = DB.customizationSettings.get();
+        if (cs && cs.nameNumberPackage && cs.nameNumberPackage.price) {
+          productState.personalizeFee = cs.nameNumberPackage.price;
+          const feeTag = document.getElementById('personalize-cost-tag');
+          if (feeTag) feeTag.textContent = `(+${DB.currency.format(productState.personalizeFee)})`;
+        }
+
+        // Read dynamic patches from Admin DB
+        const dbPatches = DB.patches.enabled();
+        if (dbPatches && dbPatches.length > 0) {
+          renderDynamicPatches(dbPatches);
+        }
+
+        // Read dynamic sleeves from Admin DB
+        const dbSleeves = DB.sleeves.enabled();
+        if (dbSleeves && dbSleeves.length > 0) {
+          renderDynamicSleeves(dbSleeves);
+        }
+
+        // Read dynamic sizes from Admin DB
+        const dbSizes = DB.sizes.enabled();
+        if (dbSizes && dbSizes.length > 0) {
+          renderDynamicSizes(dbSizes);
+        }
+      }
+
+      if (targetProduct) {
+        productState.product = targetProduct;
+        productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
+
+        // Update page title & headings
+        document.title = `${targetProduct.name} | ZENVY Elite Sportswear`;
+        const titleEl = document.getElementById('pd-title');
+        if (titleEl) titleEl.textContent = targetProduct.name;
+        
+        const catEl = document.getElementById('pd-category-tag');
+        if (catEl) catEl.textContent = (targetProduct.categoryName || 'MEN\'S FOOTBALL').toUpperCase();
+        
+        const priceEl = document.getElementById('pd-base-price');
+        if (priceEl) priceEl.textContent = DB.currency ? DB.currency.format(productState.basePrice) : `৳${productState.basePrice}`;
+
+        const origEl = document.getElementById('pd-original-price');
+        if (origEl) {
+          if (targetProduct.compareAt || (targetProduct.basePrice && targetProduct.basePrice > productState.basePrice)) {
+            const orig = targetProduct.compareAt || targetProduct.basePrice;
+            origEl.textContent = DB.currency ? DB.currency.format(orig) : `৳${orig}`;
+            origEl.classList.remove('hidden');
+          } else {
+            origEl.classList.add('hidden');
+          }
+        }
+
+        // Product Images
+        const imgUrl = (targetProduct.images && targetProduct.images[0] && targetProduct.images[0].url) 
+          ? targetProduct.images[0].url 
+          : (targetProduct.image || ANGLE_IMAGES.front);
+
+        ANGLE_IMAGES.front = imgUrl;
+        ANGLE_IMAGES.back = imgUrl; // maintains base jersey artwork
+        const mainImg = document.getElementById('main-product-img');
+        if (mainImg) {
+          mainImg.src = imgUrl;
+          mainImg.alt = targetProduct.name;
+        }
+
+        const modal3dImg = document.getElementById('modal-3d-img');
+        if (modal3dImg) {
+          modal3dImg.src = imgUrl;
+          modal3dImg.alt = targetProduct.name;
+        }
+
+        // Stock status
+        const stockEl = document.getElementById('pd-stock-tag');
+        if (stockEl) {
+          if (targetProduct.stock === 0) {
+            stockEl.textContent = 'OUT OF STOCK';
+            stockEl.className = 'text-red-600 font-bold';
+          } else if (targetProduct.isPreorder) {
+            stockEl.textContent = 'PRE-ORDER';
+            stockEl.className = 'text-purple-600 font-bold';
+          } else {
+            stockEl.textContent = 'IN STOCK';
+            stockEl.className = 'text-emerald-700 font-bold';
+          }
+        }
+      }
+
+      calculateLiveTotal();
+      syncFooterSocialLinks();
+    }
+
+    // Dynamic Social Links & Currency Synchronization from DB
+    function syncFooterSocialLinks() {
+      if (typeof DB === 'undefined' || !DB.brand) return;
+      const brand = DB.brand.get();
+      if (!brand) return;
+
+      const fbEl = document.getElementById('footer-social-fb');
+      if (fbEl && brand.socialFacebook) fbEl.href = brand.socialFacebook;
+
+      const igEl = document.getElementById('footer-social-ig');
+      if (igEl && brand.socialInstagram) igEl.href = brand.socialInstagram;
+
+      const xEl = document.getElementById('footer-social-x');
+      if (xEl && brand.socialTwitter) xEl.href = brand.socialTwitter;
+
+      const ttEl = document.getElementById('footer-social-tiktok');
+      if (ttEl && brand.socialTikTok) ttEl.href = brand.socialTikTok;
+
+      const ytEl = document.getElementById('footer-social-yt');
+      if (ytEl && brand.socialYoutube) ytEl.href = brand.socialYoutube;
+
+      // Currency label in footer
+      const cur = DB.currency.get();
+      const curLabel = document.getElementById('footer-currency-indicator');
+      if (curLabel) {
+        curLabel.textContent = `CURRENCY: ${cur.code} (${cur.symbol})`;
+      }
+    }
+
+    // Live Storage Event listener for real-time admin sync
+    window.addEventListener('storage', (e) => {
+      if (e.key && (e.key.includes('brand') || e.key.includes('customization') || e.key.includes('homepage'))) {
+        initProductPage();
+      }
+    });
+
+    function renderDynamicPatches(patches) {
+      const container = document.getElementById('patches-list-container');
+      if (!container) return;
+      container.innerHTML = patches.map(p => `
+        <label class="flex items-center justify-between p-2.5 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-gray-400 transition-all text-xs">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" name="patch" value="${p.id}" data-name="${p.name}" data-price="${p.price}" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
+            <span class="font-medium text-gray-800">${p.name}</span>
+          </div>
+          <span class="font-mono-ui text-gray-600 font-bold">+${p.price > 0 ? (DB.currency ? DB.currency.format(p.price) : '৳' + p.price) : 'Free'}</span>
+        </label>
+      `).join('');
+    }
+
+    function renderDynamicSleeves(sleeves) {
+      const container = document.getElementById('sleeve-options-container');
+      if (!container) return;
+      container.innerHTML = sleeves.map((s, idx) => `
+        <div onclick="selectSleeve('${s.id}', ${s.additionalPrice}, this)" class="sleeve-card ${idx === 0 ? 'active' : ''} flex flex-col justify-center">
+          <div class="text-xs font-bold text-black">${s.name}</div>
+          <div class="text-[11px] text-gray-500 mt-0.5">${s.additionalPrice > 0 ? '+' + (DB.currency ? DB.currency.format(s.additionalPrice) : '৳' + s.additionalPrice) : 'Included'}</div>
+        </div>
+      `).join('');
+      if (sleeves.length > 0) {
+        productState.selectedSleeve = sleeves[0].id;
+        productState.sleevePrice = sleeves[0].additionalPrice || 0;
+      }
+    }
+
+    function renderDynamicSizes(sizes) {
+      const container = document.getElementById('size-options-container');
+      if (!container) return;
+      container.innerHTML = sizes.map((s, idx) => `
+        <button type="button" onclick="selectSize('${s.code}', this)" class="size-btn ${s.code === 'M' || (idx === 1 && !sizes.some(x => x.code === 'M')) ? 'active' : ''} py-3 rounded-lg text-xs font-semibold text-center">
+          ${s.code}
+        </button>
+      `).join('');
+    }
+
+    // ─────────────────────────────────────────
+    // User Selection Handlers
+    // ─────────────────────────────────────────
+    function selectSize(size, btnEl) {
+      productState.selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      document.getElementById('modal-preview-size').textContent = size;
+    }
+
+    function selectSleeve(sleeveKey, price, cardEl) {
+      productState.selectedSleeve = sleeveKey;
+      productState.sleevePrice = parseFloat(price) || 0;
+      document.querySelectorAll('.sleeve-card').forEach(c => c.classList.remove('active'));
+      if (cardEl) cardEl.classList.add('active');
+      
+      document.getElementById('modal-preview-sleeve').textContent = sleeveKey === 'long' ? 'Long Sleeve' : 'Short Sleeve';
+      calculateLiveTotal();
+    }
+
+    function changeQty(delta) {
+      productState.quantity = Math.max(1, productState.quantity + delta);
+      document.getElementById('pd-qty-display').textContent = productState.quantity;
+      calculateLiveTotal();
+    }
+
+    function togglePersonalization() {
+      const toggle = document.getElementById('personalize-toggle');
+      toggle.checked = !toggle.checked;
+      onPersonalizeToggleChange(toggle.checked);
+    }
+
+    function onPersonalizeToggleChange(checked) {
+      productState.isPersonalized = checked;
+      const fields = document.getElementById('personalization-fields');
+      const overlay = document.getElementById('live-custom-text-overlay');
+      const modalOverlay = document.getElementById('modal-3d-custom-overlay');
+
+      if (checked) {
+        fields.classList.remove('hidden');
+        if (productState.currentAngle === 'back') {
+          overlay.classList.remove('hidden');
+        }
+        modalOverlay.classList.remove('hidden');
+        document.getElementById('modal-preview-print').textContent = `${productState.customName} #${productState.customNumber}`;
+      } else {
+        fields.classList.add('hidden');
+        overlay.classList.add('hidden');
+        modalOverlay.classList.add('hidden');
+        document.getElementById('modal-preview-print').textContent = 'None';
+      }
+
+      calculateLiveTotal();
+    }
+
+    function updateCustomName(val) {
+      productState.customName = (val || '').toUpperCase();
+      document.getElementById('live-overlay-name').textContent = productState.customName;
+      document.getElementById('modal-3d-name').textContent = productState.customName;
+      document.getElementById('thumb-name-preview').textContent = productState.customName || 'NAME';
+      document.getElementById('modal-preview-print').textContent = `${productState.customName} #${productState.customNumber}`;
+    }
+
+    function updateCustomNumber(val) {
+      productState.customNumber = val || '';
+      document.getElementById('live-overlay-number').textContent = productState.customNumber;
+      document.getElementById('modal-3d-number').textContent = productState.customNumber;
+      document.getElementById('thumb-number-preview').textContent = productState.customNumber || '00';
+      document.getElementById('modal-preview-print').textContent = `${productState.customName} #${productState.customNumber}`;
+    }
+
+    function handleLogoUpload(e) {
+      if (e.target.files && e.target.files[0]) {
+        document.getElementById('logo-status').classList.remove('hidden');
+        showToast('Logo uploaded! Applied to custom preview.');
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Angle / View Switcher
+    // ─────────────────────────────────────────
+    function setAngleView(angle) {
+      productState.currentAngle = angle;
+      const img = document.getElementById('main-product-img');
+      const textOverlay = document.getElementById('live-custom-text-overlay');
+
+      // Update button highlights
+      ['front', 'back', 'detail'].forEach(a => {
+        const btn = document.getElementById(`view-${a}-btn`);
+        if (btn) {
+          if (a === angle) {
+            btn.className = 'text-[11px] font-bold px-3 py-1 rounded-full bg-white/90 shadow-sm text-black';
+          } else {
+            btn.className = 'text-[11px] font-bold px-3 py-1 rounded-full bg-black/10 text-gray-700 hover:bg-white/80';
+          }
+        }
+      });
+
+      if (angle === 'back') {
+        img.src = ANGLE_IMAGES.back;
+        if (productState.isPersonalized) {
+          textOverlay.classList.remove('hidden');
+        }
+      } else if (angle === 'detail') {
+        img.src = ANGLE_IMAGES.detail;
+        textOverlay.classList.add('hidden');
+      } else {
+        img.src = ANGLE_IMAGES.front;
+        textOverlay.classList.add('hidden');
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Real-Time Total Calculation
+    // ─────────────────────────────────────────
+    function calculateLiveTotal() {
+      let unitPrice = productState.basePrice + productState.sleevePrice;
+
+      // Personalization fee
+      if (productState.isPersonalized) {
+        unitPrice += productState.personalizeFee;
+      }
+
+      // Calculate selected patches
+      let patchTotal = 0;
+      productState.selectedPatches = [];
+      document.querySelectorAll('input[name="patch"]:checked').forEach(p => {
+        const pPrice = parseFloat(p.getAttribute('data-price')) || 0;
+        patchTotal += pPrice;
+        productState.selectedPatches.push(p.value);
+      });
+      unitPrice += patchTotal;
+      productState.patchPrice = patchTotal;
+
+      const grandTotal = unitPrice * productState.quantity;
+      document.getElementById('pd-final-total').textContent = DB.currency ? DB.currency.format(grandTotal) : `৳${grandTotal.toFixed(2)}`;
+    }
+
+    // ─────────────────────────────────────────
+    // Cart Handling
+    // ─────────────────────────────────────────
+    function handleAddToCart() {
+      const itemTitle = document.getElementById('pd-title').textContent;
+      const unitPrice = productState.basePrice + productState.sleevePrice + (productState.isPersonalized ? productState.personalizeFee : 0) + productState.patchPrice;
+      
+      const sleeveLabel = productState.selectedSleeve === 'long' ? 'Full Sleeve' : (productState.selectedSleeve === 'sleeveless' ? 'Sleeveless' : 'Half Sleeve');
+      const patchLabel = (productState.selectedPatches && productState.selectedPatches.length > 0) ? productState.selectedPatches.join(', ') : '';
+
+      const customDetails = [
+        `Size: ${productState.selectedSize}`,
+        sleeveLabel,
+        productState.isPersonalized ? `Custom: ${productState.customName} #${productState.customNumber}` : null,
+        patchLabel ? `Patches: ${patchLabel}` : null
+      ].filter(Boolean).join(' • ');
+
+      const cartItem = {
+        id: 'item_' + Date.now(),
+        productId: productState.product ? productState.product.id : 'aeronkit_pro',
+        name: itemTitle,
+        price: unitPrice,
+        image: ANGLE_IMAGES.front,
+        details: customDetails,
+        qty: productState.quantity,
+        size: productState.selectedSize || 'M',
+        sleeve: sleeveLabel,
+        customName: productState.isPersonalized ? (productState.customName || '') : '',
+        customNumber: productState.isPersonalized ? (productState.customNumber || '') : '',
+        patchName: patchLabel,
+        patches: productState.selectedPatches || []
+      };
+
+      // Save to localStorage
+      try {
+        const currentCart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+        const existing = currentCart.find(item => (item.id === cartItem.id || item.productId === cartItem.productId) && item.details === cartItem.details);
+        if (existing) {
+          existing.qty = (existing.qty || 1) + productState.quantity;
+        } else {
+          currentCart.push(cartItem);
+        }
+        localStorage.setItem('zenvy_cart', JSON.stringify(currentCart));
+      } catch (e) {}
+
+      updateCartBadge();
+      showToast(`Added ${productState.quantity}x ${itemTitle} (${productState.selectedSize}) to cart!`);
+
+      // Button animation feedback
+      const btn = document.getElementById('add-to-cart-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check</span><span>Added to Cart!</span>`;
+      btn.className = 'w-full bg-emerald-700 text-white font-headline font-bold text-sm tracking-wider uppercase py-4 rounded-full flex items-center justify-center gap-2 shadow-lg transition-all';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.className = 'w-full bg-black text-white hover:bg-neutral-800 active:scale-[0.99] font-headline font-bold text-sm tracking-wider uppercase py-4 rounded-full flex items-center justify-center gap-2 shadow-lg shadow-black/10 transition-all';
+      }, 2000);
+    }
+
+    function updateCartBadge() {
+      try {
+        const currentCart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+        const total = currentCart.reduce((sum, item) => sum + (item.qty || 1), 0);
+        const badge = document.getElementById('header-cart-badge');
+        if (badge) {
+          badge.textContent = total;
+          badge.style.display = total > 0 ? 'inline-block' : 'none';
+        }
+      } catch (e) {}
+    }
+
+    function toggleCartDrawer(forceOpen = null) {
+      const container = document.getElementById('cart-drawer-container');
+      const drawer = container ? container.querySelector('aside') : null;
+      if (!container || !drawer) return;
+
+      const isOpen = container.classList.contains('pointer-events-auto');
+      const shouldOpen = forceOpen !== null ? forceOpen : !isOpen;
+
+      if (shouldOpen) {
+        renderProductCartDrawer();
+        container.classList.remove('pointer-events-none', 'opacity-0');
+        container.classList.add('pointer-events-auto', 'opacity-100');
+        drawer.classList.remove('translate-x-full');
+      } else {
+        container.classList.add('pointer-events-none', 'opacity-0');
+        container.classList.remove('pointer-events-auto', 'opacity-100');
+        drawer.classList.add('translate-x-full');
+      }
+    }
+
+    function toggleCartModal() {
+      toggleCartDrawer();
+    }
+
+    function renderProductCartDrawer() {
+      const container = document.getElementById('product-drawer-items');
+      const countEl = document.getElementById('product-drawer-count');
+      const subtotalEl = document.getElementById('product-drawer-subtotal');
+      const totalEl = document.getElementById('product-drawer-total');
+      if (!container) return;
+
+      const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+      const totalQty = cart.reduce((s, i) => s + (i.qty || 1), 0);
+      const subtotal = cart.reduce((s, i) => s + ((i.price || 0) * (i.qty || 1)), 0);
+
+      if (countEl) countEl.textContent = totalQty;
+      if (subtotalEl) subtotalEl.textContent = `৳${subtotal.toLocaleString()}`;
+      if (totalEl) totalEl.textContent = `৳${subtotal.toLocaleString()}`;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-400">
+            <span class="material-symbols-outlined text-5xl mb-2 text-gray-300">shopping_cart</span>
+            <p class="text-sm font-bold text-gray-600">Your bag is empty</p>
+            <p class="text-xs text-gray-400 mt-1">Configure your jersey to add it to your bag.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = cart.map((item, idx) => `
+        <div class="flex gap-3.5 p-3.5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+          <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'}" class="w-16 h-16 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start">
+              <h4 class="font-bold text-xs text-black truncate">${item.name}</h4>
+              <button onclick="removeProductCartItem(${idx})" class="text-gray-400 hover:text-red-500 p-0.5" title="Remove item">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-gray-500 mt-0.5 leading-tight">${item.details || 'Standard Edition'}</p>
+            <div class="flex justify-between items-center mt-2.5">
+              <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-2 py-0.5 bg-gray-50/50">
+                <button onclick="updateProductCartQty(${idx}, -1)" class="text-gray-500 hover:text-black text-xs font-bold px-1">−</button>
+                <span class="font-mono-ui text-xs font-bold">${item.qty || 1}</span>
+                <button onclick="updateProductCartQty(${idx}, 1)" class="text-gray-500 hover:text-black text-xs font-bold px-1">+</button>
+              </div>
+              <span class="font-mono-ui font-bold text-xs text-black">৳${((item.price || 0) * (item.qty || 1)).toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateProductCartQty(index, delta) {
+      const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+      if (!cart[index]) return;
+      cart[index].qty = (cart[index].qty || 1) + delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+      localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+      updateCartBadge();
+      renderProductCartDrawer();
+    }
+
+    function removeProductCartItem(index) {
+      const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+      cart.splice(index, 1);
+      localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+      updateCartBadge();
+      renderProductCartDrawer();
+    }
+
+    function proceedProductToCheckout() {
+      const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+      if (cart.length === 0) {
+        showToast('Your bag is empty! Add an item first.');
+        return;
+      }
+      window.location.href = 'index.html?view=checkout';
+    }
+
+    // ─────────────────────────────────────────
+    // Modals
+    // ─────────────────────────────────────────
+    function open3DModal() {
+      document.getElementById('modal-3d').classList.remove('hidden');
+    }
+    function close3DModal() {
+      document.getElementById('modal-3d').classList.add('hidden');
+    }
+    function rotateModalView(angle) {
+      const img = document.getElementById('modal-3d-img');
+      const customOverlay = document.getElementById('modal-3d-custom-overlay');
+      if (angle === 'back') {
+        img.src = ANGLE_IMAGES.back;
+        if (productState.isPersonalized) customOverlay.classList.remove('hidden');
+      } else if (angle === 'side') {
+        img.src = ANGLE_IMAGES.detail;
+        customOverlay.classList.add('hidden');
+      } else {
+        img.src = ANGLE_IMAGES.front;
+        customOverlay.classList.add('hidden');
+      }
+    }
+
+    function openSizeGuideModal() {
+      document.getElementById('modal-size-guide').classList.remove('hidden');
+    }
+    function closeSizeGuideModal() {
+      document.getElementById('modal-size-guide').classList.add('hidden');
+    }
+
+    function showReviewsAlert() {
+      showToast('128 verified customer reviews — Rating: 4.9 / 5.0 ★');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('product-toast');
+      const msgEl = document.getElementById('toast-message');
+      if (toast && msgEl) {
+        msgEl.textContent = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3800);
+      }
+    }
+  </script>
+</body>
+</html>

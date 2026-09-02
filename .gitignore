@@ -1,0 +1,34 @@
+# Node
+node_modules/
+.next/
+.turbo/
+
+# Build outputs
+out/
+dist/
+build/
+
+# Database
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Firebase cache
+.firebase/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

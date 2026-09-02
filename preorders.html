@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Preorders – ZENVY | Reserve Upcoming Jerseys</title>
+<meta name="description" content="Reserve upcoming limited-edition jerseys, club kits and national team jerseys before they sell out. Secure your preorder with ZENVY today."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-fixed-dim":"#c8c6c5","background":"#fbf9f8","on-error-container":"#93000a","surface-dim":"#dbdad9","surface-variant":"#e4e2e2","inverse-primary":"#c8c6c5","primary-container":"#1c1b1b","on-primary":"#ffffff","inverse-on-surface":"#f2f0f0","on-secondary-fixed":"#001452","surface-container-lowest":"#ffffff","surface-container-highest":"#e4e2e2","error":"#ba1a1a","error-container":"#ffdad6","on-surface":"#1b1c1c","secondary":"#003ec6","surface-container-low":"#f5f3f3","on-surface-variant":"#444748","secondary-container":"#0052fe","on-secondary":"#ffffff","surface":"#fbf9f8","surface-container":"#efeded","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7","on-background":"#1b1c1c","tertiary":"#000000","on-secondary-container":"#dfe3ff","surface-container-high":"#e9e8e7","on-error":"#ffffff"},spacing:{"margin-desktop":"64px","margin-mobile":"16px","unit":"8px","gutter":"24px","container-max":"1440px"},fontFamily:{"body-lg":["Inter"],"caption":["Inter"],"display-lg":["Montserrat"],"label-md":["Inter"],"headline-md":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]},fontSize:{"body-lg":["18px",{lineHeight:"28px",fontWeight:"400"}],"caption":["12px",{lineHeight:"16px",fontWeight:"400"}],"display-lg":["64px",{lineHeight:"72px",letterSpacing:"-0.02em",fontWeight:"800"}],"label-md":["14px",{lineHeight:"20px",letterSpacing:"0.05em",fontWeight:"600"}],"headline-md":["24px",{lineHeight:"32px",fontWeight:"700"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.01em",fontWeight:"700"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}}
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 20px 40px rgba(0,0,0,0.05);}
+  .glass-nav{background-color:rgba(255,255,255,0.85);backdrop-filter:blur(20px);}
+  #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+  #cart-drawer.open{transform:translateX(0);}
+  #mobile-menu{transform:translateX(-100%);transition:transform .3s ease;}
+  #mobile-menu.open{transform:translateX(0);}
+  #toast{transform:translateY(100px);opacity:0;transition:all .3s;}
+  #toast.show{transform:translateY(0);opacity:1;}
+  #preorder-modal{display:none;}
+  #preorder-modal.open{display:flex;}
+  .qty-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #c4c7c7;cursor:pointer;font-size:18px;}
+  .qty-btn:hover{background:#f5f3f3;}
+  .qty-input{width:56px;height:40px;border-top:1px solid #c4c7c7;border-bottom:1px solid #c4c7c7;text-align:center;font-family:Inter;font-size:16px;outline:none;}
+  .field-wrap{position:relative;margin-bottom:20px;}
+  .field-wrap input,.field-wrap select,.field-wrap textarea{width:100%;border:1px solid #c4c7c7;border-radius:8px;padding:13px 16px;font-family:Inter;font-size:15px;outline:none;background:#fff;transition:border-color .2s;}
+  .field-wrap input:focus,.field-wrap select:focus{border-color:#003ec6;border-width:2px;}
+  .field-wrap label{display:block;font-family:Inter;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#444748;margin-bottom:6px;}
+  .progress-bar{height:6px;background:#e4e2e2;border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+  .size-btn{border:1px solid #c4c7c7;padding:8px 16px;cursor:pointer;font-family:Inter;font-size:14px;font-weight:600;transition:all .2s;border-radius:6px;}
+  .size-btn:hover,.size-btn.active{background:#000;color:#fff;border-color:#000;}
+  @keyframes pulse-badge{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.8;transform:scale(1.03);}}
+  .preorder-badge{animation:pulse-badge 2.5s ease-in-out infinite;}
+  /* Skeleton */
+  .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+</style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <h2 class="font-headline-md text-headline-md text-primary">Your Bag</h2>
+    <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
+      <span class="material-symbols-outlined text-6xl text-on-surface-variant/40 mb-4">shopping_bag</span>
+      <p class="font-headline-md text-headline-md text-primary mb-2">Your bag is empty</p>
+    </div>
+    <div id="cart-list" class="hidden space-y-4"></div>
+  </div>
+  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-body-lg text-body-lg text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-headline-md text-headline-md text-primary">৳ 0</span>
+    </div>
+    <a href="checkout.html" class="block w-full bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest text-center mb-3">Checkout</a>
+    <button onclick="closeCart()" class="block w-full border border-primary text-primary font-label-md text-label-md uppercase px-8 py-4 tracking-widest text-center">Continue Shopping</button>
+  </div>
+</aside>
+
+<!-- ===== NAV ===== -->
+<nav class="fixed w-full top-0 left-0 z-50 bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.06)] border-b border-outline-variant/50">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
+    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
+    <div class="hidden md:flex gap-8 items-center">
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="shop.html">Collections</a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="preorders.html">Preorders</a>
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="customizer.html">Customizer</a>
+    </div>
+    <div class="flex items-center gap-4 text-primary">
+      <a href="shop.html" aria-label="Shop" class="hover:text-secondary transition-colors duration-300 hidden md:block">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">store</span>
+      </a>
+      <button aria-label="Shopping Bag" onclick="openCart()" class="hover:text-secondary transition-colors duration-300 relative">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-secondary text-on-secondary rounded-full w-5 h-5 flex items-center justify-center font-bold text-[11px]">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="hover:text-secondary transition-colors duration-300 hidden md:block">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">person</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-20">
+
+  <!-- ===== HERO BANNER ===== -->
+  <section class="relative py-20 md:py-28 px-margin-mobile md:px-margin-desktop bg-primary text-on-primary overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary-container rounded-full blur-2xl transform -translate-x-1/3 translate-y-1/3"></div>
+    </div>
+    <div class="max-w-container-max mx-auto relative z-10">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 bg-secondary/20 border border-secondary/30 text-secondary-container px-4 py-2 rounded-full mb-6">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+          <span class="font-label-md text-label-md uppercase tracking-widest">Reserve Now</span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg md:text-[48px] md:leading-[56px] mb-4">UPCOMING DROPS<br/><span class="text-secondary-container">& PREORDERS</span></h1>
+        <p class="font-body-lg text-body-lg text-inverse-on-surface/80 max-w-lg mb-8">Secure your favourite jersey before it drops. Limited slots — once they're gone, they're gone. Free delivery on all preorders over ৳ 3,000.</p>
+        <div class="flex flex-wrap gap-6">
+          <div class="flex items-center gap-2 text-inverse-on-surface/70">
+            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">lock</span>
+            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Secure Payment</span>
+          </div>
+          <div class="flex items-center gap-2 text-inverse-on-surface/70">
+            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">local_shipping</span>
+            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Guaranteed Delivery</span>
+          </div>
+          <div class="flex items-center gap-2 text-inverse-on-surface/70">
+            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">refresh</span>
+            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Full Refund if Cancelled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="py-12 bg-surface-container-low border-b border-outline-variant">
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-lg mb-3">1</div>
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">Choose Your Jersey</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Browse upcoming drops and select size & customization</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-lg mb-3">2</div>
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">Pay Advance</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Pay a small advance via bKash or Nagad to secure your slot</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-lg mb-3">3</div>
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">We Confirm</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Receive confirmation with expected delivery date</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-bold text-lg mb-3">4</div>
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">Delivered to You</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Jersey shipped on expected date, remainder paid on delivery</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PREORDER PRODUCTS ===== -->
+  <section class="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+    <div class="flex justify-between items-end mb-10">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-2 block">Limited Slots</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary">OPEN PREORDERS</h2>
+      </div>
+      <div class="hidden md:flex items-center gap-2 text-on-surface-variant">
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+        <span class="font-caption text-caption">Updated regularly</span>
+      </div>
+    </div>
+
+    <!-- Skeleton loaders while fetching -->
+    <div id="preorder-skeleton" class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div class="rounded-xl overflow-hidden ambient-shadow bg-white">
+        <div class="skeleton h-80 w-full"></div>
+        <div class="p-6 space-y-3">
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+          <div class="skeleton h-4 rounded w-full"></div>
+          <div class="skeleton h-12 rounded w-full mt-4"></div>
+        </div>
+      </div>
+      <div class="rounded-xl overflow-hidden ambient-shadow bg-white">
+        <div class="skeleton h-80 w-full"></div>
+        <div class="p-6 space-y-3">
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+          <div class="skeleton h-4 rounded w-full"></div>
+          <div class="skeleton h-12 rounded w-full mt-4"></div>
+        </div>
+      </div>
+      <div class="rounded-xl overflow-hidden ambient-shadow bg-white">
+        <div class="skeleton h-80 w-full"></div>
+        <div class="p-6 space-y-3">
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+          <div class="skeleton h-4 rounded w-full"></div>
+          <div class="skeleton h-12 rounded w-full mt-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actual products grid -->
+    <div id="preorder-grid" class="hidden grid grid-cols-1 md:grid-cols-3 gap-gutter"></div>
+
+    <!-- Empty state -->
+    <div id="preorder-empty" class="hidden text-center py-24">
+      <span class="material-symbols-outlined text-7xl text-on-surface-variant/30 mb-6 block" style="font-variation-settings:'FILL' 1">upcoming</span>
+      <h3 class="font-headline-md text-headline-md text-primary mb-2">No Open Preorders Right Now</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-8 max-w-sm mx-auto">Check back soon — we drop new preorders regularly. Browse our in-stock collection in the meantime.</p>
+      <a href="shop.html" class="inline-block bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest">Browse In-Stock</a>
+    </div>
+  </section>
+
+  <!-- ===== PREORDER FAQ ===== -->
+  <section class="py-16 bg-surface-container-low border-t border-outline-variant">
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-10 text-center">PREORDER FAQ</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl p-6 ambient-shadow">
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-2">Do I pay full price upfront?</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">No. You pay a small advance (typically ৳500–৳1000) to secure your slot. The remainder is paid on delivery via COD or bKash.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 ambient-shadow">
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-2">What if delivery is delayed?</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">We'll notify you immediately of any delay with a new estimated date. You may cancel for a full refund anytime before shipping.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 ambient-shadow">
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-2">Can I customise a preorder jersey?</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Yes! Name, number, patch and sleeve type customisation is available on select preorder jerseys at the time of ordering.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 ambient-shadow">
+          <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-2">How do I track my preorder?</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Log in to your account and visit "My Orders". Your preorder status is updated in real-time from Pending → Confirmed → Processing → Shipped → Delivered.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== PREORDER MODAL ===== -->
+<div id="preorder-modal" class="fixed inset-0 z-[200] bg-black/60 items-start justify-center overflow-y-auto py-10 px-4">
+  <div class="bg-white rounded-2xl w-full max-w-lg mx-auto my-auto ambient-shadow relative">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="preorder-badge inline-flex items-center gap-1 bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+            Preorder
+          </span>
+        </div>
+        <h2 id="modal-title" class="font-headline-md text-headline-md text-primary mt-2">Reserve Jersey</h2>
+      </div>
+      <button onclick="closeModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-2xl">close</span>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="px-6 py-5">
+      <!-- Product Summary -->
+      <div class="flex gap-4 mb-6 bg-surface-container-low rounded-xl p-4">
+        <img id="modal-img" src="" alt="" class="w-20 h-20 object-cover rounded-lg bg-surface-container flex-shrink-0"/>
+        <div class="flex-1">
+          <p id="modal-name" class="font-label-md text-label-md text-primary mb-1"></p>
+          <div class="flex items-center gap-3">
+            <span id="modal-price" class="font-headline-md text-headline-md text-primary"></span>
+            <span id="modal-compare" class="font-body-md text-body-md line-through text-on-surface-variant hidden"></span>
+          </div>
+          <div id="modal-delivery" class="flex items-center gap-1 mt-1 text-secondary">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">local_shipping</span>
+            <span class="font-caption text-caption"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slot progress -->
+      <div id="modal-slots-wrap" class="mb-5 hidden">
+        <div class="flex justify-between mb-1">
+          <span class="font-caption text-caption text-on-surface-variant">Slots remaining</span>
+          <span id="modal-slots-text" class="font-caption text-caption text-secondary font-bold"></span>
+        </div>
+        <div class="progress-bar">
+          <div id="modal-slots-bar" class="progress-fill bg-secondary"></div>
+        </div>
+      </div>
+
+      <!-- Size Selector -->
+      <div class="mb-5">
+        <label class="block font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-3">Select Size</label>
+        <div id="modal-sizes" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Qty -->
+      <div class="flex items-center gap-4 mb-5">
+        <label class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">Quantity</label>
+        <div class="flex items-center">
+          <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
+          <span class="qty-input" id="modal-qty">1</span>
+          <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+        </div>
+      </div>
+
+      <hr class="border-outline-variant mb-5"/>
+
+      <!-- Customer Info -->
+      <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-4">Your Details</h3>
+      <div class="field-wrap">
+        <label>Full Name</label>
+        <input type="text" id="po-name" placeholder="Musfique Ahmed" required/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="field-wrap">
+          <label>Phone</label>
+          <input type="tel" id="po-phone" placeholder="01700-000000" required/>
+        </div>
+        <div class="field-wrap">
+          <label>Email (optional)</label>
+          <input type="email" id="po-email" placeholder="you@example.com"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label>Delivery Address</label>
+        <input type="text" id="po-address" placeholder="House, Road, Area, City" required/>
+      </div>
+      <div class="field-wrap">
+        <label>Division</label>
+        <select id="po-division">
+          <option>Dhaka</option><option>Chittagong</option><option>Rajshahi</option><option>Khulna</option><option>Sylhet</option><option>Barisal</option><option>Rangpur</option><option>Mymensingh</option>
+        </select>
+      </div>
+
+      <hr class="border-outline-variant mb-5"/>
+
+      <!-- Payment -->
+      <h3 class="font-label-md text-label-md uppercase tracking-wider text-primary mb-2">Advance Payment</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Pay <strong id="advance-amount-text">৳ 700</strong> advance to secure your preorder. Remainder paid on delivery.</p>
+
+      <div class="space-y-3 mb-5">
+        <!-- bKash -->
+        <div id="po-pay-bkash" onclick="selectPoPayment('bkash')" class="border-2 border-primary rounded-xl p-4 cursor-pointer transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-[#E2136E] rounded-lg flex items-center justify-center text-white font-black text-lg">b</div>
+              <div>
+                <p class="font-label-md text-label-md text-primary">bKash</p>
+                <p class="font-caption text-caption text-on-surface-variant">Send to: <strong>01700-XXXXXX</strong></p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">radio_button_checked</span>
+          </div>
+          <div id="po-bkash-instructions" class="mt-4 bg-pink-50 rounded-lg p-4 border border-pink-100">
+            <p class="font-label-md text-label-md text-primary mb-2">How to pay via bKash:</p>
+            <ol class="font-body-md text-body-md text-on-surface-variant space-y-1 list-decimal list-inside text-sm">
+              <li>Open bKash app → Send Money</li>
+              <li>Number: <strong class="text-primary">01700-000000</strong></li>
+              <li>Amount: <strong class="text-primary" id="bkash-advance-amt">৳ 700</strong></li>
+              <li>Reference: Your phone number</li>
+              <li>Enter your TrxID below after payment</li>
+            </ol>
+            <div class="field-wrap mt-3 mb-0">
+              <label>bKash Transaction ID</label>
+              <input type="text" id="po-bkash-trxid" placeholder="e.g. 8AB7C2D3E4"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nagad -->
+        <div id="po-pay-nagad" onclick="selectPoPayment('nagad')" class="border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-[#F05A28] rounded-lg flex items-center justify-center text-white font-black text-base">N</div>
+              <div>
+                <p class="font-label-md text-label-md text-primary">Nagad</p>
+                <p class="font-caption text-caption text-on-surface-variant">Send to: <strong>01700-XXXXXX</strong></p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant text-xl">radio_button_unchecked</span>
+          </div>
+          <div id="po-nagad-instructions" class="hidden mt-4 bg-orange-50 rounded-lg p-4 border border-orange-100">
+            <p class="font-label-md text-label-md text-primary mb-2">How to pay via Nagad:</p>
+            <ol class="font-body-md text-body-md text-on-surface-variant space-y-1 list-decimal list-inside text-sm">
+              <li>Open Nagad app → Send Money</li>
+              <li>Number: <strong class="text-primary">01700-000000</strong></li>
+              <li>Amount: <strong class="text-primary" id="nagad-advance-amt">৳ 700</strong></li>
+              <li>Reference: Your phone number</li>
+              <li>Enter your TrxID below after payment</li>
+            </ol>
+            <div class="field-wrap mt-3 mb-0">
+              <label>Nagad Transaction ID</label>
+              <input type="text" id="po-nagad-trxid" placeholder="e.g. N7AB3C9D2E"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- COD -->
+        <div id="po-pay-cod" onclick="selectPoPayment('cod')" class="border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">payments</span>
+              </div>
+              <div>
+                <p class="font-label-md text-label-md text-primary">Cash on Delivery</p>
+                <p class="font-caption text-caption text-on-surface-variant">Pay full amount when your jersey arrives</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant text-xl">radio_button_unchecked</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Note -->
+      <div class="field-wrap">
+        <label>Order Note (optional)</label>
+        <textarea id="po-note" rows="2" placeholder="Any special instructions?" style="border:1px solid #c4c7c7;border-radius:8px;padding:12px 16px;font-family:Inter;font-size:15px;width:100%;outline:none;resize:none;"></textarea>
+      </div>
+
+      <!-- Price summary -->
+      <div class="bg-surface-container-low rounded-xl p-4 mb-5">
+        <div class="flex justify-between font-body-md text-body-md mb-2">
+          <span class="text-on-surface-variant">Preorder Price</span>
+          <span id="modal-summary-price" class="text-primary font-bold">৳ 0</span>
+        </div>
+        <div class="flex justify-between font-body-md text-body-md mb-2">
+          <span class="text-on-surface-variant">Quantity</span>
+          <span id="modal-summary-qty" class="text-primary">× 1</span>
+        </div>
+        <div class="flex justify-between font-body-md text-body-md mb-3 border-t border-outline-variant pt-3">
+          <span class="text-on-surface-variant">Advance to Pay Now</span>
+          <span id="modal-summary-advance" class="text-secondary font-bold">৳ 700</span>
+        </div>
+        <div class="flex justify-between font-headline-md text-headline-md">
+          <span class="text-primary">Total Order Value</span>
+          <span id="modal-summary-total" class="text-primary">৳ 0</span>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div id="modal-error" class="hidden bg-error-container text-on-error-container font-body-md text-body-md rounded-lg px-4 py-3 mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-base">error</span>
+        <span id="modal-error-text">Please fill all required fields.</span>
+      </div>
+
+      <!-- Submit -->
+      <button id="modal-submit-btn" onclick="submitPreorder()" class="w-full bg-secondary text-on-secondary font-label-md text-label-md uppercase px-8 py-4 hover:bg-primary transition-colors tracking-widest flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+        Confirm Preorder
+      </button>
+      <p class="font-caption text-caption text-on-surface-variant text-center mt-3">By confirming, you agree to our preorder terms. Full refund if order is cancelled before shipping.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PREORDER SUCCESS MODAL ===== -->
+<div id="success-modal" class="hidden fixed inset-0 z-[210] bg-black/60 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl w-full max-w-md text-center p-10 ambient-shadow">
+    <div class="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+      <span class="material-symbols-outlined text-4xl text-white" style="font-variation-settings:'FILL' 1">check_circle</span>
+    </div>
+    <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Preorder Confirmed!</h2>
+    <p id="success-order-num" class="font-body-md text-body-md text-on-surface-variant mb-2"></p>
+    <p class="font-body-md text-body-md text-on-surface-variant mb-6">We've received your preorder. You'll be notified when it ships. Expected delivery: <strong id="success-date" class="text-primary"></strong></p>
+    <div class="flex gap-3 flex-col">
+      <a href="index.html" class="block bg-primary text-on-primary font-label-md text-label-md uppercase px-8 py-4 hover:bg-secondary transition-colors tracking-widest">Back to Home</a>
+      <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="border border-primary text-primary font-label-md text-label-md uppercase px-8 py-4 tracking-widest">View More Preorders</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-background border-t border-outline-variant py-12">
+  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4">
+    <a class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
+    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant">© 2026 ZENVY. ALL RIGHTS RESERVED. BDT (৳)</p>
+    <div class="flex gap-6">
+      <a href="shop.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Shop</a>
+      <a href="customizer.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Customizer</a>
+      <a href="account.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Account</a>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-primary text-on-primary px-6 py-4 rounded-xl font-label-md text-label-md shadow-xl flex items-center gap-3">
+  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script type="module">
+import { getPreorderProducts, placePreorder, formatExpectedDate } from './js/preorders.js';
+
+// ---- State ----
+let currentProduct = null;
+let modalQty = 1;
+let modalSelectedSize = '';
+let selectedPayment = 'bkash';
+const ADVANCE_AMOUNT = 700;
+
+// ---- Cart ----
+let cart = JSON.parse(localStorage.getItem('apex_cart') || '[]');
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  const badge = document.getElementById('cart-count');
+  if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
+  else badge.classList.add('hidden');
+}
+updateCartCount();
+
+function openCart() {
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
+}
+window.openCart = openCart;
+
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
+window.closeCart = closeCart;
+
+// ---- Toast ----
+function showToast(msg, type='success') {
+  const toast = document.getElementById('toast');
+  const icon = toast.querySelector('.material-symbols-outlined');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-4 rounded-xl font-label-md text-label-md shadow-xl flex items-center gap-3 ${type==='error'?'bg-error text-on-error':'bg-primary text-on-primary'}`;
+  icon.textContent = type==='error' ? 'error' : 'check_circle';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ---- Load Preorder Products ----
+async function loadPreorders() {
+  const skeleton = document.getElementById('preorder-skeleton');
+  const grid = document.getElementById('preorder-grid');
+  const empty = document.getElementById('preorder-empty');
+
+  try {
+    const products = await getPreorderProducts(12);
+    skeleton.classList.add('hidden');
+
+    if (products.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    grid.classList.remove('hidden');
+    grid.innerHTML = products.map(p => renderPreorderCard(p)).join('');
+  } catch (e) {
+    skeleton.classList.add('hidden');
+    // Render demo cards as fallback
+    grid.classList.remove('hidden');
+    grid.innerHTML = getDemoCards().map(p => renderPreorderCard(p)).join('');
+  }
+}
+
+function getDemoCards() {
+  return [
+    {
+      id: 'demo-1',
+      name: 'Argentina 2026 World Cup Special Edition',
+      description: 'Exclusive 2026 FIFA World Cup special edition jersey. Light blue and white stripes with golden champion badge.',
+      basePrice: 9500, preorderPrice: 8500, compareAtPrice: 11000,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H'],
+      preorderMaxQty: 150, preorderSold: 38,
+      expectedDeliveryDate: '15 November 2026',
+      sizes: ['S','M','L','XL','XXL']
+    },
+    {
+      id: 'demo-2',
+      name: 'Barcelona x Zenvy Home 2026/27',
+      description: "Next-season Barcelona home jersey with innovative DryTech Pro fabric.",
+      basePrice: 8200, preorderPrice: 7200, compareAtPrice: 9500,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P'],
+      preorderMaxQty: 100, preorderSold: 61,
+      expectedDeliveryDate: '20 September 2026',
+      sizes: ['S','M','L','XL','XXL']
+    },
+    {
+      id: 'demo-3',
+      name: 'Bangladesh Cricket ODI Jersey 2026',
+      description: 'Official Bangladesh cricket ODI jersey for 2026. Green and red with tiger embroidery.',
+      basePrice: 4500, preorderPrice: 3800, compareAtPrice: 5500,
+      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X'],
+      preorderMaxQty: 200, preorderSold: 45,
+      expectedDeliveryDate: '5 October 2026',
+      sizes: ['S','M','L','XL','XXL','XXXL']
+    }
+  ];
+}
+
+function renderPreorderCard(p) {
+  const img = (p.images && p.images[0]) || '';
+  const price = p.preorderPrice || p.basePrice || 0;
+  const compare = p.compareAtPrice || 0;
+  const sold = p.preorderSold || 0;
+  const max = p.preorderMaxQty || 0;
+  const remaining = max > 0 ? max - sold : null;
+  const pct = max > 0 ? Math.min(100, Math.round((sold / max) * 100)) : 0;
+  const soldOut = max > 0 && remaining !== null && remaining <= 0;
+  const deliveryDate = p.expectedDeliveryDate ? (typeof p.expectedDeliveryDate === 'string' ? p.expectedDeliveryDate : formatExpectedDate(p.expectedDeliveryDate)) : 'TBA';
+  const savings = compare > price ? compare - price : 0;
+
+  return `
+  <div class="group relative flex flex-col bg-surface rounded-xl overflow-hidden ambient-shadow transition-all duration-300 hover:-translate-y-2">
+    <!-- Image -->
+    <div class="relative h-80 w-full bg-surface-container-low overflow-hidden">
+      <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="${img}" onerror="this.style.background='#efeded'"/>
+      <!-- Badges -->
+      <div class="absolute top-4 left-4 flex flex-col gap-2">
+        ${soldOut
+          ? `<span class="bg-error text-on-error font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">Sold Out</span>`
+          : `<span class="preorder-badge bg-secondary text-on-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1">
+               <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">schedule</span>
+               Preorder
+             </span>`
+        }
+        ${savings > 0 ? `<span class="bg-white/90 text-secondary font-label-md text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">Save ৳${savings.toLocaleString()}</span>` : ''}
+      </div>
+      ${remaining !== null && remaining <= 20 && !soldOut ? `
+        <div class="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-sm text-white rounded-lg px-3 py-2 text-center">
+          <span class="font-label-md text-[12px] uppercase tracking-wider">⚡ Only ${remaining} slots left!</span>
+        </div>
+      ` : ''}
+    </div>
+    <!-- Info -->
+    <div class="p-6 flex-1 flex flex-col">
+      <h3 class="font-headline-md text-[18px] leading-6 text-primary mb-1 line-clamp-2">${p.name}</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-3 text-sm line-clamp-2">${p.description || ''}</p>
+      <!-- Delivery date -->
+      <div class="flex items-center gap-1 text-secondary mb-3">
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">local_shipping</span>
+        <span class="font-caption text-caption">Expected: <strong>${deliveryDate}</strong></span>
+      </div>
+      <!-- Slot progress -->
+      ${max > 0 ? `
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="font-caption text-caption text-on-surface-variant">${sold} reserved</span>
+            <span class="font-caption text-caption ${remaining !== null && remaining <= 20 ? 'text-error font-bold' : 'text-on-surface-variant'}">${remaining !== null ? remaining + ' slots left' : 'Unlimited'}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill ${pct > 80 ? 'bg-error' : 'bg-secondary'}" style="width:${pct}%"></div>
+          </div>
+        </div>
+      ` : ''}
+      <!-- Pricing -->
+      <div class="flex items-end justify-between mt-auto pt-3 border-t border-outline-variant">
+        <div>
+          <p class="font-headline-md text-headline-md text-primary">৳ ${price.toLocaleString()}</p>
+          ${compare > price ? `<p class="font-caption text-caption line-through text-on-surface-variant">৳ ${compare.toLocaleString()}</p>` : ''}
+        </div>
+        ${soldOut
+          ? `<button disabled class="font-label-md text-label-md uppercase px-5 py-3 bg-surface-container text-on-surface-variant rounded-lg cursor-not-allowed text-xs tracking-wider">Sold Out</button>`
+          : `<button onclick="openPreorderModal(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="font-label-md text-label-md uppercase px-5 py-3 bg-secondary text-on-secondary hover:bg-primary transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1">
+               <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
+               Pre-Order
+             </button>`
+        }
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- Modal ----
+window.openPreorderModal = function(p) {
+  currentProduct = p;
+  modalQty = 1;
+  modalSelectedSize = '';
+
+  const price = p.preorderPrice || p.basePrice || 0;
+  const compare = p.compareAtPrice || 0;
+  const img = (p.images && p.images[0]) || '';
+  const sold = p.preorderSold || 0;
+  const max = p.preorderMaxQty || 0;
+  const remaining = max > 0 ? max - sold : null;
+  const pct = max > 0 ? Math.min(100, Math.round((sold / max) * 100)) : 0;
+  const deliveryDate = p.expectedDeliveryDate ? (typeof p.expectedDeliveryDate === 'string' ? p.expectedDeliveryDate : formatExpectedDate(p.expectedDeliveryDate)) : 'TBA';
+
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-img').src = img;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-price').textContent = '৳ ' + price.toLocaleString();
+
+  const compareEl = document.getElementById('modal-compare');
+  if (compare > price) { compareEl.textContent = '৳ ' + compare.toLocaleString(); compareEl.classList.remove('hidden'); }
+  else compareEl.classList.add('hidden');
+
+  const delEl = document.getElementById('modal-delivery').querySelector('span:last-child');
+  delEl.textContent = 'Expected delivery: ' + deliveryDate;
+
+  // Slots
+  const slotsWrap = document.getElementById('modal-slots-wrap');
+  if (max > 0) {
+    slotsWrap.classList.remove('hidden');
+    document.getElementById('modal-slots-text').textContent = (remaining !== null ? remaining : '∞') + ' slots left';
+    document.getElementById('modal-slots-bar').style.width = pct + '%';
+    document.getElementById('modal-slots-bar').className = `progress-fill ${pct > 80 ? 'bg-error' : 'bg-secondary'}`;
+  } else slotsWrap.classList.add('hidden');
+
+  // Sizes
+  const sizesEl = document.getElementById('modal-sizes');
+  const sizes = p.sizes || ['S','M','L','XL','XXL'];
+  sizesEl.innerHTML = sizes.map(s => `<button class="size-btn" onclick="selectModalSize('${s}',this)">${s}</button>`).join('');
+
+  // Advance
+  const advance = Math.min(ADVANCE_AMOUNT, price);
+  document.getElementById('advance-amount-text').textContent = '৳ ' + advance.toLocaleString();
+  document.getElementById('bkash-advance-amt').textContent = '৳ ' + advance.toLocaleString();
+  document.getElementById('nagad-advance-amt').textContent = '৳ ' + advance.toLocaleString();
+  document.getElementById('modal-summary-advance').textContent = '৳ ' + advance.toLocaleString();
+
+  updateModalSummary();
+  selectPoPayment('bkash');
+
+  // Reset fields
+  ['po-name','po-phone','po-email','po-address','po-bkash-trxid','po-nagad-trxid','po-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('modal-error').classList.add('hidden');
+
+  document.getElementById('preorder-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeModal = function() {
+  document.getElementById('preorder-modal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.selectModalSize = function(size, btn) {
+  modalSelectedSize = size;
+  document.querySelectorAll('#modal-sizes .size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+window.changeModalQty = function(delta) {
+  modalQty = Math.max(1, modalQty + delta);
+  document.getElementById('modal-qty').textContent = modalQty;
+  updateModalSummary();
+};
+
+function updateModalSummary() {
+  if (!currentProduct) return;
+  const price = currentProduct.preorderPrice || currentProduct.basePrice || 0;
+  const total = price * modalQty;
+  const advance = Math.min(ADVANCE_AMOUNT, price) * modalQty;
+  document.getElementById('modal-summary-price').textContent = '৳ ' + price.toLocaleString();
+  document.getElementById('modal-summary-qty').textContent = '× ' + modalQty;
+  document.getElementById('modal-summary-total').textContent = '৳ ' + total.toLocaleString();
+  document.getElementById('modal-summary-advance').textContent = '৳ ' + advance.toLocaleString();
+}
+
+window.selectPoPayment = function(method) {
+  selectedPayment = method;
+  const methods = ['bkash','nagad','cod'];
+  methods.forEach(m => {
+    const el = document.getElementById('po-pay-' + m);
+    const icon = el.querySelector('.material-symbols-outlined:last-child');
+    if (m === method) {
+      el.className = 'border-2 border-primary rounded-xl p-4 cursor-pointer transition-all';
+      icon.textContent = 'radio_button_checked';
+      icon.className = 'material-symbols-outlined text-primary text-xl';
+    } else {
+      el.className = 'border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/50';
+      icon.textContent = 'radio_button_unchecked';
+      icon.className = 'material-symbols-outlined text-on-surface-variant text-xl';
+    }
+    const inst = document.getElementById('po-' + m + '-instructions');
+    if (inst) inst.classList.toggle('hidden', m !== method);
+  });
+};
+
+// ---- Submit Preorder ----
+window.submitPreorder = async function() {
+  const name = document.getElementById('po-name').value.trim();
+  const phone = document.getElementById('po-phone').value.trim();
+  const address = document.getElementById('po-address').value.trim();
+  const division = document.getElementById('po-division').value;
+  const email = document.getElementById('po-email').value.trim();
+  const note = document.getElementById('po-note').value.trim();
+
+  const errEl = document.getElementById('modal-error');
+  const errText = document.getElementById('modal-error-text');
+
+  const showErr = msg => {
+    errText.textContent = msg;
+    errEl.classList.remove('hidden');
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  if (!name) return showErr('Please enter your full name.');
+  if (!phone || phone.length < 10) return showErr('Please enter a valid phone number.');
+  if (!address) return showErr('Please enter your delivery address.');
+  if (!modalSelectedSize) return showErr('Please select a size.');
+
+  if (selectedPayment === 'bkash') {
+    const trx = document.getElementById('po-bkash-trxid').value.trim();
+    if (!trx) return showErr('Please enter your bKash Transaction ID after sending advance payment.');
+  }
+  if (selectedPayment === 'nagad') {
+    const trx = document.getElementById('po-nagad-trxid').value.trim();
+    if (!trx) return showErr('Please enter your Nagad Transaction ID after sending advance payment.');
+  }
+
+  errEl.classList.add('hidden');
+
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> Processing...`;
+
+  const price = currentProduct.preorderPrice || currentProduct.basePrice || 0;
+  const advance = selectedPayment === 'cod' ? 0 : Math.min(ADVANCE_AMOUNT, price) * modalQty;
+  const deliveryDate = currentProduct.expectedDeliveryDate
+    ? (typeof currentProduct.expectedDeliveryDate === 'string' ? currentProduct.expectedDeliveryDate : formatExpectedDate(currentProduct.expectedDeliveryDate))
+    : 'TBA';
+
+  const trxId = selectedPayment === 'bkash'
+    ? document.getElementById('po-bkash-trxid').value.trim()
+    : selectedPayment === 'nagad' ? document.getElementById('po-nagad-trxid').value.trim() : '';
+
+  try {
+    const result = await placePreorder({
+      productId: currentProduct.id,
+      productName: currentProduct.name,
+      productImg: (currentProduct.images && currentProduct.images[0]) || '',
+      size: modalSelectedSize,
+      qty: modalQty,
+      basePrice: price,
+      total: price * modalQty,
+      customerName: name,
+      customerEmail: email,
+      customerPhone: phone,
+      shippingAddress: { fullAddress: address, division },
+      paymentMethod: selectedPayment,
+      advanceAmount: advance,
+      paymentTrxId: trxId,
+      expectedDate: currentProduct.expectedDeliveryDate || deliveryDate,
+      preorderNote: note
+    });
+
+    if (result.success) {
+      closeModal();
+      document.getElementById('success-order-num').textContent = 'Order #' + result.orderNumber;
+      document.getElementById('success-date').textContent = deliveryDate;
+      document.getElementById('success-modal').classList.remove('hidden');
+    } else {
+      throw new Error(result.error || 'Failed to place preorder');
+    }
+  } catch (e) {
+    showErr('Failed to place preorder. Please try again.');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span> Confirm Preorder`;
+  }
+};
+
+// Init
+loadPreorders();
+</script>
+</body>
+</html>

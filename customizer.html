@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Custom Jersey Builder – ZENVY</title>
+<meta name="description" content="Design your ultimate performance gear with ZENVY Custom Jersey Builder."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#f8f9fa",
+          "surface": "#ffffff",
+          "primary": "#000000",
+          "secondary": "#003ec6",
+          "on-surface": "#1b1c1c",
+          "on-surface-variant": "#5f6368",
+          "outline-variant": "#e2e8f0"
+        },
+        fontFamily: {
+          "sans": ["Inter", "sans-serif"],
+          "display": ["Montserrat", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.04);}
+  .color-swatch{width:28px;height:28px;border-radius:9999px;cursor:pointer;transition:all .2s;}
+  .color-swatch.active{outline:2px solid #000;outline-offset:2px;}
+  .option-btn.active{background:#003ec6;color:#fff;border-color:#003ec6;}
+  #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+  #cart-drawer.open{transform:translateX(0);}
+</style>
+</head>
+<body class="bg-[#f8f9fa] text-[#1b1c1c] antialiased min-h-screen font-sans flex flex-col justify-between">
+
+<!-- NAV -->
+<nav class="bg-white border-b border-outline-variant sticky top-0 z-50">
+  <div class="max-w-[1340px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
+    <a href="index.html" class="font-display text-2xl font-black tracking-tight text-primary">ZENVY</a>
+    
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+      <a href="index.html" class="text-on-surface-variant hover:text-primary">Home</a>
+      <a href="shop.html" class="text-on-surface-variant hover:text-primary">Shop</a>
+      <a href="shop.html?cat=club" class="text-on-surface-variant hover:text-primary">Men</a>
+      <a href="shop.html?cat=national" class="text-on-surface-variant hover:text-primary">Women</a>
+      <a href="customizer.html" class="text-secondary font-bold border-b-2 border-secondary pb-1">Customizer</a>
+      <a href="preorders.html" class="text-on-surface-variant hover:text-primary">Preorders</a>
+    </div>
+
+    <div class="flex items-center gap-5">
+      <button aria-label="Cart" onclick="openCart()" class="text-on-surface-variant hover:text-primary relative">
+        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-primary text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">person</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <h2 class="font-display text-xl font-bold text-primary">Your Bag</h2>
+    <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
+      <p class="font-display text-lg text-primary font-bold mb-2">Your bag is empty</p>
+    </div>
+    <div id="cart-list" class="hidden space-y-4"></div>
+  </div>
+  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-sm font-semibold text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-display text-lg font-bold text-primary">৳ 0</span>
+    </div>
+    <a href="checkout.html" class="block w-full bg-primary text-white text-xs uppercase tracking-widest px-8 py-3.5 hover:bg-secondary transition-colors text-center rounded-xl font-bold">Checkout Securely</a>
+  </div>
+</aside>
+
+<main class="max-w-[1340px] mx-auto px-4 md:px-8 py-8 w-full flex-1">
+
+  <!-- PAGE TITLE (MATCHING SCREENSHOT 2) -->
+  <div class="mb-8">
+    <h1 class="font-display text-3xl font-black text-primary mb-1">Custom Jersey Builder</h1>
+    <p class="text-sm text-on-surface-variant font-semibold">Design your ultimate performance gear.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- ===== LEFT PANEL: CANVAS (7 COLS) ===== -->
+    <div class="lg:col-span-7 bg-white rounded-3xl p-8 min-h-[500px] flex flex-col justify-between items-center relative ambient-shadow border border-outline-variant">
+      
+      <!-- Top Instruction Pill -->
+      <span class="absolute top-6 right-6 text-[11px] font-bold text-on-surface-variant/70 uppercase tracking-widest">
+        Drag to Rotate
+      </span>
+
+      <!-- Jersey Preview Canvas -->
+      <div class="relative w-full max-w-sm h-80 flex items-center justify-center my-auto">
+        <img id="builder-jersey-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Custom Jersey" class="w-full h-full object-contain filter drop-shadow-lg"/>
+        
+        <!-- Live Name & Number Overlay -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none pt-4">
+          <span id="cz-name-preview" class="font-display font-black text-xl uppercase tracking-widest text-primary drop-shadow">YOUR NAME</span>
+          <span id="cz-num-preview" class="font-display font-black text-6xl text-primary drop-shadow leading-none mt-1">00</span>
+        </div>
+      </div>
+
+      <!-- Bottom Controls Bar (Reset, Zoom Out, Zoom In) -->
+      <div class="bg-[#f8f9fa] rounded-full px-5 py-2 border border-outline-variant flex items-center gap-4 text-on-surface-variant text-sm font-bold shadow-sm">
+        <button onclick="resetBuilder()" class="hover:text-primary" title="Reset View">↺</button>
+        <button onclick="zoomBuilder(-10)" class="hover:text-primary" title="Zoom Out">🔍 -</button>
+        <button onclick="zoomBuilder(10)" class="hover:text-primary" title="Zoom In">🔍 +</button>
+      </div>
+
+    </div>
+
+    <!-- ===== RIGHT PANEL: CONTROLS (5 COLS - MATCHING SCREENSHOT 2) ===== -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- 1. Design Options Card -->
+      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
+        <h3 class="font-display text-base font-bold text-primary mb-4">Design Options</h3>
+        
+        <!-- Base Style -->
+        <div class="mb-4">
+          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Base Style</label>
+          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <button onclick="setBaseStyle(this, 'ZENVY Pro')" class="option-btn active border border-outline-variant rounded-xl p-3 text-center">ZENVY Pro</button>
+            <button onclick="setBaseStyle(this, 'Classic Fit')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Classic Fit</button>
+          </div>
+        </div>
+
+        <!-- Base Color Swatches -->
+        <div class="mb-4">
+          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Base Color</label>
+          <div class="flex items-center gap-3">
+            <button onclick="setColor(this, '#ffffff')" class="color-swatch active bg-white border border-gray-300"></button>
+            <button onclick="setColor(this, '#000000')" class="color-swatch bg-black"></button>
+            <button onclick="setColor(this, '#003ec6')" class="color-swatch bg-[#003ec6]"></button>
+            <button onclick="setColor(this, '#ba1a1a')" class="color-swatch bg-[#ba1a1a]"></button>
+            <button onclick="setColor(this, '#e2e8f0')" class="color-swatch bg-[#e2e8f0]"></button>
+          </div>
+        </div>
+
+        <!-- Sleeve Style -->
+        <div>
+          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Sleeve Style</label>
+          <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+            <button onclick="setSleeve(this, 'Short')" class="option-btn active border border-outline-variant rounded-xl p-3 text-center">Short</button>
+            <button onclick="setSleeve(this, 'Long')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Long</button>
+            <button onclick="setSleeve(this, 'Sleeveless')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Sleeveless</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Personalization Card -->
+      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
+        <h3 class="font-display text-base font-bold text-primary mb-4">Personalization</h3>
+        
+        <div class="mb-4">
+          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-1">Your Name</label>
+          <input type="text" id="builder-name" value="SMITH" placeholder="e.g. SMITH" oninput="updateBuilderText()" class="w-full border border-outline-variant rounded-xl p-3 text-sm font-bold uppercase bg-[#f8f9fa] outline-none focus:border-primary"/>
+        </div>
+
+        <div>
+          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-1">Your Number (0-99)</label>
+          <input type="text" id="builder-num" value="10" maxlength="2" placeholder="10" oninput="updateBuilderText()" class="w-full border border-outline-variant rounded-xl p-3 text-sm font-bold uppercase bg-[#f8f9fa] outline-none focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- 3. Price & Add to Cart Card -->
+      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <p class="text-xs text-on-surface-variant font-semibold">Total Price</p>
+            <p id="builder-total-price" class="font-display text-2xl font-black text-primary">৳2,750</p>
+          </div>
+          <div class="text-right text-xs text-on-surface-variant">
+            <p>Base: ৳2,000</p>
+            <p>Customization: ৳750</p>
+          </div>
+        </div>
+
+        <button onclick="addBuilderToCart()" class="w-full bg-primary text-white font-bold text-sm px-6 py-4 rounded-xl hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-lg">
+          <span class="material-symbols-outlined text-base">shopping_cart</span>
+          <span>Add to Cart</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="bg-white border-t border-outline-variant py-8 mt-12 text-center text-xs text-on-surface-variant">
+  <p>© 2026 ZENVY Sportswear. All rights reserved.</p>
+</footer>
+
+<script>
+let selectedStyle = 'ZENVY Pro';
+let selectedSleeve = 'Short';
+let selectedColor = '#ffffff';
+
+function setBaseStyle(btn, style) {
+  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedStyle = style;
+}
+
+function setSleeve(btn, sleeve) {
+  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSleeve = sleeve;
+}
+
+function setColor(btn, color) {
+  document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedColor = color;
+}
+
+function updateBuilderText() {
+  const name = document.getElementById('builder-name').value.trim() || 'YOUR NAME';
+  const num = document.getElementById('builder-num').value.trim() || '00';
+  document.getElementById('cz-name-preview').textContent = name;
+  document.getElementById('cz-num-preview').textContent = num;
+}
+
+function resetBuilder() {
+  document.getElementById('builder-name').value = 'SMITH';
+  document.getElementById('builder-num').value = '10';
+  updateBuilderText();
+}
+
+let zoomLevel = 1;
+function zoomBuilder(delta) {
+  zoomLevel += delta > 0 ? 0.1 : -0.1;
+  if (zoomLevel < 0.7) zoomLevel = 0.7;
+  if (zoomLevel > 1.4) zoomLevel = 1.4;
+  document.getElementById('builder-jersey-img').style.transform = `scale(${zoomLevel})`;
+}
+
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+
+function addBuilderToCart() {
+  const name = document.getElementById('builder-name').value.trim();
+  const num = document.getElementById('builder-num').value.trim();
+
+  cart.push({
+    id: 'cz-' + Date.now(),
+    name: `Custom ${selectedStyle} Jersey`,
+    price: 2750,
+    size: 'M',
+    customization: { name, number: num, sleeve: selectedSleeve, color: selectedColor },
+    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P',
+    qty: 1
+  });
+
+  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  window.location.href = 'checkout.html';
+}
+
+function openCart() {
+  const list = document.getElementById('cart-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  if (!list) return;
+
+  if (cart.length === 0) {
+    list.classList.add('hidden'); empty.classList.remove('hidden'); footer.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden'); list.classList.remove('hidden'); footer.classList.remove('hidden');
+    let subtotal = 0;
+    list.innerHTML = cart.map(item => {
+      const itemPrice = (item.price || 0) * (item.qty || 1);
+      subtotal += itemPrice;
+      return `<div class="flex gap-4 py-3 border-b border-outline-variant">
+        <img src="${item.img}" class="w-14 h-14 object-contain rounded-xl bg-slate-100 flex-shrink-0"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm text-primary truncate">${item.name}</p>
+          <p class="text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
+        </div>
+      </div>`;
+    }).join('');
+    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+  }
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
+}
+
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
+</script>
+</body>
+</html>

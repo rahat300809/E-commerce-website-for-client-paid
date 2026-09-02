@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shop Football Jerseys & Sportswear – ZENVY</title>
+<meta name="description" content="Browse ZENVY's collection of authentic football jerseys, club kits, national team shirts, and custom sportswear."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#f8f9fa",
+          "surface": "#ffffff",
+          "primary": "#000000",
+          "secondary": "#003ec6",
+          "on-surface": "#1b1c1c",
+          "on-surface-variant": "#5f6368",
+          "outline-variant": "#e2e8f0",
+          "brand-green": "#00a83f"
+        },
+        fontFamily: {
+          "sans": ["Inter", "sans-serif"],
+          "display": ["Montserrat", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.04);}
+  #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+  #cart-drawer.open{transform:translateX(0);}
+  #mobile-menu{transform:translateX(-100%);transition:transform .3s ease;}
+  #mobile-menu.open{transform:translateX(0);}
+  .wish-btn.active span{font-variation-settings:'FILL' 1;color:#ba1a1a;}
+</style>
+</head>
+<body class="bg-[#f8f9fa] text-[#1b1c1c] antialiased min-h-screen font-sans flex flex-col justify-between">
+
+<!-- ===== HEADER / NAVBAR ===== -->
+<nav class="bg-white border-b border-outline-variant sticky top-0 z-50">
+  <div class="max-w-[1340px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
+    <a href="index.html" class="font-display text-2xl font-black tracking-tight text-primary">ZENVY</a>
+    
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+      <a href="index.html" class="text-on-surface-variant hover:text-primary">Home</a>
+      <a href="shop.html" class="text-secondary font-bold border-b-2 border-secondary pb-1">Shop</a>
+      <a href="shop.html?cat=club" class="text-on-surface-variant hover:text-primary">Men</a>
+      <a href="shop.html?cat=national" class="text-on-surface-variant hover:text-primary">Women</a>
+      <a href="customizer.html" class="text-on-surface-variant hover:text-primary">Customizer</a>
+      <a href="preorders.html" class="text-on-surface-variant hover:text-primary">Preorders</a>
+    </div>
+
+    <div class="flex items-center gap-5">
+      <a href="shop.html" aria-label="Wishlist" class="text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">favorite</span>
+      </a>
+      <button aria-label="Cart" onclick="openCart()" class="text-on-surface-variant hover:text-primary relative">
+        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-primary text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
+      <a href="account.html" aria-label="Account" class="text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">person</span>
+      </a>
+      <button aria-label="Menu" onclick="openMobileMenu()" class="md:hidden text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">menu</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
+  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
+    <h2 class="font-display text-xl font-bold text-primary">Your Bag</h2>
+    <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
+      <p class="font-display text-lg text-primary font-bold mb-2">Your bag is empty</p>
+    </div>
+    <div id="cart-list" class="hidden space-y-4"></div>
+  </div>
+  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-sm font-semibold text-on-surface-variant">Subtotal</span>
+      <span id="cart-subtotal" class="font-display text-lg font-bold text-primary">৳ 0</span>
+    </div>
+    <a href="checkout.html" class="block w-full bg-primary text-white text-xs uppercase tracking-widest px-8 py-3.5 hover:bg-secondary transition-colors text-center rounded-xl font-bold">Checkout Securely</a>
+  </div>
+</aside>
+
+<main class="max-w-[1340px] mx-auto px-4 md:px-8 py-6 w-full flex-1">
+
+  <!-- BREADCRUMBS -->
+  <div class="flex items-center gap-2 text-xs text-on-surface-variant mb-6 font-semibold">
+    <a href="index.html" class="hover:underline">Home</a>
+    <span>›</span>
+    <a href="shop.html" class="hover:underline">Jerseys</a>
+    <span>›</span>
+    <span class="text-primary font-bold">Football</span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- ===== LEFT SIDEBAR FILTERS ===== -->
+    <aside class="lg:col-span-3 bg-white rounded-2xl p-6 ambient-shadow border border-outline-variant">
+      <h3 class="font-display text-lg font-bold text-primary mb-4 pb-3 border-b border-outline-variant">Filters</h3>
+
+      <!-- Category Filter -->
+      <div class="mb-6">
+        <h4 class="text-xs uppercase font-bold tracking-wider text-on-surface-variant mb-3">Category</h4>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" checked onchange="filterProducts()" class="rounded border-outline-variant text-primary focus:ring-primary"/>
+            <span class="font-semibold text-primary">Football Jerseys</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" onchange="filterProducts()" class="rounded border-outline-variant text-primary focus:ring-primary"/>
+            <span class="text-on-surface-variant">Cricket Kits</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" onchange="filterProducts()" class="rounded border-outline-variant text-primary focus:ring-primary"/>
+            <span class="text-on-surface-variant">Custom Printing</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Brand Filter -->
+      <div class="mb-6">
+        <h4 class="text-xs uppercase font-bold tracking-wider text-on-surface-variant mb-3">Brand</h4>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" checked class="rounded border-outline-variant text-primary focus:ring-primary"/>
+            <span class="font-semibold text-primary">ZENVY Pro</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary"/>
+            <span class="text-on-surface-variant">ZENVY Classic</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Price Range Slider -->
+      <div>
+        <h4 class="text-xs uppercase font-bold tracking-wider text-on-surface-variant mb-3">Price (BDT)</h4>
+        <input type="range" min="0" max="10000" value="5000" class="w-full accent-primary" oninput="document.getElementById('price-val').textContent=this.value"/>
+        <div class="flex justify-between text-xs font-bold text-primary mt-2">
+          <span>৳0</span>
+          <span>৳<span id="price-val">5000</span></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT GRID (9 COLS) ===== -->
+    <section class="lg:col-span-9">
+      
+      <!-- Top Title & Sort Bar -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 class="font-display text-2xl md:text-3xl font-black text-primary">Football Jerseys</h1>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-on-surface-variant">Sort by:</span>
+          <select id="sort-select" onchange="sortProducts(this.value)" class="text-xs font-bold border border-outline-variant rounded-xl px-3 py-2 bg-white outline-none">
+            <option value="newest">Newest</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Cards Grid (Matching Screenshot 1) -->
+      <div id="shop-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Product 1 -->
+        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <span class="absolute top-3 left-3 bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-1 rounded-full">New Arrival</span>
+            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-lg">favorite</span>
+            </button>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          </div>
+          <div>
+            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">ZENVY Strike Pro Jersey</h3>
+            <p class="text-xs text-on-surface-variant mb-2">Men's Authentic Edition</p>
+            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
+              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.5)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-display text-lg font-bold text-primary">৳3,500</span>
+              <button onclick="quickAddToCart(1,'ZENVY Strike Pro Jersey',3500,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <span class="absolute top-3 left-3 bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-1 rounded-full">-20%</span>
+            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-lg">favorite</span>
+            </button>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          </div>
+          <div>
+            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">Crimson Velocity Kit</h3>
+            <p class="text-xs text-on-surface-variant mb-2">Unisex Replica</p>
+            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
+              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(5.0)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-display text-lg font-bold text-primary">৳2,800</span>
+                <span class="text-xs text-on-surface-variant line-through ml-1">৳3,500</span>
+              </div>
+              <button onclick="quickAddToCart(2,'Crimson Velocity Kit',2800,'https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-lg">favorite</span>
+            </button>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+          </div>
+          <div>
+            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">Pro Training Top</h3>
+            <p class="text-xs text-on-surface-variant mb-2">DryTech Series</p>
+            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
+              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.8)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-display text-lg font-bold text-primary">৳4,200</span>
+              <button onclick="quickAddToCart(3,'Pro Training Top',4200,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pagination (Matching Screenshot 1) -->
+      <div class="flex justify-center items-center gap-2 mt-10">
+        <button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant hover:bg-white">‹</button>
+        <button class="w-8 h-8 rounded-full bg-primary text-white text-xs font-bold shadow">1</button>
+        <button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant hover:bg-white">2</button>
+        <button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant hover:bg-white">3</button>
+        <button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant hover:bg-white">›</button>
+      </div>
+
+    </section>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-white border-t border-outline-variant pt-12 pb-8 mt-12">
+  <div class="max-w-[1340px] mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-outline-variant text-xs text-on-surface-variant">
+    <div>
+      <h4 class="font-display text-lg font-bold text-primary mb-2">ZENVY Sportswear</h4>
+      <p>Elevating athletic performance through premium design and technical innovation across Bangladesh.</p>
+    </div>
+    <div>
+      <h5 class="font-bold text-primary mb-2">Links</h5>
+      <ul class="space-y-1">
+        <li><a href="shop.html" class="hover:underline">Shop</a></li>
+        <li><a href="customizer.html" class="hover:underline">Customizer Builder</a></li>
+        <li><a href="preorders.html" class="hover:underline">Preorders</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5 class="font-bold text-primary mb-2">Legal</h5>
+      <ul class="space-y-1">
+        <li><a href="#" class="hover:underline">Privacy Policy</a></li>
+        <li><a href="#" class="hover:underline">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="text-center text-xs text-on-surface-variant pt-6">© 2026 ZENVY Sportswear. All rights reserved.</p>
+</footer>
+
+<script>
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+
+function saveCart() {
+  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  updateCartCount();
+}
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + (i.qty || 1), 0);
+  const badge = document.getElementById('cart-count');
+  if (!badge) return;
+  if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+}
+
+function quickAddToCart(id, name, price, img) {
+  const ex = cart.find(i => i.id === id);
+  if (ex) ex.qty = (ex.qty || 1) + 1;
+  else cart.push({ id, name, price, img, size: 'M', qty: 1 });
+  saveCart();
+  openCart();
+}
+
+function openCart() {
+  const list = document.getElementById('cart-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  if (!list) return;
+
+  if (cart.length === 0) {
+    list.classList.add('hidden'); empty.classList.remove('hidden'); footer.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden'); list.classList.remove('hidden'); footer.classList.remove('hidden');
+    let subtotal = 0;
+    list.innerHTML = cart.map(item => {
+      const itemPrice = (item.price || 0) * (item.qty || 1);
+      subtotal += itemPrice;
+      return `<div class="flex gap-4 py-3 border-b border-outline-variant">
+        <img src="${item.img}" class="w-14 h-14 object-contain rounded-xl bg-slate-100 flex-shrink-0"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm text-primary truncate">${item.name}</p>
+          <p class="text-xs text-on-surface-variant">Qty: ${item.qty || 1}</p>
+          <p class="text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
+        </div>
+      </div>`;
+    }).join('');
+    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+  }
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').style.opacity = '1';
+  document.getElementById('cart-overlay').style.pointerEvents = 'all';
+}
+
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').style.opacity = '0';
+  document.getElementById('cart-overlay').style.pointerEvents = 'none';
+}
+
+updateCartCount();
+</script>
+</body>
+</html>

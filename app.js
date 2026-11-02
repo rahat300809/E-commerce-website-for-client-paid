@@ -29,21 +29,9 @@ function formatMoney(amountInBDT) {
   return `৳${Math.round(amountInBDT).toLocaleString()}`;
 }
 
-// Initialize Application — Firestore-first
-document.addEventListener('DOMContentLoaded', async () => {
-  // Show loading overlay while fetching cloud data
-  const loadingEl = document.getElementById('app-loading-overlay');
-
-  // Step 1: Hydrate localStorage from Firestore (gets latest admin changes)
-  if (window.ZenvyFirebase) {
-    try {
-      await window.ZenvyFirebase.hydrate();
-    } catch(e) {
-      console.warn('Firestore hydration failed, using local data:', e);
-    }
-  }
-
-  // Step 2: Initialize UI with (now up-to-date) data
+// Initialize Application — Instant Local-First with Background Cloud Sync
+document.addEventListener('DOMContentLoaded', () => {
+  // Step 1: Render UI IMMEDIATELY with local cached data (instant 0ms first-paint)
   syncHomepageContent();
   renderCart();
   updateCustomizerTotal();
@@ -68,13 +56,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => toggleCartDrawer(true), 200);
   }
 
-  // Step 3: Hide loading overlay
-  if (loadingEl) loadingEl.style.display = 'none';
-
-  // Step 4: Start real-time Firestore listener for live admin→website sync
+  // Step 2: Background Cloud Sync (Runs non-blocking without delaying page display)
   if (window.ZenvyFirebase) {
+    window.ZenvyFirebase.hydrate().then(() => {
+      // Silently re-sync components if cloud has newer admin data
+      syncHomepageContent();
+      renderCart();
+      syncFooterSocialLinks();
+      renderCheckoutPaymentMethods();
+      syncModelShowcase();
+    }).catch(e => console.warn('Background sync:', e));
+
     window.ZenvyFirebase.startLiveSync(() => {
-      // Runs whenever admin saves anything to Firestore
+      // Runs whenever admin saves anything to Firestore in real-time
       syncHomepageContent();
       renderCart();
       syncFooterSocialLinks();
@@ -1507,7 +1501,24 @@ function renderShopProducts() {
     filtered.sort((a, b) => (b.salePrice || b.basePrice || 0) - (a.salePrice || a.basePrice || 0));
   }
 
-  if (countEl) countEl.textContent = `${filtered.length}`;
+  // Fallback to all products if selected category has no matching items
+  let isCategoryFallback = false;
+  if (filtered.length === 0 && shopActiveCategory !== 'all') {
+    isCategoryFallback = true;
+    filtered = allProducts.filter(p => {
+      const price = p.salePrice || p.basePrice || 0;
+      return price <= shopMaxPrice;
+    });
+    if (shopSortOrder === 'price-asc') {
+      filtered.sort((a, b) => (a.salePrice || a.basePrice || 0) - (b.salePrice || b.basePrice || 0));
+    } else if (shopSortOrder === 'price-desc') {
+      filtered.sort((a, b) => (b.salePrice || b.basePrice || 0) - (a.salePrice || a.basePrice || 0));
+    }
+  }
+
+  if (countEl) {
+    countEl.textContent = isCategoryFallback ? `${filtered.length} (All Kits)` : `${filtered.length}`;
+  }
 
   const PAGE_SIZE = 9;
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -1545,7 +1556,7 @@ function renderShopProducts() {
       <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-gray-200 p-8">
         <span class="material-symbols-outlined text-5xl text-gray-300 mb-3">inventory_2</span>
         <h3 class="font-headline-lg text-lg font-bold text-primary mb-1">No products found</h3>
-        <p class="font-body-md text-xs text-secondary mb-4">No products in category "${shopActiveCategory}" match your current filters.</p>
+        <p class="font-body-md text-xs text-secondary mb-4">No products in catalog match your current price filters.</p>
         <button onclick="resetFilters()" class="bg-primary text-white font-label-caps text-xs px-5 py-2.5 rounded-full font-bold">Reset Filters</button>
       </div>
     `;
@@ -1556,7 +1567,21 @@ function renderShopProducts() {
   const pageProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
   const defaultImg = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
 
-  grid.innerHTML = pageProducts.map(p => {
+  const fallbackNotice = isCategoryFallback ? `
+    <div class="col-span-full mb-3 bg-amber-50/90 border border-amber-200/90 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-amber-600 text-xl flex-shrink-0">info</span>
+        <div>
+          <span class="font-bold text-black font-headline">"${shopActiveCategory}"</span> ক্যাটাগরিতে এই মুহূর্তে কোনো জার্সি নেই। নিচে আমাদের সব <strong>${filtered.length}টি</strong> জার্সি দেখানো হচ্ছে:
+        </div>
+      </div>
+      <button type="button" onclick="selectCategory('all')" class="self-start sm:self-auto bg-black hover:bg-neutral-800 text-white font-headline text-[11px] font-bold px-3.5 py-1.5 rounded-full transition-all shadow-2xs whitespace-nowrap cursor-pointer">
+        সব ক্যাটাগরি দেখুন
+      </button>
+    </div>
+  ` : '';
+
+  grid.innerHTML = fallbackNotice + pageProducts.map(p => {
     const imgUrl = (p.images && p.images[0] && p.images[0].url) ? p.images[0].url : (p.image || defaultImg);
     const priceFormatted = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origFormatted = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';

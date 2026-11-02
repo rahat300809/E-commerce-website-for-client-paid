@@ -103,6 +103,171 @@ window.addEventListener('zenvy-store-updated', (e) => {
 });
 
 
+// ── Dynamic Hero Banner Carousel Engine ──
+let heroBannerActiveIndex = 0;
+let heroBannerInterval = null;
+let heroBannersList = [];
+
+function getHeroBanners() {
+  let banners = [];
+  if (typeof DB !== 'undefined' && DB.banners) {
+    banners = typeof DB.banners.active === 'function' ? DB.banners.active() : DB.banners.all().filter(b => b.isActive !== false);
+  }
+  if (!banners || banners.length === 0) {
+    if (typeof DB !== 'undefined' && DB.homepage) {
+      const hp = DB.homepage.get();
+      if (hp && hp.banners && hp.banners.length > 0) {
+        banners = hp.banners.filter(b => b.isActive !== false);
+      }
+    }
+  }
+  if (!banners || banners.length === 0) {
+    banners = [
+      {
+        id: 'hero_1',
+        title: 'ENGINEERED FOR SUPREMACY',
+        subtitle: 'The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.',
+        badge: 'NEW ARRIVAL • MATCH EDITION',
+        desktopImg: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
+        ctaPrimaryText: 'SHOP',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: '3D Studio',
+        ctaSecondaryLink: 'customizer.html'
+      },
+      {
+        id: 'hero_2',
+        title: 'AUTHENTIC UCL CLUB EDITIONS',
+        subtitle: 'Official club crests, tournament starball badges, and pro player customization precision.',
+        badge: 'EXCLUSIVE DROP • LIMITED STOCK',
+        desktopImg: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80',
+        ctaPrimaryText: 'EXPLORE KITS',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: 'CUSTOMIZE',
+        ctaSecondaryLink: 'product.html'
+      },
+      {
+        id: 'hero_3',
+        title: 'AEROKNIT AIRFLOW TECHNOLOGY',
+        subtitle: 'Ultra-breathable micro-mesh engineered for 90 minutes of maximum pitch endurance.',
+        badge: 'PRO SPECIFICATION',
+        desktopImg: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80',
+        ctaPrimaryText: 'BUY NOW',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: 'DISCOVER',
+        ctaSecondaryLink: 'product.html'
+      }
+    ];
+  }
+  return banners;
+}
+
+function renderHeroBannerCarousel() {
+  const wrapper = document.getElementById('hero-slides-wrapper');
+  const dotsEl = document.getElementById('hero-banner-dots');
+  if (!wrapper) return;
+
+  heroBannersList = getHeroBanners();
+  if (heroBannersList.length === 0) return;
+
+  if (heroBannerActiveIndex >= heroBannersList.length) heroBannerActiveIndex = 0;
+  if (heroBannerActiveIndex < 0) heroBannerActiveIndex = heroBannersList.length - 1;
+
+  wrapper.innerHTML = heroBannersList.map((banner, index) => {
+    const isActive = index === heroBannerActiveIndex;
+    const bg = banner.desktopImg || banner.bgImage || banner.image || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80';
+    const badge = banner.badge || banner.marqueeText || 'NEW ARRIVAL • MATCH EDITION';
+    const title = banner.title || 'ENGINEERED FOR SUPREMACY';
+    const subtitle = banner.subtitle || banner.description || 'The new standard in high-performance kits.';
+    const cta1 = banner.ctaPrimaryText || banner.ctaText || 'SHOP';
+    const cta2 = banner.ctaSecondaryText || '3D Studio';
+
+    return `
+      <div class="hero-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out flex items-center ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}"
+           data-index="${index}">
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ${isActive ? 'scale-100' : 'scale-105'}"
+             style="background-image: url('${bg}');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25 sm:to-transparent"></div>
+        <div class="relative z-10 max-w-xl p-5 sm:p-10 md:p-12 text-white">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-xs font-mono-ui font-bold uppercase tracking-widest mb-2 sm:mb-3 border border-white/20">
+            <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>${badge}</span>
+          </div>
+          <h1 class="font-headline text-xl xs:text-2xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight uppercase mb-2 sm:mb-3 drop-shadow">
+            ${title}
+          </h1>
+          <p class="font-body text-[11px] sm:text-sm text-gray-200 leading-relaxed mb-4 sm:mb-6 max-w-md line-clamp-2">
+            ${subtitle}
+          </p>
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
+              <span>${cta1}</span>
+              <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </a>
+            <a href="#customizer" onclick="switchView('customizer'); return false;" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
+              <span>${cta2}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (dotsEl) {
+    dotsEl.innerHTML = heroBannersList.map((_, i) => `
+      <button type="button" onclick="gotoHeroBannerSlide(${i})"
+              class="transition-all duration-300 rounded-full cursor-pointer ${i === heroBannerActiveIndex ? 'w-5 sm:w-6 h-1.5 sm:h-2 bg-white' : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70'}"
+              aria-label="Slide ${i + 1}"></button>
+    `).join('');
+  }
+
+  if (!wrapper._swipeAttached) {
+    let startX = 0;
+    wrapper.addEventListener('touchstart', (e) => {
+      startX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    wrapper.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - startX;
+      if (diff > 45) prevHeroBannerSlide();
+      else if (diff < -45) nextHeroBannerSlide();
+    }, { passive: true });
+    wrapper._swipeAttached = true;
+  }
+
+  startHeroBannerAutoScroll();
+}
+
+function startHeroBannerAutoScroll() {
+  if (heroBannerInterval) clearInterval(heroBannerInterval);
+  if (heroBannersList.length > 1) {
+    heroBannerInterval = setInterval(() => {
+      nextHeroBannerSlide(false);
+    }, 5500);
+  }
+}
+
+window.nextHeroBannerSlide = function(manual = true) {
+  if (heroBannersList.length <= 1) return;
+  heroBannerActiveIndex = (heroBannerActiveIndex + 1) % heroBannersList.length;
+  renderHeroBannerCarousel();
+  if (manual) startHeroBannerAutoScroll();
+};
+
+window.prevHeroBannerSlide = function() {
+  if (heroBannersList.length <= 1) return;
+  heroBannerActiveIndex = (heroBannerActiveIndex - 1 + heroBannersList.length) % heroBannersList.length;
+  renderHeroBannerCarousel();
+  startHeroBannerAutoScroll();
+};
+
+window.gotoHeroBannerSlide = function(index) {
+  heroBannerActiveIndex = index;
+  renderHeroBannerCarousel();
+  startHeroBannerAutoScroll();
+};
+
 // ── Dynamic Homepage & Storefront Sync from DB ──
 function syncHomepageContent() {
   if (typeof DB === 'undefined') return;
@@ -128,43 +293,8 @@ function syncHomepageContent() {
     if (marqueeEl && ann.marqueeText) marqueeEl.textContent = ann.marqueeText;
   }
 
-  // 2. Hero Banner
-  const hero = homeConfig.hero;
-  if (hero) {
-    const heroSection = document.getElementById('hero-banner-section');
-    if (heroSection) {
-      heroSection.style.display = hero.enabled !== false ? '' : 'none';
-    }
-    const badgeText = document.getElementById('hero-badge-text');
-    if (badgeText && hero.badge) badgeText.textContent = hero.badge;
-
-    const titleText = document.getElementById('hero-title-text');
-    if (titleText && hero.title) titleText.textContent = hero.title;
-
-    const subText = document.getElementById('hero-subtitle-text');
-    if (subText && hero.subtitle) subText.textContent = hero.subtitle;
-
-    const cta1Label = document.getElementById('hero-cta1-label');
-    const cta1Btn = document.getElementById('hero-cta1-btn');
-    if (cta1Label) cta1Label.textContent = hero.ctaPrimaryText || 'SHOP';
-    if (cta1Btn) {
-      const link = hero.ctaPrimaryLink || 'index.html#shop';
-      cta1Btn.href = link;
-      if (link.includes('#shop') || link.toLowerCase().includes('shop')) {
-        cta1Btn.onclick = (e) => { e.preventDefault(); switchView('shop'); };
-      } else {
-        cta1Btn.onclick = null;
-      }
-    }
-
-    const cta2Label = document.getElementById('hero-cta2-label');
-    if (cta2Label && hero.ctaSecondaryText) cta2Label.textContent = hero.ctaSecondaryText;
-
-    const heroBg = document.getElementById('hero-bg-div');
-    if (heroBg && hero.bgImage) {
-      heroBg.style.backgroundImage = `url('${hero.bgImage}')`;
-    }
-  }
+  // 2. Hero Banner Carousel (Auto-scrolling, Multi-banner support)
+  renderHeroBannerCarousel();
 
   // 3. Value Props Bar (4 Selling Points)
   const props = homeConfig.valueProps || [
@@ -294,28 +424,12 @@ function syncHomepageContent() {
       }).join('');
     }
   }
-  // 6. Active Promotional Banners → hero overlay / announcement
+  // 6. Active Promotional Banners marquee sync
   if (typeof DB !== 'undefined' && DB.banners) {
-    const activeBanners = DB.banners.active();
-    if (activeBanners.length > 0) {
-      const topBanner = activeBanners[0];
-      const bannerImg = topBanner.desktopImg || topBanner.bgImage || '';
-      if (bannerImg) {
-        const heroBg = document.getElementById('hero-bg-div');
-        if (heroBg) heroBg.style.backgroundImage = `url('${bannerImg}')`;
-      }
-      if (topBanner.title) {
-        const titleEl = document.getElementById('hero-title-text');
-        if (titleEl) titleEl.textContent = topBanner.title;
-      }
-      if (topBanner.subtitle) {
-        const subEl = document.getElementById('hero-subtitle-text');
-        if (subEl) subEl.textContent = topBanner.subtitle;
-      }
-      if (topBanner.marqueeText) {
-        const marqueeEl = document.getElementById('store-marquee-text');
-        if (marqueeEl) marqueeEl.textContent = topBanner.marqueeText;
-      }
+    const activeBanners = typeof DB.banners.active === 'function' ? DB.banners.active() : [];
+    if (activeBanners.length > 0 && activeBanners[0].marqueeText) {
+      const marqueeEl = document.getElementById('store-marquee-text');
+      if (marqueeEl) marqueeEl.textContent = activeBanners[0].marqueeText;
     }
   }
 

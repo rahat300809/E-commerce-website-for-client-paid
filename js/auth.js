@@ -48,10 +48,16 @@ export function initAuth(onUserChange) {
 // Check if a user has ADMIN status (Checks: hardcoded master emails, admins collection, customers role, and session flag)
 export async function checkUserIsAdmin(user) {
   if (!user || !user.email) return false;
-  const userEmail = user.email.toLowerCase();
+  const userEmail = user.email.toLowerCase().trim();
+
+  // Block any legacy test email
+  const LEGACY_UNAUTHORIZED = ['pro300809@gmail.com', 'rahat3008096081@gmail.com', 'webzenvy099@gmail.com', 'admin@zenvy.com'];
+  if (LEGACY_UNAUTHORIZED.includes(userEmail)) {
+    return false;
+  }
 
   // 1. Permanent Master Owner Emails (Firebase project creator & Store Owner)
-  const MASTER_EMAILS = ['gfse083@gmail.com', 'rahat300809@gmail.com', 'admin@zenvy.com'];
+  const MASTER_EMAILS = ['gfse083@gmail.com', 'rahat300809@gmail.com'];
   if (MASTER_EMAILS.includes(userEmail)) {
     return true;
   }
@@ -59,7 +65,7 @@ export async function checkUserIsAdmin(user) {
   // 2. Check 'admins' Firestore collection (doc ID = email)
   try {
     const adminDocSnap = await getDoc(doc(db, 'admins', userEmail));
-    if (adminDocSnap.exists() && adminDocSnap.data().active !== false) {
+    if (adminDocSnap.exists() && adminDocSnap.data().active === true) {
       return true;
     }
   } catch (e) {
@@ -71,22 +77,12 @@ export async function checkUserIsAdmin(user) {
     const storeAccessDoc = await getDoc(doc(db, 'zenvy_store', 'admin_access'));
     if (storeAccessDoc.exists()) {
       const data = storeAccessDoc.data()?.data || [];
-      if (Array.isArray(data) && data.some(a => (a.email || '').trim().toLowerCase() === userEmail && a.status !== 'Inactive')) {
+      if (Array.isArray(data) && data.some(a => (a.email || '').trim().toLowerCase() === userEmail && a.status === 'Active')) {
         return true;
       }
     }
   } catch (e) {
     console.warn('Firestore zenvy_store admin_access check:', e);
-  }
-
-  // 4. Check 'customers' collection (doc ID = uid)
-  try {
-    const customerDoc = await getDoc(doc(db, 'customers', user.uid));
-    if (customerDoc.exists() && customerDoc.data().role === 'ADMIN') {
-      return true;
-    }
-  } catch (e) {
-    console.warn('Firestore customer role check warning:', e);
   }
 
   return false;
@@ -95,6 +91,7 @@ export async function checkUserIsAdmin(user) {
 // 🔵 Google Sign-In for Users & Customers
 export async function loginWithGoogle() {
   try {
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
@@ -115,6 +112,7 @@ export async function loginWithGoogle() {
 // 🔴 Admin Login via Google
 export async function adminLoginWithGoogle() {
   try {
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 

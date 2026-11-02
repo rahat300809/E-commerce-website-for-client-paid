@@ -26,18 +26,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Verify active session integrity
   if (DB.auth.isLoggedIn()) {
-    updateAdminUserInfo();
-    showApp();
-    nav(location.hash.replace('#', '') || 'dashboard');
-  } else {
-    // Check if a password has been set yet (first-time setup)
-    const adminAuth = typeof Store !== 'undefined' ? Store.getObj('adminAuth', { password: null }) : {};
-    if (!adminAuth || !adminAuth.password) {
-      showFirstTimeSetup();
+    const user = DB.auth.getCurrentUser();
+    const isAuth = user && user.email ? DB.adminAccess.isAuthorized(user.email) : false;
+    if (isAuth) {
+      updateAdminUserInfo();
+      showApp();
+      nav(location.hash.replace('#', '') || 'dashboard');
     } else {
+      console.warn('[Admin Security] Active session not authorized for:', user?.email);
+      DB.auth.logout();
       showLogin();
     }
+  } else {
+    showLogin();
   }
   updateNavBadges();
 
@@ -61,78 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 function showLogin() {
   document.getElementById('admin-login').classList.remove('hidden');
   document.getElementById('admin-app').classList.add('hidden');
-  const setup = document.getElementById('admin-first-time-setup');
-  if (setup) setup.classList.add('hidden');
-}
-
-function showFirstTimeSetup() {
-  // Show or create the first-time setup overlay
-  let setup = document.getElementById('admin-first-time-setup');
-  if (!setup) {
-    setup = document.createElement('div');
-    setup.id = 'admin-first-time-setup';
-    setup.className = 'fixed inset-0 z-50 flex items-center justify-center bg-gray-950/95 backdrop-blur-sm';
-    setup.innerHTML = `
-      <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
-        <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-center">
-          <div class="text-4xl mb-2">🔐</div>
-          <h2 class="text-white text-2xl font-bold">Welcome to ZENVY Admin</h2>
-          <p class="text-gray-400 text-sm mt-1">First-time setup: Create your admin password</p>
-        </div>
-        <div class="p-8 space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Create Admin Password</label>
-            <input type="password" id="setup-pw" placeholder="At least 8 characters"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Confirm Password</label>
-            <input type="password" id="setup-pw-confirm" placeholder="Repeat your password"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-          </div>
-          <p id="setup-err" class="hidden text-red-600 text-xs text-center"></p>
-          <button onclick="handleFirstTimeSetup()"
-            class="w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors">
-            Save Password &amp; Enter Admin Panel
-          </button>
-          <p class="text-center text-gray-500 text-xs">This password is stored locally and never sent to any server.</p>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(setup);
-  }
-  setup.classList.remove('hidden');
-  document.getElementById('admin-login')?.classList.add('hidden');
-  document.getElementById('admin-app')?.classList.add('hidden');
-}
-
-function handleFirstTimeSetup() {
-  const pw = (document.getElementById('setup-pw')?.value || '').trim();
-  const pw2 = (document.getElementById('setup-pw-confirm')?.value || '').trim();
-  const errEl = document.getElementById('setup-err');
-  if (!pw || pw.length < 8) {
-    if (errEl) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.classList.remove('hidden'); }
-    return;
-  }
-  if (pw !== pw2) {
-    if (errEl) { errEl.textContent = 'Passwords do not match.'; errEl.classList.remove('hidden'); }
-    return;
-  }
-  const result = DB.auth.changePassword(pw);
-  if (!result.success) {
-    if (errEl) { errEl.textContent = result.error || 'Could not save password.'; errEl.classList.remove('hidden'); }
-    return;
-  }
-  // Auto-login after setup
-  sessionStorage.setItem('zenvy_admin_session', '1');
-  sessionStorage.setItem('zenvy_admin_user', JSON.stringify({ email: 'admin@zenvy.com', name: 'Master Admin', role: 'Super Admin' }));
-  DB.log('Admin password created during first-time setup');
-  const setup = document.getElementById('admin-first-time-setup');
-  if (setup) setup.classList.add('hidden');
-  updateAdminUserInfo();
-  showApp();
-  nav('dashboard');
-  toast('Welcome! Admin password saved successfully.', 'success');
+  const errEl = document.getElementById('login-err');
+  if (errEl) errEl.classList.add('hidden');
 }
 
 function showApp() {
@@ -168,7 +101,7 @@ async function signInWithGoogle() {
   if (errEl) errEl.classList.add('hidden');
   if (statusEl) {
     statusEl.style.display = 'block';
-    statusEl.textContent = 'Connecting to Google Authentication...';
+    statusEl.textContent = 'Opening Google Account Chooser...';
   }
 
   try {
@@ -176,9 +109,16 @@ async function signInWithGoogle() {
       throw new Error('Firebase Auth is initializing. Please try again in 2 seconds.');
     }
 
+    // Clear any prior cached session
+    sessionStorage.removeItem('zenvy_admin_session');
+    sessionStorage.removeItem('zenvy_admin_user');
+    try { await firebase.auth().signOut(); } catch(e){}
+
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
+    // Force Google Account Chooser prompt every single time
+    provider.setCustomParameters({ prompt: 'select_account' });
 
     const result = await firebase.auth().signInWithPopup(provider);
     const user = result.user;
@@ -187,7 +127,8 @@ async function signInWithGoogle() {
       throw new Error('Could not retrieve email from Google Account.');
     }
 
-    if (statusEl) statusEl.textContent = `Verifying ${user.email}...`;
+    const email = user.email.trim().toLowerCase();
+    if (statusEl) statusEl.textContent = `Verifying authorization for ${email}...`;
 
     const authRes = await DB.auth.loginWithGoogleUser(user);
     if (authRes.success) {
@@ -196,17 +137,25 @@ async function signInWithGoogle() {
       updateAdminUserInfo();
       showApp();
       nav(location.hash.replace('#', '') || 'dashboard');
-      toast(`Welcome, ${user.displayName || user.email}!`, 'success');
+      toast(`Welcome, ${user.displayName || email}!`, 'success');
     } else {
-      await firebase.auth().signOut();
+      // Access Denied: strictly revoke session and firebase auth
+      try { await firebase.auth().signOut(); } catch(e){}
+      sessionStorage.removeItem('zenvy_admin_session');
+      sessionStorage.removeItem('zenvy_admin_user');
       if (statusEl) statusEl.style.display = 'none';
       if (errEl) {
-        errEl.textContent = authRes.error || `Access Denied: ${user.email} is not authorized.`;
+        errEl.textContent = authRes.error || `Access Denied: ${email} is not authorized.`;
         errEl.classList.remove('hidden');
       }
+      toast(authRes.error || `Access Denied: ${email} is not authorized.`, 'error');
+      showLogin();
     }
   } catch (error) {
     console.error('Google Sign In Error:', error);
+    try { await firebase.auth().signOut(); } catch(e){}
+    sessionStorage.removeItem('zenvy_admin_session');
+    sessionStorage.removeItem('zenvy_admin_user');
     if (statusEl) statusEl.style.display = 'none';
     if (errEl) {
       let msg = error.message || 'Google sign in failed.';

@@ -25,6 +25,17 @@
       "**/*.ps1",
       "**/*.sh",
       "README.md"
+    ],
+    "headers": [
+      {
+        "source": "**/admin*.@(html|js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
     ]
   }
 }

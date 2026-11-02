@@ -1547,6 +1547,13 @@ const DB = {
       let list = Store.get('admin_access', []);
       if (!Array.isArray(list)) list = [];
 
+      // Purge legacy test accounts that should never have access
+      const LEGACY_UNAUTHORIZED = ['pro300809@gmail.com', 'rahat3008096081@gmail.com', 'webzenvy099@gmail.com', 'admin@zenvy.com'];
+      list = list.filter(a => {
+        const em = (a.email || '').trim().toLowerCase();
+        return em && !LEGACY_UNAUTHORIZED.includes(em);
+      });
+
       const defaults = [
         {
           id: 'adm_creator_gfse',
@@ -1582,7 +1589,7 @@ const DB = {
       const cleanEmail = email.trim().toLowerCase();
       if (this.MASTER_EMAILS.includes(cleanEmail)) return true;
       const list = this.all();
-      return list.some(a => (a.email || '').trim().toLowerCase() === cleanEmail && a.status !== 'Inactive');
+      return list.some(a => (a.email || '').trim().toLowerCase() === cleanEmail && a.status === 'Active');
     },
     add(email, role = 'Admin', name = '', addedBy = 'Super Admin') {
       if (!email || !email.includes('@')) return { success: false, error: 'Valid email is required' };
@@ -1683,7 +1690,7 @@ const DB = {
       if (!user || !user.email) return { success: false, error: 'Invalid Google account data.' };
       const email = user.email.trim().toLowerCase();
 
-      // Master Creators (Firebase Project creator & Store owner)
+      // 1. Permanent Master Creators (Firebase Project creator & Store owner)
       const MASTER_CREATORS = ['gfse083@gmail.com', 'rahat300809@gmail.com'];
       if (MASTER_CREATORS.includes(email)) {
         sessionStorage.setItem('zenvy_admin_session', '1');
@@ -1697,40 +1704,9 @@ const DB = {
         return { success: true };
       }
 
-      // Check Local Whitelist (added via Admin Team section)
-      let list = DB.adminAccess.all();
-      let match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status !== 'Inactive');
-
-      // Check Live Firestore Whitelist (in case email was added from another computer)
-      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
-        try {
-          const docSnap = await firebase.firestore().collection('zenvy_store').doc('admin_access').get();
-          if (docSnap.exists) {
-            const cloudList = docSnap.data()?.data || [];
-            if (Array.isArray(cloudList)) {
-              Store.set('admin_access', cloudList);
-              match = cloudList.find(a => (a.email || '').trim().toLowerCase() === email && a.status !== 'Inactive');
-            }
-          }
-        } catch(e) {
-          console.warn('[AdminAuth] Cloud whitelist check failed:', e);
-        }
-      }
-
-      // Check Firestore 'admins' collection
-      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
-        try {
-          const adminDoc = await firebase.firestore().collection('admins').doc(email).get();
-          if (adminDoc.exists && adminDoc.data()?.active !== false) {
-            const admData = adminDoc.data();
-            match = {
-              email,
-              name: admData.name || user.displayName || email,
-              role: admData.role || 'Admin'
-            };
-          }
-        } catch(e) {}
-      }
+      // 2. Check explicitly whitelisted team members
+      const list = DB.adminAccess.all();
+      const match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status === 'Active');
 
       if (match) {
         sessionStorage.setItem('zenvy_admin_session', '1');
@@ -1744,6 +1720,7 @@ const DB = {
         return { success: true };
       }
 
+      // 3. Reject any other random email
       return {
         success: false,
         error: `Access Denied: ${email} is not authorized. Only the Firebase creator and emails added from Admin Settings → Admin Team can access the Admin Suite.`

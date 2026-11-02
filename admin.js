@@ -343,26 +343,28 @@ function toggleAdminCurrency() {
 // ──────────────────────────────────────────────────────────────
 // View Router
 // ──────────────────────────────────────────────────────────────
+const VIEW_MAP = {
+  dashboard: renderDashboard, products: renderProducts,
+  categories: renderCategories, collections: renderCollections,
+  inventory: renderInventory, patches: renderPatches,
+  sleeves: renderSleeves, sizes: renderSizes,
+  colors: renderColors, addons: renderAddons,
+  printing: renderPrinting, orders: renderOrders,
+  preorders: renderPreorders, customers: renderCustomers,
+  coupons: renderCoupons, flashsales: renderFlashSales,
+  banners: renderBanners, 'shop-banner': renderShopDiscountBanner, homepage: renderHomepage,
+  'model-showcase': renderModelShowcase,
+  teams: renderTeams, reviews: renderReviews,
+  returns: renderReturns, refunds: renderRefunds,
+  shipping: renderShipping, 'payment-config': renderPaymentConfig,
+  analytics: renderAnalytics, activity: renderActivity,
+  'settings-brand': renderSettingsBrand, 'settings-store': renderSettingsStore,
+  'settings-seo': renderSettingsSEO, 'settings-notifications': renderSettingsNotifications,
+  'settings-admin': renderSettingsAdmin,
+};
+
 function renderView(view, container) {
-  const renders = {
-    dashboard: renderDashboard, products: renderProducts,
-    categories: renderCategories, collections: renderCollections,
-    inventory: renderInventory, patches: renderPatches,
-    sleeves: renderSleeves, sizes: renderSizes,
-    colors: renderColors, addons: renderAddons,
-    printing: renderPrinting, orders: renderOrders,
-    preorders: renderPreorders, customers: renderCustomers,
-    coupons: renderCoupons, flashsales: renderFlashSales,
-    banners: renderBanners, 'shop-banner': renderShopDiscountBanner, homepage: renderHomepage,
-    teams: renderTeams, reviews: renderReviews,
-    returns: renderReturns, refunds: renderRefunds,
-    shipping: renderShipping, 'payment-config': renderPaymentConfig,
-    analytics: renderAnalytics, activity: renderActivity,
-    'settings-brand': renderSettingsBrand, 'settings-store': renderSettingsStore,
-    'settings-seo': renderSettingsSEO, 'settings-notifications': renderSettingsNotifications,
-    'settings-admin': renderSettingsAdmin,
-  };
-  const fn = renders[view];
+  const fn = VIEW_MAP[view];
   if (fn) fn(container);
   else container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined empty-state-icon">construction</span><div class="empty-state-title">Coming Soon</div></div>`;
 }
@@ -724,9 +726,13 @@ let productPage = 1;
 let selectedProducts = new Set();
 
 function renderProducts(container) {
+  const cats = DB.categories.all();
   let items = DB.products.all().filter(p => !p.isArchived);
   if (productSearch) { const q = productSearch.toLowerCase(); items = items.filter(p => p.name?.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q)); }
-  if (productCatFilter) items = items.filter(p => p.categoryId === productCatFilter);
+  if (productCatFilter) {
+    const selCat = cats.find(c => c.id === productCatFilter);
+    items = items.filter(p => p.categoryId === productCatFilter || (selCat && (p.categoryName || '').toLowerCase() === selCat.name.toLowerCase()));
+  }
   if (productStatusFilter === 'published') items = items.filter(p => p.isPublished);
   if (productStatusFilter === 'draft') items = items.filter(p => !p.isPublished);
   if (productStatusFilter === 'outofstock') items = items.filter(p => p.stock === 0);
@@ -743,7 +749,6 @@ function renderProducts(container) {
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const page = Math.min(productPage, totalPages || 1);
   const paged = items.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
-  const cats = DB.categories.all();
 
   container.innerHTML = `
     <div class="page-header">
@@ -957,7 +962,7 @@ function openProductForm(id = null) {
             <label class="form-label">Category</label>
             <select name="categoryId" class="form-select" onchange="updateSubcats(this.value)">
               <option value="">Select Category</option>
-              ${cats.map(c => `<option value="${c.id}" ${product?.categoryId===c.id?'selected':''}>${c.name}</option>`).join('')}
+              ${cats.map(c => `<option value="${c.id}" ${(product?.categoryId===c.id || (product?.categoryName && product.categoryName.toLowerCase() === c.name.toLowerCase()))?'selected':''}>${c.name}</option>`).join('')}
             </select>
             <button type="button" class="btn btn-ghost btn-xs mt-2" onclick="inlineAddCategory()">+ New Category</button>
           </div>
@@ -1663,12 +1668,18 @@ function openCategoryForm(id = null) {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Desktop Image</label>
+          <label class="form-label">Category Banner / Image (Desktop)</label>
           <div id="cat-img-zone"></div>
+          <input type="text" id="cat-img-url" name="imageUrl" class="form-input" style="margin-top:6px;"
+                 placeholder="Or paste direct image URL (https://...)" value="${imgUrl}"
+                 oninput="window._catImgUrl=this.value;"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Mobile Image</label>
+          <label class="form-label">Category Banner (Mobile)</label>
           <div id="cat-mobile-zone"></div>
+          <input type="text" id="cat-mobile-url" name="mobileImgUrl" class="form-input" style="margin-top:6px;"
+                 placeholder="Or paste mobile image URL (https://...)" value="${mobileUrl}"
+                 oninput="window._catMobileUrl=this.value;"/>
         </div>
       </div>
       <div class="form-row">
@@ -1690,7 +1701,7 @@ function openCategoryForm(id = null) {
           <input type="checkbox" name="isActive" ${cat?.isActive!==false?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Active
         </label>
         <label class="checkbox-chip ${cat?.isFeatured?'selected':''}">
-          <input type="checkbox" name="isFeatured" ${cat?.isFeatured?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Featured
+          <input type="checkbox" name="isFeatured" ${cat?.isFeatured?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Featured on Storefront
         </label>
       </div>
 
@@ -1719,17 +1730,29 @@ function openCategoryForm(id = null) {
   `;
   openModal(cat ? `Edit: ${cat.name}` : 'New Category', html, footer, 'modal-md');
 
+  window._catImgUrl = imgUrl;
+  window._catMobileUrl = mobileUrl;
+
   setTimeout(() => {
-    const desktopZone = Uploader.createSingleZone({ id:'cat-desktop', value: imgUrl, label:'Desktop Image', onchange: v => imgUrl = v });
-    const mobileZone = Uploader.createSingleZone({ id:'cat-mobile', value: mobileUrl, label:'Mobile Image', onchange: v => mobileUrl = v });
+    const desktopZone = Uploader.createSingleZone({
+      id:'cat-desktop', value: imgUrl, label:'Desktop Image',
+      onchange: v => {
+        imgUrl = v; window._catImgUrl = v;
+        const inp = document.getElementById('cat-img-url');
+        if (inp && v.startsWith('http')) inp.value = v;
+      }
+    });
+    const mobileZone = Uploader.createSingleZone({
+      id:'cat-mobile', value: mobileUrl, label:'Mobile Image',
+      onchange: v => {
+        mobileUrl = v; window._catMobileUrl = v;
+        const inp = document.getElementById('cat-mobile-url');
+        if (inp && v.startsWith('http')) inp.value = v;
+      }
+    });
     document.getElementById('cat-img-zone')?.appendChild(desktopZone);
     document.getElementById('cat-mobile-zone')?.appendChild(mobileZone);
-    window._catImgUrl = imgUrl; window._catMobileUrl = mobileUrl;
-    desktopZone.querySelector('.upload-zone-inner')?.addEventListener && (window._catImgGetter = () => imgUrl);
-    mobileZone.querySelector('.upload-zone-inner')?.addEventListener && (window._catMobileGetter = () => mobileUrl);
   }, 100);
-
-  window._catImgUrl = imgUrl; window._catMobileUrl = mobileUrl;
 }
 
 function addSubcatInline(catId) {
@@ -1749,19 +1772,29 @@ function saveCategoryForm(id) {
   const name = fd.get('name')?.trim();
   const slug = fd.get('slug')?.trim();
   if (!name || !slug) { toast('Name and slug required', 'error'); return; }
+  
+  const directImg = document.getElementById('cat-img-url')?.value?.trim();
+  const directMobile = document.getElementById('cat-mobile-url')?.value?.trim();
+
   const data = {
     name, slug, description: fd.get('description'),
-    imageUrl: window._catImgUrl || '',
-    mobileImgUrl: window._catMobileUrl || '',
+    imageUrl: directImg || window._catImgUrl || '',
+    mobileImgUrl: directMobile || window._catMobileUrl || '',
     displayOrder: parseInt(fd.get('displayOrder')) || 0,
     seoTitle: fd.get('seoTitle'), seoDesc: fd.get('seoDesc'),
     isActive: fd.get('isActive') === 'on',
     isFeatured: fd.get('isFeatured') === 'on',
   };
-  if (id) { DB.categories.update(id, data); toast('Category updated', 'success'); }
-  else { DB.categories.create(data); toast('Category created', 'success'); }
+  if (id) {
+    DB.categories.update(id, data);
+    toast('Category updated & synced!', 'success');
+  } else {
+    DB.categories.create(data);
+    toast('Category created & synced!', 'success');
+  }
   closeModal();
   renderCategories(document.getElementById('admin-content'));
+  try { window.dispatchEvent(new Event('storage')); } catch(e){}
   try { window.dispatchEvent(new Event('storage')); } catch(e){}
 }
 
@@ -3139,10 +3172,17 @@ function saveBanner(id, publish) {
     toast(publish ? 'Banner published & live!' : 'Banner saved as draft', 'success'); 
   }
 
-  // Update homepage banners array
+  // Update homepage banners array and sync hero
   try {
     const hp = DB.homepage ? DB.homepage.get() : {};
     hp.banners = DB.banners.all().filter(b => b.isActive);
+    if (publish) {
+      if (!hp.hero) hp.hero = {};
+      hp.hero.enabled = true;
+      hp.hero.title = title;
+      if (data.subtitle) hp.hero.subtitle = data.subtitle;
+      if (img) hp.hero.bgImage = img;
+    }
     if (DB.homepage) DB.homepage.save(hp);
   } catch(e) {}
 
@@ -3453,47 +3493,37 @@ function removeShopBannerSlide(index) {
   });
 }
 
-function handleSingleShopBannerUpload(event, index) {
+async function handleSingleShopBannerUpload(event, index) {
   const file = event.target.files?.[0];
   if (!file || !shopBannerSlidesState || !shopBannerSlidesState[index]) return;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    shopBannerSlidesState[index].bgImage = e.target.result;
-    activeShopBannerSlide = index;
-    renderShopDiscountBanner(document.getElementById('admin-content'));
-    toast(`Banner #${index + 1} image updated!`, 'success');
-  };
-  reader.readAsDataURL(file);
+  const dataUrl = await Uploader.compressImage(file, 1600, 0.85);
+  shopBannerSlidesState[index].bgImage = dataUrl;
+  activeShopBannerSlide = index;
+  renderShopDiscountBanner(document.getElementById('admin-content'));
+  toast(`Banner #${index + 1} image updated!`, 'success');
 }
 
-function handleBulkShopBannerUpload(event) {
+async function handleBulkShopBannerUpload(event) {
   const files = Array.from(event.target.files || []);
   if (files.length === 0) return;
 
   if (!shopBannerSlidesState) shopBannerSlidesState = [];
 
-  let loaded = 0;
-  files.forEach((file, idx) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      shopBannerSlidesState.push({
-        tag: `🔥 PROMO #${shopBannerSlidesState.length + 1}`,
-        title: file.name.replace(/\.[^/.]+$/, '').toUpperCase().slice(0, 30),
-        subtitle: 'Special Promotional Kit • Exclusive Online Offer',
-        discountBadge: 'HOT DEAL',
-        bgImage: e.target.result,
-        link: '#view-shop'
-      });
-      loaded++;
-      if (loaded === files.length) {
-        activeShopBannerSlide = shopBannerSlidesState.length - 1;
-        renderShopDiscountBanner(document.getElementById('admin-content'));
-        toast(`🎉 Successfully uploaded ${files.length} banner images! Click Save & Publish.`, 'success');
-      }
-    };
-    reader.readAsDataURL(file);
-  });
+  toast(`Optimizing and processing ${files.length} images...`, 'info');
+  for (const file of files) {
+    const dataUrl = await Uploader.compressImage(file, 1600, 0.85);
+    shopBannerSlidesState.push({
+      tag: `🔥 PROMO #${shopBannerSlidesState.length + 1}`,
+      title: file.name.replace(/\.[^/.]+$/, '').toUpperCase().slice(0, 30),
+      subtitle: 'Special Promotional Kit • Exclusive Online Offer',
+      discountBadge: 'HOT DEAL',
+      bgImage: dataUrl,
+      link: '#view-shop'
+    });
+  }
+  activeShopBannerSlide = shopBannerSlidesState.length - 1;
+  renderShopDiscountBanner(document.getElementById('admin-content'));
 }
 
 function applyShopDiscountPresetToCurrent(preset) {
@@ -3581,6 +3611,210 @@ function saveShopDiscountBanner() {
 
   toast(`🎉 Saved and published ${shopBannerSlidesState.length} Shop Banners to live storefront!`, 'success');
   try { window.dispatchEvent(new Event('storage')); } catch(e){}
+}
+
+// ──────────────────────────────────────────────────────────────
+// ═══ VIEW: MODEL SHOWCASE & TESTIMONIALS ═══
+// ──────────────────────────────────────────────────────────────
+function renderModelShowcase(container) {
+  const models = DB.modelShowcase ? DB.modelShowcase.all() : [];
+  container.innerHTML = `
+    <div class="page-header" style="margin-bottom:20px;">
+      <div class="page-header-left">
+        <div class="page-title">Athlete & Jersey Model Showcase</div>
+        <div class="page-subtitle" style="font-size:13px;color:#6B7280;margin-top:4px;">
+          Manage models and athletes wearing your jerseys/t-shirts in the 3D Circular Testimonial Carousel above the footer.
+        </div>
+      </div>
+      <div class="page-actions" style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="DB.modelShowcase.reset();renderModelShowcase(document.getElementById('admin-content'));toast('Reset to default athlete models','info')">
+          <span class="material-symbols-outlined">restart_alt</span> Reset Defaults
+        </button>
+        <button class="btn btn-primary" onclick="openModelShowcaseForm()">
+          <span class="material-symbols-outlined">add</span> Add New Model
+        </button>
+      </div>
+    </div>
+
+    <div class="card mb-4" style="border-radius:14px;border:1px solid #E5E7EB;">
+      <div class="table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:70px">Photo</th>
+              <th>Athlete / Model</th>
+              <th>Jersey Model Worn</th>
+              <th>Quote / Feedback</th>
+              <th>Status</th>
+              <th>Order</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${models.length === 0 ? `<tr><td colspan="7">${emptyState('group', 'No models added yet', 'Showcase athletes and models wearing your jerseys', 'Add Model', 'openModelShowcaseForm()')}</td></tr>` :
+              models.map(m => `
+                <tr>
+                  <td>
+                    <img src="${m.src}" alt="${m.name}" style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #E5E7EB;"/>
+                  </td>
+                  <td>
+                    <div style="font-weight:700;font-size:13px;color:#0F172A;">${m.name}</div>
+                    <div style="font-size:11px;color:#64748B;">${m.designation || 'Athlete'}</div>
+                  </td>
+                  <td>
+                    <span class="badge badge-purple" style="font-size:11px;">${m.jerseyName || 'Match Jersey'}</span>
+                  </td>
+                  <td style="max-width:280px;">
+                    <div style="font-size:12px;color:#475569;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
+                      "${m.quote}"
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge ${m.isActive !== false ? 'badge-green' : 'badge-gray'}">${m.isActive !== false ? 'Active' : 'Hidden'}</span>
+                  </td>
+                  <td style="font-size:12px;font-weight:600;">${m.displayOrder || 1}</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-ghost btn-sm" onclick="openModelShowcaseForm('${m.id}')" title="Edit Model">
+                      <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="DB.modelShowcase.update('${m.id}', { isActive: ${m.isActive === false} });renderModelShowcase(document.getElementById('admin-content'));toast('Visibility updated','success')" title="Toggle Visibility">
+                      <span class="material-symbols-outlined">${m.isActive !== false ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                    <button class="btn btn-ghost btn-sm text-red" onclick="deleteModelShowcaseItem('${m.id}', '${m.name.replace(/'/g, "\\'")}')" title="Delete">
+                      <span class="material-symbols-outlined" style="color:#DC2626">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function openModelShowcaseForm(id = null) {
+  const m = id ? DB.modelShowcase.byId(id) : null;
+  window._modelPhotoUrl = m?.src || '';
+
+  const html = `
+    <form id="model-showcase-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Athlete / Model Name<span class="req">*</span></label>
+          <input type="text" name="name" class="form-input" required value="${m?.name || ''}" placeholder="e.g. Rahim Chowdhury"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Club / Designation<span class="req">*</span></label>
+          <input type="text" name="designation" class="form-input" required value="${m?.designation || ''}" placeholder="e.g. National Team Striker"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Jersey Model / Outfit Worn</label>
+          <input type="text" name="jerseyName" class="form-input" value="${m?.jerseyName || ''}" placeholder="e.g. AeroKnit Pro Match Kit"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Display Order</label>
+          <input type="number" name="displayOrder" class="form-input" value="${m?.displayOrder || 1}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Testimonial Quote / Feedback<span class="req">*</span></label>
+        <textarea name="quote" class="form-textarea" rows="3" required placeholder="What the athlete or model says about the jersey, fit, and performance…">${m?.quote || ''}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Model Photo (Wearing Jersey/T-shirt)<span class="req">*</span></label>
+        <div id="model-photo-zone" style="margin-bottom:8px;"></div>
+        <input type="text" id="model-photo-url-input" name="src" class="form-input" placeholder="Or paste direct image URL (https://...)" value="${m?.src || ''}" oninput="window._modelPhotoUrl=this.value;const p=document.getElementById('model-preview-img');if(p){p.src=this.value;p.style.display=this.value?'block':'none';}"/>
+        <div style="margin-top:8px;">
+          <img id="model-preview-img" src="${m?.src || ''}" style="max-height:120px;border-radius:10px;object-fit:cover;border:1px solid #E5E7EB;display:${m?.src ? 'block' : 'none'};"/>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;margin-top:12px;">
+        <label class="checkbox-chip ${m?.isActive !== false ? 'selected' : ''}">
+          <input type="checkbox" name="isActive" ${m?.isActive !== false ? 'checked' : ''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Active on Website
+        </label>
+      </div>
+    </form>
+  `;
+
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveModelShowcaseForm('${id || ''}')">
+      ${m ? 'Update Model' : 'Save Model'}
+    </button>
+  `;
+
+  openModal(m ? `Edit: ${m.name}` : 'Add Athlete Model', html, footer, 'modal-md');
+
+  setTimeout(() => {
+    const zone = Uploader.createSingleZone({
+      id: 'model-photo-uploader',
+      value: m?.src || '',
+      placeholder: 'Upload high-resolution photo of model wearing jersey',
+      onchange: async v => {
+        window._modelPhotoUrl = v;
+        const inp = document.getElementById('model-photo-url-input');
+        if (inp) inp.value = v;
+        const p = document.getElementById('model-preview-img');
+        if (p) { p.src = v; p.style.display = 'block'; }
+      }
+    });
+    document.getElementById('model-photo-zone')?.appendChild(zone);
+  }, 100);
+}
+
+function saveModelShowcaseForm(id) {
+  const form = document.getElementById('model-showcase-form');
+  if (!form) return;
+  const fd = new FormData(form);
+  const name = fd.get('name')?.trim();
+  const designation = fd.get('designation')?.trim();
+  const quote = fd.get('quote')?.trim();
+  const src = fd.get('src')?.trim() || window._modelPhotoUrl || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80';
+
+  if (!name || !quote) {
+    toast('Name and Quote are required.', 'error');
+    return;
+  }
+
+  const data = {
+    name,
+    designation,
+    quote,
+    src,
+    jerseyName: fd.get('jerseyName')?.trim() || 'ZENVY Jersey',
+    displayOrder: parseInt(fd.get('displayOrder')) || 1,
+    isActive: fd.get('isActive') === 'on'
+  };
+
+  if (id) {
+    DB.modelShowcase.update(id, data);
+    toast('Athlete model updated successfully!', 'success');
+  } else {
+    DB.modelShowcase.create(data);
+    toast('New athlete model added to showcase!', 'success');
+  }
+
+  closeModal();
+  renderModelShowcase(document.getElementById('admin-content'));
+  try { window.dispatchEvent(new Event('storage')); } catch(e){}
+  try { window.dispatchEvent(new CustomEvent('zenvy-store-updated')); } catch(e){}
+}
+
+function deleteModelShowcaseItem(id, name) {
+  showConfirm('Delete Model', `Remove "${name}" from the model showcase?`, () => {
+    DB.modelShowcase.delete(id);
+    toast('Model removed from showcase', 'success');
+    renderModelShowcase(document.getElementById('admin-content'));
+    try { window.dispatchEvent(new Event('storage')); } catch(e){}
+    try { window.dispatchEvent(new CustomEvent('zenvy-store-updated')); } catch(e){}
+  });
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -3776,19 +4010,54 @@ function saveAnnouncementConfig() {
 
 function saveHomepageHero() {
   const config = DB.homepage.get();
+  const bgImage = document.getElementById('hero-bg-url')?.value?.trim() || window._heroBgUrl || '';
+  const title = document.getElementById('hero-title')?.value?.trim() || '';
+  const subtitle = document.getElementById('hero-subtitle')?.value?.trim() || '';
+  const badge = document.getElementById('hero-badge')?.value?.trim() || '';
+  const enabled = document.getElementById('hero-enabled')?.checked !== false;
+
   config.hero = { 
-    enabled: document.getElementById('hero-enabled')?.checked,
-    badge: document.getElementById('hero-badge')?.value,
-    title: document.getElementById('hero-title')?.value, 
-    subtitle: document.getElementById('hero-subtitle')?.value, 
+    enabled,
+    badge,
+    title, 
+    subtitle, 
     ctaPrimaryText: document.getElementById('hero-cta1-text')?.value, 
     ctaPrimaryLink: document.getElementById('hero-cta1-link')?.value,
     ctaSecondaryText: document.getElementById('hero-cta2-text')?.value, 
     ctaSecondaryLink: document.getElementById('hero-cta2-link')?.value,
-    bgImage: document.getElementById('hero-bg-url')?.value || window._heroBgUrl || ''
+    bgImage
   };
   DB.homepage.save(config);
-  toast('Hero banner saved! Storefront updated.', 'success');
+
+  // Synchronize with DB.banners so Homepage Management and Home Banners never fight
+  try {
+    const banners = DB.banners.all();
+    const heroBanner = banners.find(b => b.type === 'hero' || b.id === 'hero_main') || banners[0];
+    if (heroBanner) {
+      DB.banners.update(heroBanner.id, {
+        title,
+        subtitle,
+        bgImage,
+        desktopImg: bgImage,
+        isActive: enabled,
+        type: 'hero'
+      });
+    } else {
+      DB.banners.create({
+        id: 'hero_main',
+        title: title || 'ENGINEERED FOR SUPREMACY',
+        subtitle: subtitle || 'The new standard in high-performance kits.',
+        bgImage,
+        desktopImg: bgImage,
+        isActive: enabled,
+        type: 'hero',
+        displayOrder: 0
+      });
+    }
+  } catch(e) {}
+
+  toast('🎉 Hero banner saved! Storefront updated.', 'success');
+  try { window.dispatchEvent(new Event('storage')); } catch(e){}
 }
 
 function saveValuePropsConfig() {

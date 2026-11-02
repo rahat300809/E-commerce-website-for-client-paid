@@ -244,7 +244,7 @@
           </a>
         </div>
 
-        <div id="collections-bento-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+        <div id="collections-bento-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
           <!-- Populated dynamically from DB.homepage.collections -->
         </div>
       </section>
@@ -539,16 +539,26 @@
           <!-- ── RIGHT: Products Area ── -->
           <div class="flex-1 min-w-0">
 
-            <!-- Header Row: Title + Sort -->
+            <!-- Header Row: Title + View Switcher + Sort -->
             <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-3 mb-5 pb-4 border-b border-gray-200">
               <div>
                 <h1 class="font-headline-lg text-xl sm:text-2xl font-bold text-primary leading-tight">Football Jerseys</h1>
                 <p class="font-mono-ui text-xs text-secondary mt-0.5"><span id="product-count">6</span> Products</p>
               </div>
-              <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="flex items-center gap-2 flex-shrink-0 self-end xs:self-auto">
+                <!-- Mobile & Desktop Grid Switcher (2-col grid vs 1-col feed) -->
+                <div class="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200" id="shop-view-toggles">
+                  <button type="button" onclick="setShopViewMode('grid-2')" id="btn-view-grid-2" class="p-1.5 rounded-md text-primary bg-white shadow-2xs transition-all cursor-pointer" title="2 Products per row (Grid)">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+                  </button>
+                  <button type="button" onclick="setShopViewMode('grid-1')" id="btn-view-grid-1" class="p-1.5 rounded-md text-gray-500 hover:text-black transition-all cursor-pointer" title="1 Product per row (Feed)">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M4 6h16v3H4V6zm0 5h16v3H4v-3zm0 5h16v3H4v-3z"/></svg>
+                  </button>
+                </div>
+
                 <span class="font-body-md text-sm text-secondary hidden sm:inline">Sort by:</span>
                 <select id="sort-select" onchange="sortProducts(this.value)"
-                        class="bg-white border border-gray-200 rounded-lg px-3 py-2 font-body-md text-sm text-primary focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-sm min-w-[140px]">
+                        class="bg-white border border-gray-200 rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 font-body-md text-xs sm:text-sm text-primary focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-sm">
                   <option value="newest">Newest</option>
                   <option value="price-asc">Price: Low to High</option>
                   <option value="price-desc">Price: High to Low</option>
@@ -558,8 +568,8 @@
             </div>
 
             <!-- Product Grid -->
-            <!-- Mobile: 1 col → Tablet (≥640): 2 col → Large desktop (≥1280): 3 col -->
-            <div id="shop-product-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+            <!-- Mobile: 2 col (allows seeing multiple products!) → Tablet/Laptop: 3 col → Large desktop: 4 col -->
+            <div id="shop-product-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
               <!-- Rendered dynamically from DB.products.published() -->
             </div><!-- /product grid -->
 
@@ -764,22 +774,19 @@
 
     <!-- ==================== VIEW 4: DISTRACTION-FREE CHECKOUT (Screen bff3d89b18dd42cc8e3f9dce42b7147c) ==================== -->
     <div id="view-checkout" class="page-view">
-      
-      <header class="w-full py-4 px-grid-margin border-b border-surface-variant flex justify-between items-center bg-white sticky top-[60px] z-40 shadow-sm">
-        <div class="font-display-sm text-2xl font-extrabold tracking-tighter text-primary">ZENVY</div>
-        <div class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-xs font-mono-ui font-semibold">
-          <span class="material-symbols-outlined text-[16px]">lock</span>
-          256-Bit SSL Encrypted Checkout
-        </div>
-      </header>
-
-      <main class="w-full max-w-7xl mx-auto px-grid-margin py-section-padding grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter">
+      <main class="w-full max-w-7xl mx-auto px-grid-margin py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter">
         
         <!-- Left Column: Delivery & Payment Details (7 Cols) -->
         <div class="lg:col-span-7 space-y-8">
-          <div>
-            <h1 class="font-display-sm text-3xl md:text-4xl text-primary font-bold">Complete Your Order</h1>
-            <p class="font-body-lg text-secondary mt-1">Review your delivery details and choose a payment method.</p>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-surface-variant/60">
+            <div>
+              <h1 class="font-display-sm text-3xl md:text-4xl text-primary font-bold">Complete Your Order</h1>
+              <p class="font-body-lg text-secondary mt-1">Review your delivery details and choose a payment method.</p>
+            </div>
+            <div class="inline-flex items-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-200/60 px-3 py-1.5 rounded-full text-xs font-mono-ui font-semibold self-start sm:self-center shadow-xs">
+              <span class="material-symbols-outlined text-[16px]">lock</span>
+              256-Bit SSL Encrypted Checkout
+            </div>
           </div>
 
           <!-- Section 1: Address -->
@@ -1148,6 +1155,71 @@
         </div>
       </div>
     </div> <!-- End of view-admin -->
+
+    <!-- ==================== ATHLETE & MODEL CIRCULAR SHOWCASE ==================== -->
+    <section id="model-showcase-section" class="w-full bg-[#f8f9fa] text-gray-900 py-16 sm:py-24 relative overflow-hidden border-t border-gray-200/80">
+      <!-- Subtle ambient lighting -->
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <div class="text-center mb-10 sm:mb-14">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-800 font-mono-ui text-[11px] font-bold uppercase tracking-widest mb-2 shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            PRO ATHLETES & JERSEY MODELS
+          </span>
+          <h2 class="font-headline font-black text-2xl sm:text-4xl text-gray-900 tracking-tight mt-1">
+            Worn by Champions On & Off the Pitch
+          </h2>
+          <p class="font-body text-xs sm:text-sm text-gray-600 max-w-lg mx-auto mt-2 leading-relaxed">
+            Real athlete experiences wearing ZENVY Match & Training Editions. Verified pro durability, AeroKnit airflow, and tailored precision.
+          </p>
+        </div>
+
+        <!-- 3D Circular Testimonials Carousel Container -->
+        <div class="relative w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-14">
+          
+          <!-- 3D Image Perspective Box -->
+          <div class="w-full md:w-1/2 h-72 sm:h-80 md:h-96 relative" id="showcase-3d-images-box" style="perspective:1000px;">
+            <!-- Populated via JS: Left, Active, Right images with 3D transform -->
+          </div>
+
+          <!-- Testimonial Content & Controls -->
+          <div class="w-full md:w-1/2 flex flex-col justify-between text-left">
+            <div id="showcase-content-box" class="min-h-[170px] flex flex-col justify-center">
+              <span id="showcase-jersey-tag" class="inline-block bg-white text-amber-800 border border-amber-300/80 shadow-2xs font-mono-ui text-[10px] font-bold px-3 py-1 rounded-full w-max mb-2">
+                AEROKNIT PRO KIT
+              </span>
+              <h3 id="showcase-name" class="font-headline font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
+                Rahim Chowdhury
+              </h3>
+              <p id="showcase-designation" class="font-mono-ui text-xs text-gray-500 mb-3">
+                Dhaka Premier League Midfielder
+              </p>
+              <p id="showcase-quote" class="font-body text-sm sm:text-base text-gray-700 leading-relaxed italic">
+                "The AeroKnit weave feels weightless during 90 minutes on the pitch. The customization precision on the player name and UCL starball badge is unmatched in Bangladesh."
+              </p>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-3 pt-6 border-t border-gray-200/80 mt-4">
+              <button onclick="prevShowcaseModel()" class="w-11 h-11 rounded-full bg-white hover:bg-black text-gray-800 hover:text-white border border-gray-200 shadow-sm flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Previous Model">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+              </button>
+              <button onclick="nextShowcaseModel()" class="w-11 h-11 rounded-full bg-black hover:bg-amber-500 text-white hover:text-black flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Next Model">
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
+              <div class="flex items-center gap-1.5 ml-4" id="showcase-dots">
+                <!-- Dots populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
 
     <!-- ==================== GLOBAL FOOTER ==================== -->
     <footer class="bg-[#fbfbfb] border-t border-gray-100 py-14 sm:py-16 mt-auto">

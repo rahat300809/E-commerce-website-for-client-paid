@@ -260,18 +260,27 @@ function addBuilderToCart() {
   const name = document.getElementById('builder-name').value.trim();
   const num = document.getElementById('builder-num').value.trim();
 
-  cart.push({
+  const imgUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P';
+  const item = {
     id: 'cz-' + Date.now(),
+    productId: 'custom_jersey_builder',
     name: `Custom ${selectedStyle} Jersey`,
     price: 2750,
     size: 'M',
+    sleeve: selectedSleeve,
+    customName: name,
+    customNumber: num,
+    details: `Custom 3D Studio • Size: M • ${selectedSleeve} Sleeve • ${name} #${num}`,
     customization: { name, number: num, sleeve: selectedSleeve, color: selectedColor },
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P',
+    image: imgUrl,
+    img: imgUrl,
     qty: 1
-  });
+  };
+  cart.push(item);
 
   localStorage.setItem('zenvy_cart', JSON.stringify(cart));
-  window.location.href = 'checkout.html';
+  try { window.dispatchEvent(new Event('storage')); } catch(e){}
+  window.location.href = 'index.html?view=checkout';
 }
 
 function openCart() {

@@ -134,6 +134,7 @@
   }
 
   // ── Pull data from Firestore into localStorage ─────────────────
+  // ── Pull data from Firestore into localStorage ─────────────────
   async function hydrate() {
     if (!_db) return;
     try {
@@ -147,8 +148,27 @@
         const key = docSnap.id;
         const payload = docSnap.data();
         if (payload && payload.data !== undefined) {
-          localStorage.setItem(`${DB_VERSION}_${key}`, JSON.stringify(payload.data));
-          count++;
+          const localKey = `${DB_VERSION}_${key}`;
+          const localUpdatedStr = localStorage.getItem(`${localKey}_updatedAt`);
+          const localUpdatedAt = localUpdatedStr ? parseInt(localUpdatedStr, 10) : 0;
+          const cloudUpdatedAt = payload.updatedAt || 0;
+
+          // Only overwrite local data if cloud payload is strictly newer than local
+          // or if local key has never been written
+          const hasLocal = localStorage.getItem(localKey) !== null;
+          if (!hasLocal || cloudUpdatedAt > localUpdatedAt) {
+            localStorage.setItem(localKey, JSON.stringify(payload.data));
+            if (cloudUpdatedAt) {
+              localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+            }
+            count++;
+          } else if (localUpdatedAt > cloudUpdatedAt) {
+            // Local is newer than cloud; push local updates up to Firestore
+            try {
+              const localVal = JSON.parse(localStorage.getItem(localKey));
+              pushToFirestore(key, localVal);
+            } catch(e) {}
+          }
         }
       });
       console.log(`[ZenvySync] Hydrated ${count} keys from Firestore ✅`);
@@ -173,11 +193,19 @@
           const payload = change.doc.data();
           if (payload && payload.data !== undefined) {
             const localKey = `${DB_VERSION}_${key}`;
-            const existing = localStorage.getItem(localKey);
-            const incoming = JSON.stringify(payload.data);
-            if (existing !== incoming) {
-              localStorage.setItem(localKey, incoming);
-              changed = true;
+            const localUpdatedStr = localStorage.getItem(`${localKey}_updatedAt`);
+            const localUpdatedAt = localUpdatedStr ? parseInt(localUpdatedStr, 10) : 0;
+            const cloudUpdatedAt = payload.updatedAt || 0;
+
+            const hasLocal = localStorage.getItem(localKey) !== null;
+            if (!hasLocal || cloudUpdatedAt >= localUpdatedAt) {
+              const incoming = JSON.stringify(payload.data);
+              const existing = localStorage.getItem(localKey);
+              if (existing !== incoming) {
+                localStorage.setItem(localKey, incoming);
+                if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                changed = true;
+              }
             }
           }
         }

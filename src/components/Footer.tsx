@@ -1,12 +1,13 @@
-'use client';
-
 import React from 'react';
+import { CircularTestimonials, Testimonial } from './ui/circular-testimonials';
+import { jerseyModelTestimonials } from './ui/demo';
 
 interface FooterProps {
   brandName?: string;
   tagline?: string;
   phone?: string;
   email?: string;
+  testimonials?: Testimonial[];
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -14,9 +15,46 @@ export const Footer: React.FC<FooterProps> = ({
   tagline = 'The New Era of Performance',
   phone = '+880 1700-000000',
   email = 'support@zenvy.com',
+  testimonials = jerseyModelTestimonials,
 }) => {
   return (
-    <footer className="w-full bg-primary text-on-primary pt-16 pb-12 mt-auto border-t border-white/10">
+    <footer className="w-full bg-primary text-on-primary pt-10 pb-12 mt-auto border-t border-white/10">
+      {/* Athlete & Model Showcase */}
+      <div className="w-full border-b border-white/10 pb-12 mb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-grid-margin">
+          <div className="text-center mb-6">
+            <span className="text-[11px] font-mono-ui uppercase font-bold tracking-widest text-amber-400">
+              PRO ATHLETES & JERSEY MODELS
+            </span>
+            <h3 className="font-display-sm text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              Worn by Champions On & Off the Pitch
+            </h3>
+            <p className="text-xs text-on-primary/60 max-w-md mx-auto mt-1">
+              Real athlete reviews on match-day performance, pro-aeroknit breathability, and custom name-and-number precision.
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <CircularTestimonials
+              testimonials={testimonials}
+              autoplay={true}
+              colors={{
+                name: "#0f172a",
+                designation: "#64748b",
+                testimony: "#334155",
+                arrowBackground: "#ffffff",
+                arrowForeground: "#0f172a",
+                arrowHoverBackground: "#000000",
+              }}
+              fontSizes={{
+                name: "1.5rem",
+                designation: "0.9rem",
+                quote: "1.05rem",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-grid-margin grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <h2 className="font-display-sm text-2xl font-extrabold tracking-tighter text-white mb-2">

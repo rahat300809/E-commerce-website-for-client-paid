@@ -26,21 +26,61 @@ const Uploader = {
     return { ok: true };
   },
 
-  // Read file as data URL (base64)
-  readAsDataURL(file) {
-    return new Promise((resolve, reject) => {
+  // Compress image before base64 encoding to stay well within storage quotas
+  compressImage(file, maxDimension = 1400, quality = 0.82) {
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result);
-      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressed);
+          } catch(err) {
+            resolve(e.target.result);
+          }
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve('');
       reader.readAsDataURL(file);
     });
+  },
+
+  // Read file as data URL (with automatic compression)
+  async readAsDataURL(file, opts = {}) {
+    return await Uploader.compressImage(file, opts.maxDimension || 1400, opts.quality || 0.82);
   },
 
   // Process one file: validate + read
   async processFile(file, opts = {}) {
     const validation = Uploader.validate(file, opts);
     if (!validation.ok) throw new Error(validation.error);
-    const dataUrl = await Uploader.readAsDataURL(file);
+    const dataUrl = await Uploader.readAsDataURL(file, opts);
     return { name: file.name, type: file.type, size: file.size, dataUrl };
   },
 

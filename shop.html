@@ -4,6 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Shop Football Jerseys & Sportswear – ZENVY</title>
+<script>
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    const cat = p.get('cat') || p.get('category');
+    let target = 'index.html?view=shop';
+    if (cat) target += '&category=' + encodeURIComponent(cat);
+    window.location.replace(target);
+  })();
+</script>
 <meta name="description" content="Browse ZENVY's collection of authentic football jerseys, club kits, national team shirts, and custom sportswear."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -162,11 +171,23 @@
     <section class="lg:col-span-9">
       
       <!-- Top Title & Sort Bar -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 class="font-display text-2xl md:text-3xl font-black text-primary">Football Jerseys</h1>
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold text-on-surface-variant">Sort by:</span>
-          <select id="sort-select" onchange="sortProducts(this.value)" class="text-xs font-bold border border-outline-variant rounded-xl px-3 py-2 bg-white outline-none">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        <div>
+          <h1 class="font-display text-xl sm:text-2xl md:text-3xl font-black text-primary">Football Jerseys</h1>
+          <p class="text-xs text-on-surface-variant font-medium mt-0.5" id="product-count">16 Products</p>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <!-- View Toggle Switcher (2-col grid vs 1-col feed) -->
+          <div class="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+            <button type="button" onclick="setShopViewMode('grid-2')" id="btn-view-grid-2" class="p-1.5 rounded-md text-primary bg-white shadow-2xs transition-all cursor-pointer" title="2-Column Grid (Multiple Products)">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+            </button>
+            <button type="button" onclick="setShopViewMode('grid-1')" id="btn-view-grid-1" class="p-1.5 rounded-md text-gray-500 hover:text-black transition-all cursor-pointer" title="1-Column Feed">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M4 6h16v3H4V6zm0 5h16v3H4v-3zm0 5h16v3H4v-3z"/></svg>
+            </button>
+          </div>
+          <span class="text-xs font-semibold text-on-surface-variant hidden sm:inline">Sort by:</span>
+          <select id="sort-select" onchange="sortProducts(this.value)" class="text-xs font-bold border border-outline-variant rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 bg-white outline-none">
             <option value="newest">Newest</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
@@ -174,73 +195,79 @@
         </div>
       </div>
 
-      <!-- Product Cards Grid (Matching Screenshot 1) -->
-      <div id="shop-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Product Cards Grid (2-column on mobile, 3 on md, 4 on lg) -->
+      <div id="shop-products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
         
         <!-- Product 1 -->
-        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
-          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
-            <span class="absolute top-3 left-3 bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-1 rounded-full">New Arrival</span>
-            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
-              <span class="material-symbols-outlined text-lg">favorite</span>
+        <div class="bg-white rounded-xl sm:rounded-3xl p-2.5 sm:p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-lg sm:rounded-2xl overflow-hidden aspect-square mb-2.5 sm:mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-blue-100 text-blue-800 text-[9px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">New Arrival</span>
+            <button class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-sm sm:text-lg">favorite</span>
             </button>
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Product" class="w-full h-full object-contain p-1.5 sm:p-2 group-hover:scale-105 transition-transform duration-300"/>
           </div>
-          <div>
-            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">ZENVY Strike Pro Jersey</h3>
-            <p class="text-xs text-on-surface-variant mb-2">Men's Authentic Edition</p>
-            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
-              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.5)</span>
+          <div class="flex flex-col flex-1 justify-between">
+            <div>
+              <h3 class="font-display text-xs sm:text-base font-bold text-primary leading-tight mb-1 line-clamp-2">ZENVY Strike Pro Jersey</h3>
+              <p class="text-[10px] sm:text-xs text-on-surface-variant mb-1 sm:mb-2 truncate">Men's Authentic Edition</p>
+              <div class="flex items-center gap-1 text-amber-500 text-[10px] sm:text-xs mb-2 sm:mb-3">
+                ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.5)</span>
+              </div>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="font-display text-lg font-bold text-primary">৳3,500</span>
-              <button onclick="quickAddToCart(1,'ZENVY Strike Pro Jersey',3500,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            <div class="flex items-center justify-between gap-1 pt-1 border-t border-outline-variant/60">
+              <span class="font-display text-xs sm:text-base font-bold text-primary">৳3,500</span>
+              <button onclick="quickAddToCart(1,'ZENVY Strike Pro Jersey',3500,'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P')" class="bg-primary text-white text-[10px] sm:text-xs font-bold px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-secondary transition-colors whitespace-nowrap">Add</button>
             </div>
           </div>
         </div>
 
         <!-- Product 2 -->
-        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
-          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
-            <span class="absolute top-3 left-3 bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-1 rounded-full">-20%</span>
-            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
-              <span class="material-symbols-outlined text-lg">favorite</span>
+        <div class="bg-white rounded-xl sm:rounded-3xl p-2.5 sm:p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-lg sm:rounded-2xl overflow-hidden aspect-square mb-2.5 sm:mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-100 text-red-800 text-[9px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">-20%</span>
+            <button class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-sm sm:text-lg">favorite</span>
             </button>
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d" alt="Product" class="w-full h-full object-contain p-1.5 sm:p-2 group-hover:scale-105 transition-transform duration-300"/>
           </div>
-          <div>
-            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">Crimson Velocity Kit</h3>
-            <p class="text-xs text-on-surface-variant mb-2">Unisex Replica</p>
-            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
-              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(5.0)</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="font-display text-lg font-bold text-primary">৳2,800</span>
-                <span class="text-xs text-on-surface-variant line-through ml-1">৳3,500</span>
+          <div class="flex flex-col flex-1 justify-between">
+            <div>
+              <h3 class="font-display text-xs sm:text-base font-bold text-primary leading-tight mb-1 line-clamp-2">Crimson Velocity Kit</h3>
+              <p class="text-[10px] sm:text-xs text-on-surface-variant mb-1 sm:mb-2 truncate">Unisex Replica</p>
+              <div class="flex items-center gap-1 text-amber-500 text-[10px] sm:text-xs mb-2 sm:mb-3">
+                ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(5.0)</span>
               </div>
-              <button onclick="quickAddToCart(2,'Crimson Velocity Kit',2800,'https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            </div>
+            <div class="flex items-center justify-between gap-1 pt-1 border-t border-outline-variant/60">
+              <div>
+                <span class="font-display text-xs sm:text-base font-bold text-primary">৳2,800</span>
+                <span class="text-[9px] sm:text-xs text-on-surface-variant line-through ml-0.5">৳3,500</span>
+              </div>
+              <button onclick="quickAddToCart(2,'Crimson Velocity Kit',2800,'https://lh3.googleusercontent.com/aida-public/AB6AXuA-a-l2zLHN5PRQ03zBbIkV27wnM75Co4SzuknWklzKl65mvkXJS9Xnl0liA5hSD43B_uZ8ilivh9m8vPvdrlZWcQCcDMAo5iuHpAAgVSXJ1SLmB35Fe_X6aEFwEC-jH_B6UU4rBO1d82nSKRDOzkdhU9_5VIVpD9qJGmXN65pSoJix6M4NVdnl0zVzDX7cn5ZP6XUS9bsoOXTYZlNJ7EjVasbstTMKE2t04EzsGE_X1zAc0m79x37d')" class="bg-primary text-white text-[10px] sm:text-xs font-bold px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-secondary transition-colors whitespace-nowrap">Add</button>
             </div>
           </div>
         </div>
 
         <!-- Product 3 -->
-        <div class="bg-white rounded-3xl p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
-          <div class="relative rounded-2xl overflow-hidden aspect-[4/3] mb-4 bg-[#f4efe8] flex items-center justify-center">
-            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
-              <span class="material-symbols-outlined text-lg">favorite</span>
+        <div class="bg-white rounded-xl sm:rounded-3xl p-2.5 sm:p-4 ambient-shadow border border-outline-variant flex flex-col justify-between group">
+          <div class="relative rounded-lg sm:rounded-2xl overflow-hidden aspect-square mb-2.5 sm:mb-4 bg-[#f4efe8] flex items-center justify-center">
+            <button class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error shadow">
+              <span class="material-symbols-outlined text-sm sm:text-lg">favorite</span>
             </button>
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" alt="Product" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"/>
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H" alt="Product" class="w-full h-full object-contain p-1.5 sm:p-2 group-hover:scale-105 transition-transform duration-300"/>
           </div>
-          <div>
-            <h3 class="font-display text-base font-bold text-primary leading-tight mb-1">Pro Training Top</h3>
-            <p class="text-xs text-on-surface-variant mb-2">DryTech Series</p>
-            <div class="flex items-center gap-1 text-amber-500 text-xs mb-3">
-              ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.8)</span>
+          <div class="flex flex-col flex-1 justify-between">
+            <div>
+              <h3 class="font-display text-xs sm:text-base font-bold text-primary leading-tight mb-1 line-clamp-2">Pro Training Top</h3>
+              <p class="text-[10px] sm:text-xs text-on-surface-variant mb-1 sm:mb-2 truncate">DryTech Series</p>
+              <div class="flex items-center gap-1 text-amber-500 text-[10px] sm:text-xs mb-2 sm:mb-3">
+                ★★★★★ <span class="text-on-surface-variant font-bold ml-1">(4.8)</span>
+              </div>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="font-display text-lg font-bold text-primary">৳4,200</span>
-              <button onclick="quickAddToCart(3,'Pro Training Top',4200,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-secondary transition-colors">Quick Add</button>
+            <div class="flex items-center justify-between gap-1 pt-1 border-t border-outline-variant/60">
+              <span class="font-display text-xs sm:text-base font-bold text-primary">৳4,200</span>
+              <button onclick="quickAddToCart(3,'Pro Training Top',4200,'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H')" class="bg-primary text-white text-[10px] sm:text-xs font-bold px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-secondary transition-colors whitespace-nowrap">Add</button>
             </div>
           </div>
         </div>
@@ -349,6 +376,22 @@ function closeCart() {
 }
 
 updateCartCount();
+
+function setShopViewMode(mode) {
+  const grid = document.getElementById('shop-products-grid');
+  const btn2 = document.getElementById('btn-view-grid-2');
+  const btn1 = document.getElementById('btn-view-grid-1');
+  if (!grid) return;
+  if (mode === 'grid-1') {
+    grid.className = 'grid grid-cols-1 gap-4';
+    if (btn1) { btn1.classList.add('bg-white', 'text-primary', 'shadow-2xs'); btn1.classList.remove('text-gray-500'); }
+    if (btn2) { btn2.classList.remove('bg-white', 'text-primary', 'shadow-2xs'); btn2.classList.add('text-gray-500'); }
+  } else {
+    grid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6';
+    if (btn2) { btn2.classList.add('bg-white', 'text-primary', 'shadow-2xs'); btn2.classList.remove('text-gray-500'); }
+    if (btn1) { btn1.classList.remove('bg-white', 'text-primary', 'shadow-2xs'); btn1.classList.add('text-gray-500'); }
+  }
+}
 </script>
 </body>
 </html>

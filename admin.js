@@ -189,7 +189,7 @@ async function signInWithGoogle() {
 
     if (statusEl) statusEl.textContent = `Verifying ${user.email}...`;
 
-    const authRes = DB.auth.loginWithGoogleUser(user);
+    const authRes = await DB.auth.loginWithGoogleUser(user);
     if (authRes.success) {
       if (statusEl) statusEl.style.display = 'none';
       if (errEl) errEl.classList.add('hidden');

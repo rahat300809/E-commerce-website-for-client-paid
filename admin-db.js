@@ -1540,28 +1540,49 @@ const DB = {
 
   // ── Admin Access & Team Members (Google Auth whitelist) ──
   adminAccess: {
+    // Permanent master store & Firebase creators
+    MASTER_EMAILS: ['gfse083@gmail.com', 'rahat300809@gmail.com'],
+
     all() {
-      const list = Store.get('admin_access', []);
-      if (!Array.isArray(list) || list.length === 0) {
-        return [
-          {
-            id: 'adm_master',
-            email: 'admin@zenvy.com',
-            name: 'Master Admin',
-            role: 'Super Admin',
-            status: 'Active',
-            addedAt: new Date().toISOString(),
-            addedBy: 'System'
-          }
-        ];
-      }
+      let list = Store.get('admin_access', []);
+      if (!Array.isArray(list)) list = [];
+
+      const defaults = [
+        {
+          id: 'adm_creator_gfse',
+          email: 'gfse083@gmail.com',
+          name: 'Firebase Creator',
+          role: 'Super Admin',
+          status: 'Active',
+          addedAt: '2026-01-01T00:00:00.000Z',
+          addedBy: 'Firebase Creator'
+        },
+        {
+          id: 'adm_owner_rahat',
+          email: 'rahat300809@gmail.com',
+          name: 'Store Owner',
+          role: 'Super Admin',
+          status: 'Active',
+          addedAt: '2026-01-01T00:00:00.000Z',
+          addedBy: 'Store Owner'
+        }
+      ];
+
+      // Ensure master owners are always present
+      defaults.forEach(d => {
+        if (!list.some(a => (a.email || '').trim().toLowerCase() === d.email.toLowerCase())) {
+          list.unshift(d);
+        }
+      });
+
       return list;
     },
     isAuthorized(email) {
       if (!email) return false;
       const cleanEmail = email.trim().toLowerCase();
+      if (this.MASTER_EMAILS.includes(cleanEmail)) return true;
       const list = this.all();
-      return list.some(a => (a.email || '').trim().toLowerCase() === cleanEmail);
+      return list.some(a => (a.email || '').trim().toLowerCase() === cleanEmail && a.status !== 'Inactive');
     },
     add(email, role = 'Admin', name = '', addedBy = 'Super Admin') {
       if (!email || !email.includes('@')) return { success: false, error: 'Valid email is required' };
@@ -1581,6 +1602,23 @@ const DB = {
       };
       list.push(newAdmin);
       Store.set('admin_access', list);
+
+      // Mirror to Firestore 'admins' collection
+      if (typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          firebase.firestore().collection('admins').doc(cleanEmail).set({
+            email: cleanEmail,
+            name: newAdmin.name,
+            role: newAdmin.role,
+            active: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            addedBy
+          }, { merge: true });
+        } catch(e) {
+          console.warn('Could not mirror to admins collection:', e);
+        }
+      }
+
       DB.log(`Granted ${role} admin access to ${cleanEmail}`);
       return { success: true, admin: newAdmin };
     },
@@ -1588,13 +1626,26 @@ const DB = {
       let list = this.all();
       const target = list.find(a => a.id === id || (a.email && a.email.toLowerCase() === id.toLowerCase()));
       if (!target) return { success: false, error: 'Admin not found' };
-      // Prevent deleting the last remaining admin
-      if (list.length <= 1) {
-        return { success: false, error: 'Cannot remove the last administrator account.' };
+
+      const cleanEmail = (target.email || '').trim().toLowerCase();
+      if (this.MASTER_EMAILS.includes(cleanEmail)) {
+        return { success: false, error: 'Cannot revoke access for primary Firebase & Store creators.' };
       }
-      list = list.filter(a => a.id !== id && (a.email && a.email.toLowerCase() !== id.toLowerCase()));
+
+      list = list.filter(a => a.id !== id && (a.email && a.email.toLowerCase() !== cleanEmail));
       Store.set('admin_access', list);
-      DB.log(`Revoked admin access for ${target.email}`);
+
+      // Revoke in Firestore 'admins' collection
+      if (typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          firebase.firestore().collection('admins').doc(cleanEmail).set({
+            active: false,
+            revokedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        } catch(e) {}
+      }
+
+      DB.log(`Revoked admin access for ${cleanEmail}`);
       return { success: true };
     }
   },
@@ -1617,7 +1668,7 @@ const DB = {
         this._failCount = 0;
         this._lockUntil = 0;
         sessionStorage.setItem('zenvy_admin_session', '1');
-        sessionStorage.setItem('zenvy_admin_user', JSON.stringify({ email: 'admin@zenvy.com', name: 'Master Admin', role: 'Super Admin' }));
+        sessionStorage.setItem('zenvy_admin_user', JSON.stringify({ email: 'gfse083@gmail.com', name: 'Master Admin', role: 'Super Admin' }));
         DB.log('Admin logged in via Master Password');
         return true;
       }
@@ -1628,15 +1679,59 @@ const DB = {
       }
       return false;
     },
-    loginWithGoogleUser(user) {
+    async loginWithGoogleUser(user) {
       if (!user || !user.email) return { success: false, error: 'Invalid Google account data.' };
       const email = user.email.trim().toLowerCase();
-      let list = DB.adminAccess.all();
 
-      // SECURITY: Only allow Google login if the email is already on the whitelist.
-      // The placeholder 'admin@zenvy.com' is NOT a valid Google auth bypass.
-      // To set up the first admin, use the Master Password login and add the Google email from Admin Settings.
-      const match = list.find(a => (a.email || '').trim().toLowerCase() === email);
+      // Master Creators (Firebase Project creator & Store owner)
+      const MASTER_CREATORS = ['gfse083@gmail.com', 'rahat300809@gmail.com'];
+      if (MASTER_CREATORS.includes(email)) {
+        sessionStorage.setItem('zenvy_admin_session', '1');
+        sessionStorage.setItem('zenvy_admin_user', JSON.stringify({
+          email,
+          name: user.displayName || (email === 'gfse083@gmail.com' ? 'Firebase Creator' : 'Store Owner'),
+          photo: user.photoURL || '',
+          role: 'Super Admin'
+        }));
+        DB.log(`Owner ${email} logged in via Google Auth`);
+        return { success: true };
+      }
+
+      // Check Local Whitelist (added via Admin Team section)
+      let list = DB.adminAccess.all();
+      let match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status !== 'Inactive');
+
+      // Check Live Firestore Whitelist (in case email was added from another computer)
+      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          const docSnap = await firebase.firestore().collection('zenvy_store').doc('admin_access').get();
+          if (docSnap.exists) {
+            const cloudList = docSnap.data()?.data || [];
+            if (Array.isArray(cloudList)) {
+              Store.set('admin_access', cloudList);
+              match = cloudList.find(a => (a.email || '').trim().toLowerCase() === email && a.status !== 'Inactive');
+            }
+          }
+        } catch(e) {
+          console.warn('[AdminAuth] Cloud whitelist check failed:', e);
+        }
+      }
+
+      // Check Firestore 'admins' collection
+      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          const adminDoc = await firebase.firestore().collection('admins').doc(email).get();
+          if (adminDoc.exists && adminDoc.data()?.active !== false) {
+            const admData = adminDoc.data();
+            match = {
+              email,
+              name: admData.name || user.displayName || email,
+              role: admData.role || 'Admin'
+            };
+          }
+        } catch(e) {}
+      }
+
       if (match) {
         sessionStorage.setItem('zenvy_admin_session', '1');
         sessionStorage.setItem('zenvy_admin_user', JSON.stringify({
@@ -1645,10 +1740,14 @@ const DB = {
           photo: user.photoURL || '',
           role: match.role || 'Admin'
         }));
-        DB.log(`Admin ${email} logged in via Google Auth`);
+        DB.log(`Admin ${email} (${match.role || 'Admin'}) logged in via Google Auth`);
         return { success: true };
       }
-      return { success: false, error: `Access Denied: ${email} is not on the authorized admin whitelist. Use Master Password to log in and add your Google email in Admin Settings → Admin Team.` };
+
+      return {
+        success: false,
+        error: `Access Denied: ${email} is not authorized. Only the Firebase creator and emails added from Admin Settings → Admin Team can access the Admin Suite.`
+      };
     },
     getCurrentUser() {
       try {

@@ -50,15 +50,13 @@ export async function checkUserIsAdmin(user) {
   if (!user || !user.email) return false;
   const userEmail = user.email.toLowerCase();
 
-  // Explicit admin emails (including developer/owner default emails)
-  if (
-    userEmail === 'admin@zenvy.com' ||
-    userEmail.includes('admin')
-  ) {
+  // 1. Permanent Master Owner Emails (Firebase project creator & Store Owner)
+  const MASTER_EMAILS = ['gfse083@gmail.com', 'rahat300809@gmail.com', 'admin@zenvy.com'];
+  if (MASTER_EMAILS.includes(userEmail)) {
     return true;
   }
 
-  // 1. Check 'admins' Firestore collection (doc ID = email)
+  // 2. Check 'admins' Firestore collection (doc ID = email)
   try {
     const adminDocSnap = await getDoc(doc(db, 'admins', userEmail));
     if (adminDocSnap.exists() && adminDocSnap.data().active !== false) {
@@ -68,7 +66,20 @@ export async function checkUserIsAdmin(user) {
     console.warn('Firestore admins check warning:', e);
   }
 
-  // 2. Check 'customers' collection (doc ID = uid)
+  // 3. Check 'zenvy_store/admin_access' Firestore collection
+  try {
+    const storeAccessDoc = await getDoc(doc(db, 'zenvy_store', 'admin_access'));
+    if (storeAccessDoc.exists()) {
+      const data = storeAccessDoc.data()?.data || [];
+      if (Array.isArray(data) && data.some(a => (a.email || '').trim().toLowerCase() === userEmail && a.status !== 'Inactive')) {
+        return true;
+      }
+    }
+  } catch (e) {
+    console.warn('Firestore zenvy_store admin_access check:', e);
+  }
+
+  // 4. Check 'customers' collection (doc ID = uid)
   try {
     const customerDoc = await getDoc(doc(db, 'customers', user.uid));
     if (customerDoc.exists() && customerDoc.data().role === 'ADMIN') {
@@ -78,8 +89,7 @@ export async function checkUserIsAdmin(user) {
     console.warn('Firestore customer role check warning:', e);
   }
 
-  // 3. Check local session flag
-  return localStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  return false;
 }
 
 // 🔵 Google Sign-In for Users & Customers
@@ -110,8 +120,14 @@ export async function adminLoginWithGoogle() {
 
     const adminStatus = await checkUserIsAdmin(user);
     if (!adminStatus) {
-      // If not yet marked as admin, grant admin access if it's the primary Gmail or auto-authorize
-      await grantAdminAccess(user.email);
+      // Strictly deny unauthorized users and sign out
+      await signOut(auth);
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      isAdmin = false;
+      return {
+        success: false,
+        error: `Access Denied: ${user.email} is not authorized. Only the Firebase creator and emails added from Admin Settings → Admin Team can access the Admin Dashboard.`
+      };
     }
 
     isAdmin = true;

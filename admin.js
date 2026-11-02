@@ -2659,7 +2659,7 @@ function openCreateOrderModal() {
         <div class="form-group"><label class="form-label">Customer Name<span class="req">*</span></label><input type="text" name="customerName" class="form-input" required placeholder="Full Name"/></div>
         <div class="form-group"><label class="form-label">Phone<span class="req">*</span></label><input type="text" name="customerPhone" class="form-input" required placeholder="01XXXXXXXXX"/></div>
       </div>
-      <div class="form-group"><label class="form-label">Email</label><input type="email" name="customerEmail" class="form-input" placeholder="email@example.com"/></div>
+      <div class="form-group"><label class="form-label">Email <span style="font-size:11px;color:#94A3B8;font-weight:normal">(Optional)</span></label><input type="text" name="customerEmail" class="form-input" placeholder="email@example.com (optional)"/></div>
       <div class="form-group"><label class="form-label">Shipping Address<span class="req">*</span></label><input type="text" name="shippingAddress" class="form-input" required placeholder="Street address"/></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">City<span class="req">*</span></label><input type="text" name="city" class="form-input" required placeholder="Dhaka"/></div>

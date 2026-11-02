@@ -1562,7 +1562,12 @@ const DB = {
   activityLog: {
     add(entry) {
       const items = Store.get('activityLog');
-      items.unshift({ id: Store.genId(), ...entry, admin: 'Admin', date: Store.now() });
+      let adminName = 'Admin';
+      try {
+        const u = DB.auth.getCurrentUser();
+        if (u) adminName = u.name || u.email || 'Admin';
+      } catch(e) {}
+      items.unshift({ id: Store.genId(), ...entry, admin: adminName, date: Store.now() });
       Store.set('activityLog', items.slice(0, 1000));
     },
     all() { return Store.get('activityLog'); }

@@ -133,7 +133,49 @@
     }
   }
 
-  // ── Pull data from Firestore into localStorage ─────────────────
+  // ── Intelligent Array Merge for Multi-Admin Concurrency ────────
+  function mergeArraysById(localArr, cloudArr) {
+    if (!Array.isArray(localArr)) return Array.isArray(cloudArr) ? cloudArr : [];
+    if (!Array.isArray(cloudArr)) return localArr;
+
+    const map = new Map();
+    // 1. Seed with cloud items as baseline
+    cloudArr.forEach(item => {
+      if (item && typeof item === 'object') {
+        const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
+        map.set(key ? String(key) : JSON.stringify(item), item);
+      } else {
+        map.set(String(item), item);
+      }
+    });
+
+    // 2. Intelligently merge local items
+    localArr.forEach(item => {
+      if (item && typeof item === 'object') {
+        const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
+        const mapKey = key ? String(key) : JSON.stringify(item);
+        if (!map.has(mapKey)) {
+          // Local item not in cloud yet
+          map.set(mapKey, item);
+        } else {
+          // Exists in both: preserve whichever has the newer timestamp
+          const cloudItem = map.get(mapKey);
+          const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudItem.updatedAt || cloudItem.createdAt || 0).getTime();
+          if (localTime > cloudTime) {
+            map.set(mapKey, item);
+          }
+        }
+      } else {
+        if (!map.has(String(item))) {
+          map.set(String(item), item);
+        }
+      }
+    });
+
+    return Array.from(map.values());
+  }
+
   // ── Pull data from Firestore into localStorage ─────────────────
   async function hydrate() {
     if (!_db) return;
@@ -149,26 +191,24 @@
         const payload = docSnap.data();
         if (payload && payload.data !== undefined) {
           const localKey = `${DB_VERSION}_${key}`;
-          const localUpdatedStr = localStorage.getItem(`${localKey}_updatedAt`);
-          const localUpdatedAt = localUpdatedStr ? parseInt(localUpdatedStr, 10) : 0;
           const cloudUpdatedAt = payload.updatedAt || 0;
 
-          // Only overwrite local data if cloud payload is strictly newer than local
-          // or if local key has never been written
-          const hasLocal = localStorage.getItem(localKey) !== null;
-          if (!hasLocal || cloudUpdatedAt > localUpdatedAt) {
-            localStorage.setItem(localKey, JSON.stringify(payload.data));
-            if (cloudUpdatedAt) {
-              localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
-            }
-            count++;
-          } else if (localUpdatedAt > cloudUpdatedAt) {
-            // Local is newer than cloud; push local updates up to Firestore
+          let finalData = payload.data;
+          const rawLocal = localStorage.getItem(localKey);
+          if (rawLocal && Array.isArray(payload.data)) {
             try {
-              const localVal = JSON.parse(localStorage.getItem(localKey));
-              pushToFirestore(key, localVal);
+              const localParsed = JSON.parse(rawLocal);
+              if (Array.isArray(localParsed)) {
+                finalData = mergeArraysById(localParsed, payload.data);
+              }
             } catch(e) {}
           }
+
+          localStorage.setItem(localKey, JSON.stringify(finalData));
+          if (cloudUpdatedAt) {
+            localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+          }
+          count++;
         }
       });
       console.log(`[ZenvySync] Hydrated ${count} keys from Firestore ✅`);
@@ -193,19 +233,24 @@
           const payload = change.doc.data();
           if (payload && payload.data !== undefined) {
             const localKey = `${DB_VERSION}_${key}`;
-            const localUpdatedStr = localStorage.getItem(`${localKey}_updatedAt`);
-            const localUpdatedAt = localUpdatedStr ? parseInt(localUpdatedStr, 10) : 0;
             const cloudUpdatedAt = payload.updatedAt || 0;
+            const existingStr = localStorage.getItem(localKey);
 
-            const hasLocal = localStorage.getItem(localKey) !== null;
-            if (!hasLocal || cloudUpdatedAt >= localUpdatedAt) {
-              const incoming = JSON.stringify(payload.data);
-              const existing = localStorage.getItem(localKey);
-              if (existing !== incoming) {
-                localStorage.setItem(localKey, incoming);
-                if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
-                changed = true;
-              }
+            let finalData = payload.data;
+            if (existingStr && Array.isArray(payload.data)) {
+              try {
+                const existingParsed = JSON.parse(existingStr);
+                if (Array.isArray(existingParsed)) {
+                  finalData = mergeArraysById(existingParsed, payload.data);
+                }
+              } catch(e) {}
+            }
+
+            const incomingStr = JSON.stringify(finalData);
+            if (existingStr !== incomingStr) {
+              localStorage.setItem(localKey, incomingStr);
+              if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+              changed = true;
             }
           }
         }

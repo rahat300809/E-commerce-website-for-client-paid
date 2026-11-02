@@ -63,14 +63,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.ZenvyFirebase.startLiveSync(() => {
+      // 1. Re-verify auth integrity in real-time (in case permissions changed)
+      if (DB.auth.isLoggedIn()) {
+        const user = DB.auth.getCurrentUser();
+        const isAuth = user && user.email ? DB.adminAccess.isAuthorized(user.email) : false;
+        if (!isAuth) {
+          console.warn('[Admin Security] Revoked access for:', user?.email);
+          DB.auth.logout();
+          showLogin();
+          return;
+        }
+      }
+
+      // 2. Real-time badge & admin info update
       updateNavBadges();
       updateAdminUserInfo();
-      // Re-render current active view if in app
+
+      // 3. Multi-admin concurrency protection:
+      // Do not overwrite view or close modals while an admin is actively typing or editing
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (
+        activeEl.tagName === 'INPUT' ||
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.tagName === 'SELECT' ||
+        activeEl.isContentEditable
+      );
+      const isModalOpen = !document.getElementById('generic-modal')?.classList.contains('hidden') ||
+                          !document.getElementById('confirm-modal')?.classList.contains('hidden');
+
+      if (isTyping || isModalOpen) {
+        window._pendingLiveRefresh = true;
+        showLiveSyncPill('🔄 Team updates synced');
+        return;
+      }
+
+      // 4. Safe realtime view re-render
       if (DB.auth.isLoggedIn() && typeof currentView !== 'undefined') {
         const content = document.getElementById('admin-content');
         if (content) {
           const viewFunc = VIEW_MAP[currentView];
-          if (typeof viewFunc === 'function') viewFunc(content);
+          if (typeof viewFunc === 'function') {
+            viewFunc(content);
+            showLiveSyncPill('🔄 Realtime updated');
+          }
         }
       }
     });
@@ -384,7 +419,17 @@ function showConfirm(title, msg, onOk, okLabel = 'Confirm', danger = true) {
   btn.className = danger ? 'btn btn-danger' : 'btn btn-primary';
   document.getElementById('confirm-modal').classList.remove('hidden');
 }
-function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); confirmCallback = null; }
+function closeConfirm() { 
+  document.getElementById('confirm-modal').classList.add('hidden'); 
+  confirmCallback = null; 
+  if (window._pendingLiveRefresh) {
+    window._pendingLiveRefresh = false;
+    const content = document.getElementById('admin-content');
+    if (content && typeof VIEW_MAP[currentView] === 'function') {
+      VIEW_MAP[currentView](content);
+    }
+  }
+}
 function confirmOk() { 
   const cb = confirmCallback;
   closeConfirm(); 
@@ -419,7 +464,37 @@ function openModal(title, bodyHtml, footer = '', size = 'modal-lg') {
   box.className = `modal-box ${size}`;
   document.getElementById('generic-modal').classList.remove('hidden');
 }
-function closeModal() { document.getElementById('generic-modal').classList.add('hidden'); }
+function closeModal() { 
+  document.getElementById('generic-modal').classList.add('hidden'); 
+  if (window._pendingLiveRefresh) {
+    window._pendingLiveRefresh = false;
+    const content = document.getElementById('admin-content');
+    if (content && typeof VIEW_MAP[currentView] === 'function') {
+      VIEW_MAP[currentView](content);
+    }
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Multi-Admin Live Sync Floating Indicator
+// ──────────────────────────────────────────────────────────────
+function showLiveSyncPill(text = '🔄 Live Synced') {
+  let pill = document.getElementById('admin-live-sync-indicator');
+  if (!pill) {
+    pill = document.createElement('div');
+    pill.id = 'admin-live-sync-indicator';
+    pill.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#0F172A;color:#10B981;font-size:12px;font-weight:600;padding:7px 16px;border-radius:9999px;box-shadow:0 10px 25px rgba(0,0,0,0.35);border:1px solid rgba(16,185,129,0.3);z-index:99999;display:flex;align-items:center;gap:8px;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);pointer-events:none;opacity:0;transform:translateY(12px);';
+    document.body.appendChild(pill);
+  }
+  pill.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 10px #10B981;"></span> ${text}`;
+  pill.style.opacity = '1';
+  pill.style.transform = 'translateY(0)';
+  clearTimeout(pill._timer);
+  pill._timer = setTimeout(() => {
+    pill.style.opacity = '0';
+    pill.style.transform = 'translateY(12px)';
+  }, 2200);
+}
 
 // Close modals on backdrop click
 document.addEventListener('click', e => {

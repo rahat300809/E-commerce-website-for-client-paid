@@ -226,7 +226,7 @@ export function requireAdmin() {
 
     onAuthStateChanged(auth, async (user) => {
       if (!user && localStorage.getItem(ADMIN_SESSION_KEY) !== 'true') {
-        window.location.href = '/admin/login.html';
+        window.location.href = '/admin.html';
         return;
       }
       const adminOk = await checkUserIsAdmin(user);
@@ -234,7 +234,7 @@ export function requireAdmin() {
         isAdmin = true;
         resolve(user || { email: 'admin@zenvy.com' });
       } else {
-        window.location.href = '/admin/login.html';
+        window.location.href = '/admin.html';
       }
     });
   });

@@ -203,11 +203,11 @@ function renderHeroBannerCarousel() {
             ${subtitle}
           </p>
           <div class="flex items-center gap-2.5 sm:gap-3">
-            <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
+            <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
               <span>${cta1}</span>
               <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>
-            <a href="#customizer" onclick="switchView('customizer'); return false;" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
+            <a href="javascript:void(0)" onclick="return safeSwitchView('customizer', event)" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
               <span>${cta2}</span>
             </a>
           </div>
@@ -225,14 +225,23 @@ function renderHeroBannerCarousel() {
   }
 
   if (!wrapper._swipeAttached) {
-    let startX = 0;
+    let startX = 0, startY = 0;
     wrapper.addEventListener('touchstart', (e) => {
-      startX = e.changedTouches[0].screenX;
+      if (e.changedTouches && e.changedTouches[0]) {
+        startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY;
+      }
     }, { passive: true });
     wrapper.addEventListener('touchend', (e) => {
-      const diff = e.changedTouches[0].screenX - startX;
-      if (diff > 45) prevHeroBannerSlide();
-      else if (diff < -45) nextHeroBannerSlide();
+      if (e.changedTouches && e.changedTouches[0]) {
+        const diffX = e.changedTouches[0].screenX - startX;
+        const diffY = e.changedTouches[0].screenY - startY;
+        // Only trigger slide change if movement was clearly horizontal, NOT vertical scrolling!
+        if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+          if (diffX > 45) prevHeroBannerSlide();
+          else nextHeroBannerSlide();
+        }
+      }
     }, { passive: true });
     wrapper._swipeAttached = true;
   }
@@ -823,7 +832,48 @@ window.addEventListener('hashchange', () => {
   }
 });
 
+// Prevent accidental navigation when user is scrolling with touch on mobile
+let isTouchScrolling = false;
+let touchStartY = 0, touchStartX = 0;
+
+window.addEventListener('touchstart', (e) => {
+  if (e.touches && e.touches[0]) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    isTouchScrolling = false;
+  }
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (e.touches && e.touches[0]) {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (dx > 10 || dy > 10) {
+      isTouchScrolling = true;
+    }
+  }
+}, { passive: true });
+
+window.addEventListener('touchend', () => {
+  setTimeout(() => {
+    isTouchScrolling = false;
+  }, 120);
+}, { passive: true });
+
+window.safeSwitchView = function(viewName, ev) {
+  if (isTouchScrolling) {
+    if (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    return false;
+  }
+  switchView(viewName);
+  return false;
+};
+
 window.goToShopCategory = function(catName) {
+  if (isTouchScrolling) return; // Ignore accidental tap during scroll!
   switchView('shop');
   setTimeout(() => {
     selectCategory(catName);

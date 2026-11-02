@@ -203,11 +203,11 @@
                   The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.
                 </p>
                 <div class="flex items-center gap-2.5 sm:gap-3">
-                  <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group">
+                  <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
                     <span>SHOP</span>
                     <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </a>
-                  <a href="#customizer" onclick="switchView('customizer'); return false;" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200">
+                  <a href="javascript:void(0)" onclick="return safeSwitchView('customizer', event)" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
                     <span>3D Studio</span>
                   </a>
                 </div>
@@ -245,7 +245,7 @@
             <span id="collections-sec-sub" class="text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-widest block mb-1">EXPLORE BY CATEGORY</span>
             <h2 id="collections-sec-title" class="font-headline text-2xl sm:text-3xl font-extrabold text-black uppercase">FEATURING COLLECTIONS</h2>
           </div>
-          <a href="index.html#shop" onclick="switchView('shop')" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors">
+          <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer">
             View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
           </a>
         </div>
@@ -290,8 +290,6 @@
 
         </div>
       </section>
-
-    </div>
 
     </div>
 

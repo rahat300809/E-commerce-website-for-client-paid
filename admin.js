@@ -16,24 +16,16 @@ const PAGE_SIZE = 20;
 // ──────────────────────────────────────────────────────────────
 // Boot
 // ──────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  // Hydrate from Firestore if available
-  if (window.ZenvyFirebase) {
-    try {
-      await window.ZenvyFirebase.hydrate();
-    } catch (e) {
-      console.warn('[Admin] Firestore hydration warning:', e);
-    }
-  }
-
-  // Verify active session integrity
+document.addEventListener('DOMContentLoaded', () => {
+  // Step 1: Instant 0ms Local-First Paint (Eliminates white screen on reload)
   if (DB.auth.isLoggedIn()) {
     const user = DB.auth.getCurrentUser();
     const isAuth = user && user.email ? DB.adminAccess.isAuthorized(user.email) : false;
     if (isAuth) {
       updateAdminUserInfo();
       showApp();
-      nav(location.hash.replace('#', '') || 'dashboard');
+      const initialView = (location.hash || '').replace(/^#\/?/, '').trim() || 'dashboard';
+      nav(initialView);
     } else {
       console.warn('[Admin Security] Active session not authorized for:', user?.email);
       DB.auth.logout();
@@ -44,8 +36,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   updateNavBadges();
 
-  // Start live sync for admin panel as well
+  // Step 2: Background Cloud Sync (Runs non-blocking without delaying page display)
   if (window.ZenvyFirebase) {
+    window.ZenvyFirebase.hydrate().then(() => {
+      // Re-check auth integrity after fresh cloud data
+      if (DB.auth.isLoggedIn()) {
+        const user = DB.auth.getCurrentUser();
+        const isAuth = user && user.email ? DB.adminAccess.isAuthorized(user.email) : false;
+        if (isAuth) {
+          updateAdminUserInfo();
+          updateNavBadges();
+          if (currentView) {
+            const content = document.getElementById('admin-content');
+            if (content && typeof VIEW_MAP[currentView] === 'function') {
+              VIEW_MAP[currentView](content);
+            }
+          }
+        } else {
+          console.warn('[Admin Security] Revoked access for:', user?.email);
+          DB.auth.logout();
+          showLogin();
+        }
+      }
+    }).catch(e => {
+      console.warn('[Admin] Background hydration notice:', e);
+    });
+
     window.ZenvyFirebase.startLiveSync(() => {
       updateNavBadges();
       updateAdminUserInfo();
@@ -62,15 +78,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function showLogin() {
-  document.getElementById('admin-login').classList.remove('hidden');
-  document.getElementById('admin-app').classList.add('hidden');
+  document.documentElement.classList.remove('admin-session-active');
+  const loginEl = document.getElementById('admin-login');
+  if (loginEl) loginEl.classList.remove('hidden');
+  const appEl = document.getElementById('admin-app');
+  if (appEl) appEl.classList.add('hidden');
   const errEl = document.getElementById('login-err');
   if (errEl) errEl.classList.add('hidden');
 }
 
 function showApp() {
-  document.getElementById('admin-login').classList.add('hidden');
-  document.getElementById('admin-app').classList.remove('hidden');
+  document.documentElement.classList.add('admin-session-active');
+  const loginEl = document.getElementById('admin-login');
+  if (loginEl) loginEl.classList.add('hidden');
+  const appEl = document.getElementById('admin-app');
+  if (appEl) appEl.classList.remove('hidden');
   updateAdminUserInfo();
 }
 
@@ -222,23 +244,36 @@ const VIEW_TITLES = {
 };
 
 function nav(view) {
+  view = (view || 'dashboard').replace(/^#\/?/, '').trim() || 'dashboard';
   currentView = view;
-  location.hash = view;
+  if (location.hash !== '#' + view) {
+    try { location.hash = view; } catch(e){}
+  }
+
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
-  const title = VIEW_TITLES[view] || view;
-  document.getElementById('topbar-page-title').textContent = title;
-  // Destroy previous charts
-  Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch {} });
+  const title = VIEW_TITLES[view] || (view.charAt(0).toUpperCase() + view.slice(1));
+  const titleEl = document.getElementById('topbar-page-title');
+  if (titleEl) titleEl.textContent = title;
+
+  // Destroy previous charts safely
+  Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch(e){} });
   chartInstances = {};
+
   // Hide search results
-  document.getElementById('global-search-results').classList.add('hidden');
-  document.getElementById('global-search').value = '';
+  const searchResults = document.getElementById('global-search-results');
+  if (searchResults) searchResults.classList.add('hidden');
+  const searchInput = document.getElementById('global-search');
+  if (searchInput) searchInput.value = '';
+
   // Close sidebar on mobile
-  document.getElementById('admin-sidebar').classList.remove('open');
+  const sidebar = document.getElementById('admin-sidebar');
+  if (sidebar) sidebar.classList.remove('open');
 
   const content = document.getElementById('admin-content');
+  if (!content) return;
+
   content.innerHTML = '<div style="padding:40px 0;text-align:center"><div class="skeleton" style="height:32px;width:200px;margin:0 auto 12px"></div><div class="skeleton" style="height:200px;border-radius:12px;margin-bottom:12px"></div></div>';
 
   // Auto-expand parent group if nav item is in a group
@@ -249,7 +284,14 @@ function nav(view) {
     }
   });
 
-  setTimeout(() => renderView(view, content), 80);
+  setTimeout(() => {
+    try {
+      renderView(view, content);
+    } catch(err) {
+      console.error('[Admin] View render error:', err);
+      content.innerHTML = `<div style="padding:40px;text-align:center;color:#DC2626;"><h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">View Render Notice</h3><p style="font-size:13px;color:#6B7280;">${err.message || 'Error rendering this view.'}</p><button onclick="nav('dashboard')" class="btn btn-primary" style="margin-top:16px;">Return to Dashboard</button></div>`;
+    }
+  }, 40);
 }
 
 function toggleNavGroup(header) {

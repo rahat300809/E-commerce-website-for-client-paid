@@ -17,6 +17,31 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="styles.css">
 
+  <script>
+    // Instant 0ms initial view detection before DOM paint
+    (function() {
+      try {
+        var rawHash = (window.location.hash || '').replace('#', '').trim();
+        var urlParams = new URLSearchParams(window.location.search);
+        var cat = urlParams.get('category') || urlParams.get('cat');
+        var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+        var target = urlParams.get('view') || rawHash || (path === 'shop' || cat ? 'shop' : (path === 'customizer' ? 'customizer' : (path === 'checkout' ? 'checkout' : 'home')));
+        if (target && target !== 'home') {
+          document.documentElement.setAttribute('data-target-view', target);
+        }
+      } catch(e){}
+    })();
+  </script>
+  <style>
+    /* Prevent home flash when reloading directly on #shop, #customizer, or #checkout */
+    html[data-target-view="shop"] #view-home { display: none !important; }
+    html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
+    html[data-target-view="customizer"] #view-home { display: none !important; }
+    html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
+    html[data-target-view="checkout"] #view-home { display: none !important; }
+    html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
+  </style>
+
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -157,21 +182,26 @@
     <div onclick="toggleMobileMenu(true)" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
     <div id="mobile-menu-panel" class="absolute top-[88px] left-0 w-full bg-white/95 backdrop-blur-2xl border-b border-white/80 shadow-2xl p-5 flex flex-col gap-2 transform -translate-y-full transition-transform duration-300 ease-in-out">
       <div class="text-[11px] font-label-caps text-secondary uppercase tracking-widest pb-2 border-b border-outline-variant/30 font-bold">Navigation</div>
-      <button onclick="switchView('home'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
+      <button onclick="switchView('home'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
         <span class="material-symbols-outlined text-lg">home</span> Home
       </button>
-      <button onclick="switchView('shop'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
-        <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop Catalog
+      <button onclick="switchView('shop'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+        <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop Catalog & Kits
       </button>
-      <a href="product.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
-        <span class="material-symbols-outlined text-lg">checkroom</span> Jerseys & Customizer
-      </a>
-      <button onclick="switchView('customizer'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
+      <button onclick="switchView('customizer'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
         <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Jersey 3D Studio
       </button>
-      <a href="preorders.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
-        <span class="material-symbols-outlined text-lg">schedule</span> Preorders
+      <a href="preorders.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">schedule</span> Reserve Preorders
       </a>
+      <button onclick="switchView('order-tracking'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+        <span class="material-symbols-outlined text-lg">local_shipping</span> Track Order
+      </button>
+      <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+        <a href="admin.html" onclick="toggleMobileMenu(true);" class="text-xs text-gray-500 hover:text-black font-mono-ui font-semibold flex items-center gap-1.5 py-1">
+          <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Admin Suite
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1090,13 +1120,14 @@
             
             <!-- Quick Links -->
             <div>
-              <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2.5 sm:mb-4">LINKS</h4>
+              <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2.5 sm:mb-4">EXPLORE</h4>
               <ul class="flex flex-col gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 font-medium">
-                <li><a href="javascript:void(0)" onclick="alert('ZENVY Privacy Policy: We protect customer data using enterprise encryption.')" class="hover:text-black transition-colors">Privacy Policy</a></li>
-                <li><a href="javascript:void(0)" onclick="alert('ZENVY Terms of Service: Standard e-commerce terms apply.')" class="hover:text-black transition-colors">Terms of Service</a></li>
-                <li><a href="javascript:void(0)" onclick="alert('Shipping Information:\n\nInside Dhaka: Delivered within 24–48 hours.\nOutside Dhaka (All Bangladesh): 2–3 business days via Steadfast / Pathao courier.\n\nDelivery charge is shown at checkout based on your location.')" class="hover:text-black transition-colors">Shipping</a></li>
-                <li><a href="javascript:void(0)" onclick="alert('Returns Policy: 30-day hassle-free returns on all unworn items.')" class="hover:text-black transition-colors">Returns</a></li>
-                <li><a href="javascript:void(0)" onclick="alert('Support: Reach our concierge team at support@zenvy.com')" class="hover:text-black transition-colors">Contact</a></li>
+                <li><a href="javascript:void(0)" onclick="switchView('home'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">Home Storefront</a></li>
+                <li><a href="javascript:void(0)" onclick="switchView('shop'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
+                <li><a href="javascript:void(0)" onclick="switchView('customizer'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">3D Custom Studio</a></li>
+                <li><a href="preorders.html" class="hover:text-black transition-colors">Reserve Preorders</a></li>
+                <li><a href="javascript:void(0)" onclick="switchView('order-tracking'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">Track Order</a></li>
+                <li><a href="admin.html" class="hover:text-black transition-colors">Admin Portal</a></li>
               </ul>
             </div>
 

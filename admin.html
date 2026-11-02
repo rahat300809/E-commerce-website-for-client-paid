@@ -8,13 +8,29 @@
   <link rel="stylesheet" href="admin.css"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // Instant 0ms session check before DOM paints to eliminate white-screen on reload
+    (function() {
+      try {
+        if (sessionStorage.getItem('zenvy_admin_session') === '1') {
+          document.documentElement.classList.add('admin-session-active');
+        }
+      } catch(e){}
+    })();
+  </script>
+  <style>
+    /* Instant CSS state before JS loads */
+    html.admin-session-active #admin-login { display: none !important; }
+    html.admin-session-active #admin-app { display: block !important; }
+    html:not(.admin-session-active) #admin-login { display: flex !important; }
+  </style>
 </head>
 <body class="admin-body">
 
 <!-- ═══════════════════════════════════════════
      LOGIN PAGE
 ════════════════════════════════════════════ -->
-<div id="admin-login" class="hidden">
+<div id="admin-login">
   <div class="login-card" style="max-width:420px;padding:36px 32px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.08);">
     <div class="login-logo" style="letter-spacing:0.2em;font-size:28px;">ZENVY</div>
     <p class="login-sub" style="margin-bottom:24px;">Admin Portal • Authorized Access Only</p>

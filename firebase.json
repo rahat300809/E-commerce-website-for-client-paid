@@ -4,6 +4,8 @@
   },
   "hosting": {
     "public": ".",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -25,6 +27,40 @@
       "**/*.ps1",
       "**/*.sh",
       "README.md"
+    ],
+    "rewrites": [
+      {
+        "source": "/admin",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/admin/**",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/shop",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/customizer",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/checkout",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/preorders",
+        "destination": "/preorders.html"
+      },
+      {
+        "source": "/product",
+        "destination": "/product.html"
+      },
+      {
+        "source": "/account",
+        "destination": "/account.html"
+      }
     ],
     "headers": [
       {

@@ -15,6 +15,13 @@ const appState = {
   }
 };
 
+// Shop State Globals (Initialized at top to prevent TDZ on quick routing)
+var shopCurrentPage = 1;
+var shopActiveCategory = 'all';
+var shopMaxPrice = 10000;
+var shopSortOrder = 'default';
+var shopCarouselIndex = 0;
+
 function saveCartState() {
   try {
     localStorage.setItem('zenvy_cart', JSON.stringify(appState.cart));
@@ -33,6 +40,8 @@ function formatMoney(amountInBDT) {
 document.addEventListener('DOMContentLoaded', () => {
   // Step 1: Render UI IMMEDIATELY with local cached data (instant 0ms first-paint)
   syncHomepageContent();
+  renderShopCategories();
+  renderShopProducts();
   renderCart();
   updateCustomizerTotal();
   syncFooterSocialLinks();
@@ -42,10 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const catParam = urlParams.get('category') || urlParams.get('cat');
   const rawHash = (window.location.hash || '').replace('#', '').trim();
-  const targetView = urlParams.get('view') || rawHash || 'home';
+  const pathName = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+
+  let targetView = urlParams.get('view') || rawHash;
+  if (!targetView) {
+    if (pathName === 'shop' || pathName === 'shop.html' || catParam) targetView = 'shop';
+    else if (pathName === 'customizer' || pathName === 'customizer.html') targetView = 'customizer';
+    else if (pathName === 'checkout' || pathName === 'checkout.html') targetView = 'checkout';
+    else targetView = 'home';
+  }
+
   if (catParam) {
     switchView('shop', false);
-    setTimeout(() => selectCategory(catParam), 150);
+    setTimeout(() => selectCategory(catParam), 80);
   } else if (['checkout', 'shop', 'customizer', 'studio', 'order-tracking', 'preorder', 'preorders', 'home'].includes(targetView)) {
     switchView(targetView, false);
   } else {
@@ -53,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (urlParams.get('openCart') === '1' || urlParams.get('openCart') === 'true') {
-    setTimeout(() => toggleCartDrawer(true), 200);
+    setTimeout(() => toggleCartDrawer(true), 150);
   }
 
   // Step 2: Background Cloud Sync (Runs non-blocking without delaying page display)
@@ -810,11 +828,11 @@ function switchView(viewName, updateUrl = true) {
     activeTab.className = "nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-primary font-bold bg-white shadow-sm";
   }
 
-  // View-specific initialization
+  // View-specific initialization (Synchronous 0ms paint)
   if (normalized === 'shop') {
-    // Render shop grid and discount banner from DB on each visit
-    shopCarouselGoto(0);
-    setTimeout(() => changeShopPage(typeof shopCurrentPage !== 'undefined' ? shopCurrentPage : 1), 50);
+    renderShopCategories();
+    renderShopProducts();
+    try { shopCarouselGoto(0); } catch(e){}
   } else if (normalized === 'home') {
     syncHomepageContent();
   } else if (normalized === 'checkout') {
@@ -1335,10 +1353,7 @@ window.setShopViewMode = function(mode) {
 };
 
 // ── Dynamic Shop Categories & Products Engine ──
-let shopCurrentPage = 1;
-let shopActiveCategory = 'all';
-let shopMaxPrice = 10000;
-let shopSortOrder = 'default';
+// (Globals initialized at top of app.js)
 
 function renderShopCategories() {
   const listEl = document.getElementById('shop-category-list');

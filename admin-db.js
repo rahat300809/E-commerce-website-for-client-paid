@@ -1022,6 +1022,26 @@ const DB = {
       notifLog.push({ orderId: id, orderNumber: old?.orderNumber, status, sentAt: Store.now() });
       Store.set('notifLog', notifLog);
     },
+    updatePayment(id, { paymentStatus, paidAmount, paymentRemark, paymentTrxId }) {
+      const old = DB.orders.byId(id);
+      if (!old) return;
+      const total = old.totalAmount || 0;
+      const isPaid = paymentStatus === 'PAID';
+      const finalPaidAmount = paidAmount !== undefined && paidAmount !== '' ? Number(paidAmount) : (isPaid ? total : (old.paidAmount || 0));
+      const due = Math.max(0, total - finalPaidAmount);
+
+      const updated = DB.orders.update(id, {
+        paymentStatus,
+        paidAmount: finalPaidAmount,
+        dueAmount: due,
+        paymentRemark: paymentRemark !== undefined ? paymentRemark : (old.paymentRemark || ''),
+        paymentTrxId: paymentTrxId !== undefined ? paymentTrxId : (old.paymentTrxId || ''),
+        paidAt: isPaid ? (old.paidAt || Store.now()) : old.paidAt
+      });
+      DB.activityLog.add({ action: `Payment ${paymentStatus}`, entity: 'Order', entityId: id, detail: `${old.orderNumber} - ৳${finalPaidAmount} (${paymentRemark || 'No remark'})` });
+      DB.log(`Order ${old.orderNumber} payment updated to ${paymentStatus}`);
+      return updated;
+    },
     update(id, data) {
       const items = Store.get('orders').map(o => o.id === id ? { ...o, ...data, updatedAt: Store.now() } : o);
       Store.set('orders', items); return items.find(o => o.id === id);

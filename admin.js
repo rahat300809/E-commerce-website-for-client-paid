@@ -2414,13 +2414,19 @@ function renderOrders(container) {
                   </td>
                   <td style="font-size:12px">${(o.items||[]).length} items</td>
                   <td class="font-mono" style="font-weight:700">৳${(o.totalAmount||0).toLocaleString()}</td>
-                  <td><span class="badge ${o.paymentStatus==='PAID'?'badge-green':o.paymentStatus==='FAILED'?'badge-red':'badge-amber'}">${o.paymentStatus}</span></td>
+                  <td onclick="event.stopPropagation();openPaymentRemarkModal('${o.id}')" title="Click to remark / mark as paid">
+                    <span class="badge ${o.paymentStatus==='PAID'?'badge-green':o.paymentStatus==='FAILED'?'badge-red':'badge-amber'}" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px">
+                      ${o.paymentStatus}
+                      <span class="material-symbols-outlined" style="font-size:12px;opacity:0.7">edit</span>
+                    </span>
+                  </td>
                   <td><span class="badge badge-${statusColor(o.status)} status-${o.status}">${o.status}</span></td>
                   <td style="font-size:12px;color:#9CA3AF">${fmtDate(o.createdAt)}</td>
                   <td class="actions-cell" onclick="event.stopPropagation()">
-                    <button class="btn btn-ghost btn-sm" onclick="openOrderDetail('${o.id}')"><span class="material-symbols-outlined">visibility</span></button>
-                    <button class="btn btn-ghost btn-sm" onclick="openOrderStatusModal('${o.id}')"><span class="material-symbols-outlined">sync</span></button>
-                    <button class="btn btn-ghost btn-sm" onclick="printInvoice('${o.id}')"><span class="material-symbols-outlined">print</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="openPaymentRemarkModal('${o.id}')" title="Mark Paid / Payment Remark"><span class="material-symbols-outlined" style="color:#16A34A">payments</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="openOrderDetail('${o.id}')" title="Order Details"><span class="material-symbols-outlined">visibility</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="openOrderStatusModal('${o.id}')" title="Update Status"><span class="material-symbols-outlined">sync</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="printInvoice('${o.id}')" title="Print Invoice"><span class="material-symbols-outlined">print</span></button>
                   </td>
                 </tr>
               `).join('')}
@@ -2464,14 +2470,21 @@ function openOrderDetail(id) {
         <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#64748B;letter-spacing:0.05em;margin-bottom:8px">Order & Payment Info</div>
         <div style="font-weight:800;font-size:16px;color:#0F172A;font-family:monospace;">#${o.orderNumber || o.id}</div>
         <div style="font-size:12px;color:#64748B;margin-top:2px;">${fmtDate(o.createdAt)}</div>
-        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           <span class="badge badge-${statusColor(o.status)}" style="font-weight:800;">${o.status}</span>
-          <span class="badge ${o.paymentStatus==='PAID'?'badge-green':o.paymentStatus==='FAILED'?'badge-red':'badge-amber'}" style="font-weight:800;">${o.paymentStatus}</span>
+          <span class="badge ${o.paymentStatus==='PAID'?'badge-green':o.paymentStatus==='FAILED'?'badge-red':'badge-amber'}" style="font-weight:800;display:inline-flex;align-items:center;gap:4px;">
+            ${o.paymentStatus}
+          </span>
         </div>
         <div style="font-size:13px;color:#334155;margin-top:10px;padding-top:8px;border-top:1px solid #F1F5F9;">
           <strong>Payment Method:</strong> ${o.paymentMethod || 'Cash on Delivery'}
         </div>
-        ${o.trackingNumber ? `<div style="font-size:13px;color:#0369A1;margin-top:4px;">Tracking #: <strong>${o.trackingNumber}</strong></div>` : ''}
+        ${o.paymentRemark || o.paymentTrxId ? `
+          <div style="font-size:12px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;padding:6px 10px;border-radius:6px;margin-top:8px;line-height:1.4;">
+            <strong>Payment Remark:</strong> ${o.paymentRemark || o.paymentTrxId}
+          </div>
+        ` : ''}
+        ${o.trackingNumber ? `<div style="font-size:13px;color:#0369A1;margin-top:6px;">Tracking #: <strong>${o.trackingNumber}</strong></div>` : ''}
       </div>
     </div>
 
@@ -2548,17 +2561,260 @@ function openOrderDetail(id) {
       </div>
     </div>
 
-    <div class="card" style="padding:16px;border-radius:12px;border:1px solid #E2E8F0;">
-      <div class="card-title" style="margin-bottom:12px;font-size:13px;font-weight:800;">Update Status & Tracking</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <select id="detail-status" class="form-select" style="width:180px">
-          ${statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-        <input type="text" id="detail-tracking" class="form-input" value="${o.trackingNumber||''}" placeholder="Tracking number" style="max-width:200px"/>
-        <button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${id}')">Update Status</button>
-        <button class="btn btn-secondary btn-sm" onclick="printInvoice('${id}')"><span class="material-symbols-outlined">print</span> Print Invoice</button>
+    <!-- Payment Remarking & Status Management Suite -->
+    <div class="card" style="padding:18px;border-radius:12px;border:1px solid #CBD5E1;background:#F8FAFC;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:14px;font-weight:800;color:#0F172A;display:flex;align-items:center;gap:6px;">
+          <span class="material-symbols-outlined" style="color:#16A34A;font-size:22px;">payments</span>
+          Payment Remarking & Order Status
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" style="background:#16A34A;color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:4px;" onclick="quickMarkOrderPaid('${id}')">
+            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> 1-Click Mark as PAID (৳${(o.totalAmount||0).toLocaleString()})
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="printInvoice('${id}')">
+            <span class="material-symbols-outlined" style="font-size:16px;">print</span> Print Invoice
+          </button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;">
+        <div>
+          <label class="form-label" style="font-size:11px;font-weight:700;text-transform:uppercase;">Payment Status</label>
+          <select id="detail-pay-status" class="form-select" onchange="if(this.value==='PAID'){document.getElementById('detail-paid-amount').value='${o.totalAmount||0}'}">
+            ${['PENDING','PAID','PARTIALLY_PAID','FAILED','REFUNDED'].map(p=>`<option value="${p}" ${o.paymentStatus===p?'selected':''}>${p}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;font-weight:700;text-transform:uppercase;">Paid Amount (৳)</label>
+          <input type="number" id="detail-paid-amount" class="form-input" value="${o.paidAmount !== undefined ? o.paidAmount : (o.paymentStatus==='PAID' ? o.totalAmount : 0)}" placeholder="Paid Amount"/>
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;font-weight:700;text-transform:uppercase;">Order Status</label>
+          <select id="detail-status" class="form-select">
+            ${statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;font-weight:700;text-transform:uppercase;">Tracking Number</label>
+          <input type="text" id="detail-tracking" class="form-input" value="${o.trackingNumber||''}" placeholder="e.g. STEADFAST-12345"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label" style="font-size:11px;font-weight:700;text-transform:uppercase;">Payment Remark / Trx ID / Notes</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="detail-pay-remark" class="form-input" value="${o.paymentRemark || o.paymentTrxId || ''}" placeholder="e.g. bKash TrxID: 9B7X2K4M / Full payment received via COD rider / Advance ৳150" style="flex:1;"/>
+          <button class="btn btn-primary btn-sm" onclick="saveOrderDetailPaymentAndStatus('${id}')" style="white-space:nowrap;padding:0 22px;display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save Updates
+          </button>
+        </div>
       </div>
     </div>
+  `;
+  openModal(`Order Details: #${o.orderNumber || o.id}`, html, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`, 'modal-xl');
+}
+
+function quickMarkOrderPaid(id) {
+  const o = DB.orders.byId(id);
+  if (!o) return;
+  const total = o.totalAmount || 0;
+  DB.orders.updatePayment(id, {
+    paymentStatus: 'PAID',
+    paidAmount: total,
+    paymentRemark: o.paymentRemark || 'Marked as PAID by admin'
+  });
+  toast(`Order #${o.orderNumber || id} marked as PAID (৳${total.toLocaleString()})`, 'success');
+  updateNavBadges();
+  closeModal();
+  renderOrders(document.getElementById('admin-content'));
+}
+
+function saveOrderDetailPaymentAndStatus(id) {
+  const status = document.getElementById('detail-status')?.value;
+  const tracking = document.getElementById('detail-tracking')?.value;
+  const payStatus = document.getElementById('detail-pay-status')?.value;
+  const paidAmount = document.getElementById('detail-paid-amount')?.value;
+  const payRemark = document.getElementById('detail-pay-remark')?.value?.trim();
+
+  if (status) DB.orders.updateStatus(id, status);
+  if (tracking !== undefined) DB.orders.update(id, { trackingNumber: tracking });
+  if (payStatus) {
+    DB.orders.updatePayment(id, {
+      paymentStatus: payStatus,
+      paidAmount,
+      paymentRemark: payRemark,
+      paymentTrxId: payRemark
+    });
+  }
+
+  toast('Order status and payment remark saved successfully', 'success');
+  updateNavBadges();
+  closeModal();
+  renderOrders(document.getElementById('admin-content'));
+}
+
+function openOrderStatusModal(id) {
+  const o = DB.orders.byId(id);
+  if (!o) return;
+  const statuses = ['PENDING','CONFIRMED','PROCESSING','PACKED','SHIPPED','OUT_FOR_DELIVERY','DELIVERED','CANCELLED','RETURNED','REFUNDED'];
+  const payStatuses = ['PAID','PENDING','PARTIALLY_PAID','FAILED','REFUNDED'];
+  const total = o.totalAmount || 0;
+  const currentPaid = o.paidAmount !== undefined ? o.paidAmount : (o.paymentStatus === 'PAID' ? total : 0);
+
+  const html = `
+    <div style="background:#F8FAFC;padding:12px;border-radius:10px;margin-bottom:14px;border:1px solid #E2E8F0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#64748B;">ORDER #${o.orderNumber || o.id}</div>
+          <div style="font-size:14px;font-weight:800;color:#0F172A;">${o.customerName || 'Customer'}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#64748B;">Total Amount</div>
+          <div style="font-size:16px;font-weight:900;color:#0F172A;font-family:monospace;">৳${total.toLocaleString()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Mark as Paid Button -->
+    <div style="margin-bottom:14px;">
+      <button type="button" class="btn btn-sm" style="width:100%;background:#DCFCE7;color:#166534;border:1px solid #86EFAC;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;"
+        onclick="document.getElementById('detail-pay-status').value='PAID';document.getElementById('detail-paid-amount').value='${total}';">
+        <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> 1-Click Mark as PAID (৳${total.toLocaleString()})
+      </button>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" style="font-weight:700;">Order Status</label>
+        <select id="detail-status" class="form-select">${statuses.map(s=>`<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('')}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="font-weight:700;">Payment Status</label>
+        <select id="detail-pay-status" class="form-select" onchange="if(this.value==='PAID'){document.getElementById('detail-paid-amount').value='${total}'}">
+          ${payStatuses.map(s => `<option value="${s}" ${o.paymentStatus === s ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" style="font-weight:700;">Paid Amount (৳)</label>
+        <input type="number" id="detail-paid-amount" class="form-input" value="${currentPaid}" placeholder="e.g. ${total}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="font-weight:700;">Tracking Number</label>
+        <input type="text" id="detail-tracking" class="form-input" value="${o?.trackingNumber||''}" placeholder="e.g. STEADFAST-12345"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Payment Remark / Trx ID</label>
+      <input type="text" id="detail-pay-remark" class="form-input" value="${o.paymentRemark || o.paymentTrxId || ''}" placeholder="e.g. bKash TrxID: 9B7X2K4M / Full payment received"/>
+    </div>
+  `;
+  openModal('Update Order Status & Payment Remark', html, `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateOrderStatus('${id}')">Save Updates</button>`, 'modal-md');
+}
+
+function updateOrderStatus(id) {
+  const status = document.getElementById('detail-status')?.value;
+  const tracking = document.getElementById('detail-tracking')?.value;
+  const payStatus = document.getElementById('detail-pay-status')?.value;
+  const paidAmount = document.getElementById('detail-paid-amount')?.value;
+  const payRemark = document.getElementById('detail-pay-remark')?.value?.trim();
+
+  if (status) DB.orders.updateStatus(id, status);
+  if (tracking !== undefined) DB.orders.update(id, { trackingNumber: tracking });
+  if (payStatus) {
+    DB.orders.updatePayment(id, {
+      paymentStatus: payStatus,
+      paidAmount,
+      paymentRemark: payRemark,
+      paymentTrxId: payRemark
+    });
+  }
+
+  toast(`Order status and payment remark updated`, 'success');
+  updateNavBadges();
+  closeModal();
+  renderOrders(document.getElementById('admin-content'));
+}
+
+function openPaymentRemarkModal(id) {
+  const o = DB.orders.byId(id);
+  if (!o) return;
+  const payStatuses = ['PAID','PENDING','PARTIALLY_PAID','FAILED','REFUNDED'];
+  const total = o.totalAmount || 0;
+  const currentPaid = o.paidAmount !== undefined ? o.paidAmount : (o.paymentStatus === 'PAID' ? total : 0);
+
+  const html = `
+    <div style="background:#F8FAFC;padding:14px 16px;border-radius:10px;margin-bottom:16px;border:1px solid #E2E8F0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Order #${o.orderNumber || o.id}</div>
+          <div style="font-size:15px;font-weight:800;color:#0F172A;">${o.customerName || 'Customer'}</div>
+          <div style="font-size:12px;color:#64748B;">${o.customerPhone || ''}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#64748B;font-weight:700;">TOTAL AMOUNT</div>
+          <div style="font-size:18px;font-weight:900;color:#0F172A;font-family:monospace;">৳${total.toLocaleString()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick 1-Click Buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button type="button" class="btn btn-sm" style="flex:1;background:#DCFCE7;color:#166534;border:1px solid #86EFAC;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;"
+        onclick="document.getElementById('modal-pay-status').value='PAID';document.getElementById('modal-pay-amount').value='${total}';">
+        <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> 1-Click Mark PAID
+      </button>
+      <button type="button" class="btn btn-sm btn-secondary" style="font-weight:700;"
+        onclick="document.getElementById('modal-pay-status').value='PENDING';document.getElementById('modal-pay-amount').value='0';">
+        Set PENDING
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Payment Status<span class="req">*</span></label>
+      <select id="modal-pay-status" class="form-select" onchange="if(this.value==='PAID'){document.getElementById('modal-pay-amount').value='${total}'}">
+        ${payStatuses.map(s => `<option value="${s}" ${o.paymentStatus === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Paid Amount (৳)</label>
+      <input type="number" id="modal-pay-amount" class="form-input" value="${currentPaid}" placeholder="e.g. ${total}"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Payment Remark / Trx ID / Notes</label>
+      <textarea id="modal-pay-remark" class="form-textarea" rows="2" placeholder="e.g. bKash TrxID: 9B7X2K4M / Full payment received via COD rider / Advance ৳150 paid">${o.paymentRemark || o.paymentTrxId || ''}</textarea>
+    </div>
+  `;
+
+  openModal(`Payment Remarking: #${o.orderNumber || o.id}`, html, `
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="savePaymentRemark('${id}')">Save Payment Remarks</button>
+  `, 'modal-md');
+}
+
+function savePaymentRemark(id) {
+  const paymentStatus = document.getElementById('modal-pay-status')?.value || 'PENDING';
+  const paidAmount = document.getElementById('modal-pay-amount')?.value;
+  const paymentRemark = document.getElementById('modal-pay-remark')?.value?.trim();
+
+  DB.orders.updatePayment(id, {
+    paymentStatus,
+    paidAmount,
+    paymentRemark,
+    paymentTrxId: paymentRemark
+  });
+
+  toast(`Payment updated to ${paymentStatus}`, 'success');
+  closeModal();
+  updateNavBadges();
+  renderOrders(document.getElementById('admin-content'));
+}
   `;
   openModal(`Order Details: #${o.orderNumber || o.id}`, html, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`, 'modal-xl');
 }

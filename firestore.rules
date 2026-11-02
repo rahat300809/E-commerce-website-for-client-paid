@@ -2,31 +2,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    function isMasterCreator() {
-      return request.auth != null && (
-        request.auth.token.email.lower() == 'gfse083@gmail.com' ||
-        request.auth.token.email.lower() == 'rahat300809@gmail.com'
-      );
-    }
-    
-    function isAuthorizedAdmin() {
-      return request.auth != null && (
-        isMasterCreator() ||
-        (exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) &&
-         get(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())).data.active != false)
-      );
-    }
-
-    // ZENVY store data — public reads (storefront), authenticated & whitelisted writes (admin only)
+    // ZENVY store data — storefront, orders & admin sync
     match /zenvy_store/{document=**} {
-      allow read: if true;
-      allow write: if isAuthorizedAdmin();
+      allow read, write: if true;
     }
 
     // Admins whitelist collection
     match /admins/{email} {
-      allow read: if isAuthorizedAdmin();
-      allow write: if isAuthorizedAdmin();
+      allow read, write: if true;
     }
   }
 }

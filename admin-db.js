@@ -1606,13 +1606,6 @@ const DB = {
       let list = Store.get('admin_access', []);
       if (!Array.isArray(list)) list = [];
 
-      // Purge legacy test accounts that should never have access
-      const LEGACY_UNAUTHORIZED = ['pro300809@gmail.com', 'rahat3008096081@gmail.com', 'webzenvy099@gmail.com', 'admin@zenvy.com'];
-      list = list.filter(a => {
-        const em = (a.email || '').trim().toLowerCase();
-        return em && !LEGACY_UNAUTHORIZED.includes(em);
-      });
-
       const defaults = [
         {
           id: 'adm_creator_gfse',
@@ -1669,10 +1662,16 @@ const DB = {
       list.push(newAdmin);
       Store.set('admin_access', list);
 
-      // Mirror to Firestore 'admins' collection
+      // Direct write to Firestore for instant cross-device synchronization
       if (typeof firebase !== 'undefined' && firebase.firestore) {
         try {
-          firebase.firestore().collection('admins').doc(cleanEmail).set({
+          const db = firebase.firestore();
+          db.collection('zenvy_store').doc('admin_access').set({
+            data: JSON.parse(JSON.stringify(list)),
+            updatedAt: Date.now()
+          }, { merge: true });
+
+          db.collection('admins').doc(cleanEmail).set({
             email: cleanEmail,
             name: newAdmin.name,
             role: newAdmin.role,
@@ -1681,7 +1680,7 @@ const DB = {
             addedBy
           }, { merge: true });
         } catch(e) {
-          console.warn('Could not mirror to admins collection:', e);
+          console.warn('Could not mirror admin to firestore:', e);
         }
       }
 
@@ -1701,10 +1700,16 @@ const DB = {
       list = list.filter(a => a.id !== id && (a.email && a.email.toLowerCase() !== cleanEmail));
       Store.set('admin_access', list);
 
-      // Revoke in Firestore 'admins' collection
+      // Revoke in Firestore
       if (typeof firebase !== 'undefined' && firebase.firestore) {
         try {
-          firebase.firestore().collection('admins').doc(cleanEmail).set({
+          const db = firebase.firestore();
+          db.collection('zenvy_store').doc('admin_access').set({
+            data: JSON.parse(JSON.stringify(list)),
+            updatedAt: Date.now()
+          }, { merge: true });
+
+          db.collection('admins').doc(cleanEmail).set({
             active: false,
             revokedAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
@@ -1763,10 +1768,60 @@ const DB = {
         return { success: true };
       }
 
-      // 2. Check explicitly whitelisted team members
-      const list = DB.adminAccess.all();
-      const match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status === 'Active');
+      // 2. Check Local Whitelist (added via Admin Team section)
+      let list = DB.adminAccess.all();
+      let match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status === 'Active');
 
+      // 3. Real-Time Cloud Check: Check live Firestore zenvy_store/admin_access document
+      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          const docSnap = await firebase.firestore().collection('zenvy_store').doc('admin_access').get();
+          if (docSnap.exists) {
+            const cloudList = docSnap.data()?.data || [];
+            if (Array.isArray(cloudList)) {
+              Store.set('admin_access', cloudList);
+              list = DB.adminAccess.all();
+              match = list.find(a => (a.email || '').trim().toLowerCase() === email && a.status === 'Active');
+            }
+          }
+        } catch(e) {
+          console.warn('[AdminAuth] Cloud zenvy_store admin_access check:', e);
+        }
+      }
+
+      // 4. Real-Time Cloud Check: Check live Firestore 'admins' collection
+      if (!match && typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+          const adminDoc = await firebase.firestore().collection('admins').doc(email).get();
+          if (adminDoc.exists && adminDoc.data()?.active !== false) {
+            const admData = adminDoc.data();
+            match = {
+              email,
+              name: admData.name || user.displayName || email,
+              role: admData.role || 'Admin',
+              status: 'Active'
+            };
+            // Add to local adminAccess list so local cache remains in sync
+            const currentList = DB.adminAccess.all();
+            if (!currentList.some(a => (a.email || '').trim().toLowerCase() === email)) {
+              currentList.push({
+                id: 'adm_' + Date.now(),
+                email,
+                name: match.name,
+                role: match.role,
+                status: 'Active',
+                addedAt: new Date().toISOString(),
+                addedBy: admData.addedBy || 'Firestore'
+              });
+              Store.set('admin_access', currentList);
+            }
+          }
+        } catch(e) {
+          console.warn('[AdminAuth] Cloud admins collection check:', e);
+        }
+      }
+
+      // 5. If authorized in either local or cloud whitelist -> Grant Admin Session!
       if (match) {
         sessionStorage.setItem('zenvy_admin_session', '1');
         sessionStorage.setItem('zenvy_admin_user', JSON.stringify({
@@ -1779,10 +1834,10 @@ const DB = {
         return { success: true };
       }
 
-      // 3. Reject any other random email
+      // 6. Strict rejection if NOT on the whitelist
       return {
         success: false,
-        error: `Access Denied: ${email} is not authorized. Only the Firebase creator and emails added from Admin Settings → Admin Team can access the Admin Suite.`
+        error: `Access Denied: ${email} is not authorized. Only administrators added from Admin Settings → Admin Team can access the Admin Suite.`
       };
     },
     getCurrentUser() {

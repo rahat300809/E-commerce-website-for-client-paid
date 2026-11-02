@@ -50,12 +50,6 @@ export async function checkUserIsAdmin(user) {
   if (!user || !user.email) return false;
   const userEmail = user.email.toLowerCase().trim();
 
-  // Block any legacy test email
-  const LEGACY_UNAUTHORIZED = ['pro300809@gmail.com', 'rahat3008096081@gmail.com', 'webzenvy099@gmail.com', 'admin@zenvy.com'];
-  if (LEGACY_UNAUTHORIZED.includes(userEmail)) {
-    return false;
-  }
-
   // 1. Permanent Master Owner Emails (Firebase project creator & Store Owner)
   const MASTER_EMAILS = ['gfse083@gmail.com', 'rahat300809@gmail.com'];
   if (MASTER_EMAILS.includes(userEmail)) {

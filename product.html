@@ -654,23 +654,23 @@
 
 
   <!-- ==================== SHOPPING CART DRAWER ==================== -->
-  <div id="cart-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300 opacity-0">
-    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto"></div>
-    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transform translate-x-full transition-transform duration-300 ease-out z-10">
+  <div id="cart-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300 opacity-0" style="display: none;">
+    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
+    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
       <!-- Drawer Header -->
       <div class="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="material-symbols-outlined text-black text-2xl">shopping_bag</span>
-          <h2 class="font-headline text-base sm:text-lg font-bold tracking-tight text-black">YOUR SHOPPING BAG</h2>
+          <h2 class="font-headline text-base sm:text-lg font-black tracking-tight text-black">YOUR SHOPPING BAG</h2>
           <span id="product-drawer-count" class="bg-black text-white text-[11px] font-mono-ui font-bold px-2 py-0.5 rounded-full">0</span>
         </div>
-        <button onclick="toggleCartDrawer(false)" class="p-1.5 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors">
-          <span class="material-symbols-outlined">close</span>
+        <button type="button" onclick="toggleCartDrawer(false)" class="p-1.5 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close bag">
+          <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
 
       <!-- Drawer Items List -->
-      <div id="product-drawer-items" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+      <div id="product-drawer-items" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
         <!-- Rendered dynamically -->
       </div>
 
@@ -682,15 +682,15 @@
         </div>
         <div class="flex justify-between text-xs text-gray-500 font-medium">
           <span>Delivery</span>
-          <span class="text-emerald-600 font-bold">Standard Delivery</span>
+          <span class="text-emerald-600 font-bold font-mono-ui">Calculated at Checkout</span>
         </div>
         <div class="flex justify-between text-base font-bold text-black pt-2 border-t border-gray-200">
           <span>Grand Total</span>
           <span id="product-drawer-total" class="font-mono-ui font-black text-lg">৳0</span>
         </div>
 
-        <button onclick="proceedProductToCheckout()" class="w-full bg-black text-white py-3.5 rounded-full font-headline text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-lg flex justify-center items-center gap-2 font-bold mt-2 cursor-pointer">
-          PROCEED TO CHECKOUT
+        <button type="button" onclick="proceedProductToCheckout()" class="w-full bg-black text-white py-3.5 rounded-full font-headline text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-lg flex justify-center items-center gap-2 font-bold mt-2 cursor-pointer active:scale-[0.99]">
+          <span>PROCEED TO CHECKOUT</span>
           <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </button>
       </div>
@@ -769,7 +769,6 @@
 
     </div>
   </footer>
-
 
   <!-- ═══════════════════════════════════════════
        JAVASCRIPT APP LOGIC & DB CONNECTION
@@ -1347,9 +1346,18 @@
         patchLabel ? `Badges: ${patchLabel}` : null
       ].filter(Boolean).join(' • ');
 
-      const currentImg = (productState.product && productState.product.images && productState.product.images[0] && productState.product.images[0].url)
-        ? productState.product.images[0].url
-        : (ANGLE_IMAGES.front || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80');
+      let currentImg = ANGLE_IMAGES.front;
+      if (!currentImg && productState.product) {
+        if (typeof productState.product.image === 'string') {
+          currentImg = productState.product.image;
+        } else if (productState.product.images) {
+          if (typeof productState.product.images.front === 'string') currentImg = productState.product.images.front;
+          else if (Array.isArray(productState.product.images) && productState.product.images[0]) {
+            currentImg = typeof productState.product.images[0] === 'string' ? productState.product.images[0] : (productState.product.images[0].url || '');
+          }
+        }
+      }
+      if (!currentImg) currentImg = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80';
 
       const cartItem = {
         id: 'item_' + Date.now(),
@@ -1415,7 +1423,7 @@
     function buyNowDirect() {
       handleAddToCart();
       setTimeout(() => {
-        window.location.href = 'index.html?view=checkout';
+        window.location.href = 'index.html#checkout';
       }, 250);
     }
 
@@ -1436,18 +1444,25 @@
       const drawer = container ? container.querySelector('aside') : null;
       if (!container || !drawer) return;
 
-      const isOpen = container.classList.contains('pointer-events-auto');
-      const shouldOpen = forceOpen !== null ? forceOpen : !isOpen;
+      const isHidden = container.style.display === 'none' || container.classList.contains('pointer-events-none');
+      const shouldOpen = forceOpen !== null ? forceOpen : isHidden;
 
       if (shouldOpen) {
         renderProductCartDrawer();
+        container.style.display = 'block';
+        void container.offsetWidth;
         container.classList.remove('pointer-events-none', 'opacity-0');
         container.classList.add('pointer-events-auto', 'opacity-100');
-        drawer.classList.remove('translate-x-full');
+        drawer.style.transform = 'translateX(0)';
       } else {
         container.classList.add('pointer-events-none', 'opacity-0');
         container.classList.remove('pointer-events-auto', 'opacity-100');
-        drawer.classList.add('translate-x-full');
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (container.classList.contains('pointer-events-none')) {
+            container.style.display = 'none';
+          }
+        }, 300);
       }
     }
 
@@ -1529,7 +1544,7 @@
         showToast('Your bag is empty! Add an item first.');
         return;
       }
-      window.location.href = 'index.html?view=checkout';
+      window.location.href = 'index.html#checkout';
     }
 
     function showToast(msg) {

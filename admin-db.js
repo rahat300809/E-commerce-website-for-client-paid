@@ -1290,6 +1290,28 @@ const DB = {
   payments: {
     get() {
       const def = {
+        bkash: {
+          enabled: true,
+          number: '01700000000',
+          type: 'Personal',
+          instructions: 'bKash Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+        },
+        nagad: {
+          enabled: true,
+          number: '01800000000',
+          type: 'Personal',
+          instructions: 'Nagad Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+        },
+        rocket: {
+          enabled: true,
+          number: '01900000000',
+          type: 'Personal',
+          instructions: 'Rocket Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+        },
+        cod: {
+          enabled: true,
+          instructions: 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।'
+        },
         uddoktaPay: {
           enabled: true,
           apiKey: 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf',
@@ -1297,18 +1319,23 @@ const DB = {
           sandbox: false,
           bkashEnabled: true,
           merchantNumber: '01700000000',
-          accountType: 'Merchant'
+          accountType: 'Personal'
         },
         methods: [
-          { id: 'cod', name: 'Cash on Delivery', enabled: true, icon: 'payments' },
-          { id: 'bkash', name: 'bKash (UddoktaPay)', enabled: true, icon: 'smartphone', number: '01700000000', apiKey: 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf' },
-          { id: 'nagad', name: 'Nagad', enabled: false, icon: 'smartphone', number: '' },
-          { id: 'card', name: 'Credit/Debit Card', enabled: false, icon: 'credit_card' }
+          { id: 'bkash', name: 'bKash', enabled: true, icon: 'smartphone', number: '01700000000', type: 'Personal', instructions: 'bKash Personal নাম্বারে Send Money করুন।' },
+          { id: 'nagad', name: 'Nagad', enabled: true, icon: 'smartphone', number: '01800000000', type: 'Personal', instructions: 'Nagad Personal নাম্বারে Send Money করুন।' },
+          { id: 'rocket', name: 'Rocket', enabled: true, icon: 'smartphone', number: '01900000000', type: 'Personal', instructions: 'Rocket Personal নাম্বারে Send Money করুন।' },
+          { id: 'cod', name: 'Cash on Delivery', enabled: true, icon: 'payments', instructions: 'পণ্য হাতে পেয়ে পরিশোধ করুন।' }
         ]
       };
       const saved = Store.getObj('paymentConfig', def);
+      if (!saved.bkash) saved.bkash = def.bkash;
+      if (!saved.nagad) saved.nagad = def.nagad;
+      if (!saved.rocket) saved.rocket = def.rocket;
+      if (!saved.cod) saved.cod = def.cod;
       if (!saved.uddoktaPay) saved.uddoktaPay = def.uddoktaPay;
       if (!saved.uddoktaPay.apiKey) saved.uddoktaPay.apiKey = 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf';
+      if (!saved.methods || !saved.methods.length) saved.methods = def.methods;
       return saved;
     },
     save(data) {
@@ -1316,7 +1343,7 @@ const DB = {
       if (window.ZenvyFirebase && window.ZenvyFirebase.push) {
         window.ZenvyFirebase.push('paymentConfig', data);
       }
-      DB.log('Payment & UddoktaPay gateway config updated');
+      DB.log('bKash, Nagad, Rocket & Payment gateway configuration updated');
     },
     getUddoktaPayConfig() {
       const cfg = this.get();
@@ -1476,6 +1503,10 @@ const DB = {
       const dueAmount = order.dueAmount !== undefined ? order.dueAmount : (order.paymentStatus === 'PAID' ? 0 : order.totalAmount);
       const shippingFee = order.shippingFee || 0;
 
+      const trxId = order.paymentTrxId || order.trxId || order.transactionId;
+      const senderPhone = order.paymentSenderPhone;
+      const paymentRemark = order.paymentRemark;
+
       const msg = `⚡ <b>NEW ZENVY ORDER RECEIVED!</b> ⚡\n` +
         `━━━━━━━━━━━━━━━━━━━━━\n` +
         `🏷️ <b>Order ID:</b> <code>#${safe(order.orderNumber || order.id || Date.now())}</code>\n` +
@@ -1486,12 +1517,15 @@ const DB = {
         `━━━━━━━━━━━━━━━━━━━━━\n` +
         `🛒 <b>Items Ordered (${(order.items || []).length}):</b>\n${itemsList}\n` +
         `━━━━━━━━━━━━━━━━━━━━━\n` +
-        `💳 <b>Payment Plan:</b> ${safe(order.paymentMethod || 'Cash on Delivery')}\n` +
+        `💳 <b>Payment Method:</b> <b>${safe(order.paymentMethod || 'Cash on Delivery')}</b>\n` +
+        (trxId ? `🔑 <b>Transaction ID:</b> <code>${safe(trxId)}</code>\n` : '') +
+        (senderPhone ? `📱 <b>Sender Number:</b> <code>${safe(senderPhone)}</code>\n` : '') +
+        (paymentRemark ? `📝 <b>Payment Remark:</b> ${safe(paymentRemark)}\n` : '') +
         `📊 <b>Payment Status:</b> ${safe(order.paymentStatus || 'PENDING')}\n` +
         `📦 <b>Delivery Charge:</b> ৳${Math.round(shippingFee).toLocaleString()}\n` +
         `💰 <b>Total Order Value:</b> <b>৳${Math.round(order.totalAmount || 0).toLocaleString()}</b>\n` +
-        `✅ <b>Advance Paid (bKash):</b> <b>৳${Math.round(paidAmount).toLocaleString()}</b>\n` +
-        `🚚 <b>Due on Delivery (COD):</b> <b>৳${Math.round(dueAmount).toLocaleString()}</b>\n` +
+        `✅ <b>Paid Amount:</b> <b>৳${Math.round(paidAmount).toLocaleString()}</b>\n` +
+        `🚚 <b>Due on Delivery:</b> <b>৳${Math.round(dueAmount).toLocaleString()}</b>\n` +
         `🕒 <b>Time:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })} (BST)\n` +
         `━━━━━━━━━━━━━━━━━━━━━\n` +
         `🚀 <i>ZENVY Elite Sportswear Order Engine</i>`;

@@ -43,9 +43,14 @@ export async function createOrder(orderData) {
       currency: brand.currencySymbol,
 
       // Payment
-      paymentMethod: orderData.paymentMethod,
-      paymentStatus: orderData.paymentMethod === 'bkash_advance' ? 'PENDING_PAYMENT' : 'PENDING',
-      advancePayment: orderData.advancePayment || 0,
+      paymentMethod: orderData.paymentMethod || 'Cash on Delivery',
+      paymentTrxId: orderData.paymentTrxId || orderData.trxId || '',
+      paymentSenderPhone: orderData.paymentSenderPhone || '',
+      paymentRemark: orderData.paymentRemark || (orderData.paymentTrxId ? `${orderData.paymentMethod} TrxID: ${orderData.paymentTrxId}${orderData.paymentSenderPhone ? ' (Sender: ' + orderData.paymentSenderPhone + ')' : ''}` : ''),
+      paymentStatus: orderData.paymentStatus || (orderData.paymentTrxId ? 'PAID_VERIFYING' : (orderData.paymentMethod === 'bkash_advance' ? 'PENDING_PAYMENT' : 'PENDING')),
+      advancePayment: orderData.advancePayment || orderData.paidAmount || 0,
+      paidAmount: orderData.paidAmount || (orderData.paymentTrxId ? (orderData.paidAmount || orderData.total || 0) : 0),
+      dueAmount: orderData.dueAmount !== undefined ? orderData.dueAmount : (orderData.total || 0),
 
       // Order status
       status: 'PENDING',
@@ -60,6 +65,35 @@ export async function createOrder(orderData) {
     };
 
     const ref = await addDoc(collection(db, 'orders'), order);
+
+    try {
+      const existingDbOrders = JSON.parse(localStorage.getItem('zenvy_db_orders') || '[]');
+      const localOrderObj = {
+        id: ref.id,
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        customerEmail: order.customerEmail,
+        shippingAddress: order.shippingAddress,
+        items: order.items,
+        totalAmount: order.total,
+        subtotal: order.subtotal,
+        paymentMethod: order.paymentMethod,
+        paymentTrxId: order.paymentTrxId,
+        paymentSenderPhone: order.paymentSenderPhone,
+        paymentRemark: order.paymentRemark,
+        paymentStatus: order.paymentStatus,
+        paidAmount: order.paidAmount,
+        dueAmount: order.dueAmount,
+        status: order.status,
+        createdAt: new Date().toISOString()
+      };
+      existingDbOrders.unshift(localOrderObj);
+      localStorage.setItem('zenvy_db_orders', JSON.stringify(existingDbOrders));
+    } catch (cacheErr) {
+      console.warn('Local cache order sync error:', cacheErr);
+    }
+
     return { success: true, orderId: ref.id, orderNumber: order.orderNumber };
   } catch (e) {
     console.error('createOrder error:', e);

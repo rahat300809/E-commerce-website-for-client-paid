@@ -520,7 +520,7 @@ function resolveCartDeliveryAndAdvancePolicy() {
 }
 
 function renderCheckoutPaymentMethods() {
-  const container = document.getElementById('checkout-payment-methods-list');
+  const container = document.getElementById('checkout-payment-methods-list') || document.getElementById('checkout-payment-methods');
   if (!container) return;
 
   const policy = resolveCartDeliveryAndAdvancePolicy();
@@ -607,20 +607,26 @@ function renderCheckoutPaymentMethods() {
 
   container.innerHTML = methods.map((m, idx) => {
     const isBkash = m.id === 'bkash';
+    const isNagad = m.id === 'nagad';
+    const isRocket = m.id === 'rocket';
+    const isCod = m.id === 'cod';
+    const color = isBkash ? '#D12053' : (isNagad ? '#EA580C' : (isRocket ? '#7C3AED' : '#16A34A'));
+    const phoneNum = m.number || (isBkash ? payConfig.bkash?.number : isNagad ? payConfig.nagad?.number : isRocket ? payConfig.rocket?.number : '');
+    const accType = m.type || (isBkash ? payConfig.bkash?.type : isNagad ? payConfig.nagad?.type : isRocket ? payConfig.rocket?.type : '');
+
     return `
       <label class="flex items-center gap-3 p-3.5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
         <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black" />
-        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${isBkash ? 'bg-[#D12053] text-white font-bold' : 'bg-gray-100 text-gray-700'}">
-          ${isBkash ? '৳' : `<span class="material-symbols-outlined text-base">${m.icon || 'payments'}</span>`}
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold" style="background:${color};">
+          ${isCod ? '💵' : '৳'}
         </div>
         <div class="flex-1">
           <div class="flex items-center gap-2">
             <span class="font-bold text-xs text-black">${m.name}</span>
-            ${isBkash ? '<span class="bg-[#FFF1F5] text-[#D12053] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-pink-200">UddoktaPay Connected</span>' : ''}
+            ${accType ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${color}15;color:${color};border:1px solid ${color}40;">${accType}</span>` : ''}
           </div>
-          ${m.id === 'cod' && policy.codNote ? `<div class="text-[11px] text-gray-500 mt-0.5">${policy.codNote}</div>` : ''}
-          ${isBkash ? `<div class="text-[11px] text-gray-500 mt-0.5">Automated bKash checkout with instant TrxID validation</div>` : ''}
-          ${!isBkash && m.id !== 'cod' && m.number ? `<div class="text-[11px] text-gray-500 mt-0.5">Send to: ${m.number}</div>` : ''}
+          ${phoneNum ? `<div class="text-[11px] text-gray-700 font-mono font-bold mt-0.5">Send to: ${phoneNum}</div>` : ''}
+          ${isCod && policy.codNote ? `<div class="text-[11px] text-gray-500 mt-0.5">${policy.codNote}</div>` : ''}
         </div>
       </label>
     `;
@@ -1954,7 +1960,7 @@ function placeOrder() {
       paidAmount: 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
-      paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : 'Cash on Delivery',
+      paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
       paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
       status: 'PENDING',
       notes: `Plan: ${planLabel} • Zone: ${zoneName} • Delivery Charge: ৳${shippingFee}`
@@ -1993,7 +1999,7 @@ function placeOrder() {
       paidAmount: 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
-      paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : 'Cash on Delivery',
+      paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
       paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
       status: 'PENDING',
       createdAt: new Date().toISOString()
@@ -2005,10 +2011,9 @@ function placeOrder() {
   saveCartState();
   renderCart();
 
-  // If advance payment is required via bKash, open automated payment modal
-  const uddoktaConfig = (typeof DB !== 'undefined' && DB.uddoktaPay) ? DB.uddoktaPay.get() : { enabled: true };
-  if (payableNow > 0 && selectedPaymentId === 'bkash') {
-    openBkashPaymentModal(createdOrder, uddoktaConfig, payableNow, activeSplit, dueOnDelivery);
+  // If advance payment is required via bKash, Nagad or Rocket, open payment modal
+  if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket')) {
+    openMfsPaymentModal(createdOrder, selectedPaymentId, payableNow, activeSplit, dueOnDelivery);
     return;
   }
 
@@ -2018,12 +2023,26 @@ function placeOrder() {
   switchView('order-confirmation');
   showToast('🎉 Order placed successfully!');
 }
-function openBkashPaymentModal(order, uddoktaConfig, payableNow = null, activeSplit = 'delivery_only', dueOnDelivery = 0) {
+
+function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, activeSplit = 'delivery_only', dueOnDelivery = 0) {
   const existingModal = document.getElementById('bkash-payment-modal');
   if (existingModal) existingModal.remove();
 
-  const apiKey = uddoktaConfig.apiKey || 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf';
-  const merchantNum = uddoktaConfig.merchantNumber || '01700000000';
+  const payCfg = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : {};
+  const isNagad = providerId === 'nagad';
+  const isRocket = providerId === 'rocket';
+  const isBkash = !isNagad && !isRocket;
+
+  const providerName = isNagad ? 'Nagad' : isRocket ? 'Rocket' : 'bKash';
+  const providerColor = isNagad ? '#EA580C' : isRocket ? '#7C3AED' : '#D12053';
+  const providerBg = isNagad ? '#FFF7ED' : isRocket ? '#FAF5FF' : '#FFF1F5';
+  const providerBorder = isNagad ? '#FED7AA' : isRocket ? '#E9D5FF' : '#FCE7F3';
+
+  const cfgObj = isNagad ? (payCfg.nagad || {}) : isRocket ? (payCfg.rocket || {}) : (payCfg.bkash || {});
+  const phoneNum = cfgObj.number || (payCfg.uddoktaPay?.merchantNumber || '01700000000');
+  const accType = cfgObj.type || 'Personal';
+  const instructions = cfgObj.instructions || `${providerName} ${accType} নাম্বারে Send Money করুন এবং TrxID নিচের ঘরে দিন।`;
+
   const amount = Math.round(payableNow !== null ? payableNow : (order.payableNowAmount || order.totalAmount || 0));
   const isDeliveryOnly = activeSplit === 'delivery_only';
 
@@ -2031,29 +2050,25 @@ function openBkashPaymentModal(order, uddoktaConfig, payableNow = null, activeSp
   modal.id = 'bkash-payment-modal';
   modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md';
   modal.innerHTML = `
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-pink-100">
-      <!-- bKash Header -->
-      <div style="background:linear-gradient(135deg, #D12053 0%, #9D174D 100%);" class="p-6 text-white text-center relative">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-gray-100">
+      <!-- MFS Header -->
+      <div style="background:${providerColor};" class="p-6 text-white text-center relative">
         <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-3">
-          <span class="text-3xl font-black" style="color:#D12053;">৳</span>
+          <span class="text-3xl font-black" style="color:${providerColor};">৳</span>
         </div>
-        <h3 class="text-xl font-bold font-headline tracking-wide">bKash Payment Gateway</h3>
-        <p class="text-xs text-white/90 mt-1">UddoktaPay Merchant API Connected</p>
-        <div class="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full text-[11px] font-mono mt-2.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>API: ${apiKey.slice(0, 8)}...${apiKey.slice(-4)}</span>
-        </div>
+        <h3 class="text-xl font-bold font-headline tracking-wide">${providerName} Payment Gateway</h3>
+        <p class="text-xs text-white/90 mt-1">${providerName} ${accType} Verification</p>
       </div>
 
       <!-- Body -->
       <div class="p-6 space-y-4">
         <!-- Payable Highlight -->
-        <div class="bg-[#FFF1F5] border border-pink-200 rounded-2xl p-4 flex justify-between items-center">
+        <div style="background:${providerBg};border:1px solid ${providerBorder};" class="rounded-2xl p-4 flex justify-between items-center">
           <div>
             <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
               ${isDeliveryOnly ? '⚡ Delivery Charge Advance' : '🔒 Full Order Amount'}
             </div>
-            <div class="text-2xl font-black font-mono-ui" style="color:#D12053;">৳${amount.toLocaleString()}</div>
+            <div class="text-2xl font-black font-mono-ui" style="color:${providerColor};">৳${amount.toLocaleString()}</div>
             ${isDeliveryOnly ? `<div class="text-[11px] text-gray-600 mt-0.5">Remaining <b>৳${dueOnDelivery.toLocaleString()}</b> Due on Delivery</div>` : ''}
           </div>
           <div class="text-right">
@@ -2062,25 +2077,33 @@ function openBkashPaymentModal(order, uddoktaConfig, payableNow = null, activeSp
           </div>
         </div>
 
-        <div class="border border-gray-100 bg-gray-50/80 rounded-2xl p-4 text-xs space-y-2 text-gray-700">
-          <div class="font-bold text-black flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm" style="color:#D12053;">touch_app</span> bKash Payment Instructions:
+        <div class="border border-gray-200 bg-gray-50/80 rounded-2xl p-4 text-xs space-y-2 text-gray-700">
+          <div class="font-bold text-black flex items-center justify-between">
+            <span class="flex items-center gap-1.5" style="color:${providerColor};">
+              <span class="material-symbols-outlined text-sm">touch_app</span> ${providerName} Instructions:
+            </span>
+            <button type="button" onclick="navigator.clipboard.writeText('${phoneNum}');this.textContent='Copied!';" class="text-[11px] font-bold text-white px-2 py-0.5 rounded shadow-sm" style="background:${providerColor};">
+              Copy Number
+            </button>
           </div>
-          <div class="pl-4 space-y-1.5 text-[11px]">
-            <div>1. Open your <b>bKash App</b> $\rightarrow$ Select <b>Payment</b> (or Send Money).</div>
-            <div>2. Recipient Number: <b class="font-mono bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900">${merchantNum}</b></div>
-            <div>3. Enter Amount: <b class="font-mono">৳${amount}</b> • Reference: <b class="font-mono">#${order.id}</b></div>
-            <div>4. Enter PIN to confirm payment and copy the <b>TrxID</b>.</div>
+          <div class="pl-2 space-y-1.5 text-[11px]">
+            <div>Recipient Number: <b class="font-mono bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900">${phoneNum}</b> (${accType})</div>
+            <div>${instructions}</div>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Enter bKash Transaction ID (TrxID)<span class="text-red-500">*</span></label>
-          <input type="text" id="bkash-trx-input" placeholder="e.g. BL9A7XYZ10" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:border-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-100 bg-white" />
+          <label class="block text-xs font-bold text-gray-700 mb-1">Enter ${providerName} Transaction ID (TrxID)<span class="text-red-500">*</span></label>
+          <input type="text" id="bkash-trx-input" placeholder="e.g. 9B7X2K4M" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:outline-none focus:ring-2 bg-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Your Sender Phone Number (Optional)</label>
+          <input type="tel" id="bkash-sender-input" placeholder="e.g. 017XXXXXXXX" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:outline-none bg-white" />
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button onclick="submitBkashTrxId('${order.id}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:#D12053;" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-lg flex items-center justify-center gap-2 transition-all">
+          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-lg flex items-center justify-center gap-2 transition-all">
             <span class="material-symbols-outlined text-base">verified</span> Verify & Confirm Order
           </button>
           <button onclick="document.getElementById('bkash-payment-modal').remove(); switchView('home');" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold text-xs hover:bg-gray-50">
@@ -2093,29 +2116,35 @@ function openBkashPaymentModal(order, uddoktaConfig, payableNow = null, activeSp
   document.body.appendChild(modal);
 }
 
-function submitBkashTrxId(orderId, paidAmount, dueAmount, splitMode) {
+window.openBkashPaymentModal = (order, uddoktaConfig, payableNow, activeSplit, dueOnDelivery) => openMfsPaymentModal(order, 'bkash', payableNow, activeSplit, dueOnDelivery);
+
+function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode) {
   const trxInput = document.getElementById('bkash-trx-input');
   const trxId = trxInput ? trxInput.value.trim().toUpperCase() : '';
+  const senderInput = document.getElementById('bkash-sender-input');
+  const senderPhone = senderInput ? senderInput.value.trim() : '';
 
-  if (!trxId || trxId.length < 6) {
-    showToast('⚠️ Please enter a valid bKash Transaction ID (TrxID)');
+  if (!trxId || trxId.length < 4) {
+    showToast(`⚠️ Please enter a valid ${providerName} Transaction ID (TrxID)`);
     return;
   }
 
   const isFullPaid = splitMode === 'full' || dueAmount === 0;
   const paymentStatus = isFullPaid ? 'PAID' : 'ADVANCE_DELIVERY_PAID';
-  const paymentDetails = isFullPaid
-    ? `Full payment of ৳${paidAmount} paid via bKash (TrxID: ${trxId})`
-    : `Advance delivery charge ৳${paidAmount} paid via bKash (TrxID: ${trxId}) • Due ৳${dueAmount} on Delivery`;
+  const paymentDetails = `${providerName} TrxID: ${trxId}${senderPhone ? ' (Sender: ' + senderPhone + ')' : ''} • ${isFullPaid ? 'Full Paid' : `Advance ৳${paidAmount} paid, ৳${dueAmount} due`}`;
 
   if (typeof DB !== 'undefined' && DB.orders) {
     DB.orders.update(orderId, {
+      paymentMethod: providerName,
       paymentStatus: paymentStatus,
       status: 'PROCESSING',
       paidAmount: paidAmount,
       dueAmount: dueAmount,
       trxId: trxId,
       transactionId: trxId,
+      paymentTrxId: trxId,
+      paymentSenderPhone: senderPhone,
+      paymentRemark: paymentDetails,
       paymentDetails: paymentDetails
     });
 
@@ -2123,6 +2152,10 @@ function submitBkashTrxId(orderId, paidAmount, dueAmount, splitMode) {
     if (order && DB.telegram && DB.telegram.sendOrderNotification) {
       DB.telegram.sendOrderNotification({
         ...order,
+        paymentMethod: providerName,
+        paymentTrxId: trxId,
+        paymentSenderPhone: senderPhone,
+        paymentRemark: paymentDetails,
         paidAmount,
         dueAmount,
         paymentStatus: `${paymentStatus} (TrxID: ${trxId})`,
@@ -2134,7 +2167,7 @@ function submitBkashTrxId(orderId, paidAmount, dueAmount, splitMode) {
   const modal = document.getElementById('bkash-payment-modal');
   if (modal) modal.remove();
 
-  showToast(`🎉 Payment Verified! TrxID: ${trxId}. ${isFullPaid ? '100% Paid!' : `Advance ৳${paidAmount} received. ৳${dueAmount} due on delivery.`}`, 6000);
+  showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
   switchView('home');
 }
 

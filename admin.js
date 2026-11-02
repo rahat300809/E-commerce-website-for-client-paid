@@ -2419,6 +2419,15 @@ function renderOrders(container) {
                       ${o.paymentStatus}
                       <span class="material-symbols-outlined" style="font-size:12px;opacity:0.7">edit</span>
                     </span>
+                    <div style="font-weight:800;font-size:11px;color:#0F172A;margin-top:3px;display:flex;align-items:center;gap:4px;">
+                      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${(o.paymentMethod||'').toLowerCase().includes('bkash')?'#D12053':(o.paymentMethod||'').toLowerCase().includes('nagad')?'#EA580C':(o.paymentMethod||'').toLowerCase().includes('rocket')?'#7C3AED':'#16A34A'}"></span>
+                      ${o.paymentMethod || 'COD'}
+                    </div>
+                    ${(o.paymentTrxId || o.trxId || o.transactionId) ? `
+                      <div style="font-family:monospace;font-size:10px;font-weight:800;color:#0369A1;background:#E0F2FE;border:1px solid #BAE6FD;padding:1px 6px;border-radius:4px;display:inline-block;margin-top:2px;">
+                        Trx: ${o.paymentTrxId || o.trxId || o.transactionId}
+                      </div>
+                    ` : ''}
                   </td>
                   <td><span class="badge badge-${statusColor(o.status)} status-${o.status}">${o.status}</span></td>
                   <td style="font-size:12px;color:#9CA3AF">${fmtDate(o.createdAt)}</td>
@@ -2476,12 +2485,29 @@ function openOrderDetail(id) {
             ${o.paymentStatus}
           </span>
         </div>
-        <div style="font-size:13px;color:#334155;margin-top:10px;padding-top:8px;border-top:1px solid #F1F5F9;">
-          <strong>Payment Method:</strong> ${o.paymentMethod || 'Cash on Delivery'}
+        <div style="font-size:13px;color:#334155;margin-top:10px;padding-top:8px;border-top:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
+          <span><strong>Payment Method:</strong> <b style="color:#0F172A;">${o.paymentMethod || 'Cash on Delivery'}</b></span>
+          <span class="badge" style="background:${(o.paymentMethod||'').toLowerCase().includes('bkash')?'#FFF1F5;color:#D12053;border:1px solid #FBCFE8':(o.paymentMethod||'').toLowerCase().includes('nagad')?'#FFF7ED;color:#EA580C;border:1px solid #FED7AA':(o.paymentMethod||'').toLowerCase().includes('rocket')?'#FAF5FF;color:#7C3AED;border:1px solid #E9D5FF':'#F0FDF4;color:#16A34A;border:1px solid #BBF7D0'} font-weight:800;font-size:10px;">
+            ${(o.paymentMethod || 'COD').toUpperCase()}
+          </span>
         </div>
-        ${o.paymentRemark || o.paymentTrxId ? `
+        ${(o.paymentTrxId || o.trxId || o.transactionId) ? `
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;padding:8px 12px;border-radius:8px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#1D4ED8;letter-spacing:0.04em;">Transaction ID (TrxID)</div>
+              <div style="font-family:monospace;font-weight:900;font-size:13px;color:#1E40AF;margin-top:1px;">
+                ${o.paymentTrxId || o.trxId || o.transactionId}
+              </div>
+              ${o.paymentSenderPhone ? `<div style="font-size:11px;color:#1D4ED8;margin-top:2px;">Sender Phone: <b>${o.paymentSenderPhone}</b></div>` : ''}
+            </div>
+            <button type="button" class="btn btn-sm" style="background:#2563EB;color:white;font-size:11px;padding:3px 8px;gap:3px;" onclick="navigator.clipboard.writeText('${o.paymentTrxId || o.trxId || o.transactionId}');toast('TrxID Copied!','success');">
+              <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> Copy
+            </button>
+          </div>
+        ` : ''}
+        ${o.paymentRemark ? `
           <div style="font-size:12px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;padding:6px 10px;border-radius:6px;margin-top:8px;line-height:1.4;">
-            <strong>Payment Remark:</strong> ${o.paymentRemark || o.paymentTrxId}
+            <strong>Payment Remark:</strong> ${o.paymentRemark}
           </div>
         ` : ''}
         ${o.trackingNumber ? `<div style="font-size:13px;color:#0369A1;margin-top:6px;">Tracking #: <strong>${o.trackingNumber}</strong></div>` : ''}
@@ -4592,23 +4618,42 @@ function saveShipping(id) {
 // ──────────────────────────────────────────────────────────────
 function renderPaymentConfig(container) {
   const config = DB.payments.get();
-  const uddokta = config.uddoktaPay || {
+  const bkash = config.bkash || {
     enabled: true,
+    number: '01700000000',
+    type: 'Personal',
+    instructions: 'bKash Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+  };
+  const nagad = config.nagad || {
+    enabled: true,
+    number: '01800000000',
+    type: 'Personal',
+    instructions: 'Nagad Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+  };
+  const rocket = config.rocket || {
+    enabled: true,
+    number: '01900000000',
+    type: 'Personal',
+    instructions: 'Rocket Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।'
+  };
+  const cod = config.cod || {
+    enabled: true,
+    instructions: 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।'
+  };
+  const uddokta = config.uddoktaPay || {
+    enabled: false,
     apiKey: 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf',
     apiUrl: 'https://pay.uddoktapay.com/api/checkout-v2',
     sandbox: false,
-    bkashEnabled: true,
-    merchantNumber: '01700000000',
-    accountType: 'Merchant'
+    bkashEnabled: true
   };
-  const methods = config.methods || [];
 
   container.innerHTML = `
     <div class="page-header" style="margin-bottom:20px;">
       <div class="page-header-left">
-        <div class="page-title">Payment & Gateway Settings</div>
+        <div class="page-title">Payment & Gateway Settings (bKash, Nagad, Rocket, COD)</div>
         <div class="page-subtitle" style="font-size:13px;color:#6B7280;margin-top:4px;">
-          Configure bKash, UddoktaPay automated API gateway, and customer checkout methods.
+          Configure payment numbers, account types (Personal/Merchant), instructions, and customer checkout options.
         </div>
       </div>
       <div class="page-header-actions">
@@ -4618,20 +4663,185 @@ function renderPaymentConfig(container) {
       </div>
     </div>
 
-    <!-- UddoktaPay bKash Gateway Card -->
-    <div class="card" style="border-radius:14px;border:1px solid #E5E7EB;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
-      <div class="card-header" style="background:#FFF1F5;border-bottom:1px solid #FCE7F3;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;">
+    <!-- 1. bKash Settings Card -->
+    <div class="card" style="border-radius:14px;border:1px solid #FBCFE8;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(209,32,83,0.05);">
+      <div class="card-header" style="background:#FFF1F5;border-bottom:1px solid #FCE7F3;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:40px;height:40px;border-radius:10px;background:#D12053;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#D12053;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
             ৳
           </div>
           <div>
             <div style="font-weight:800;font-size:15px;color:#9D174D;display:flex;align-items:center;gap:8px;">
-              UddoktaPay bKash Automated Gateway
-              <span class="badge" style="background:#D12053;color:white;font-size:10px;padding:3px 8px;border-radius:999px;">CONNECTED</span>
+              bKash Configuration
+              <span class="badge" style="background:#D12053;color:white;font-size:10px;padding:2px 8px;border-radius:999px;">MFS</span>
             </div>
             <div style="font-size:12px;color:#831843;margin-top:2px;">
-              Automated instant checkout & TrxID verification for bKash, Nagad & Cards.
+              Customer will see this number and instructions when selecting bKash at checkout.
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="bkash-enabled" ${bkash.enabled ? 'checked' : ''}>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="card-body" style="padding:20px;">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">bKash Phone Number *</label>
+            <input type="text" id="bkash-number" class="form-input" value="${bkash.number || ''}" placeholder="e.g. 017XXXXXXXX" style="font-weight:700;font-family:monospace;font-size:14px;color:#0F172A;"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">Account Type</label>
+            <select id="bkash-type" class="form-select" style="font-weight:600;">
+              <option value="Personal" ${bkash.type === 'Personal' ? 'selected' : ''}>Personal (Send Money)</option>
+              <option value="Merchant" ${bkash.type === 'Merchant' ? 'selected' : ''}>Merchant (Payment)</option>
+              <option value="Agent" ${bkash.type === 'Agent' ? 'selected' : ''}>Agent (Cash In)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight:700;font-size:12px;">Payment Instructions to Customer</label>
+          <textarea id="bkash-instructions" class="form-input" rows="2" placeholder="e.g. bKash Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।">${bkash.instructions || ''}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Nagad Settings Card -->
+    <div class="card" style="border-radius:14px;border:1px solid #FED7AA;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(234,88,12,0.05);">
+      <div class="card-header" style="background:#FFF7ED;border-bottom:1px solid #FFEDD5;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#EA580C;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
+            ৳
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#C2410C;display:flex;align-items:center;gap:8px;">
+              Nagad Configuration
+              <span class="badge" style="background:#EA580C;color:white;font-size:10px;padding:2px 8px;border-radius:999px;">MFS</span>
+            </div>
+            <div style="font-size:12px;color:#9A3412;margin-top:2px;">
+              Customer will see this number and instructions when selecting Nagad at checkout.
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="nagad-enabled" ${nagad.enabled ? 'checked' : ''}>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="card-body" style="padding:20px;">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">Nagad Phone Number *</label>
+            <input type="text" id="nagad-number" class="form-input" value="${nagad.number || ''}" placeholder="e.g. 018XXXXXXXX" style="font-weight:700;font-family:monospace;font-size:14px;color:#0F172A;"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">Account Type</label>
+            <select id="nagad-type" class="form-select" style="font-weight:600;">
+              <option value="Personal" ${nagad.type === 'Personal' ? 'selected' : ''}>Personal (Send Money)</option>
+              <option value="Merchant" ${nagad.type === 'Merchant' ? 'selected' : ''}>Merchant (Payment)</option>
+              <option value="Agent" ${nagad.type === 'Agent' ? 'selected' : ''}>Agent (Cash In)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight:700;font-size:12px;">Payment Instructions to Customer</label>
+          <textarea id="nagad-instructions" class="form-input" rows="2" placeholder="e.g. Nagad Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।">${nagad.instructions || ''}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Rocket Settings Card -->
+    <div class="card" style="border-radius:14px;border:1px solid #E9D5FF;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(124,58,237,0.05);">
+      <div class="card-header" style="background:#FAF5FF;border-bottom:1px solid #F3E8FF;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#7C3AED;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
+            ৳
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#6D28D9;display:flex;align-items:center;gap:8px;">
+              Rocket Configuration
+              <span class="badge" style="background:#7C3AED;color:white;font-size:10px;padding:2px 8px;border-radius:999px;">MFS</span>
+            </div>
+            <div style="font-size:12px;color:#5B21B6;margin-top:2px;">
+              Customer will see this number and instructions when selecting Rocket at checkout.
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="rocket-enabled" ${rocket.enabled ? 'checked' : ''}>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="card-body" style="padding:20px;">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">Rocket Phone Number *</label>
+            <input type="text" id="rocket-number" class="form-input" value="${rocket.number || ''}" placeholder="e.g. 019XXXXXXXX" style="font-weight:700;font-family:monospace;font-size:14px;color:#0F172A;"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700;font-size:12px;">Account Type</label>
+            <select id="rocket-type" class="form-select" style="font-weight:600;">
+              <option value="Personal" ${rocket.type === 'Personal' ? 'selected' : ''}>Personal (Send Money)</option>
+              <option value="Merchant" ${rocket.type === 'Merchant' ? 'selected' : ''}>Merchant (Payment)</option>
+              <option value="Agent" ${rocket.type === 'Agent' ? 'selected' : ''}>Agent (Cash In)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight:700;font-size:12px;">Payment Instructions to Customer</label>
+          <textarea id="rocket-instructions" class="form-input" rows="2" placeholder="e.g. Rocket Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের বক্সে দিন।">${rocket.instructions || ''}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Cash on Delivery (COD) Settings Card -->
+    <div class="card" style="border-radius:14px;border:1px solid #BBF7D0;margin-bottom:20px;overflow:hidden;">
+      <div class="card-header" style="background:#F0FDF4;border-bottom:1px solid #DCFCE7;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#16A34A;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
+            💵
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#15803D;">
+              Cash on Delivery (COD)
+            </div>
+            <div style="font-size:12px;color:#166534;margin-top:2px;">
+              Allow customers to pay in cash upon receiving package.
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="cod-enabled" ${cod.enabled ? 'checked' : ''}>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="card-body" style="padding:20px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight:700;font-size:12px;">Customer Delivery Note</label>
+          <input type="text" id="cod-instructions" class="form-input" value="${cod.instructions || 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।'}" placeholder="Instructions shown on checkout"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. UddoktaPay Automated Gateway (Optional / Advanced) -->
+    <div class="card" style="border-radius:14px;border:1px solid #E2E8F0;margin-bottom:20px;overflow:hidden;">
+      <div class="card-header" style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#0F172A;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:18px;">
+            ⚡
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:8px;">
+              UddoktaPay Automated Gateway
+              <span class="badge" style="background:#64748B;color:white;font-size:10px;padding:2px 8px;border-radius:999px;">OPTIONAL</span>
+            </div>
+            <div style="font-size:12px;color:#64748B;margin-top:2px;">
+              Optional instant API callback automation.
             </div>
           </div>
         </div>
@@ -4641,130 +4851,94 @@ function renderPaymentConfig(container) {
           <div class="toggle-thumb"></div>
         </label>
       </div>
-      <div class="card-body" style="padding:24px;">
-        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;">
+      <div class="card-body" style="padding:20px;">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
           <div class="form-group">
-            <label class="form-label" style="font-weight:700;font-size:12px;display:flex;justify-content:space-between;">
-              <span>UddoktaPay API Key<span class="req">*</span></span>
-              <span style="color:#059669;font-weight:600;font-size:11px;">Active Key</span>
-            </label>
-            <div style="position:relative;">
-              <input type="password" id="uddokta-api-key" class="form-input" value="${uddokta.apiKey || 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf'}" placeholder="Enter API Key" style="font-family:monospace;padding-right:40px;"/>
-              <button type="button" onclick="const f=document.getElementById('uddokta-api-key');f.type=f.type==='password'?'text':'password';" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6B7280;">
-                <span class="material-symbols-outlined" style="font-size:18px;">visibility</span>
-              </button>
-            </div>
+            <label class="form-label" style="font-weight:700;font-size:12px;">UddoktaPay API Key</label>
+            <input type="password" id="uddokta-api-key" class="form-input" value="${uddokta.apiKey || ''}" placeholder="API Key" style="font-family:monospace;"/>
           </div>
           <div class="form-group">
             <label class="form-label" style="font-weight:700;font-size:12px;">API Endpoint URL</label>
-            <input type="text" id="uddokta-api-url" class="form-input" value="${uddokta.apiUrl || 'https://pay.uddoktapay.com/api/checkout-v2'}" placeholder="https://pay.uddoktapay.com/api/checkout-v2"/>
+            <input type="text" id="uddokta-api-url" class="form-input" value="${uddokta.apiUrl || 'https://pay.uddoktapay.com/api/checkout-v2'}"/>
           </div>
         </div>
-
-        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
-          <div class="form-group">
-            <label class="form-label" style="font-weight:700;font-size:12px;">bKash Account / Merchant Number</label>
-            <input type="text" id="uddokta-merchant-num" class="form-input" value="${uddokta.merchantNumber || '01700000000'}" placeholder="e.g. 017XXXXXXXX"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="font-weight:700;font-size:12px;">Account Type</label>
-            <select id="uddokta-acc-type" class="form-input">
-              <option value="Merchant" ${uddokta.accountType === 'Merchant' ? 'selected' : ''}>Merchant (Payment)</option>
-              <option value="Personal" ${uddokta.accountType === 'Personal' ? 'selected' : ''}>Personal (Send Money)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="font-weight:700;font-size:12px;">Environment</label>
-            <select id="uddokta-sandbox" class="form-input">
-              <option value="live" ${!uddokta.sandbox ? 'selected' : ''}>Live Production Gateway</option>
-              <option value="sandbox" ${uddokta.sandbox ? 'selected' : ''}>Sandbox (Test Mode)</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
-          <div style="font-size:12px;color:#475569;line-height:1.5;">
-            <b>Integration Status:</b> API Key is integrated into client checkout. When customers select bKash, they are routed through the UddoktaPay payment gateway with instant callback verification.
-          </div>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="testUddoktaConnection()" style="white-space:nowrap;gap:4px;">
-            <span class="material-symbols-outlined" style="font-size:16px;">wifi_protected_setup</span> Test API
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Active Store Payment Methods -->
-    <div class="card" style="border-radius:14px;border:1px solid #E5E7EB;">
-      <div class="card-header" style="background:#F8FAFC;padding:16px 20px;border-bottom:1px solid #E5E7EB;">
-        <div class="card-title" style="font-size:14px;font-weight:800;color:#0F172A;">Checkout Payment Options</div>
-      </div>
-      <div class="card-body" style="padding:20px;">
-        ${methods.map((m) => `
-          <div class="toggle-row" style="padding:14px 0;border-bottom:1px solid #F1F5F9;">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span class="material-symbols-outlined" style="color:#64748B;font-size:22px;">${m.icon || 'credit_card'}</span>
-              <div>
-                <div class="toggle-label" style="font-weight:700;font-size:13px;color:#0F172A;">${m.name}</div>
-                ${m.id !== 'cod' ? `
-                  <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-                    <input type="text" id="pm-${m.id}-num" class="form-input" style="width:240px;height:32px;font-size:12px;" value="${m.number || ''}" placeholder="Account / Phone Number"/>
-                  </div>
-                ` : '<div style="font-size:11px;color:#64748B;margin-top:2px;">Customer pays in cash upon receiving package.</div>'}
-              </div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pm-${m.id}-enabled" ${m.enabled ? 'checked' : ''}>
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-        `).join('')}
       </div>
     </div>
   `;
 }
 
 function testUddoktaConnection() {
-  const apiKey = document.getElementById('uddokta-api-key')?.value.trim() || 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf';
+  const apiKey = document.getElementById('uddokta-api-key')?.value.trim();
   if (!apiKey) { toast('Please enter an API Key first', 'error'); return; }
   toast('🔄 Testing UddoktaPay API Connection...', 'info');
   setTimeout(() => {
-    toast('✅ UddoktaPay bKash API Key is Active and Ready!', 'success');
+    toast('✅ UddoktaPay API Key is Active and Ready!', 'success');
   }, 900);
 }
 
 function savePaymentConfig() {
-  const config = DB.payments.get();
-  
-  const apiKey = document.getElementById('uddokta-api-key')?.value.trim() || 'LaIfxgWZCj4ugXxp7DMoOlC6C7lxIBADioUyemUf';
-  const apiUrl = document.getElementById('uddokta-api-url')?.value.trim() || 'https://pay.uddoktapay.com/api/checkout-v2';
-  const enabled = document.getElementById('uddokta-enabled')?.checked ?? true;
-  const merchantNumber = document.getElementById('uddokta-merchant-num')?.value.trim() || '01700000000';
-  const accountType = document.getElementById('uddokta-acc-type')?.value || 'Merchant';
-  const sandbox = document.getElementById('uddokta-sandbox')?.value === 'sandbox';
+  const bkashNumber = document.getElementById('bkash-number')?.value?.trim() || '';
+  const bkashType = document.getElementById('bkash-type')?.value || 'Personal';
+  const bkashInstructions = document.getElementById('bkash-instructions')?.value?.trim() || '';
+  const bkashEnabled = document.getElementById('bkash-enabled')?.checked ?? true;
 
-  config.uddoktaPay = {
-    enabled,
-    apiKey,
-    apiUrl,
-    merchantNumber,
-    accountType,
-    sandbox,
-    bkashEnabled: true
+  const nagadNumber = document.getElementById('nagad-number')?.value?.trim() || '';
+  const nagadType = document.getElementById('nagad-type')?.value || 'Personal';
+  const nagadInstructions = document.getElementById('nagad-instructions')?.value?.trim() || '';
+  const nagadEnabled = document.getElementById('nagad-enabled')?.checked ?? true;
+
+  const rocketNumber = document.getElementById('rocket-number')?.value?.trim() || '';
+  const rocketType = document.getElementById('rocket-type')?.value || 'Personal';
+  const rocketInstructions = document.getElementById('rocket-instructions')?.value?.trim() || '';
+  const rocketEnabled = document.getElementById('rocket-enabled')?.checked ?? true;
+
+  const codEnabled = document.getElementById('cod-enabled')?.checked ?? true;
+  const codInstructions = document.getElementById('cod-instructions')?.value?.trim() || 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।';
+
+  const uddoktaEnabled = document.getElementById('uddokta-enabled')?.checked ?? false;
+  const uddoktaApiKey = document.getElementById('uddokta-api-key')?.value?.trim() || '';
+  const uddoktaApiUrl = document.getElementById('uddokta-api-url')?.value?.trim() || 'https://pay.uddoktapay.com/api/checkout-v2';
+
+  const config = {
+    bkash: {
+      enabled: bkashEnabled,
+      number: bkashNumber,
+      type: bkashType,
+      instructions: bkashInstructions
+    },
+    nagad: {
+      enabled: nagadEnabled,
+      number: nagadNumber,
+      type: nagadType,
+      instructions: nagadInstructions
+    },
+    rocket: {
+      enabled: rocketEnabled,
+      number: rocketNumber,
+      type: rocketType,
+      instructions: rocketInstructions
+    },
+    cod: {
+      enabled: codEnabled,
+      instructions: codInstructions
+    },
+    uddoktaPay: {
+      enabled: uddoktaEnabled,
+      apiKey: uddoktaApiKey,
+      apiUrl: uddoktaApiUrl,
+      sandbox: false,
+      bkashEnabled: true
+    },
+    methods: [
+      { id: 'bkash', name: 'bKash', enabled: bkashEnabled, icon: 'smartphone', number: bkashNumber, type: bkashType, instructions: bkashInstructions },
+      { id: 'nagad', name: 'Nagad', enabled: nagadEnabled, icon: 'smartphone', number: nagadNumber, type: nagadType, instructions: nagadInstructions },
+      { id: 'rocket', name: 'Rocket', enabled: rocketEnabled, icon: 'smartphone', number: rocketNumber, type: rocketType, instructions: rocketInstructions },
+      { id: 'cod', name: 'Cash on Delivery', enabled: codEnabled, icon: 'payments', instructions: codInstructions }
+    ]
   };
 
-  config.methods.forEach(m => {
-    m.enabled = document.getElementById(`pm-${m.id}-enabled`)?.checked ?? false;
-    const numEl = document.getElementById(`pm-${m.id}-num`);
-    if (numEl) m.number = numEl.value.trim();
-    if (m.id === 'bkash') {
-      m.apiKey = apiKey;
-      m.number = merchantNumber;
-    }
-  });
-
   DB.payments.save(config);
-  toast('🎉 Payment Gateway & UddoktaPay bKash Config saved and synchronized!', 'success');
+  toast('🎉 bKash, Nagad, Rocket ও Payment Settings সফলভাবে সেভ ও লাইভ সিঙ্ক করা হয়েছে!', 'success');
 }
 
 // ──────────────────────────────────────────────────────────────

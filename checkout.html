@@ -129,30 +129,44 @@
             <input type="text" id="c-address" required placeholder="House, Road, Area details" class="w-full border border-outline-variant rounded-xl p-3 text-sm font-semibold bg-[#f8f9fa] outline-none focus:border-primary"/>
           </div>
 
-          <!-- Payment Method Selection -->
+          <!-- Payment Method Selection (bKash, Nagad, Rocket, COD) -->
           <div>
-            <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Payment Method</label>
-            <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Select Payment Method</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold">
               <div>
-                <input type="radio" name="pay-method" id="pay-bkash" value="bKash" checked onchange="toggleMFS(true)" class="hidden payment-radio"/>
-                <label for="pay-bkash" class="block border border-outline-variant rounded-xl p-3 text-center cursor-pointer hover:border-primary">
-                  bKash / Nagad
+                <input type="radio" name="pay-method" id="pay-bkash" value="bKash" checked onchange="window.selectPaymentMethod('bkash')" class="hidden payment-radio"/>
+                <label for="pay-bkash" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#D12053] transition-all bg-white">
+                  <span class="w-8 h-8 rounded-lg bg-[#D12053] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
+                  <span class="text-xs font-extrabold text-gray-900">bKash</span>
                 </label>
               </div>
               <div>
-                <input type="radio" name="pay-method" id="pay-cod" value="COD" onchange="toggleMFS(false)" class="hidden payment-radio"/>
-                <label for="pay-cod" class="block border border-outline-variant rounded-xl p-3 text-center cursor-pointer hover:border-primary">
-                  Cash on Delivery
+                <input type="radio" name="pay-method" id="pay-nagad" value="Nagad" onchange="window.selectPaymentMethod('nagad')" class="hidden payment-radio"/>
+                <label for="pay-nagad" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#EA580C] transition-all bg-white">
+                  <span class="w-8 h-8 rounded-lg bg-[#EA580C] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
+                  <span class="text-xs font-extrabold text-gray-900">Nagad</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" name="pay-method" id="pay-rocket" value="Rocket" onchange="window.selectPaymentMethod('rocket')" class="hidden payment-radio"/>
+                <label for="pay-rocket" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#7C3AED] transition-all bg-white">
+                  <span class="w-8 h-8 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
+                  <span class="text-xs font-extrabold text-gray-900">Rocket</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" name="pay-method" id="pay-cod" value="COD" onchange="window.selectPaymentMethod('cod')" class="hidden payment-radio"/>
+                <label for="pay-cod" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#16A34A] transition-all bg-white">
+                  <span class="w-8 h-8 rounded-lg bg-[#16A34A] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">💵</span>
+                  <span class="text-xs font-extrabold text-gray-900">Cash on Delivery</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <!-- MFS TrxID Box -->
-          <div id="mfs-box" class="bg-pink-50 border border-pink-200 rounded-2xl p-4">
-            <p class="text-xs font-bold text-pink-950 mb-1">bKash / Nagad Personal: 01700-000000</p>
-            <p class="text-[11px] text-pink-800 mb-2">Send payment & enter Transaction ID below:</p>
-            <input type="text" id="c-trxid" placeholder="e.g. 9B7X2K4M" class="w-full border border-pink-300 rounded-xl p-2.5 text-xs font-mono font-bold bg-white uppercase"/>
+          <!-- Dynamic MFS Details Box (bKash / Nagad / Rocket / COD) -->
+          <div id="mfs-box" class="rounded-2xl transition-all">
+            <!-- Injected by window.selectPaymentMethod() -->
           </div>
 
           <button type="submit" id="place-btn" class="w-full bg-primary text-white font-bold text-sm px-6 py-4 rounded-xl hover:bg-secondary transition-colors shadow-lg">
@@ -207,6 +221,12 @@
 <footer class="bg-white border-t border-outline-variant py-8 mt-12 text-center text-xs text-on-surface-variant">
   <p>© 2026 ZENVY Sportswear. All rights reserved.</p>
 </footer>
+
+<!-- Firebase Compat & Sync Layer -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-sync.js?v=20261102_mfs3pay"></script>
+<script src="admin-db.js?v=20261102_mfs3pay"></script>
 
 <script type="module">
 import { createOrder } from './js/orders.js';
@@ -278,14 +298,146 @@ window.removeItem = function(idx) {
   renderCart();
 };
 
-window.toggleMFS = function(show) {
-  document.getElementById('mfs-box').style.display = show ? 'block' : 'none';
+function getPaymentConfig() {
+  if (window.DB && window.DB.payments) {
+    return window.DB.payments.get();
+  }
+  const def = {
+    bkash: { enabled: true, number: '01700-000000', type: 'Personal', instructions: 'bKash Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের ঘরে দিন।' },
+    nagad: { enabled: true, number: '01800-000000', type: 'Personal', instructions: 'Nagad Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের ঘরে দিন।' },
+    rocket: { enabled: true, number: '01900-000000', type: 'Personal', instructions: 'Rocket Personal নাম্বারে Send Money করুন। এরপর TrxID নিচের ঘরে দিন।' },
+    cod: { enabled: true, instructions: 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।' }
+  };
+  try {
+    const saved = JSON.parse(localStorage.getItem('zenvy_db_paymentConfig') || 'null');
+    if (saved) {
+      return {
+        bkash: saved.bkash || def.bkash,
+        nagad: saved.nagad || def.nagad,
+        rocket: saved.rocket || def.rocket,
+        cod: saved.cod || def.cod
+      };
+    }
+  } catch (e) {}
+  return def;
+}
+
+if (window.ZenvyFirebase) {
+  window.ZenvyFirebase.hydrate().then(() => {
+    const sel = document.querySelector('input[name="pay-method"]:checked')?.value?.toLowerCase() || 'bkash';
+    selectPaymentMethod(sel);
+  });
+}
+
+window.copyPaymentNumber = function(num, btn) {
+  if (!num) return;
+  navigator.clipboard.writeText(num).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Copied!`;
+    btn.classList.add('bg-green-600', 'text-white');
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.classList.remove('bg-green-600', 'text-white');
+    }, 2000);
+  }).catch(() => {
+    alert('Number: ' + num);
+  });
+};
+
+window.selectPaymentMethod = function(methodKey) {
+  const box = document.getElementById('mfs-box');
+  if (!box) return;
+  const cfg = getPaymentConfig();
+
+  if (methodKey === 'bkash') {
+    const p = cfg.bkash || {};
+    box.className = 'bg-[#FFF1F5] border border-pink-200 rounded-2xl p-4 text-xs space-y-3';
+    box.innerHTML = `
+      <div class="flex items-center justify-between pb-2 border-b border-pink-200">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-[#9D174D] block">bKash ${p.type || 'Personal'} Account</span>
+          <span class="text-base font-black font-mono text-[#D12053] tracking-wide">${p.number || '017XXXXXXXX'}</span>
+        </div>
+        <button type="button" onclick="window.copyPaymentNumber('${p.number}', this)" class="bg-[#D12053] hover:bg-[#9D174D] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all shadow-sm">
+          <span class="material-symbols-outlined text-sm">content_copy</span> Copy Number
+        </button>
+      </div>
+      <p class="text-[11px] text-[#831843] font-semibold">${p.instructions || 'bKash Personal নাম্বারে Send Money করুন এবং নিচের ঘরে Transaction ID দিন।'}</p>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Enter bKash Transaction ID (TrxID) <span class="text-red-600">*</span></label>
+        <input type="text" id="c-trxid" required placeholder="e.g. 9B7X2K4M" class="w-full border border-pink-300 rounded-xl p-2.5 text-xs font-mono font-bold bg-white uppercase focus:border-[#D12053] outline-none" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Your Sender bKash Number (Optional)</label>
+        <input type="tel" id="c-sender-phone" placeholder="e.g. 017XXXXXXXX" class="w-full border border-pink-200 rounded-xl p-2.5 text-xs font-mono bg-white outline-none" />
+      </div>
+    `;
+  } else if (methodKey === 'nagad') {
+    const p = cfg.nagad || {};
+    box.className = 'bg-[#FFF7ED] border border-orange-200 rounded-2xl p-4 text-xs space-y-3';
+    box.innerHTML = `
+      <div class="flex items-center justify-between pb-2 border-b border-orange-200">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-[#C2410C] block">Nagad ${p.type || 'Personal'} Account</span>
+          <span class="text-base font-black font-mono text-[#EA580C] tracking-wide">${p.number || '018XXXXXXXX'}</span>
+        </div>
+        <button type="button" onclick="window.copyPaymentNumber('${p.number}', this)" class="bg-[#EA580C] hover:bg-[#C2410C] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all shadow-sm">
+          <span class="material-symbols-outlined text-sm">content_copy</span> Copy Number
+        </button>
+      </div>
+      <p class="text-[11px] text-[#9A3412] font-semibold">${p.instructions || 'Nagad Personal নাম্বারে Send Money করুন এবং নিচের ঘরে Transaction ID দিন।'}</p>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Enter Nagad Transaction ID (TrxID) <span class="text-red-600">*</span></label>
+        <input type="text" id="c-trxid" required placeholder="e.g. 7A8B9C10" class="w-full border border-orange-300 rounded-xl p-2.5 text-xs font-mono font-bold bg-white uppercase focus:border-[#EA580C] outline-none" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Your Sender Nagad Number (Optional)</label>
+        <input type="tel" id="c-sender-phone" placeholder="e.g. 018XXXXXXXX" class="w-full border border-orange-200 rounded-xl p-2.5 text-xs font-mono bg-white outline-none" />
+      </div>
+    `;
+  } else if (methodKey === 'rocket') {
+    const p = cfg.rocket || {};
+    box.className = 'bg-[#FAF5FF] border border-purple-200 rounded-2xl p-4 text-xs space-y-3';
+    box.innerHTML = `
+      <div class="flex items-center justify-between pb-2 border-b border-purple-200">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-[#6D28D9] block">Rocket ${p.type || 'Personal'} Account</span>
+          <span class="text-base font-black font-mono text-[#7C3AED] tracking-wide">${p.number || '019XXXXXXXX'}</span>
+        </div>
+        <button type="button" onclick="window.copyPaymentNumber('${p.number}', this)" class="bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all shadow-sm">
+          <span class="material-symbols-outlined text-sm">content_copy</span> Copy Number
+        </button>
+      </div>
+      <p class="text-[11px] text-[#5B21B6] font-semibold">${p.instructions || 'Rocket Personal নাম্বারে Send Money করুন এবং নিচের ঘরে Transaction ID দিন।'}</p>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Enter Rocket Transaction ID (TrxID) <span class="text-red-600">*</span></label>
+        <input type="text" id="c-trxid" required placeholder="e.g. RK998822" class="w-full border border-purple-300 rounded-xl p-2.5 text-xs font-mono font-bold bg-white uppercase focus:border-[#7C3AED] outline-none" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-800 mb-1">Your Sender Rocket Number (Optional)</label>
+        <input type="tel" id="c-sender-phone" placeholder="e.g. 019XXXXXXXX" class="w-full border border-purple-200 rounded-xl p-2.5 text-xs font-mono bg-white outline-none" />
+      </div>
+    `;
+  } else {
+    // COD
+    const p = cfg.cod || {};
+    box.className = 'bg-[#F0FDF4] border border-green-200 rounded-2xl p-4 text-xs';
+    box.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">💵</span>
+        <div>
+          <span class="font-extrabold text-[#15803D] block text-xs">Cash on Delivery (ক্যাশ অন ডেলিভারি)</span>
+          <span class="text-[11px] text-[#166534] block mt-0.5">${p.instructions || 'পণ্য হাতে পেয়ে ডেলিভারি রাইডারের নিকট ক্যাশ মূল্য পরিশোধ করুন।'}</span>
+        </div>
+      </div>
+    `;
+  }
 };
 
 window.handlePlaceOrder = async function(e) {
   e.preventDefault();
   if (!cart || cart.length === 0) {
-    alert('Your cart is empty!');
+    alert('আপনার কার্ট খালি! অনুগ্রহ করে কোনো পণ্য যোগ করুন।');
     return;
   }
 
@@ -294,8 +446,18 @@ window.handlePlaceOrder = async function(e) {
   const email = (document.getElementById('c-email')?.value || '').trim();
   const city = document.getElementById('c-city').value.trim();
   const address = document.getElementById('c-address').value.trim();
-  const paymentMethod = document.querySelector('input[name="pay-method"]:checked').value;
-  const paymentTrxId = document.getElementById('c-trxid').value.trim();
+  const paymentMethodInput = document.querySelector('input[name="pay-method"]:checked');
+  const paymentMethod = paymentMethodInput ? paymentMethodInput.value : 'Cash on Delivery';
+  const trxInput = document.getElementById('c-trxid');
+  const paymentTrxId = trxInput ? trxInput.value.trim().toUpperCase() : '';
+  const senderPhoneInput = document.getElementById('c-sender-phone');
+  const paymentSenderPhone = senderPhoneInput ? senderPhoneInput.value.trim() : '';
+
+  if (paymentMethod !== 'COD' && (!paymentTrxId || paymentTrxId.length < 4)) {
+    alert('⚠️ অনুগ্রহ করে আপনার ' + paymentMethod + ' পেমেন্টের সঠিক Transaction ID (TrxID) প্রবেশ করান।');
+    if (trxInput) trxInput.focus();
+    return;
+  }
 
   const total = cart.reduce((s, i) => s + (i.price || 0) * (i.qty || 1), 0);
 
@@ -304,29 +466,48 @@ window.handlePlaceOrder = async function(e) {
   btn.textContent = 'Processing Order...';
 
   try {
-    const orderId = await createOrder({
+    const formattedMethod = paymentMethod === 'COD' ? 'Cash on Delivery' : paymentMethod;
+    const paymentRemark = paymentTrxId
+      ? `${formattedMethod} TrxID: ${paymentTrxId}${paymentSenderPhone ? ' (Sender: ' + paymentSenderPhone + ')' : ''}`
+      : 'Cash on Delivery';
+
+    const orderRes = await createOrder({
       customerName: name,
       customerPhone: phone,
       customerEmail: email,
+      shippingAddress: `${address}, ${city}`,
       city,
       address,
-      paymentMethod,
+      paymentMethod: formattedMethod,
       paymentTrxId,
+      paymentSenderPhone,
+      paymentRemark,
+      paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PAID',
+      paidAmount: paymentMethod === 'COD' ? 0 : total,
+      dueAmount: paymentMethod === 'COD' ? total : 0,
       items: cart,
+      subtotal: total,
       total
     });
 
-    alert('🎉 Order Placed Successfully!\nOrder Reference: ' + orderId);
-    localStorage.removeItem('zenvy_cart');
-    window.location.href = 'index.html';
+    if (orderRes && orderRes.success) {
+      const orderRef = orderRes.orderNumber || orderRes.orderId;
+      alert(`🎉 অর্ডার সফলভাবে প্লেস হয়েছে!\n\nঅর্ডার রেফারেন্স: #${orderRef}\nপেমেন্ট মেথড: ${formattedMethod}\n${paymentTrxId ? 'Transaction ID: ' + paymentTrxId : ''}\n\nধন্যবাদ, ZENVY এর সাথে থাকার জন্য!`);
+      localStorage.removeItem('zenvy_cart');
+      window.location.href = 'index.html';
+    } else {
+      throw new Error(orderRes?.error || 'Order placement failed');
+    }
   } catch (err) {
-    alert('Could not place order: ' + err.message);
+    alert('অর্ডার সম্পন্ন করা যায়নি: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Checkout Securely';
   }
 };
 
+// Initial setup
+selectPaymentMethod('bkash');
 renderCart();
 </script>
 </body>

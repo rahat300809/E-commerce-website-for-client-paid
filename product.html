@@ -170,6 +170,9 @@
   <!-- ═══════════════════════════════════════════
        HEADER NAVIGATION
   ════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════
+       HEADER NAVIGATION
+  ════════════════════════════════════════════ -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 transition-all">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 md:h-20 flex items-center justify-between">
       
@@ -178,16 +181,16 @@
         <a href="index.html#shop" class="p-1.5 rounded-full hover:bg-gray-100 text-gray-700 transition-colors flex items-center justify-center" title="Back to Shop">
           <span class="material-symbols-outlined text-[20px] sm:text-[24px]">arrow_back</span>
         </a>
-        <a href="index.html" class="flex items-center gap-2">
+        <a href="index.html#home" class="flex items-center gap-2">
           <span class="font-headline font-black text-xl sm:text-2xl tracking-[0.16em] text-black">ZENVY</span>
         </a>
       </div>
 
-      <!-- Center Links (Desktop only) -->
+      <!-- Center Links (Desktop) -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-semibold">
-        <a href="index.html" class="text-gray-600 hover:text-black transition-colors">Home</a>
-        <a href="index.html#shop" class="text-black font-bold border-b-2 border-black pb-0.5">Shop</a>
-        <a href="customizer.html" class="text-gray-600 hover:text-black transition-colors flex items-center gap-1">
+        <a href="index.html#home" class="text-gray-600 hover:text-black transition-colors">Home</a>
+        <a href="index.html#shop" class="text-gray-600 hover:text-black transition-colors">Shop</a>
+        <a href="index.html#customizer" class="text-gray-600 hover:text-black transition-colors flex items-center gap-1">
           <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span> Custom Studio
         </a>
         <a href="preorders.html" class="text-gray-600 hover:text-black transition-colors">Preorders</a>
@@ -202,8 +205,28 @@
           <span class="material-symbols-outlined text-[22px] sm:text-[24px]">shopping_bag</span>
           <span id="header-cart-badge" class="absolute top-0 right-0 bg-black text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
         </button>
+        <!-- Mobile Menu Toggle Button -->
+        <button onclick="toggleProductMobileNav()" class="md:hidden text-gray-700 hover:text-black p-1.5 rounded-full hover:bg-gray-100" title="Navigation Menu">
+          <span class="material-symbols-outlined text-[22px]">menu</span>
+        </button>
       </div>
 
+    </div>
+
+    <!-- Mobile Navigation Dropdown Menu -->
+    <div id="product-mobile-nav" class="hidden md:hidden border-t border-gray-100 bg-white/98 px-4 py-3 shadow-lg flex flex-col gap-2">
+      <a href="index.html#home" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-lg">home</span> Home
+      </a>
+      <a href="index.html#shop" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop
+      </a>
+      <a href="index.html#customizer" class="text-sm font-bold text-amber-600 py-2 px-3 rounded-lg hover:bg-amber-50/50 flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Studio
+      </a>
+      <a href="preorders.html" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-lg">schedule</span> Preorders
+      </a>
     </div>
   </header>
 
@@ -776,12 +799,21 @@
       galleryImages: []
     };
 
+    // Authentic High-Res Default Angles
+    const DEFAULT_BACK_IMAGE = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvPSMv4hm-ogvHICrLE75pSyHISjUeRYFACniC-YFTC6395bXDbLCEXnamAC_4lHGSDhOnnbm749_rc59n9IIu1p1gOP6rFKwmskJ7depORghWDz9ApaZcCt2mKRzZH6LnLM15nulbMpzHctlkozD_yUmKpIMektqElyuGrcDtzHydDlXqscB4e-luHSYlE7gFo3zwRlKQ_BojzHVyjjah_G0TAj4P6eVNddadsSpPfs_2fRF4dcc-Xw';
+    const DEFAULT_DETAIL_IMAGE = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+
     // Images for different angles
     const ANGLE_IMAGES = {
       front: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA',
-      back: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA',
-      detail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80'
+      back: DEFAULT_BACK_IMAGE,
+      detail: DEFAULT_DETAIL_IMAGE
     };
+
+    function toggleProductMobileNav() {
+      const nav = document.getElementById('product-mobile-nav');
+      if (nav) nav.classList.toggle('hidden');
+    }
 
     // ─────────────────────────────────────────
     // Initialization
@@ -811,6 +843,9 @@
         const allProducts = DB.products.all();
         if (prodId) {
           targetProduct = DB.products.byId(prodId);
+          if (!targetProduct) {
+            targetProduct = allProducts.find(p => String(p.id).trim() === String(prodId).trim() || String(p.slug) === String(prodId));
+          }
         }
         if (!targetProduct && prodSlug) {
           targetProduct = allProducts.find(p => p.slug === prodSlug);
@@ -886,6 +921,17 @@
         productState.product = targetProduct;
         productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
 
+        // Clean & shorten browser address bar to shareable link (e.g. /product.html?id=108)
+        try {
+          if (window.history && window.history.replaceState && targetProduct.id) {
+            const shortQuery = `?id=${encodeURIComponent(targetProduct.id)}`;
+            if (window.location.search !== shortQuery) {
+              const currentPath = window.location.pathname.endsWith('product.html') ? window.location.pathname : 'product.html';
+              window.history.replaceState(null, '', `${currentPath}${shortQuery}`);
+            }
+          }
+        } catch (e) {}
+
         // Update page title & headings
         document.title = `${targetProduct.name} | ZENVY Elite Performance`;
         const titleEl = document.getElementById('pd-title');
@@ -917,7 +963,7 @@
           }
         }
 
-        // Product Images & Gallery Array
+        // Product Images & Multi-Angle Setup
         const imagesList = [];
         if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
           targetProduct.images.forEach(img => {
@@ -934,8 +980,10 @@
 
         productState.galleryImages = imagesList;
         ANGLE_IMAGES.front = imagesList[0] || ANGLE_IMAGES.front;
-        ANGLE_IMAGES.back = imagesList[1] || imagesList[0] || ANGLE_IMAGES.front;
-        ANGLE_IMAGES.detail = imagesList[2] || imagesList[0] || ANGLE_IMAGES.detail;
+        // If 2nd image is identical or missing, use authentic back cutout
+        ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : DEFAULT_BACK_IMAGE;
+        // If 3rd image is missing, use close-up macro fabric texture
+        ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : DEFAULT_DETAIL_IMAGE;
 
         const mainImg = document.getElementById('main-product-img');
         if (mainImg) {
@@ -1203,6 +1251,20 @@
       const patchOverlay = document.getElementById('live-patch-overlay');
 
       resetAngleBtnHighlights(angle);
+
+      // Sync active state on thumbnails strip
+      const thumbBtns = document.querySelectorAll('.thumb-btn');
+      if (thumbBtns.length >= 3) {
+        thumbBtns.forEach(b => {
+          b.classList.remove('border-black');
+          b.classList.add('border-gray-200');
+        });
+        const targetIdx = angle === 'front' ? 0 : (angle === 'back' ? 1 : 2);
+        if (thumbBtns[targetIdx]) {
+          thumbBtns[targetIdx].classList.remove('border-gray-200');
+          thumbBtns[targetIdx].classList.add('border-black');
+        }
+      }
 
       if (angle === 'back') {
         if (img) img.src = ANGLE_IMAGES.back;

@@ -53,14 +53,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const catParam = urlParams.get('category') || urlParams.get('cat');
-  const targetView = urlParams.get('view') || window.location.hash.replace('#', '') || 'home';
+  const rawHash = (window.location.hash || '').replace('#', '').trim();
+  const targetView = urlParams.get('view') || rawHash || 'home';
   if (catParam) {
-    switchView('shop');
+    switchView('shop', false);
     setTimeout(() => selectCategory(catParam), 150);
-  } else if (['checkout', 'shop', 'studio', 'order-tracking', 'preorder', 'home'].includes(targetView)) {
-    switchView(targetView);
+  } else if (['checkout', 'shop', 'customizer', 'studio', 'order-tracking', 'preorder', 'preorders', 'home'].includes(targetView)) {
+    switchView(targetView, false);
   } else {
-    switchView('home');
+    switchView('home', false);
   }
 
   if (urlParams.get('openCart') === '1' || urlParams.get('openCart') === 'true') {
@@ -759,9 +760,15 @@ function syncFooterSocialLinks() {
   if (ytEl && brand.socialYoutube) ytEl.href = brand.socialYoutube;
 }
 
-// View Switcher Router
-function switchView(viewName) {
-  appState.activeView = viewName;
+// View Switcher Router with Short Shareable URL Sync
+function switchView(viewName, updateUrl = true) {
+  const aliasMap = {
+    'studio': 'customizer',
+    'preorder': 'shop',
+    'preorders': 'shop'
+  };
+  const normalized = aliasMap[viewName] || viewName;
+  appState.activeView = normalized;
 
   // Hide all page views
   document.querySelectorAll('.page-view').forEach(view => {
@@ -769,10 +776,19 @@ function switchView(viewName) {
   });
 
   // Show target view
-  const targetView = document.getElementById(`view-${viewName}`);
+  const targetView = document.getElementById(`view-${normalized}`);
   if (targetView) {
     targetView.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Update browser address bar to clean short shareable link without full page reload
+  if (updateUrl && window.history && window.history.pushState) {
+    const targetHash = normalized === 'home' ? '' : `#${normalized}`;
+    const cleanUrl = window.location.pathname.replace(/\/$/, '') + targetHash;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState(null, '', cleanUrl || '/');
+    }
   }
 
   // Update navbar tab highlights
@@ -780,24 +796,32 @@ function switchView(viewName) {
     tab.className = "nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60";
   });
 
-  const activeTab = document.getElementById(`nav-btn-${viewName}`);
+  const activeTab = document.getElementById(`nav-btn-${normalized}`);
   if (activeTab) {
     activeTab.className = "nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-primary font-bold bg-white shadow-sm";
   }
 
   // View-specific initialization
-  if (viewName === 'shop') {
+  if (normalized === 'shop') {
     // Render shop grid and discount banner from DB on each visit
     shopCarouselGoto(0);
     setTimeout(() => changeShopPage(typeof shopCurrentPage !== 'undefined' ? shopCurrentPage : 1), 50);
-  } else if (viewName === 'home') {
+  } else if (normalized === 'home') {
     syncHomepageContent();
-  } else if (viewName === 'checkout') {
+  } else if (normalized === 'checkout') {
     renderCart();
     renderCheckoutPaymentMethods();
     updateCheckoutCalculations();
   }
 }
+
+// React to browser Back/Forward or direct link hash clicks
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '').trim() || 'home';
+  if (['home', 'shop', 'customizer', 'studio', 'checkout', 'order-tracking', 'preorder', 'preorders'].includes(hash)) {
+    switchView(hash, false);
+  }
+});
 
 window.goToShopCategory = function(catName) {
   switchView('shop');
@@ -1639,19 +1663,13 @@ if (!window._shopCarouselTimer) {
 let pdState = { product: null, size: 'M', qty: 1 };
 
 function openProduct(product) {
-  if (!product) {
-    window.location.href = 'product.html?id=101';
-    return;
+  let prodId = '101';
+  if (typeof product === 'string' || typeof product === 'number') {
+    prodId = product;
+  } else if (product && typeof product === 'object') {
+    prodId = product.id || product.slug || '101';
   }
-  let queryParams = [];
-  if (product.id) queryParams.push(`id=${encodeURIComponent(product.id)}`);
-  if (product.name) queryParams.push(`name=${encodeURIComponent(product.name)}`);
-  if (product.price) queryParams.push(`price=${encodeURIComponent(product.price)}`);
-  if (product.image) queryParams.push(`image=${encodeURIComponent(product.image)}`);
-  if (product.category) queryParams.push(`category=${encodeURIComponent(product.category)}`);
-  if (product.badge) queryParams.push(`badge=${encodeURIComponent(product.badge)}`);
-
-  window.location.href = `product.html?${queryParams.join('&')}`;
+  window.location.href = `product.html?id=${encodeURIComponent(prodId)}`;
 }
 
 function closeProduct() {

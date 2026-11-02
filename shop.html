@@ -8,8 +8,8 @@
   (function() {
     const p = new URLSearchParams(window.location.search);
     const cat = p.get('cat') || p.get('category');
-    let target = 'index.html?view=shop';
-    if (cat) target += '&category=' + encodeURIComponent(cat);
+    let target = 'index.html#shop';
+    if (cat) target = 'index.html?category=' + encodeURIComponent(cat) + '#shop';
     window.location.replace(target);
   })();
 </script>

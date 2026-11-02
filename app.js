@@ -1315,10 +1315,10 @@ function renderShopCategories() {
 
   if (pillsEl) {
     pillsEl.innerHTML = `
-      <button onclick="selectCategory('all',this)" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-mono-ui font-bold transition-all ${shopActiveCategory === 'all' ? 'bg-primary text-white border border-primary shadow-sm' : 'border border-gray-200 text-secondary hover:border-primary hover:text-primary'}">All</button>
+      <button onclick="selectCategory('all',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer ${shopActiveCategory === 'all' ? 'bg-black text-white font-bold shadow-2xs' : 'bg-white border border-gray-200 hover:border-black text-gray-700 font-medium'}">All Jerseys</button>
       ${categories.map(c => {
         const isSelected = shopActiveCategory.toLowerCase() === c.name.toLowerCase();
-        return `<button onclick="selectCategory('${c.name.replace(/'/g, "\\'")}',this)" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-mono-ui font-bold transition-all ${isSelected ? 'bg-primary text-white border border-primary shadow-sm' : 'border border-gray-200 text-secondary hover:border-primary hover:text-primary'}">${c.name}</button>`;
+        return `<button onclick="selectCategory('${c.name.replace(/'/g, "\\'")}',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer ${isSelected ? 'bg-black text-white font-bold shadow-2xs' : 'bg-white border border-gray-200 hover:border-black text-gray-700 font-medium'}">${c.name}</button>`;
       }).join('')}
     `;
   }
@@ -1510,48 +1510,69 @@ function renderShopProducts() {
     const imgUrl = (p.images && p.images[0] && p.images[0].url) ? p.images[0].url : (p.image || defaultImg);
     const priceFormatted = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origFormatted = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
-    const badge = p.isPreorder ? 'PRE-ORDER' : (p.stock === 0 ? 'OUT OF STOCK' : (p.compareAt ? 'SALE' : ''));
+    const badgeText = p.isPreorder ? 'PRE-ORDER' : (p.stock === 0 ? 'OUT OF STOCK' : (p.compareAt ? 'SALE' : ''));
+    const badgeClass = p.isPreorder ? 'bg-purple-600 text-white' : (p.stock === 0 ? 'bg-neutral-800 text-white' : 'bg-red-50 text-red-600 border border-red-200');
 
     return `
-      <div class="shop-card bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 group flex flex-col"
+      <div class="shop-card bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col"
            data-id="${p.id}" data-price="${p.salePrice || p.basePrice}" data-category="${p.categoryName || ''}">
-        <div class="relative overflow-hidden bg-[#f4f4f6] cursor-pointer" style="aspect-ratio:1/1;"
-             onclick="openProduct({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',category:'${(p.categoryName || '').replace(/'/g, "\\'")}'})">
-          <img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
-          ${badge ? `<span class="absolute top-3 left-3 ${p.isPreorder ? 'bg-purple-600' : 'bg-primary'} text-white font-label-caps text-[10px] px-2.5 py-1 rounded-full font-bold shadow">${badge}</span>` : ''}
-          <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.salePrice || p.basePrice})"
-                  class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
-            <span class="material-symbols-outlined text-base">favorite</span>
+        
+        <!-- Image Area -->
+        <div class="relative overflow-hidden bg-[#f6f6f8] cursor-pointer" style="aspect-ratio:1/1;"
+             onclick="openProduct('${p.id}')">
+          <img src="${imgUrl}" class="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
+          
+          ${badgeText ? `<span class="absolute top-2.5 left-2.5 ${badgeClass} font-mono-ui font-black text-[10px] px-2 py-0.5 rounded-full shadow-2xs">${badgeText}</span>` : ''}
+          
+          <button type="button" 
+                  onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.salePrice || p.basePrice})"
+                  class="absolute top-2.5 right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 backdrop-blur-sm shadow-2xs flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                  title="Add to Wishlist">
+            <span class="material-symbols-outlined text-[16px] sm:text-[18px]">favorite</span>
           </button>
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span class="bg-white text-primary font-label-caps text-[11px] px-3.5 py-1.5 rounded-full shadow-lg font-bold">View Details</span>
-          </div>
         </div>
-        <div class="p-4 flex flex-col gap-1 flex-1">
-          <h3 class="font-headline-lg text-sm sm:text-base font-bold text-primary leading-snug cursor-pointer hover:text-black/70 transition-colors line-clamp-1" 
-              onclick="openProduct({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',category:'${(p.categoryName || '').replace(/'/g, "\\'")}'})">${p.name}</h3>
-          <p class="font-body-md text-xs text-secondary">${p.categoryName || 'Performance'}</p>
-          <div class="flex items-center gap-1 my-0.5">
-            <span class="material-symbols-outlined text-amber-400 text-[14px] fill-1">star</span>
-            <span class="material-symbols-outlined text-amber-400 text-[14px] fill-1">star</span>
-            <span class="material-symbols-outlined text-amber-400 text-[14px] fill-1">star</span>
-            <span class="material-symbols-outlined text-amber-400 text-[14px] fill-1">star</span>
-            <span class="material-symbols-outlined text-amber-400 text-[14px]">star_half</span>
-            <span class="font-mono-ui text-[11px] text-secondary ml-1">(4.9)</span>
-          </div>
-          <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
-            <div class="flex items-baseline gap-2">
-              <span class="font-mono-ui text-base font-bold text-primary">${priceFormatted}</span>
-              ${origFormatted ? `<span class="font-mono-ui text-xs text-secondary line-through">${origFormatted}</span>` : ''}
+
+        <!-- Details & Actions -->
+        <div class="p-3 sm:p-4 flex flex-col flex-1 justify-between">
+          <div>
+            <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-mono-ui uppercase tracking-wider text-gray-400 mb-1">
+              <span class="truncate max-w-[65%]">${p.categoryName || 'PERFORMANCE'}</span>
+              <span class="flex items-center gap-0.5 text-amber-500 font-bold flex-shrink-0">
+                <span class="material-symbols-outlined text-[13px] fill-1">star</span>
+                <span>4.9</span>
+              </span>
             </div>
-            <div class="flex gap-1.5">
-              <button onclick="openProduct({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',category:'${(p.categoryName || '').replace(/'/g, "\\'")}'})"
-                      class="border border-primary text-primary font-label-caps text-[11px] px-3 py-2 rounded-full hover:bg-primary hover:text-white transition-colors font-bold whitespace-nowrap">View</button>
-              <button onclick="addToCart({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',details:'${(p.categoryName || '').replace(/'/g, "\\'")}'})"
-                      class="bg-primary text-white font-label-caps text-[11px] px-3 py-2 rounded-full hover:bg-black/80 transition-colors font-bold whitespace-nowrap">Add</button>
+
+            <h3 class="font-headline font-bold text-sm sm:text-[15px] text-black leading-snug cursor-pointer hover:text-gray-600 transition-colors line-clamp-1" 
+                onclick="openProduct('${p.id}')" title="${p.name}">
+              ${p.name}
+            </h3>
+
+            <!-- Price -->
+            <div class="mt-2 flex items-baseline gap-2">
+              <span class="font-headline font-black text-base sm:text-lg text-black">${priceFormatted}</span>
+              ${origFormatted ? `<span class="font-mono-ui text-xs text-gray-400 line-through">${origFormatted}</span>` : ''}
             </div>
           </div>
+
+          <!-- Action Buttons: Clean & Never Cut Off -->
+          <div class="grid grid-cols-2 gap-1.5 pt-2.5 border-t border-gray-100 mt-3">
+            <button type="button" 
+                    onclick="openProduct('${p.id}')"
+                    class="py-2 px-1 rounded-xl border border-gray-200 hover:border-black text-black font-headline font-bold text-xs transition-colors text-center cursor-pointer hover:bg-gray-50"
+                    title="View Product">
+              View
+            </button>
+            <button type="button" 
+                    onclick="addToCart({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',details:'${(p.categoryName || '').replace(/'/g, "\\'")}'})"
+                    class="py-2 px-1 rounded-xl bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                    title="Add to Bag">
+              <span class="material-symbols-outlined text-[14px]">shopping_bag</span>
+              <span>+ Bag</span>
+            </button>
+          </div>
         </div>
+
       </div>
     `;
   }).join('');

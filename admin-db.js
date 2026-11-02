@@ -66,7 +66,7 @@ const Store = {
 // ──────────────────────────────────────────────────────────
 // Seed Default Data (runs once per schema version)
 // ──────────────────────────────────────────────────────────
-const SEED_VERSION = 8; // Force re-seed with shop banner customization support
+const SEED_VERSION = 9; // Reseed with clean studio product cutouts
 let _isSeeding = false;
 function seedDefaultData() {
   if (_isSeeding) return;
@@ -268,7 +268,7 @@ function seedDefaultData() {
       categoryId: '',
       description: 'Full-zip technical track jacket with articulated sleeves and lightweight thermal insulation.',
       images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDG8MiBCTEJ9_yWnNhoeNhMOOSmZHbvDKLHXXwBw2x1BkoBDe9tU-XobPDwlW0ZynnUzXV_J2Oi9i4tEpr4ZliH8Mxcc3fkH5be13vj2mcxvBGyBQkRmFtEsa9Gu1KQkQkJ-FfenxUCp8wSq162R-3k-tkzumX3rZ0GtyR4SfVvHkokXixT1Ww7Sa56-FkqkPU5DKCkBmWACD6agq3vvp4pPeH1rnoV2F9L-4f86JeAxOMx-InEiB1pLw', alt: 'Velocity Track Top' }
+        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H', alt: 'Velocity Track Top' }
       ],
       isPublished: true,
       isFeatured: true,
@@ -288,7 +288,7 @@ function seedDefaultData() {
       categoryId: '',
       description: 'Pro athlete tournament jersey featuring ultra-breathable micro-mesh and seamless collar construction.',
       images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBxiz7UEkmkpxVSO5BuCiXQdztqSvXyX6w3QZrV0AZ1UtH39sH5MpR3zmgfko4Sl_R2Hg8u-Uy6hePpjZNthnGo4Dqi2SwdGBynkP4Q5OJGeHwvzTsVzaTgDo1CV8KzYvGHzWMK3sGJho6P_pgsaq9bWB7v85VYJQfOTn5nmgSL6DR-WMMJwPQmbfBp51AtpSWIsHJHuLXLBJG7xJAlg9iQZhpvkZ5jccDDUw-7IG4xhcYX_8mATdvtKA', alt: 'Elite Kit Pro' }
+        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P', alt: 'Elite Kit Pro' }
       ],
       isPublished: true,
       isFeatured: true,

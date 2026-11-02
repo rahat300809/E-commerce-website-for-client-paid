@@ -13,7 +13,13 @@
       "tsconfig.json",
       "next.config.js",
       "package.json",
-      "package-lock.json"
+      "package-lock.json",
+      "**/*.bat",
+      "**/*.cmd",
+      "**/*.exe",
+      "**/*.ps1",
+      "**/*.sh",
+      "README.md"
     ]
   }
 }

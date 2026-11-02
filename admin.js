@@ -2883,33 +2883,6 @@ function savePaymentRemark(id) {
   updateNavBadges();
   renderOrders(document.getElementById('admin-content'));
 }
-  `;
-  openModal(`Order Details: #${o.orderNumber || o.id}`, html, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`, 'modal-xl');
-}
-
-function openOrderStatusModal(id) {
-  const o = DB.orders.byId(id);
-  const statuses = ['PENDING','CONFIRMED','PROCESSING','PACKED','SHIPPED','OUT_FOR_DELIVERY','DELIVERED','CANCELLED','RETURNED','REFUNDED'];
-  const html = `
-    <div class="form-group"><label class="form-label">New Status</label>
-      <select id="detail-status" class="form-select">${statuses.map(s=>`<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('')}</select>
-    </div>
-    <div class="form-group"><label class="form-label">Tracking Number</label><input type="text" id="detail-tracking" class="form-input" value="${o?.trackingNumber||''}" placeholder="Optional tracking number"/></div>
-  `;
-  openModal('Update Order Status', html, `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateOrderStatus('${id}')">Update</button>`, 'modal-sm');
-}
-
-function updateOrderStatus(id) {
-  const status = document.getElementById('detail-status')?.value;
-  const tracking = document.getElementById('detail-tracking')?.value;
-  if (!status) return;
-  DB.orders.updateStatus(id, status);
-  if (tracking) DB.orders.update(id, { trackingNumber: tracking });
-  toast(`Order status updated to ${status}`, 'success');
-  updateNavBadges();
-  closeModal();
-  renderOrders(document.getElementById('admin-content'));
-}
 
 function printInvoice(id) {
   const o = DB.orders.byId(id);

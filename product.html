@@ -773,7 +773,9 @@
   <!-- ═══════════════════════════════════════════
        JAVASCRIPT APP LOGIC & DB CONNECTION
   ════════════════════════════════════════════ -->
-  <script type="module" src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-sync.js"></script>
   <script src="admin-db.js"></script>
   <script>
     // ─────────────────────────────────────────
@@ -820,6 +822,15 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadDataFromAdminDB();
       calculateLiveTotal();
+      updateCartBadge();
+    });
+
+    window.addEventListener('storage', () => {
+      loadDataFromAdminDB();
+      updateCartBadge();
+    });
+    window.addEventListener('zenvy-store-updated', () => {
+      loadDataFromAdminDB();
       updateCartBadge();
     });
 
@@ -963,6 +974,10 @@
         }
 
         // Product Images & Multi-Angle Setup
+        const primaryImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+          ? DB.products.getImage(targetProduct)
+          : (targetProduct.image || ANGLE_IMAGES.front);
+
         const imagesList = [];
         if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
           targetProduct.images.forEach(img => {
@@ -973,16 +988,17 @@
         if (paramImage && !imagesList.includes(paramImage)) {
           imagesList.unshift(paramImage);
         }
+        if (primaryImg && !imagesList.includes(primaryImg)) {
+          imagesList.unshift(primaryImg);
+        }
         if (imagesList.length === 0) {
-          imagesList.push(targetProduct.image || ANGLE_IMAGES.front);
+          imagesList.push(primaryImg);
         }
 
         productState.galleryImages = imagesList;
-        ANGLE_IMAGES.front = imagesList[0] || ANGLE_IMAGES.front;
-        // If 2nd image is identical or missing, use authentic back cutout
-        ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : DEFAULT_BACK_IMAGE;
-        // If 3rd image is missing, use close-up macro fabric texture
-        ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : DEFAULT_DETAIL_IMAGE;
+        ANGLE_IMAGES.front = imagesList[0] || primaryImg;
+        ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || primaryImg);
+        ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || primaryImg);
 
         const mainImg = document.getElementById('main-product-img');
         if (mainImg) {

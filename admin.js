@@ -240,6 +240,17 @@ function handleLogin(e) {
     showApp();
     nav('dashboard');
     toast('Logged in as Master Administrator', 'success');
+
+    // Instantly hydrate newest products/orders from Firestore cloud
+    if (window.ZenvyFirebase && typeof window.ZenvyFirebase.hydrate === 'function') {
+      window.ZenvyFirebase.hydrate().then(() => {
+        updateNavBadges();
+        const content = document.getElementById('admin-content');
+        if (currentView && content) {
+          renderView(currentView, content);
+        }
+      }).catch(e => console.warn('[Admin] Login hydration:', e));
+    }
   } else {
     let msg = 'Incorrect password. Please enter your valid admin password.';
     if (result && typeof result === 'object' && result.error) {
@@ -804,8 +815,9 @@ function renderProducts(container) {
   if (productStatusFilter === 'outofstock') items = items.filter(p => p.stock === 0);
   if (productStatusFilter === 'lowstock') items = items.filter(p => p.stock <= (p.lowStockAlert||5) && p.stock > 0);
   if (productStatusFilter === 'preorder') items = items.filter(p => p.isPreorder);
-  if (productSort === 'newest') items.sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
-  if (productSort === 'oldest') items.sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt));
+  const getTs = x => (x && x.createdAt) ? (new Date(x.createdAt).getTime() || 0) : 0;
+  if (productSort === 'newest') items.sort((a,b) => getTs(b) - getTs(a));
+  if (productSort === 'oldest') items.sort((a,b) => getTs(a) - getTs(b));
   if (productSort === 'name') items.sort((a,b) => a.name?.localeCompare(b.name));
   if (productSort === 'price_asc') items.sort((a,b) => a.basePrice-b.basePrice);
   if (productSort === 'price_desc') items.sort((a,b) => b.basePrice-a.basePrice);

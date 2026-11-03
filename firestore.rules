@@ -7,9 +7,22 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    match /products/{docId} {
+      allow read, write: if true;
+    }
+
+    match /orders/{docId} {
+      allow read, write: if true;
+    }
+
+    match /customers/{docId} {
+      allow read, write: if true;
+    }
+
     // Admins whitelist collection
     match /admins/{email} {
       allow read, write: if true;
     }
   }
 }
+

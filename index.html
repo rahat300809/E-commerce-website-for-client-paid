@@ -33,12 +33,25 @@
     })();
   </script>
   <style>
-    /* Prevent home flash when reloading directly on #shop, #customizer, or #checkout */
+    /* View switching synchronized with data-target-view attribute */
+    html[data-target-view="home"] #view-home { display: block !important; opacity: 1 !important; }
+    html[data-target-view="home"] #view-shop { display: none !important; }
+    html[data-target-view="home"] #view-customizer { display: none !important; }
+    html[data-target-view="home"] #view-checkout { display: none !important; }
+
     html[data-target-view="shop"] #view-home { display: none !important; }
     html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
+    html[data-target-view="shop"] #view-customizer { display: none !important; }
+    html[data-target-view="shop"] #view-checkout { display: none !important; }
+
     html[data-target-view="customizer"] #view-home { display: none !important; }
+    html[data-target-view="customizer"] #view-shop { display: none !important; }
     html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
+    html[data-target-view="customizer"] #view-checkout { display: none !important; }
+
     html[data-target-view="checkout"] #view-home { display: none !important; }
+    html[data-target-view="checkout"] #view-shop { display: none !important; }
+    html[data-target-view="checkout"] #view-customizer { display: none !important; }
     html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
   </style>
 
@@ -155,22 +168,22 @@
 
       <!-- Actions (Profile, Wishlist, Cart, Mobile Menu Toggle) -->
       <div class="flex items-center gap-1 sm:gap-2">
-        <button onclick="showToast('User Account: Logged in as Elite Member')" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60" title="Account">
+        <a href="account.html" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 flex items-center justify-center cursor-pointer" title="My Account & Orders">
           <span class="material-symbols-outlined text-[20px]">person</span>
-        </button>
+        </a>
 
-        <button onclick="toggleWishlistModal()" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 relative" title="Wishlist">
+        <button onclick="toggleWishlistModal()" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 relative cursor-pointer" title="Wishlist">
           <span class="material-symbols-outlined text-[20px]">favorite</span>
           <span id="wishlist-badge" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">0</span>
         </button>
 
-        <button onclick="toggleCartDrawer()" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full bg-primary text-on-primary hover:bg-primary/90 shadow-md flex items-center gap-1.5 px-3 sm:px-3.5" title="Cart Drawer">
+        <button onclick="toggleCartDrawer()" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full bg-primary text-on-primary hover:bg-primary/90 shadow-md flex items-center gap-1.5 px-3 sm:px-3.5 cursor-pointer" title="Cart Drawer">
           <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
           <span id="cart-badge" class="bg-white text-primary rounded-full px-2 py-0.5 text-[11px] font-bold font-mono-ui">0</span>
         </button>
 
         <!-- Mobile Menu Hamburger Toggle -->
-        <button onclick="toggleMobileMenu()" class="md:hidden hover:scale-105 transition-transform duration-200 p-2 rounded-full hover:bg-white/80 text-primary border border-transparent" title="Mobile Navigation">
+        <button onclick="toggleMobileMenu()" class="md:hidden hover:scale-105 transition-transform duration-200 p-2 rounded-full hover:bg-white/80 text-primary border border-transparent cursor-pointer" title="Mobile Navigation">
           <span id="mobile-menu-icon" class="material-symbols-outlined text-[24px]">menu</span>
         </button>
       </div>
@@ -182,21 +195,24 @@
     <div onclick="toggleMobileMenu(true)" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
     <div id="mobile-menu-panel" class="absolute top-[88px] left-0 w-full bg-white/95 backdrop-blur-2xl border-b border-white/80 shadow-2xl p-5 flex flex-col gap-2 transform -translate-y-full transition-transform duration-300 ease-in-out">
       <div class="text-[11px] font-label-caps text-secondary uppercase tracking-widest pb-2 border-b border-outline-variant/30 font-bold">Navigation</div>
-      <button onclick="switchView('home'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+      <button onclick="switchView('home'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">home</span> Home
       </button>
-      <button onclick="switchView('shop'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+      <button onclick="switchView('shop'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop Catalog & Kits
       </button>
-      <button onclick="switchView('customizer'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+      <button onclick="switchView('customizer'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Jersey 3D Studio
       </button>
       <a href="preorders.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
         <span class="material-symbols-outlined text-lg">schedule</span> Reserve Preorders
       </a>
-      <button onclick="switchView('order-tracking'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left">
+      <button onclick="openOrderTrackingModal(); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">local_shipping</span> Track Order
       </button>
+      <a href="account.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">person</span> My Account & Orders
+      </a>
       <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
         <a href="admin.html" onclick="toggleMobileMenu(true);" class="text-xs text-gray-500 hover:text-black font-mono-ui font-semibold flex items-center gap-1.5 py-1">
           <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Admin Suite
@@ -233,13 +249,13 @@
                   The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.
                 </p>
                 <div class="flex items-center gap-2.5 sm:gap-3">
-                  <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
-                    <span>SHOP</span>
+                  <button type="button" onclick="switchView('shop')" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
+                    <span>SHOP CATALOG</span>
                     <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </a>
-                  <a href="javascript:void(0)" onclick="return safeSwitchView('customizer', event)" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
+                  </button>
+                  <button type="button" onclick="switchView('customizer')" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
                     <span>3D Studio</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -275,13 +291,38 @@
             <span id="collections-sec-sub" class="text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-widest block mb-1">EXPLORE BY CATEGORY</span>
             <h2 id="collections-sec-title" class="font-headline text-2xl sm:text-3xl font-extrabold text-black uppercase">FEATURING COLLECTIONS</h2>
           </div>
-          <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer">
+          <button type="button" onclick="switchView('shop')" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer">
             View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </a>
+          </button>
         </div>
 
         <div id="collections-bento-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
           <!-- Populated dynamically from DB.homepage.collections -->
+        </div>
+      </section>
+
+      <!-- ── Dynamic Products Slider (LATEST MATCH KITS & DROPS) ── -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+          <div>
+            <span id="just-dropped-badge" class="text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-widest block mb-1">OFFICIAL STORE CATALOG</span>
+            <h2 id="just-dropped-title" class="font-headline text-2xl sm:text-3xl font-extrabold text-black uppercase">JUST DROPPED & TRENDING</h2>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            <button type="button" onclick="scrollSlider(-300)" class="w-9 h-9 rounded-full bg-white border border-gray-200 text-black hover:bg-black hover:text-white transition-all flex items-center justify-center shadow-xs cursor-pointer active:scale-95" aria-label="Previous products">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button type="button" onclick="scrollSlider(300)" class="w-9 h-9 rounded-full bg-white border border-gray-200 text-black hover:bg-black hover:text-white transition-all flex items-center justify-center shadow-xs cursor-pointer active:scale-95" aria-label="Next products">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
+            <button type="button" onclick="switchView('shop')" class="ml-2 text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap">
+              See All Kits <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="product-slider" class="flex gap-4 sm:gap-5 overflow-x-auto pb-4 hide-scrollbar scroll-smooth">
+          <!-- Populated dynamically via syncHomepageContent() in app.js -->
         </div>
       </section>
 
@@ -303,11 +344,11 @@
             </p>
             
             <div class="flex flex-wrap gap-3">
-              <a href="product.html?id=101" class="bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs sm:text-sm px-7 py-3.5 rounded-full transition-all shadow-md flex items-center gap-2">
+              <a href="product.html" class="bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs sm:text-sm px-7 py-3.5 rounded-full transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95">
                 <span>CUSTOMIZE NOW</span>
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
-              <button onclick="switchView('customizer')" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm">
+              <button type="button" onclick="switchView('customizer')" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm cursor-pointer active:scale-95">
                 Open 3D Studio
               </button>
             </div>
@@ -1126,7 +1167,8 @@
                 <li><a href="javascript:void(0)" onclick="switchView('shop'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
                 <li><a href="javascript:void(0)" onclick="switchView('customizer'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">3D Custom Studio</a></li>
                 <li><a href="preorders.html" class="hover:text-black transition-colors">Reserve Preorders</a></li>
-                <li><a href="javascript:void(0)" onclick="switchView('order-tracking'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">Track Order</a></li>
+                <li><a href="javascript:void(0)" onclick="openOrderTrackingModal()" class="hover:text-black transition-colors">Track Order</a></li>
+                <li><a href="account.html" class="hover:text-black transition-colors">My Account & Sign In</a></li>
                 <li><a href="admin.html" class="hover:text-black transition-colors">Admin Portal</a></li>
               </ul>
             </div>
@@ -1385,6 +1427,39 @@
             <span class="material-symbols-outlined text-sm text-amber-600">autorenew</span> Easy Returns
           </div>
         </div>
+      </div>
+    </div>
+  <!-- ==================== ORDER TRACKING MODAL ==================== -->
+  <div id="order-tracking-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 animate-slide-up">
+      <button type="button" onclick="closeOrderTrackingModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md">
+          <span class="material-symbols-outlined text-2xl">local_shipping</span>
+        </span>
+        <h3 class="font-headline text-xl font-bold text-black uppercase">Live Order Tracking</h3>
+        <p class="font-body text-xs text-gray-500 mt-1">Enter your Order ID (e.g. ZNV-8291) or Phone Number to check status.</p>
+      </div>
+
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="track-order-input" placeholder="Order ID or Phone (017...)" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-mono-ui font-bold focus:outline-none focus:border-black uppercase"/>
+        <button type="button" onclick="performTrackOrder()" class="bg-black hover:bg-neutral-800 active:scale-95 text-white font-headline text-xs font-bold px-5 py-3 rounded-xl transition-all shadow-sm cursor-pointer">
+          Track
+        </button>
+      </div>
+
+      <div id="track-order-result" class="hidden rounded-2xl bg-gray-50 p-4 border border-gray-200 text-xs">
+        <!-- Live status populated dynamically -->
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
+        <span class="text-gray-500">Need full customer dashboard?</span>
+        <a href="account.html" class="font-bold text-black hover:underline flex items-center gap-1">
+          Open Account <span class="material-symbols-outlined text-sm">chevron_right</span>
+        </a>
       </div>
     </div>
   </div>

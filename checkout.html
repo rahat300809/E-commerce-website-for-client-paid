@@ -257,7 +257,7 @@ function renderCart() {
     return `
       <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
         <div class="flex items-center gap-4">
-          <img src="${item.img}" class="w-24 h-24 object-contain rounded-2xl bg-slate-50 flex-shrink-0"/>
+          <img src="${item.image || item.img || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'}" class="w-24 h-24 object-contain rounded-2xl bg-slate-50 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'"/>
           <div>
             <h3 class="font-display text-base font-bold text-primary">${item.name}</h3>
             <p class="text-xs text-on-surface-variant">Size: ${item.size || 'M'} ${item.customization?.name ? `· Custom: "${item.customization.name}"` : ''}</p>
@@ -299,7 +299,10 @@ window.removeItem = function(idx) {
 };
 
 function getPaymentConfig() {
-  if (window.DB && window.DB.payments) {
+  if (window.DB && window.DB.paymentConfig && typeof window.DB.paymentConfig.get === 'function') {
+    return window.DB.paymentConfig.get();
+  }
+  if (window.DB && window.DB.payments && typeof window.DB.payments.get === 'function') {
     return window.DB.payments.get();
   }
   const def = {
@@ -309,7 +312,7 @@ function getPaymentConfig() {
     cod: { enabled: true, instructions: 'পণ্য হাতে পেয়ে ক্যাশ পরিশোধ করুন (Cash on Delivery)।' }
   };
   try {
-    const saved = JSON.parse(localStorage.getItem('zenvy_db_paymentConfig') || 'null');
+    const saved = JSON.parse(localStorage.getItem('zenvy_v1_paymentConfig') || localStorage.getItem('zenvy_db_paymentConfig') || 'null');
     if (saved) {
       return {
         bkash: saved.bkash || def.bkash,
@@ -471,32 +474,73 @@ window.handlePlaceOrder = async function(e) {
       ? `${formattedMethod} TrxID: ${paymentTrxId}${paymentSenderPhone ? ' (Sender: ' + paymentSenderPhone + ')' : ''}`
       : 'Cash on Delivery';
 
-    const orderRes = await createOrder({
-      customerName: name,
-      customerPhone: phone,
-      customerEmail: email,
-      shippingAddress: `${address}, ${city}`,
-      city,
-      address,
-      paymentMethod: formattedMethod,
-      paymentTrxId,
-      paymentSenderPhone,
-      paymentRemark,
-      paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PAID',
-      paidAmount: paymentMethod === 'COD' ? 0 : total,
-      dueAmount: paymentMethod === 'COD' ? total : 0,
-      items: cart,
-      subtotal: total,
-      total
-    });
+    let orderRef = 'ORD-' + Date.now().toString().slice(-6);
+    let orderSuccess = false;
 
-    if (orderRes && orderRes.success) {
-      const orderRef = orderRes.orderNumber || orderRes.orderId;
+    try {
+      const orderRes = await createOrder({
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        shippingAddress: `${address}, ${city}`,
+        city,
+        address,
+        paymentMethod: formattedMethod,
+        paymentTrxId,
+        paymentSenderPhone,
+        paymentRemark,
+        paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PAID',
+        paidAmount: paymentMethod === 'COD' ? 0 : total,
+        dueAmount: paymentMethod === 'COD' ? total : 0,
+        items: cart,
+        subtotal: total,
+        total
+      });
+      if (orderRes && orderRes.success) {
+        orderSuccess = true;
+        if (orderRes.orderNumber) orderRef = orderRes.orderNumber;
+      }
+    } catch (createErr) {
+      console.warn('createOrder direct failed, falling back to DB.orders:', createErr);
+    }
+
+    // Record into DB.orders so Admin Dashboard immediately receives the order
+    if (typeof DB !== 'undefined' && DB.orders) {
+      try {
+        DB.orders.create({
+          id: 'ord_' + Date.now(),
+          orderNumber: orderRef,
+          customerName: name,
+          customerPhone: phone,
+          customerEmail: email,
+          shippingAddress: `${address}, ${city}`,
+          city,
+          address,
+          paymentMethod: formattedMethod,
+          paymentTrxId,
+          paymentSenderPhone,
+          paymentRemark,
+          paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PAID',
+          paidAmount: paymentMethod === 'COD' ? 0 : total,
+          dueAmount: paymentMethod === 'COD' ? total : 0,
+          items: cart,
+          subtotal: total,
+          total,
+          status: 'PENDING',
+          createdAt: new Date().toISOString()
+        });
+        orderSuccess = true;
+      } catch (dbErr) {
+        console.warn('DB.orders.create error:', dbErr);
+      }
+    }
+
+    if (orderSuccess) {
       alert(`🎉 অর্ডার সফলভাবে প্লেস হয়েছে!\n\nঅর্ডার রেফারেন্স: #${orderRef}\nপেমেন্ট মেথড: ${formattedMethod}\n${paymentTrxId ? 'Transaction ID: ' + paymentTrxId : ''}\n\nধন্যবাদ, ZENVY এর সাথে থাকার জন্য!`);
       localStorage.removeItem('zenvy_cart');
       window.location.href = 'index.html';
     } else {
-      throw new Error(orderRes?.error || 'Order placement failed');
+      throw new Error('Order placement failed. Please try again.');
     }
   } catch (err) {
     alert('অর্ডার সম্পন্ন করা যায়নি: ' + err.message);

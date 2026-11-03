@@ -761,11 +761,19 @@ const DB = {
     },
     byId(id) {
       if (!id) return null;
-      const strId = String(id);
-      let p = DB.products.all().find(x => String(x.id) === strId || x.slug === strId);
+      const strId = String(id).trim().toLowerCase();
+      let p = DB.products.all().find(x => String(x.id).trim().toLowerCase() === strId || String(x.slug||'').trim().toLowerCase() === strId);
       return p || null;
     },
-    published() { return DB.products.all().filter(p => p.isPublished && !p.isArchived); },
+    published() {
+      return DB.products.all()
+        .filter(p => (p.isPublished !== false && p.status !== 'draft') && !p.isArchived)
+        .sort((a, b) => {
+          const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return tB - tA; // Newest products at the top!
+        });
+    },
     lowStock() { return DB.products.all().filter(p => p.stock <= (p.lowStockAlert||5) && p.stock > 0 && !p.isArchived); },
     outOfStock() { return DB.products.all().filter(p => p.stock === 0 && !p.isArchived); },
     preorders() { return DB.products.all().filter(p => p.isPreorder && !p.isArchived); },
@@ -776,22 +784,46 @@ const DB = {
         p.categoryName?.toLowerCase().includes(lq)
       );
     },
+    getImage(p) {
+      if (!p) return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+      if (Array.isArray(p.images) && p.images.length > 0) {
+        const first = p.images[0];
+        if (typeof first === 'string' && first.trim()) return first.trim();
+        if (first && typeof first === 'object' && first.url) return first.url;
+      }
+      if (typeof p.imageUrl === 'string' && p.imageUrl.trim()) return p.imageUrl.trim();
+      if (typeof p.image === 'string' && p.image.trim()) return p.image.trim();
+      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    },
     create(data) {
       const items = Store.get('products');
+      const isPub = data.isPublished !== undefined ? Boolean(data.isPublished) : (data.status === 'draft' ? false : true);
       const item = {
-        id: Store.genId(), ...data,
-        isArchived: false, createdAt: Store.now(), updatedAt: Store.now()
+        id: Store.genId(),
+        ...data,
+        isPublished: isPub,
+        status: isPub ? 'published' : 'draft',
+        isArchived: false,
+        createdAt: Store.now(),
+        updatedAt: Store.now()
       };
-      items.push(item); Store.set('products', items);
+      items.unshift(item); // Latest product placed at the top of the catalog
+      Store.set('products', items);
       DB.log(`Product created: ${item.name}`);
       if (DB.inventory && typeof DB.inventory.addHistory === 'function') {
-        DB.inventory.addHistory({ productId: item.id, productName: item.name, change: item.stock, newStock: item.stock, reason: 'Initial stock', admin: 'Admin' });
+        DB.inventory.addHistory({ productId: item.id, productName: item.name, change: item.stock || 0, newStock: item.stock || 0, reason: 'Initial stock', admin: 'Admin' });
       }
       return item;
     },
     update(id, data) {
       const old = DB.products.byId(id);
-      const items = Store.get('products').map(p => p.id === id ? { ...p, ...data, updatedAt: Store.now() } : p);
+      const updates = { ...data, updatedAt: Store.now() };
+      if (updates.isPublished !== undefined && updates.status === undefined) {
+        updates.status = updates.isPublished ? 'published' : 'draft';
+      } else if (updates.status !== undefined && updates.isPublished === undefined) {
+        updates.isPublished = updates.status !== 'draft';
+      }
+      const items = Store.get('products').map(p => p.id === id ? { ...p, ...updates } : p);
       Store.set('products', items);
       if (data.basePrice !== undefined && old?.basePrice !== data.basePrice && DB.priceHistory && typeof DB.priceHistory.add === 'function') {
         DB.priceHistory.add({ productId: id, productName: old?.name, oldPrice: old?.basePrice, newPrice: data.basePrice, type: 'basePrice' });

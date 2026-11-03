@@ -7,6 +7,10 @@
 <meta name="description" content="Reserve upcoming limited-edition jerseys, club kits and national team jerseys before they sell out. Secure your preorder with ZENVY today."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-sync.js"></script>
+<script src="admin-db.js"></script>
 <script id="tailwind-config">
   tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-fixed-dim":"#c8c6c5","background":"#fbf9f8","on-error-container":"#93000a","surface-dim":"#dbdad9","surface-variant":"#e4e2e2","inverse-primary":"#c8c6c5","primary-container":"#1c1b1b","on-primary":"#ffffff","inverse-on-surface":"#f2f0f0","on-secondary-fixed":"#001452","surface-container-lowest":"#ffffff","surface-container-highest":"#e4e2e2","error":"#ba1a1a","error-container":"#ffdad6","on-surface":"#1b1c1c","secondary":"#003ec6","surface-container-low":"#f5f3f3","on-surface-variant":"#444748","secondary-container":"#0052fe","on-secondary":"#ffffff","surface":"#fbf9f8","surface-container":"#efeded","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7","on-background":"#1b1c1c","tertiary":"#000000","on-secondary-container":"#dfe3ff","surface-container-high":"#e9e8e7","on-error":"#ffffff"},spacing:{"margin-desktop":"64px","margin-mobile":"16px","unit":"8px","gutter":"24px","container-max":"1440px"},fontFamily:{"body-lg":["Inter"],"caption":["Inter"],"display-lg":["Montserrat"],"label-md":["Inter"],"headline-md":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]},fontSize:{"body-lg":["18px",{lineHeight:"28px",fontWeight:"400"}],"caption":["12px",{lineHeight:"16px",fontWeight:"400"}],"display-lg":["64px",{lineHeight:"72px",letterSpacing:"-0.02em",fontWeight:"800"}],"label-md":["14px",{lineHeight:"20px",letterSpacing:"0.05em",fontWeight:"600"}],"headline-md":["24px",{lineHeight:"32px",fontWeight:"700"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.01em",fontWeight:"700"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}}
 </script>
@@ -495,16 +499,72 @@ let selectedPayment = 'bkash';
 const ADVANCE_AMOUNT = 700;
 
 // ---- Cart ----
-let cart = JSON.parse(localStorage.getItem('apex_cart') || '[]');
+let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
 function updateCartCount() {
-  const total = cart.reduce((s, i) => s + i.qty, 0);
+  cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+  const total = cart.reduce((s, i) => s + (i.qty || 1), 0);
   const badge = document.getElementById('cart-count');
-  if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
-  else badge.classList.add('hidden');
+  if (badge) {
+    if (total > 0) { badge.textContent = total; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  }
 }
 updateCartCount();
 
+window.addEventListener('storage', () => {
+  updateCartCount();
+  if (document.getElementById('cart-drawer')?.classList.contains('open')) {
+    renderPreordersCart();
+  }
+});
+
+function renderPreordersCart() {
+  cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+  const emptyEl = document.getElementById('cart-empty');
+  const listEl = document.getElementById('cart-list');
+  const footerEl = document.getElementById('cart-footer');
+  const subtotalEl = document.getElementById('cart-subtotal');
+
+  if (!listEl) return;
+
+  if (cart.length === 0) {
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    listEl.classList.add('hidden');
+    if (footerEl) footerEl.classList.add('hidden');
+    return;
+  }
+
+  if (emptyEl) emptyEl.classList.add('hidden');
+  listEl.classList.remove('hidden');
+  if (footerEl) footerEl.classList.remove('hidden');
+
+  let subtotal = 0;
+  listEl.innerHTML = cart.map((item, idx) => {
+    const qty = item.qty || 1;
+    const price = item.price || 0;
+    const lineTotal = price * qty;
+    subtotal += lineTotal;
+    const img = item.image || item.img || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80';
+    return `
+      <div class="flex gap-4 py-3 border-b border-outline-variant items-center">
+        <img src="${img}" class="w-14 h-14 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm text-primary truncate">${item.name}</p>
+          <p class="text-xs text-on-surface-variant line-clamp-1">${item.details || 'Standard Edition'}</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-mono text-xs font-bold">Qty: ${qty}</span>
+            <span class="font-mono text-xs font-bold text-primary">৳ ${lineTotal.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (subtotalEl) subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+}
+
 function openCart() {
+  renderPreordersCart();
   document.getElementById('cart-drawer').classList.add('open');
   document.getElementById('cart-overlay').style.opacity = '1';
   document.getElementById('cart-overlay').style.pointerEvents = 'all';
@@ -529,28 +589,60 @@ function showToast(msg, type='success') {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+window._preorderProductsMap = {};
+
+function getProductImageUrl(p) {
+  if (!p) return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80';
+  if (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function') {
+    const dbImg = DB.products.getImage(p);
+    if (dbImg) return dbImg;
+  }
+  if (typeof p.imageUrl === 'string' && p.imageUrl) return p.imageUrl;
+  if (typeof p.image === 'string' && p.image) return p.image;
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    const first = p.images[0];
+    if (typeof first === 'string') return first;
+    if (first && typeof first.url === 'string') return first.url;
+  }
+  return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80';
+}
+
 // ---- Load Preorder Products ----
 async function loadPreorders() {
   const skeleton = document.getElementById('preorder-skeleton');
   const grid = document.getElementById('preorder-grid');
   const empty = document.getElementById('preorder-empty');
 
+  let products = [];
   try {
-    const products = await getPreorderProducts(12);
-    skeleton.classList.add('hidden');
+    products = await getPreorderProducts(12);
+  } catch (e) {
+    console.warn('getPreorderProducts fallback:', e);
+  }
 
-    if (products.length === 0) {
-      empty.classList.remove('hidden');
-      return;
+  // If Firestore didn't return preorder items, check DB.products
+  if (!products || products.length === 0) {
+    if (typeof DB !== 'undefined' && DB.products) {
+      const all = DB.products.list();
+      products = all.filter(p => p.status === 'PREORDER' || (p.tags && p.tags.includes('preorder')) || (p.category && p.category.toLowerCase().includes('preorder')));
     }
+  }
 
+  // If still empty, use demo cards
+  if (!products || products.length === 0) {
+    products = getDemoCards();
+  }
+
+  if (skeleton) skeleton.classList.add('hidden');
+
+  if (!products || products.length === 0) {
+    if (empty) empty.classList.remove('hidden');
+    return;
+  }
+
+  if (grid) {
     grid.classList.remove('hidden');
     grid.innerHTML = products.map(p => renderPreorderCard(p)).join('');
-  } catch (e) {
-    skeleton.classList.add('hidden');
-    // Render demo cards as fallback
-    grid.classList.remove('hidden');
-    grid.innerHTML = getDemoCards().map(p => renderPreorderCard(p)).join('');
   }
 }
 
@@ -590,7 +682,8 @@ function getDemoCards() {
 }
 
 function renderPreorderCard(p) {
-  const img = (p.images && p.images[0]) || '';
+  window._preorderProductsMap[p.id] = p;
+  const img = getProductImageUrl(p);
   const price = p.preorderPrice || p.basePrice || 0;
   const compare = p.compareAtPrice || 0;
   const sold = p.preorderSold || 0;
@@ -605,7 +698,7 @@ function renderPreorderCard(p) {
   <div class="group relative flex flex-col bg-surface rounded-xl overflow-hidden ambient-shadow transition-all duration-300 hover:-translate-y-2">
     <!-- Image -->
     <div class="relative h-80 w-full bg-surface-container-low overflow-hidden">
-      <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="${img}" onerror="this.style.background='#efeded'"/>
+      <img alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="${img}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80'"/>
       <!-- Badges -->
       <div class="absolute top-4 left-4 flex flex-col gap-2">
         ${soldOut
@@ -652,7 +745,7 @@ function renderPreorderCard(p) {
         </div>
         ${soldOut
           ? `<button disabled class="font-label-md text-label-md uppercase px-5 py-3 bg-surface-container text-on-surface-variant rounded-lg cursor-not-allowed text-xs tracking-wider">Sold Out</button>`
-          : `<button onclick="openPreorderModal(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="font-label-md text-label-md uppercase px-5 py-3 bg-secondary text-on-secondary hover:bg-primary transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1">
+          : `<button onclick="openPreorderModalById('${p.id}')" class="font-label-md text-label-md uppercase px-5 py-3 bg-secondary text-on-secondary hover:bg-primary transition-colors tracking-wider text-xs rounded-lg flex items-center gap-1 cursor-pointer">
                <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
                Pre-Order
              </button>`
@@ -662,6 +755,11 @@ function renderPreorderCard(p) {
   </div>`;
 }
 
+window.openPreorderModalById = function(id) {
+  const p = window._preorderProductsMap ? window._preorderProductsMap[id] : null;
+  if (p) window.openPreorderModal(p);
+};
+
 // ---- Modal ----
 window.openPreorderModal = function(p) {
   currentProduct = p;
@@ -670,7 +768,7 @@ window.openPreorderModal = function(p) {
 
   const price = p.preorderPrice || p.basePrice || 0;
   const compare = p.compareAtPrice || 0;
-  const img = (p.images && p.images[0]) || '';
+  const img = getProductImageUrl(p);
   const sold = p.preorderSold || 0;
   const max = p.preorderMaxQty || 0;
   const remaining = max > 0 ? max - sold : null;
@@ -820,34 +918,77 @@ window.submitPreorder = async function() {
     ? document.getElementById('po-bkash-trxid').value.trim()
     : selectedPayment === 'nagad' ? document.getElementById('po-nagad-trxid').value.trim() : '';
 
-  try {
-    const result = await placePreorder({
-      productId: currentProduct.id,
-      productName: currentProduct.name,
-      productImg: (currentProduct.images && currentProduct.images[0]) || '',
-      size: modalSelectedSize,
-      qty: modalQty,
-      basePrice: price,
-      total: price * modalQty,
-      customerName: name,
-      customerEmail: email,
-      customerPhone: phone,
-      shippingAddress: { fullAddress: address, division },
-      paymentMethod: selectedPayment,
-      advanceAmount: advance,
-      paymentTrxId: trxId,
-      expectedDate: currentProduct.expectedDeliveryDate || deliveryDate,
-      preorderNote: note
-    });
+  const prodImg = getProductImageUrl(currentProduct);
 
-    if (result.success) {
-      closeModal();
-      document.getElementById('success-order-num').textContent = 'Order #' + result.orderNumber;
-      document.getElementById('success-date').textContent = deliveryDate;
-      document.getElementById('success-modal').classList.remove('hidden');
-    } else {
-      throw new Error(result.error || 'Failed to place preorder');
+  try {
+    let orderNum = 'ZPO-' + Date.now().toString().slice(-6);
+    let orderId = 'po_' + Date.now();
+
+    try {
+      const result = await placePreorder({
+        productId: currentProduct.id,
+        productName: currentProduct.name,
+        productImg: prodImg,
+        size: modalSelectedSize,
+        qty: modalQty,
+        basePrice: price,
+        total: price * modalQty,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        shippingAddress: { fullAddress: address, division },
+        paymentMethod: selectedPayment,
+        advanceAmount: advance,
+        paymentTrxId: trxId,
+        expectedDate: currentProduct.expectedDeliveryDate || deliveryDate,
+        preorderNote: note
+      });
+      if (result && result.orderNumber) orderNum = result.orderNumber;
+      if (result && result.orderId) orderId = result.orderId;
+    } catch (orderErr) {
+      console.warn('placePreorder direct call fallback:', orderErr);
     }
+
+    // Always record in DB.orders so Admin Dashboard immediately receives and tracks it
+    if (typeof DB !== 'undefined' && DB.orders) {
+      try {
+        DB.orders.create({
+          id: orderId,
+          orderNumber: orderNum,
+          type: 'PREORDER',
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
+          shippingAddress: { fullAddress: address, division },
+          paymentMethod: selectedPayment,
+          paymentTrxId: trxId,
+          advanceAmount: advance,
+          paymentStatus: advance > 0 ? 'ADVANCE_PAID' : 'PENDING',
+          status: 'PENDING',
+          items: [{
+            id: currentProduct.id,
+            productId: currentProduct.id,
+            name: currentProduct.name,
+            price: price,
+            qty: modalQty,
+            size: modalSelectedSize,
+            image: prodImg
+          }],
+          total: price * modalQty,
+          expectedDeliveryDate: currentProduct.expectedDeliveryDate || deliveryDate,
+          preorderNote: note,
+          createdAt: new Date().toISOString()
+        });
+      } catch (dbErr) {
+        console.warn('DB.orders.create preorder error:', dbErr);
+      }
+    }
+
+    closeModal();
+    document.getElementById('success-order-num').textContent = 'Order #' + orderNum;
+    document.getElementById('success-date').textContent = deliveryDate;
+    document.getElementById('success-modal').classList.remove('hidden');
+
   } catch (e) {
     showErr('Failed to place preorder. Please try again.');
     console.error(e);

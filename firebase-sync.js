@@ -64,7 +64,25 @@
       }
 
       // Check if Firestore needs initial seeding from localStorage
-      checkInitialCloudSeed();
+      checkInitialCloudSeed().then(() => {
+        // Automatically hydrate from cloud so other devices immediately get data
+        hydrate().then(() => {
+          console.log('[ZenvySync] Initial cloud hydration finished ✅');
+          try {
+            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'all' } }));
+          } catch(e){}
+        });
+      });
+
+      // Automatically activate live sync so updates across phones reflect instantly
+      startLiveSync(() => {
+        try {
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'live' } }));
+        } catch(e){}
+      });
+
       return true;
     } catch (e) {
       console.error('[ZenvySync] Firebase init failed:', e);
@@ -102,7 +120,7 @@
     }
   }
 
-  // ── Write to Firestore (batched & debounced) ───────────────────
+  // ── Write to Firestore (batched & fast flush) ───────────────────
   function flushWriteQueue() {
     if (!_db) return;
     const keysToWrite = { ..._writeQueue };
@@ -129,9 +147,23 @@
     _writeQueue[key] = value;
     clearTimeout(_writeTimer);
     if (_db) {
-      _writeTimer = setTimeout(flushWriteQueue, 200);
+      _writeTimer = setTimeout(flushWriteQueue, 50);
     }
   }
+
+  // Ensure pending writes are immediately saved if tab is hidden or closed
+  try {
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && Object.keys(_writeQueue).length > 0) {
+        flushWriteQueue();
+      }
+    });
+    window.addEventListener('beforeunload', () => {
+      if (Object.keys(_writeQueue).length > 0) {
+        flushWriteQueue();
+      }
+    });
+  } catch(e){}
 
   // ── Intelligent Array Merge for Multi-Admin Concurrency ────────
   function mergeArraysById(localArr, cloudArr) {
@@ -149,20 +181,23 @@
       }
     });
 
-    // 2. Intelligently merge local items
+    // 2. Intelligently merge local items (preserve newer or recently created local drafts)
     localArr.forEach(item => {
       if (item && typeof item === 'object') {
         const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
         const mapKey = key ? String(key) : JSON.stringify(item);
-        if (!map.has(mapKey)) {
-          // Local item not in cloud yet
-          map.set(mapKey, item);
-        } else {
-          // Exists in both: preserve whichever has the newer timestamp
+        if (map.has(mapKey)) {
           const cloudItem = map.get(mapKey);
           const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
           const cloudTime = new Date(cloudItem.updatedAt || cloudItem.createdAt || 0).getTime();
           if (localTime > cloudTime) {
+            map.set(mapKey, item);
+          }
+        } else {
+          // If local item is recently created offline (within 4 hours), preserve it
+          const localTime = new Date(item.createdAt || 0).getTime();
+          const fourHoursAgo = Date.now() - 4 * 60 * 60 * 1000;
+          if (localTime > fourHoursAgo) {
             map.set(mapKey, item);
           }
         }
@@ -173,7 +208,16 @@
       }
     });
 
-    return Array.from(map.values());
+    const res = Array.from(map.values());
+    // Auto-sort items with createdAt newest first
+    if (res.length > 0 && res[0] && typeof res[0] === 'object' && ('createdAt' in res[0])) {
+      res.sort((a, b) => {
+        const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return tB - tA; // Newest at top
+      });
+    }
+    return res;
   }
 
   // ── Pull data from Firestore into localStorage ─────────────────
@@ -212,6 +256,12 @@
         }
       });
       console.log(`[ZenvySync] Hydrated ${count} keys from Firestore ✅`);
+      if (count > 0) {
+        try {
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'all' } }));
+        } catch(e){}
+      }
     } catch (e) {
       console.warn('[ZenvySync] Hydration error (using local storage):', e);
     }

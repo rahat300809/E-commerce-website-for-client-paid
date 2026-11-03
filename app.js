@@ -18,7 +18,7 @@ const appState = {
 // Shop State Globals (Initialized at top to prevent TDZ on quick routing)
 var shopCurrentPage = 1;
 var shopActiveCategory = 'all';
-var shopMaxPrice = 10000;
+var shopMaxPrice = 25000;
 var shopSortOrder = 'default';
 var shopCarouselIndex = 0;
 
@@ -77,21 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Step 2: Background Cloud Sync (Runs non-blocking without delaying page display)
   if (window.ZenvyFirebase) {
     window.ZenvyFirebase.hydrate().then(() => {
-      // Silently re-sync components if cloud has newer admin data
-      syncHomepageContent();
-      renderCart();
-      syncFooterSocialLinks();
-      renderCheckoutPaymentMethods();
-      syncModelShowcase();
+      // Re-sync all components when cloud has newer admin data
+      refreshStorefrontData();
     }).catch(e => console.warn('Background sync:', e));
 
     window.ZenvyFirebase.startLiveSync(() => {
       // Runs whenever admin saves anything to Firestore in real-time
-      syncHomepageContent();
-      renderCart();
-      syncFooterSocialLinks();
-      renderCheckoutPaymentMethods();
-      syncModelShowcase();
+      refreshStorefrontData();
     });
   }
 });
@@ -305,21 +297,20 @@ function syncHomepageContent() {
     flagshipPrice.textContent = `${formatMoney(1450)} • In Stock`;
   }
 
-  const homeConfig = DB.homepage ? DB.homepage.get() : null;
-  if (!homeConfig) return;
+  const homeConfig = (typeof DB !== 'undefined' && DB.homepage) ? DB.homepage.get() : null;
 
   // 1. Top Announcement Marquee
-  const ann = homeConfig.announcement;
-  if (ann) {
+  if (homeConfig && homeConfig.announcement) {
+    const ann = homeConfig.announcement;
     const marqueeEl = document.getElementById('store-marquee-text');
     if (marqueeEl && ann.marqueeText) marqueeEl.textContent = ann.marqueeText;
   }
 
   // 2. Hero Banner Carousel (Auto-scrolling, Multi-banner support)
-  renderHeroBannerCarousel();
+  try { renderHeroBannerCarousel(); } catch (e) { console.warn('Hero carousel:', e); }
 
   // 3. Value Props Bar (4 Selling Points)
-  const props = homeConfig.valueProps || [
+  const props = (homeConfig && homeConfig.valueProps) || [
     { icon: 'local_shipping', title: 'Nationwide Delivery', subtitle: 'Inside Dhaka 24–48h • All BD 2–3 Days' },
     { icon: 'verified', title: 'Authentic Grade', subtitle: '100% Pro-Athlete Specification' },
     { icon: '3d_rotation', title: '3D Studio Live', subtitle: 'Real-Time Customizer & UCL Patches' },
@@ -339,72 +330,70 @@ function syncHomepageContent() {
   }
 
   // 4. Featured Collections Bento Grid
-  const col = homeConfig.collections;
-  if (col) {
-    const secTitle = document.getElementById('collections-sec-title');
-    if (secTitle && col.title) secTitle.textContent = col.title;
+  const col = homeConfig ? homeConfig.collections : null;
+  const secTitle = document.getElementById('collections-sec-title');
+  if (secTitle && col && col.title) secTitle.textContent = col.title;
 
-    const secSub = document.getElementById('collections-sec-sub');
-    if (secSub && col.subtitle) secSub.textContent = col.subtitle;
+  const secSub = document.getElementById('collections-sec-sub');
+  if (secSub && col && col.subtitle) secSub.textContent = col.subtitle;
 
-    const bentoContainer = document.getElementById('collections-bento-grid');
-    if (bentoContainer) {
-      const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
-      const fallbackImages = [
-        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
-        'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
-        'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80',
-        'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'
-      ];
+  const bentoContainer = document.getElementById('collections-bento-grid');
+  if (bentoContainer) {
+    const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
+    const fallbackImages = [
+      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
+      'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
+      'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80',
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'
+    ];
 
-      if (categories && categories.length > 0) {
-        const displayCats = categories.slice(0, 3);
-        bentoContainer.innerHTML = displayCats.map((c, idx) => {
-          const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
-          const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => (p.categoryName || '').toLowerCase() === c.name.toLowerCase() || p.categoryId === c.id).length : 0;
-          return `
-            <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                   style="background-image: url('${bgImg}')">
-              </div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
-              <div class="absolute bottom-0 left-0 p-5 w-full">
-                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${prodCount} KITS AVAILABLE</span>
-                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
-                <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
-              </div>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
-                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${c.name}</span>
-              </div>
+    if (categories && categories.length > 0) {
+      const displayCats = categories.slice(0, 3);
+      bentoContainer.innerHTML = displayCats.map((c, idx) => {
+        const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
+        const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => (p.categoryName || '').toLowerCase() === c.name.toLowerCase() || p.categoryId === c.id).length : 0;
+        return `
+          <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('${bgImg}')">
             </div>
-          `;
-        }).join('');
-      } else if (col && col.cards && col.cards.length > 0) {
-        bentoContainer.innerHTML = col.cards.map((c, idx) => {
-          const bgImg = (c.bgImage && !c.bgImage.includes('googleusercontent.com')) ? c.bgImage : (fallbackImages[idx % fallbackImages.length]);
-          return `
-            <div onclick="goToShopCategory('${(c.title || '').replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                   style="background-image: url('${bgImg}')">
-              </div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
-              <div class="absolute bottom-0 left-0 p-5 w-full">
-                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.tag || 'COLLECTION'}</span>
-                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.title || ''}</h3>
-                ${c.desc ? `<p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.desc}</p>` : ''}
-              </div>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
-                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Explore</span>
-              </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${prodCount} KITS AVAILABLE</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
             </div>
-          `;
-        }).join('');
-      }
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${c.name}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else if (col && col.cards && col.cards.length > 0) {
+      bentoContainer.innerHTML = col.cards.map((c, idx) => {
+        const bgImg = (c.bgImage && !c.bgImage.includes('googleusercontent.com')) ? c.bgImage : (fallbackImages[idx % fallbackImages.length]);
+        return `
+          <div onclick="goToShopCategory('${(c.title || '').replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('${bgImg}')">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.tag || 'COLLECTION'}</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.title || ''}</h3>
+              ${c.desc ? `<p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.desc}</p>` : ''}
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Explore</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
   }
 
   // 5. Just Dropped Slider
-  const jd = homeConfig.justDropped;
+  const jd = homeConfig ? homeConfig.justDropped : null;
   if (jd) {
     const jdBadge = document.getElementById('just-dropped-badge');
     if (jdBadge && jd.badge) jdBadge.textContent = jd.badge;
@@ -419,14 +408,14 @@ function syncHomepageContent() {
     const published = DB.products.published();
     if (published && published.length > 0) {
       sliderEl.innerHTML = published.map(p => {
-        const imgUrl = (p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA';
+        const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
         const priceDisplay = formatMoney(p.salePrice || p.basePrice || 1450);
         return `
           <div class="min-w-[240px] sm:min-w-[270px] flex-shrink-0 group">
             <div class="bg-[#f5f5f7] rounded-2xl p-4 sm:p-5 mb-3 relative h-[260px] sm:h-[300px] flex items-center justify-center overflow-hidden cursor-pointer"
                  onclick="window.location.href='product.html?id=${p.id}'">
               ${p.isPreorder ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
-              <button onclick="event.stopPropagation(); toggleWishlist('${p.name}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10">
+              <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10" aria-label="Wishlist">
                 <span class="material-symbols-outlined text-[16px]">favorite</span>
               </button>
               <img src="${imgUrl}" class="max-h-[200px] sm:max-h-[230px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md" alt="${p.name}"/>
@@ -436,7 +425,7 @@ function syncHomepageContent() {
             </div>
             <div class="flex justify-between items-start">
               <div>
-                <h4 class="font-headline text-sm font-bold text-black group-hover:underline">${p.name}</h4>
+                <h4 class="font-headline text-sm font-bold text-black group-hover:underline cursor-pointer" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</h4>
                 <p class="text-xs text-gray-500">${p.categoryName || 'Performance Edition'}</p>
               </div>
               <span class="font-mono-ui text-sm font-bold text-black">${priceDisplay}</span>
@@ -446,6 +435,7 @@ function syncHomepageContent() {
       }).join('');
     }
   }
+
   // 6. Active Promotional Banners marquee sync
   if (typeof DB !== 'undefined' && DB.banners) {
     const activeBanners = typeof DB.banners.active === 'function' ? DB.banners.active() : [];
@@ -456,10 +446,10 @@ function syncHomepageContent() {
   }
 
   // 7. Render dynamic categories in the Shop sidebar and quick filters
-  renderShopCategories();
+  try { renderShopCategories(); } catch(e){ console.warn('renderShopCategories:', e); }
 
   // 8. Render dynamic products in the Shop grid
-  renderShopProducts();
+  try { renderShopProducts(); } catch(e){ console.warn('renderShopProducts:', e); }
 
   // 9. Sync Shop Banner Carousel
   try { shopCarouselGoto(shopCarouselIndex || 0); } catch(e){}
@@ -795,7 +785,19 @@ function switchView(viewName, updateUrl = true) {
     'preorders': 'shop'
   };
   const normalized = aliasMap[viewName] || viewName;
+
+  if (normalized === 'order-tracking') {
+    if (typeof openOrderTrackingModal === 'function') {
+      openOrderTrackingModal();
+    }
+    return;
+  }
+
   appState.activeView = normalized;
+  // Synchronize data-target-view on html element so anti-flash CSS rules never conflict
+  try {
+    document.documentElement.setAttribute('data-target-view', normalized);
+  } catch(e){}
 
   // Hide all page views
   document.querySelectorAll('.page-view').forEach(view => {
@@ -845,58 +847,29 @@ function switchView(viewName, updateUrl = true) {
 // React to browser Back/Forward or direct link hash clicks
 window.addEventListener('hashchange', () => {
   const hash = window.location.hash.replace('#', '').trim() || 'home';
-  if (['home', 'shop', 'customizer', 'studio', 'checkout', 'order-tracking', 'preorder', 'preorders'].includes(hash)) {
+  if (hash === 'order-tracking') {
+    if (typeof openOrderTrackingModal === 'function') openOrderTrackingModal();
+    return;
+  }
+  if (['home', 'shop', 'customizer', 'studio', 'checkout', 'preorder', 'preorders'].includes(hash)) {
     switchView(hash, false);
   }
 });
 
-// Prevent accidental navigation when user is scrolling with touch on mobile
-let isTouchScrolling = false;
-let touchStartY = 0, touchStartX = 0;
-
-window.addEventListener('touchstart', (e) => {
-  if (e.touches && e.touches[0]) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    isTouchScrolling = false;
-  }
-}, { passive: true });
-
-window.addEventListener('touchmove', (e) => {
-  if (e.touches && e.touches[0]) {
-    const dx = Math.abs(e.touches[0].clientX - touchStartX);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY);
-    if (dx > 10 || dy > 10) {
-      isTouchScrolling = true;
-    }
-  }
-}, { passive: true });
-
-window.addEventListener('touchend', () => {
-  setTimeout(() => {
-    isTouchScrolling = false;
-  }, 120);
-}, { passive: true });
-
 window.safeSwitchView = function(viewName, ev) {
-  if (isTouchScrolling) {
-    if (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }
-    return false;
+  if (ev) {
+    try { ev.preventDefault(); } catch(e){}
   }
   switchView(viewName);
   return false;
 };
 
 window.goToShopCategory = function(catName) {
-  if (isTouchScrolling) return; // Ignore accidental tap during scroll!
   switchView('shop');
   setTimeout(() => {
     selectCategory(catName);
     window.scrollTo({ top: 320, behavior: 'smooth' });
-  }, 80);
+  }, 100);
 };
 
 
@@ -1271,69 +1244,97 @@ function rotate3DView(type) {
   }
 }
 
-// ── Dynamic Shop Products Rendering & Filtering ──
-function renderShopProducts() {
-  const grid = document.getElementById('shop-product-grid');
-  if (!grid || typeof DB === 'undefined' || !DB.products) return;
+// ── Storefront Global Interactive Helpers ──
+window.quickAddToCart = function(productId) {
+  if (typeof DB === 'undefined' || !DB.products) return;
+  const p = DB.products.byId(productId);
+  if (!p) return;
+  const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
+  const price = p.salePrice || p.basePrice || 1450;
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: price,
+    image: imgUrl,
+    details: `${p.categoryName || 'Standard Edition'} • M`
+  });
+};
 
-  const products = DB.products.published();
-  if (!products || products.length === 0) {
-    grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-500 font-mono-ui">No products available.</div>`;
-    const countEl = document.getElementById('product-count');
-    if (countEl) countEl.innerText = 0;
+window.scrollSlider = function(offset) {
+  const slider = document.getElementById('product-slider');
+  if (slider) {
+    slider.scrollBy({ left: offset, behavior: 'smooth' });
+  }
+};
+
+window.openOrderTrackingModal = function() {
+  const modal = document.getElementById('order-tracking-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    const input = document.getElementById('track-order-input');
+    if (input) input.focus();
+  }
+};
+
+window.closeOrderTrackingModal = function() {
+  const modal = document.getElementById('order-tracking-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.performTrackOrder = function() {
+  const input = document.getElementById('track-order-input');
+  const resultBox = document.getElementById('track-order-result');
+  if (!input || !resultBox) return;
+
+  const query = input.value.trim().toLowerCase();
+  if (!query) {
+    resultBox.classList.remove('hidden');
+    resultBox.innerHTML = `<div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-xl font-bold">অনুগ্রহ করে আপনার অর্ডার আইডি (যেমন: ORD-...) অথবা মোবাইল নম্বর দিন।</div>`;
     return;
   }
 
-  grid.innerHTML = products.map(p => {
-    const imgUrl = (p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1580087256394-dc596e1c8f4f?w=800&q=80';
-    const priceDisplay = formatMoney(p.salePrice || p.basePrice || 1450);
-    const originalPriceDisplay = (p.compareAt || (p.salePrice && p.basePrice > p.salePrice)) ? formatMoney(p.compareAt || p.basePrice) : '';
-    const badge = p.customBadge || (p.isPreorder ? 'PRE-ORDER' : p.isNewArrival ? 'New Arrival' : (p.salePrice || p.compareAt) ? 'SALE' : '');
-    const catName = p.categoryName || 'Football Kit';
+  const allOrders = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.all() : (JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]'));
+  const found = allOrders.filter(o => {
+    const id = (o.id || o.orderNumber || '').toString().toLowerCase();
+    const phone = (o.customerPhone || o.phone || (o.customer && o.customer.phone) || '').toString().toLowerCase();
+    return id.includes(query) || (phone && phone.includes(query));
+  });
 
+  resultBox.classList.remove('hidden');
+  if (found.length === 0) {
+    resultBox.innerHTML = `
+      <div class="p-4 bg-white border border-gray-200 text-gray-700 text-xs rounded-xl space-y-1">
+        <p class="font-bold text-black text-sm">কোনো অর্ডার পাওয়া যায়নি</p>
+        <p class="text-gray-500">"${query}" এর সাথে মিলে এমন কোনো অর্ডার ডাটাবেজে নেই। অনুগ্রহ করে সঠিক অর্ডার আইডি বা মোবাইল নম্বর চেক করুন।</p>
+      </div>
+    `;
+    return;
+  }
+
+  resultBox.innerHTML = found.map(order => {
+    const status = order.status || 'Pending';
+    const total = order.total || order.totalAmount || 0;
+    const date = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recent';
+    const statusColor = status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' :
+                        status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
+                        status === 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800';
     return `
-      <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md transition-shadow duration-300 group flex flex-col justify-between"
-           data-id="${p.id}" data-price="${p.salePrice || p.basePrice || 1450}" data-category="${catName.toLowerCase()}">
-        <div class="relative overflow-hidden bg-[#f4efe8] cursor-pointer" style="aspect-ratio:1/1;"
-             onclick="window.location.href='product.html?id=${p.id}'">
-          <img src="${imgUrl}"
-               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${p.name}">
-          ${badge ? `<span class="absolute top-2 left-2 sm:top-3 sm:left-3 ${p.isPreorder ? 'bg-purple-600 text-white' : badge === 'SALE' ? 'bg-red-500 text-white' : 'bg-primary text-white'} font-label-caps text-[9px] sm:text-[10px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-bold shadow-xs">${badge}</span>` : ''}
-          <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.salePrice || p.basePrice})"
-                  class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors z-10" aria-label="Wishlist">
-            <span class="material-symbols-outlined text-[15px] sm:text-base">favorite</span>
-          </button>
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors hidden sm:flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span class="bg-white text-primary font-label-caps text-[11px] px-3 py-1.5 rounded-full shadow font-bold">View Details</span>
-          </div>
+      <div class="p-3 bg-white border border-gray-200 rounded-xl space-y-2 text-xs mb-2 shadow-2xs">
+        <div class="flex justify-between items-center">
+          <span class="font-mono-ui font-bold text-black text-sm">${order.id || order.orderNumber}</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${status.toUpperCase()}</span>
         </div>
-        <div class="p-2 sm:p-3.5 flex flex-col gap-0.5 sm:gap-1 flex-1">
-          <p class="font-body-md text-[10px] sm:text-xs text-secondary truncate">${catName}</p>
-          <h3 class="font-headline-lg text-xs sm:text-sm md:text-base font-bold text-primary leading-tight line-clamp-2 cursor-pointer hover:underline min-h-[2rem]"
-              onclick="window.location.href='product.html?id=${p.id}'">${p.name}</h3>
-          <div class="flex items-center gap-1 my-0.5">
-            <span class="material-symbols-outlined text-amber-400 text-[12px] sm:text-[14px] fill-1">star</span>
-            <span class="font-mono-ui text-[10px] sm:text-[11px] text-secondary font-semibold">4.9</span>
-          </div>
-          <div class="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-gray-100 gap-1">
-            <div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5">
-              <span class="font-mono-ui text-xs sm:text-base font-bold text-primary">${priceDisplay}</span>
-              ${originalPriceDisplay ? `<span class="font-mono-ui text-[10px] sm:text-xs text-secondary line-through">${originalPriceDisplay}</span>` : ''}
-            </div>
-            <div class="flex gap-1 flex-shrink-0">
-              <button onclick="window.location.href='product.html?id=${p.id}'"
-                      class="border border-primary text-primary font-label-caps text-[9px] sm:text-[11px] px-2 sm:px-3 py-1 sm:py-1.5 rounded-full hover:bg-primary hover:text-white transition-colors font-bold whitespace-nowrap">View</button>
-              <button onclick="addToCart({id:'${p.id}', name:'${p.name.replace(/'/g, "\\'")}', price:${p.salePrice || p.basePrice || 1450}, image:'${imgUrl}', details:'Standard • M'})"
-                      class="bg-primary text-white font-label-caps text-[9px] sm:text-[11px] px-2 sm:px-3 py-1 sm:py-1.5 rounded-full hover:bg-black/80 transition-colors font-bold whitespace-nowrap">Add</button>
-            </div>
-          </div>
+        <div class="flex justify-between text-gray-500 text-[11px]">
+          <span>তারিখ: ${date}</span>
+          <span class="font-bold text-black font-mono-ui">৳${Math.round(total).toLocaleString()}</span>
+        </div>
+        <div class="text-[11px] text-gray-600 border-t border-gray-100 pt-1.5">
+          গ্রাহক: <strong>${order.customerName || (order.customer && order.customer.name) || 'Customer'}</strong> • ${order.customerPhone || (order.customer && order.customer.phone) || ''}
         </div>
       </div>
     `;
   }).join('');
-
-  applyFilters();
-}
+};
 
 window.setShopViewMode = function(mode) {
   const grid = document.getElementById('shop-product-grid') || document.getElementById('shop-products-grid');
@@ -1466,15 +1467,15 @@ function sortProducts(val) {
 
 function resetFilters() {
   shopActiveCategory = 'all';
-  shopMaxPrice = 10000;
+  shopMaxPrice = 25000;
   shopSortOrder = 'default';
   shopCurrentPage = 1;
 
   const pr = document.getElementById('price-range');
-  if (pr) pr.value = 10000;
+  if (pr) pr.value = 25000;
   const pv = document.getElementById('price-val');
   if (pv) {
-    pv.innerText = typeof DB !== 'undefined' && DB.currency ? DB.currency.format(10000) : '৳10,000';
+    pv.innerText = typeof DB !== 'undefined' && DB.currency ? DB.currency.format(25000) : '৳25,000';
   }
 
   renderShopCategories();
@@ -1515,11 +1516,16 @@ function renderShopProducts() {
     return true;
   });
 
+  const getTs = x => (x && x.createdAt) ? (new Date(x.createdAt).getTime() || 0) : 0;
+
   // Sort
   if (shopSortOrder === 'price-asc') {
     filtered.sort((a, b) => (a.salePrice || a.basePrice || 0) - (b.salePrice || b.basePrice || 0));
   } else if (shopSortOrder === 'price-desc') {
     filtered.sort((a, b) => (b.salePrice || b.basePrice || 0) - (a.salePrice || a.basePrice || 0));
+  } else {
+    // Default: Newest first!
+    filtered.sort((a, b) => getTs(b) - getTs(a));
   }
 
   // Fallback to all products if selected category has no matching items
@@ -1534,6 +1540,8 @@ function renderShopProducts() {
       filtered.sort((a, b) => (a.salePrice || a.basePrice || 0) - (b.salePrice || b.basePrice || 0));
     } else if (shopSortOrder === 'price-desc') {
       filtered.sort((a, b) => (b.salePrice || b.basePrice || 0) - (a.salePrice || a.basePrice || 0));
+    } else {
+      filtered.sort((a, b) => getTs(b) - getTs(a));
     }
   }
 
@@ -1578,7 +1586,7 @@ function renderShopProducts() {
         <span class="material-symbols-outlined text-5xl text-gray-300 mb-3">inventory_2</span>
         <h3 class="font-headline-lg text-lg font-bold text-primary mb-1">No products found</h3>
         <p class="font-body-md text-xs text-secondary mb-4">No products in catalog match your current price filters.</p>
-        <button onclick="resetFilters()" class="bg-primary text-white font-label-caps text-xs px-5 py-2.5 rounded-full font-bold">Reset Filters</button>
+        <button onclick="resetFilters()" class="bg-primary text-white font-label-caps text-xs px-5 py-2.5 rounded-full font-bold cursor-pointer">Reset Filters</button>
       </div>
     `;
     return;
@@ -1603,7 +1611,9 @@ function renderShopProducts() {
   ` : '';
 
   grid.innerHTML = fallbackNotice + pageProducts.map(p => {
-    const imgUrl = (p.images && p.images[0] && p.images[0].url) ? p.images[0].url : (p.image || defaultImg);
+    const imgUrl = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+      ? DB.products.getImage(p)
+      : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : (p.image || defaultImg));
     const priceFormatted = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origFormatted = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
     const badgeText = p.isPreorder ? 'PRE-ORDER' : (p.stock === 0 ? 'OUT OF STOCK' : (p.compareAt ? 'SALE' : ''));
@@ -1660,7 +1670,7 @@ function renderShopProducts() {
               View
             </button>
             <button type="button" 
-                    onclick="addToCart({id:'${p.id}',name:'${p.name.replace(/'/g, "\\'")}',price:${p.salePrice || p.basePrice},image:'${imgUrl}',details:'${(p.categoryName || '').replace(/'/g, "\\'")}'})"
+                    onclick="quickAddToCart('${p.id}')"
                     class="py-2 px-1 rounded-xl bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                     title="Add to Bag">
               <span class="material-symbols-outlined text-[14px]">shopping_bag</span>

@@ -151,6 +151,36 @@ initAuth(({ user, isAdmin }) => {
     } else {
       badge.textContent = 'CUSTOMER';
     }
+
+    // Populate user orders
+    const ordersListEl = document.getElementById('user-orders-list');
+    if (ordersListEl) {
+      const allOrders = JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]');
+      const userOrders = allOrders.filter(o => {
+        const email = (o.customerEmail || o.email || (o.customer && o.customer.email) || '').toLowerCase();
+        return user.email && email === user.email.toLowerCase();
+      });
+
+      if (userOrders.length === 0) {
+        ordersListEl.innerHTML = `<p class="text-xs text-on-surface-variant py-4 text-center">No recent orders found for ${user.email}.</p>`;
+      } else {
+        ordersListEl.innerHTML = userOrders.map(o => {
+          const total = o.totalAmount || o.total || 0;
+          const date = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : 'Recent';
+          return `
+            <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-outline-variant/40">
+              <div>
+                <p class="font-bold text-sm text-primary font-mono">${o.id || o.orderNumber}</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">${date} • Status: <span class="font-bold text-black uppercase">${o.status || 'Pending'}</span></p>
+              </div>
+              <div class="text-right">
+                <span class="font-bold font-mono text-sm text-primary">৳${total.toLocaleString()}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
   } else {
     authBox.classList.remove('hidden');
     profileBox.classList.add('hidden');

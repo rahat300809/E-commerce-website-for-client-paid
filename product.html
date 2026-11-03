@@ -358,20 +358,16 @@
 
         <hr class="border-gray-100 my-0.5"/>
 
-        <!-- ── SELECT SIZE (DROPDOWN + QUICK PILLS MATCHING SCREENSHOT 1) ── -->
-        <div>
+        <!-- ── SELECT SIZE (CLEAN DROPDOWN MATCHING SCREENSHOT 1) ── -->
+        <div class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
-                Select Size
-              </label>
-              <!-- Small quick button to view size chart image or guide requested by user -->
-              <button type="button" onclick="openSizeGuideModal(true)" id="btn-quick-chart-img" class="inline-flex items-center gap-1 text-[11px] font-mono-ui font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-0.5 rounded-full cursor-pointer transition-colors shadow-2xs" title="Click to view size guide & chart">
-                <span class="material-symbols-outlined text-[13px]">straighten</span>
-                <span>Size Chart</span>
-              </button>
-            </div>
-            <span id="selected-size-chip" class="text-black font-mono-ui font-black text-xs bg-gray-100 px-2 py-0.5 rounded">M</span>
+            <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
+              Select Size
+            </label>
+            <button type="button" onclick="openSizeGuideModal()" id="btn-quick-chart-img" class="inline-flex items-center gap-1 text-[11px] font-mono-ui font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-0.5 rounded-full cursor-pointer transition-colors shadow-2xs" title="Click to view size chart image">
+              <span class="material-symbols-outlined text-[13px]">straighten</span>
+              <span>Size Chart</span>
+            </button>
           </div>
           <div class="relative">
             <select id="pd-size-select" onchange="selectSize(this.value)" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-black appearance-none cursor-pointer shadow-2xs">
@@ -383,33 +379,23 @@
             </select>
             <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-lg">expand_more</span>
           </div>
-
-          <!-- Quick click size buttons -->
-          <div id="size-options-container" class="grid grid-cols-5 gap-1.5 mt-2">
-            <button type="button" onclick="selectSize('S', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">S</button>
-            <button type="button" onclick="selectSize('M', this)" class="size-btn active py-2 rounded-lg text-xs font-bold text-center">M</button>
-            <button type="button" onclick="selectSize('L', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">L</button>
-            <button type="button" onclick="selectSize('XL', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">XL</button>
-            <button type="button" onclick="selectSize('XXL', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">XXL</button>
-          </div>
         </div>
 
-        <!-- ── SLEEVE STYLE (Compact) ── -->
-        <div id="sleeve-section" class="pt-0.5">
+        <!-- ── SLEEVE STYLE (CLEAN 2 CARDS) ── -->
+        <div id="sleeve-section" class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
             <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
               Sleeve Style
             </label>
-            <span id="selected-sleeve-chip" class="text-black font-bold text-xs bg-gray-100 px-2 py-0.5 rounded">Half Sleeve</span>
           </div>
-          <div id="sleeve-options-container" class="grid grid-cols-2 gap-2">
-            <div onclick="selectSleeve('short', 0, 'Half Sleeve', this)" class="sleeve-card active flex items-center justify-between p-2.5">
+          <div id="sleeve-options-container" class="grid grid-cols-2 gap-2.5">
+            <div onclick="selectSleeve('short', 0, 'Half Sleeve', this)" class="sleeve-card active flex items-center justify-between p-3 rounded-xl border-2 border-black bg-black/5 cursor-pointer transition-all">
               <span class="text-xs font-bold text-black">Half Sleeve</span>
-              <span class="text-[10px] text-gray-500 font-mono-ui font-medium">Included</span>
+              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">Included</span>
             </div>
-            <div onclick="selectSleeve('long', 300, 'Full Sleeve', this)" class="sleeve-card flex items-center justify-between p-2.5">
+            <div onclick="selectSleeve('long', 100, 'Full Sleeve', this)" class="sleeve-card flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-gray-400 bg-white cursor-pointer transition-all">
               <span class="text-xs font-bold text-black">Full Sleeve</span>
-              <span class="text-[10px] text-gray-500 font-mono-ui font-medium">+৳300</span>
+              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">+৳100</span>
             </div>
           </div>
         </div>
@@ -432,7 +418,7 @@
             <h3 id="custom-section-heading" class="text-xs font-headline font-black text-black uppercase tracking-wider">
               Custom Name & Number (+250৳)
             </h3>
-            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED</span>
+            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED (+৳300)</span>
           </div>
           
           <div class="relative">
@@ -617,96 +603,34 @@
 
 
   <!-- ═══════════════════════════════════════════
-       SIZE GUIDE & MAPPING MODAL (MATCHING SCREENSHOT 2)
+       SIZE CHART IMAGE MODAL (ONLY IMAGE POPUP)
   ════════════════════════════════════════════ -->
-  <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md sm:max-w-lg w-full shadow-2xl overflow-hidden animate-slide-up border border-gray-100">
-      
-      <!-- Modal Header (Yellow / Athletic styling matching Screenshot 2) -->
-      <div class="bg-[#fef9c3] p-5 sm:p-6 text-center border-b border-amber-200/70 relative">
-        <button onclick="closeSizeGuideModal()" class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-gray-700 flex items-center justify-center text-sm font-bold shadow-xs cursor-pointer">✕</button>
-        
-        <div class="inline-flex items-center justify-center gap-1.5 mb-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-          <span class="text-[11px] font-mono-ui font-black uppercase tracking-widest text-amber-900">SIZE CHART</span>
+  <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="if(event.target===this)closeSizeGuideModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh] animate-slide-up">
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-gray-700 text-lg">straighten</span>
+          <h3 id="modal-sizechart-title" class="font-headline font-black text-sm uppercase tracking-wide text-black">
+            Size Chart
+          </h3>
         </div>
-        <h3 id="modal-sizechart-edition" class="font-headline font-black text-2xl sm:text-3xl text-black uppercase tracking-tight">
-          PLAYER EDITION
-        </h3>
-        <p class="text-[11px] text-amber-900/80 mt-0.5 font-medium">All measurements in inches. Slim pro athlete fit.</p>
+        <button type="button" onclick="closeSizeGuideModal()" class="w-8 h-8 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-700 flex items-center justify-center text-sm font-bold cursor-pointer transition-colors">✕</button>
       </div>
 
-      <!-- View Toggle: If image is set, can toggle between Table and Image -->
-      <div id="sizechart-view-toggle" class="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-center gap-2 hidden">
-        <button type="button" onclick="switchSizeChartTab('table')" id="btn-chart-table" class="px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs">Measurements Table</button>
-        <button type="button" onclick="switchSizeChartTab('image')" id="btn-chart-image" class="px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black">Size Chart Image</button>
-      </div>
-
-      <!-- Measurements Table View (Matching Screenshot 2) -->
-      <div id="sizechart-table-container" class="p-4 sm:p-6">
-        <div class="rounded-2xl border border-gray-200 overflow-hidden shadow-2xs">
-          <table class="w-full text-xs sm:text-sm text-center">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700 font-mono-ui uppercase font-black border-b border-gray-200">
-                <th class="py-2.5 px-3">SIZE</th>
-                <th class="py-2.5 px-3">HEIGHT (INCH)</th>
-                <th class="py-2.5 px-3">WIDTH (INCH)</th>
-              </tr>
-            </thead>
-            <tbody id="modal-size-tbody" class="divide-y divide-gray-100 font-bold">
-              <tr onclick="selectSizeAndCloseModal('S')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
-                <td class="py-2.5 px-3 font-black text-black">S</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-s-h">26</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-s-w">36</td>
-              </tr>
-              <tr onclick="selectSizeAndCloseModal('M')" class="hover:bg-amber-50/70 transition-colors cursor-pointer bg-gray-50/50">
-                <td class="py-2.5 px-3 font-black text-black">M</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-m-h">27</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-m-w">38</td>
-              </tr>
-              <tr onclick="selectSizeAndCloseModal('L')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
-                <td class="py-2.5 px-3 font-black text-black">L</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-l-h">28</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-l-w">40</td>
-              </tr>
-              <tr onclick="selectSizeAndCloseModal('XL')" class="hover:bg-amber-50/70 transition-colors cursor-pointer bg-gray-50/50">
-                <td class="py-2.5 px-3 font-black text-black">XL</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-xl-h">29</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-xl-w">42</td>
-              </tr>
-              <tr onclick="selectSizeAndCloseModal('XXL')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
-                <td class="py-2.5 px-3 font-black text-black">XXL</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-xxl-h">30</td>
-                <td class="py-2.5 px-3 text-gray-600" id="td-xxl-w">44</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Tagline matching Screenshot 2 -->
-        <div class="mt-4 text-center">
-          <span class="font-headline font-black text-xs sm:text-sm text-black tracking-widest uppercase">
-            WE BELIEVE IN QUALITY
-          </span>
-          <p class="text-[10px] text-gray-400 mt-0.5">Click any size row to select that size</p>
-        </div>
-      </div>
-
-      <!-- Size Chart Image View (If admin uploaded/provided image) -->
-      <div id="sizechart-image-container" class="p-4 hidden text-center">
-        <img id="modal-sizechart-img" src="" alt="Size Chart Graphic" class="max-h-[380px] w-auto mx-auto rounded-xl shadow-md border border-gray-100 object-contain"/>
+      <!-- Size Chart Image View (ONLY IMAGE) -->
+      <div class="p-3 sm:p-4 bg-neutral-900/5 flex items-center justify-center overflow-auto max-h-[72vh]">
+        <img id="modal-sizechart-img" src="size-chart-default.jpg" alt="Size Chart Graphic" class="max-h-[66vh] w-auto max-w-full rounded-xl shadow-md border border-gray-200 object-contain bg-white"/>
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-5 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-        <span class="text-xs text-gray-500">Selected size: <strong id="modal-active-size-tag" class="text-black">M</strong></span>
-        <button onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-5 py-2 rounded-full cursor-pointer hover:bg-neutral-800">Done</button>
+      <div class="px-5 py-3 bg-white border-t border-gray-100 flex items-center justify-end">
+        <button type="button" onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-6 py-2 rounded-full cursor-pointer hover:bg-neutral-800 transition-colors">Close</button>
       </div>
-
     </div>
   </div>
 
-      <!-- ==================== WISHLIST SLIDING DRAWER ==================== -->
+  <!-- ==================== WISHLIST SLIDING DRAWER ==================== -->
   <div id="wishlist-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0" style="display: none;">
     <div onclick="toggleWishlistModal(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
     <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
@@ -876,7 +800,7 @@
       sleevePrice: 0.00,
       quantity: 1,
       isPersonalized: false,
-      personalizeFee: 250.00,
+      personalizeFee: 300.00,
       customName: '',
       customNumber: '',
       patchPrice: 0.00,
@@ -1233,7 +1157,7 @@
           if (imgEl) imgEl.src = chartImg;
         } else {
           if (toggleCont) toggleCont.classList.add('hidden');
-          switchSizeChartTab('table');
+          // image only modal
         }
 
         // Sync initial size selection
@@ -1329,106 +1253,18 @@
       }).join('');
     }
 
-    function renderDynamicSleeves(sleeves) {
-      const container = document.getElementById('sleeve-options-container');
-      if (!container) return;
-      container.innerHTML = sleeves.map((s, idx) => `
-        <div onclick="selectSleeve('${s.id}', ${s.additionalPrice||0}, '${s.name}', this)" class="sleeve-card ${idx === 0 ? 'active' : ''} flex flex-col justify-center">
-          <div class="text-xs font-bold text-black">${s.name}</div>
-          <div class="text-[10px] text-gray-500 font-medium mt-0.5">${s.additionalPrice > 0 ? '+' + formatCurrency(s.additionalPrice) : 'Included'}</div>
-        </div>
-      `).join('');
-      if (sleeves.length > 0) {
-        productState.selectedSleeve = sleeves[0].id;
-        productState.selectedSleeveName = sleeves[0].name;
-        productState.sleevePrice = sleeves[0].additionalPrice || 0;
-        const chip = document.getElementById('selected-sleeve-chip');
-        if (chip) chip.textContent = sleeves[0].name;
-      }
-    }
+    
 
-    function renderDynamicSizes(sizes) {
-      const container = document.getElementById('size-options-container');
-      if (!container) return;
-      container.innerHTML = sizes.map((s, idx) => `
-        <button type="button" onclick="selectSize('${s.code}', this)" class="size-btn ${s.code === 'M' || (idx === 1 && !sizes.some(x => x.code === 'M')) ? 'active' : ''} py-2.5 rounded-lg text-xs font-bold text-center">
-          ${s.code}
-        </button>
-      `).join('');
-      const defaultActive = sizes.find(s => s.code === 'M') || sizes[0];
-      if (defaultActive) {
-        productState.selectedSize = defaultActive.code;
-        const chip = document.getElementById('selected-size-chip');
-        if (chip) chip.textContent = defaultActive.code;
-      }
-    }
+    
 
     // ─────────────────────────────────────────
     // User Selection Handlers
     // ─────────────────────────────────────────
-    function selectSize(size, btnEl) {
-      productState.selectedSize = size;
+    
 
-      // Sync dropdown select
-      const selectEl = document.getElementById('pd-size-select');
-      if (selectEl && selectEl.value !== size) {
-        selectEl.value = size;
-      }
 
-      // Sync pills buttons
-      document.querySelectorAll('.size-btn').forEach(b => {
-        if (b.textContent.trim() === size) {
-          b.classList.add('active');
-        } else {
-          b.classList.remove('active');
-        }
-      });
-      if (btnEl) btnEl.classList.add('active');
 
-      // Sync chips and modal displays
-      const chip = document.getElementById('selected-size-chip');
-      if (chip) chip.textContent = size;
-
-      const modalActiveTag = document.getElementById('modal-active-size-tag');
-      if (modalActiveTag) modalActiveTag.textContent = size;
-
-      const modalSize = document.getElementById('modal-preview-size');
-      if (modalSize) modalSize.textContent = size;
-
-      // Update table row highlight in modal
-      const tbody = document.getElementById('modal-size-tbody');
-      if (tbody) {
-        tbody.querySelectorAll('tr').forEach(row => {
-          const firstTd = row.querySelector('td');
-          if (firstTd && firstTd.textContent.trim() === size) {
-            row.classList.add('bg-amber-100/70', 'font-black');
-          } else {
-            row.classList.remove('bg-amber-100/70', 'font-black');
-          }
-        });
-      }
-
-      updateMobileBarSummary();
-      calculateLiveTotal();
-    }
-
-    function selectSleeve(sleeveId, price, sleeveName, cardEl) {
-      productState.selectedSleeve = sleeveId;
-      productState.selectedSleeveName = sleeveName || (sleeveId === 'long' ? 'Full Sleeve' : 'Half Sleeve');
-      productState.sleevePrice = parseFloat(price) || 0;
-      
-      document.querySelectorAll('.sleeve-card').forEach(c => c.classList.remove('active'));
-      if (cardEl) cardEl.classList.add('active');
-
-      const chip = document.getElementById('selected-sleeve-chip');
-      if (chip) chip.textContent = productState.selectedSleeveName;
-
-      const modalSleeve = document.getElementById('modal-preview-sleeve');
-      if (modalSleeve) modalSleeve.textContent = productState.selectedSleeveName;
-
-      updateMobileBarSummary();
-      calculateLiveTotal();
-    }
+    
 
     function changeQty(delta) {
       productState.quantity = Math.max(1, productState.quantity + delta);
@@ -1555,6 +1391,113 @@
     // ─────────────────────────────────────────
     // Real-Time Total Calculation
     // ─────────────────────────────────────────
+    
+    function renderDynamicSizes(sizes) {
+      const select = document.getElementById('pd-size-select');
+      if (!select) return;
+      const seen = new Set();
+      const unique = [];
+      (sizes || []).forEach(s => {
+        const code = (s.code || s.name || '').toUpperCase().trim();
+        if (code && !seen.has(code)) {
+          seen.add(code);
+          unique.push(code);
+        }
+      });
+      if (unique.length === 0) unique.push('S', 'M', 'L', 'XL', 'XXL');
+      
+      const current = productState.selectedSize || 'M';
+      select.innerHTML = unique.map(code => `
+        <option value="${code}" ${code === current ? 'selected' : ''}>${code}</option>
+      `).join('');
+
+      if (!unique.includes(productState.selectedSize)) {
+        productState.selectedSize = unique.includes('M') ? 'M' : unique[0];
+      }
+    }
+
+    function renderDynamicSleeves(sleeves) {
+      const container = document.getElementById('sleeve-options-container');
+      if (!container) return;
+      const seen = new Set();
+      const unique = [];
+      (sleeves || []).forEach(s => {
+        const name = (s.name || '').trim();
+        if (name && !seen.has(name.toLowerCase())) {
+          seen.add(name.toLowerCase());
+          unique.push(s);
+        }
+      });
+      if (unique.length === 0) {
+        unique.push({ id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 });
+        unique.push({ id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 });
+      }
+
+      container.innerHTML = unique.map((s, idx) => {
+        const isActive = s.name === productState.selectedSleeveName || idx === 0;
+        const activeClass = isActive ? 'border-2 border-black bg-black/5 active' : 'border border-gray-200 hover:border-gray-400 bg-white';
+        const priceTag = (s.additionalPrice || 0) > 0 ? `+৳${s.additionalPrice}` : 'Included';
+        return `
+          <div onclick="selectSleeve('${s.id}', ${s.additionalPrice||0}, '${s.name}', this)" 
+               class="sleeve-card ${activeClass} flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all">
+            <span class="text-xs font-bold text-black">${s.name}</span>
+            <span class="text-[11px] font-mono-ui font-semibold text-gray-500">${priceTag}</span>
+          </div>
+        `;
+      }).join('');
+
+      if (unique.length > 0 && !productState.selectedSleeveName) {
+        productState.selectedSleeve = unique[0].id;
+        productState.selectedSleeveName = unique[0].name;
+        productState.sleevePrice = unique[0].additionalPrice || 0;
+      }
+    }
+
+    function selectSize(size) {
+      productState.selectedSize = size;
+      const select = document.getElementById('pd-size-select');
+      if (select && select.value !== size) select.value = size;
+      updateMobileBarSummary();
+      calculateLiveTotal();
+    }
+
+    function selectSleeve(sleeveId, price, sleeveName, cardEl) {
+      productState.selectedSleeve = sleeveId;
+      productState.selectedSleeveName = sleeveName || (sleeveId === 'long' ? 'Full Sleeve' : 'Half Sleeve');
+      productState.sleevePrice = parseFloat(price) || 0;
+      
+      document.querySelectorAll('#sleeve-options-container .sleeve-card').forEach(c => {
+        c.className = 'sleeve-card flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-gray-400 bg-white cursor-pointer transition-all';
+      });
+      if (cardEl) {
+        cardEl.className = 'sleeve-card flex items-center justify-between p-3 rounded-xl border-2 border-black bg-black/5 active cursor-pointer transition-all';
+      }
+
+      updateMobileBarSummary();
+      calculateLiveTotal();
+    }
+
+    function openSizeGuideModal() {
+      const modal = document.getElementById('modal-size-guide');
+      if (!modal) return;
+      const p = productState.product || {};
+      const imgEl = document.getElementById('modal-sizechart-img');
+      const titleEl = document.getElementById('modal-sizechart-title');
+
+      const storeDefault = (typeof DB !== 'undefined' && DB.storeSettings) ? (DB.storeSettings.get().defaultSizeChartImage || '') : '';
+      const chartImg = p.sizeChartImage || storeDefault || 'size-chart-default.jpg';
+
+      if (imgEl) imgEl.src = chartImg;
+      if (titleEl) titleEl.textContent = `${p.name || 'Jersey'} Size Chart`;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSizeGuideModal() {
+      const modal = document.getElementById('modal-size-guide');
+      if (modal) modal.classList.add('hidden');
+    }
+
     function calculateLiveTotal() {
       let unitPrice = productState.basePrice + productState.sleevePrice;
 
@@ -1944,52 +1887,6 @@
       }
     }
 
-    function switchSizeChartTab(tab) {
-      const tableCont = document.getElementById('sizechart-table-container');
-      const imgCont = document.getElementById('sizechart-image-container');
-      const btnTable = document.getElementById('btn-chart-table');
-      const btnImg = document.getElementById('btn-chart-image');
-
-      if (tab === 'image') {
-        if (tableCont) tableCont.classList.add('hidden');
-        if (imgCont) imgCont.classList.remove('hidden');
-        if (btnTable) {
-          btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black cursor-pointer';
-        }
-        if (btnImg) {
-          btnImg.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs cursor-pointer';
-        }
-      } else {
-        if (tableCont) tableCont.classList.remove('hidden');
-        if (imgCont) imgCont.classList.add('hidden');
-        if (btnTable) {
-          btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs cursor-pointer';
-        }
-        if (btnImg) {
-          btnImg.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black cursor-pointer';
-        }
-      }
-    }
-
-    function selectSizeAndCloseModal(size) {
-      selectSize(size);
-      closeSizeGuideModal();
-    }
-
-    function openSizeGuideModal(preferImage = false) {
-      const m = document.getElementById('modal-size-guide');
-      if (m) m.classList.remove('hidden');
-      if (preferImage && productState.product?.sizeChartImage) {
-        switchSizeChartTab('image');
-      } else {
-        switchSizeChartTab('table');
-      }
-    }
-
-    function closeSizeGuideModal() {
-      const m = document.getElementById('modal-size-guide');
-      if (m) m.classList.add('hidden');
-    }
   </script>
 </body>
 </html>

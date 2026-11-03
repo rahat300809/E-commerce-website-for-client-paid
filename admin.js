@@ -1426,8 +1426,9 @@ function openProductForm(id = null) {
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Size Chart Image URL (Optional graphic image view)</label>
-            <input type="text" name="sizeChartImage" id="prod-sizechart-img" class="form-input" value="${product?.sizeChartImage||''}" placeholder="https://... size-chart-image.jpg"/>
+            <label class="form-label">Size Chart Graphic Image</label>
+            <div id="prod-sizechart-img-zone" style="margin-bottom:8px;"></div>
+            <input type="text" name="sizeChartImage" id="prod-sizechart-img" class="form-input" value="${product?.sizeChartImage||''}" placeholder="Upload above or enter image path (e.g. size-chart-default.jpg)"/>
           </div>
         </div>
 
@@ -1496,6 +1497,20 @@ function openProductForm(id = null) {
         onchange: (imgs) => { formImages = imgs; window._lastFormImages = imgs; }
       });
       galleryContainer.appendChild(gallery);
+    }
+
+    const sizeChartZone = document.getElementById('prod-sizechart-img-zone');
+    if (sizeChartZone) {
+      const zone = Uploader.createSingleZone({
+        id: 'prod-sizechart-uploader',
+        value: product?.sizeChartImage || '',
+        placeholder: 'Upload Size Chart Graphic (JPG, PNG)',
+        onchange: (v) => {
+          const input = document.getElementById('prod-sizechart-img');
+          if (input) input.value = v;
+        }
+      });
+      sizeChartZone.appendChild(zone);
     }
   }, 100);
 }

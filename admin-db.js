@@ -948,26 +948,46 @@ const DB = {
 
   // ── Sizes ──
   sizes: {
-    all() { return Store.get('sizes').sort((a,b) => a.displayOrder - b.displayOrder); },
+    all() {
+      const raw = Store.get('sizes') || [];
+      const seen = new Set();
+      const unique = [];
+      for (const s of raw) {
+        const code = (s.code || s.name || '').toUpperCase().trim();
+        if (code && !seen.has(code)) {
+          seen.add(code);
+          unique.push(s);
+        }
+      }
+      if (unique.length === 0) {
+        ['S','M','L','XL','XXL'].forEach((code, i) => {
+          unique.push({ id: 'sz_' + code.toLowerCase(), code, name: code, displayOrder: i, isEnabled: true });
+        });
+      }
+      if (raw.length !== unique.length) {
+        try { Store.set('sizes', unique); } catch(e){}
+      }
+      return unique.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+    },
     enabled() { return DB.sizes.all().filter(s => s.isEnabled); },
-    byId(id) { return Store.get('sizes').find(s => s.id === id); },
+    byId(id) { return DB.sizes.all().find(s => s.id === id); },
     create(data) {
-      const items = Store.get('sizes');
+      const items = DB.sizes.all();
       const item = { id: Store.genId(), ...data, createdAt: Store.now() };
       items.push(item); Store.set('sizes', items);
       DB.log(`Size created: ${item.code}`); return item;
     },
     update(id, data) {
-      const items = Store.get('sizes').map(s => s.id === id ? { ...s, ...data } : s);
+      const items = DB.sizes.all().map(s => s.id === id ? { ...s, ...data } : s);
       Store.set('sizes', items); return items.find(s => s.id === id);
     },
     delete(id) {
       const s = DB.sizes.byId(id);
-      Store.set('sizes', Store.get('sizes').filter(s => s.id !== id));
+      Store.set('sizes', DB.sizes.all().filter(s => s.id !== id));
       DB.log(`Size deleted: ${s?.code}`);
     },
     reorder(ids) {
-      const items = Store.get('sizes');
+      const items = DB.sizes.all();
       ids.forEach((id, i) => { const s = items.find(x => x.id === id); if (s) s.displayOrder = i; });
       Store.set('sizes', items);
     }
@@ -997,23 +1017,42 @@ const DB = {
 
   // ── Sleeves ──
   sleeves: {
-    all() { return Store.get('sleeves').sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0)); },
+    all() {
+      const raw = Store.get('sleeves') || [];
+      const seen = new Set();
+      const unique = [];
+      for (const s of raw) {
+        const name = (s.name || '').toLowerCase().trim();
+        if (name && !seen.has(name)) {
+          seen.add(name);
+          unique.push(s);
+        }
+      }
+      if (unique.length === 0) {
+        unique.push({ id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0, isEnabled: true, displayOrder: 0 });
+        unique.push({ id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100, isEnabled: true, displayOrder: 1 });
+      }
+      if (raw.length !== unique.length) {
+        try { Store.set('sleeves', unique); } catch(e){}
+      }
+      return unique.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+    },
     enabled() { return DB.sleeves.all().filter(s => s.isEnabled); },
-    byId(id) { return Store.get('sleeves').find(s => s.id === id); },
+    byId(id) { return DB.sleeves.all().find(s => s.id === id); },
     create(data) {
-      const items = Store.get('sleeves');
+      const items = DB.sleeves.all();
       const item = { id: Store.genId(), ...data, createdAt: Store.now() };
       items.push(item); Store.set('sleeves', items);
       DB.log(`Sleeve created: ${item.name}`); return item;
     },
     update(id, data) {
-      const items = Store.get('sleeves').map(s => s.id === id ? { ...s, ...data } : s);
+      const items = DB.sleeves.all().map(s => s.id === id ? { ...s, ...data } : s);
       Store.set('sleeves', items); DB.log(`Sleeve updated: ${data.name||id}`);
       return items.find(s => s.id === id);
     },
     delete(id) {
       const s = DB.sleeves.byId(id);
-      Store.set('sleeves', Store.get('sleeves').filter(s => s.id !== id));
+      Store.set('sleeves', DB.sleeves.all().filter(s => s.id !== id));
       DB.log(`Sleeve deleted: ${s?.name}`);
     }
   },

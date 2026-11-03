@@ -33,26 +33,24 @@
     })();
   </script>
   <style>
-    /* View switching synchronized with data-target-view attribute */
-    html[data-target-view="home"] #view-home { display: block !important; opacity: 1 !important; }
-    html[data-target-view="home"] #view-shop { display: none !important; }
-    html[data-target-view="home"] #view-customizer { display: none !important; }
-    html[data-target-view="home"] #view-checkout { display: none !important; }
+    /* Clean View switching: active view is always visible and cannot be blocked */
+    .page-view {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease-in-out;
+    }
+    .page-view.active {
+      display: block !important;
+      opacity: 1 !important;
+    }
 
-    html[data-target-view="shop"] #view-home { display: none !important; }
+    /* Instant anti-flash on page load for deep-linked hash/view */
     html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
-    html[data-target-view="shop"] #view-customizer { display: none !important; }
-    html[data-target-view="shop"] #view-checkout { display: none !important; }
-
-    html[data-target-view="customizer"] #view-home { display: none !important; }
-    html[data-target-view="customizer"] #view-shop { display: none !important; }
+    html[data-target-view="shop"] #view-home { display: none !important; }
     html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
-    html[data-target-view="customizer"] #view-checkout { display: none !important; }
-
-    html[data-target-view="checkout"] #view-home { display: none !important; }
-    html[data-target-view="checkout"] #view-shop { display: none !important; }
-    html[data-target-view="checkout"] #view-customizer { display: none !important; }
+    html[data-target-view="customizer"] #view-home { display: none !important; }
     html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
+    html[data-target-view="checkout"] #view-home { display: none !important; }
   </style>
 
   <script id="tailwind-config">
@@ -152,15 +150,15 @@
 
       <!-- Navigation Links (Clean Customer Nav) -->
       <div class="hidden md:flex gap-1 items-center bg-white/50 p-1.5 rounded-full border border-white/60 shadow-inner">
-        <button onclick="switchView('home')" id="nav-btn-home" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-primary font-bold bg-white shadow-sm">
+        <a href="index.html" onclick="switchView('home'); return false;" id="nav-btn-home" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-primary font-bold bg-white shadow-sm">
           Home
-        </button>
-        <button onclick="switchView('shop')" id="nav-btn-shop" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60">
+        </a>
+        <a href="index.html#shop" onclick="switchView('shop'); return false;" id="nav-btn-shop" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60">
           Shop
-        </button>
-        <button onclick="switchView('customizer')" id="nav-btn-customizer" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60 flex items-center gap-1">
+        </a>
+        <a href="customizer.html" id="nav-btn-customizer" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60 flex items-center gap-1">
           <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span> Custom Studio
-        </button>
+        </a>
         <a href="preorders.html" id="nav-btn-preorders" class="nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60">
           Preorders
         </a>
@@ -195,19 +193,19 @@
     <div onclick="toggleMobileMenu(true)" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
     <div id="mobile-menu-panel" class="absolute top-[88px] left-0 w-full bg-white/95 backdrop-blur-2xl border-b border-white/80 shadow-2xl p-5 flex flex-col gap-2 transform -translate-y-full transition-transform duration-300 ease-in-out">
       <div class="text-[11px] font-label-caps text-secondary uppercase tracking-widest pb-2 border-b border-outline-variant/30 font-bold">Navigation</div>
-      <button onclick="switchView('home'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
+      <a href="index.html" onclick="switchView('home'); toggleMobileMenu(true); return false;" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">home</span> Home
-      </button>
-      <button onclick="switchView('shop'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
+      </a>
+      <a href="index.html#shop" onclick="switchView('shop'); toggleMobileMenu(true); return false;" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop Catalog & Kits
-      </button>
-      <button onclick="switchView('customizer'); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
+      </a>
+      <a href="customizer.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Jersey 3D Studio
-      </button>
+      </a>
       <a href="preorders.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
         <span class="material-symbols-outlined text-lg">schedule</span> Reserve Preorders
       </a>
-      <button onclick="openOrderTrackingModal(); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
+      <button type="button" onclick="openOrderTrackingModal(); toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer w-full">
         <span class="material-symbols-outlined text-lg">local_shipping</span> Track Order
       </button>
       <a href="account.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
@@ -249,13 +247,13 @@
                   The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.
                 </p>
                 <div class="flex items-center gap-2.5 sm:gap-3">
-                  <button type="button" onclick="switchView('shop')" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
+                  <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
                     <span>SHOP CATALOG</span>
                     <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </button>
-                  <button type="button" onclick="switchView('customizer')" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
+                  </a>
+                  <a href="customizer.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
                     <span>3D Studio</span>
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -291,9 +289,9 @@
             <span id="collections-sec-sub" class="text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-widest block mb-1">EXPLORE BY CATEGORY</span>
             <h2 id="collections-sec-title" class="font-headline text-2xl sm:text-3xl font-extrabold text-black uppercase">FEATURING COLLECTIONS</h2>
           </div>
-          <button type="button" onclick="switchView('shop')" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer">
+          <a href="index.html#shop" onclick="switchView('shop'); return false;" class="text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer">
             View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </button>
+          </a>
         </div>
 
         <div id="collections-bento-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
@@ -315,9 +313,9 @@
             <button type="button" onclick="scrollSlider(300)" class="w-9 h-9 rounded-full bg-white border border-gray-200 text-black hover:bg-black hover:text-white transition-all flex items-center justify-center shadow-xs cursor-pointer active:scale-95" aria-label="Next products">
               <span class="material-symbols-outlined text-lg">chevron_right</span>
             </button>
-            <button type="button" onclick="switchView('shop')" class="ml-2 text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap">
+            <a href="index.html#shop" onclick="switchView('shop'); return false;" class="ml-2 text-xs font-mono-ui font-bold text-gray-600 hover:text-black flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap">
               See All Kits <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </button>
+            </a>
           </div>
         </div>
 
@@ -348,9 +346,9 @@
                 <span>CUSTOMIZE NOW</span>
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
-              <button type="button" onclick="switchView('customizer')" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm cursor-pointer active:scale-95">
+              <a href="customizer.html" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm cursor-pointer active:scale-95">
                 Open 3D Studio
-              </button>
+              </a>
             </div>
           </div>
 
@@ -510,9 +508,9 @@
     <div id="view-customizer" class="page-view">
       <main class="max-w-[1440px] mx-auto px-grid-margin py-10">
         <div class="mb-6 flex items-center gap-2 text-xs font-mono-ui text-secondary">
-          <a href="#" onclick="switchView('home'); return false;" class="hover:underline">Home</a>
+          <a href="index.html" onclick="switchView('home'); return false;" class="hover:underline">Home</a>
           <span>/</span>
-          <a href="#" onclick="switchView('shop'); return false;" class="hover:underline">Jerseys</a>
+          <a href="index.html#shop" onclick="switchView('shop'); return false;" class="hover:underline">Jerseys</a>
           <span>/</span>
           <span class="text-primary font-bold">ZENVY AeroKnit Pro Jersey</span>
         </div>
@@ -1163,11 +1161,11 @@
             <div>
               <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2.5 sm:mb-4">EXPLORE</h4>
               <ul class="flex flex-col gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 font-medium">
-                <li><a href="javascript:void(0)" onclick="switchView('home'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">Home Storefront</a></li>
-                <li><a href="javascript:void(0)" onclick="switchView('shop'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
-                <li><a href="javascript:void(0)" onclick="switchView('customizer'); window.scrollTo({top:0,behavior:'smooth'});" class="hover:text-black transition-colors">3D Custom Studio</a></li>
+                <li><a href="index.html" onclick="switchView('home'); window.scrollTo({top:0,behavior:'smooth'}); return false;" class="hover:text-black transition-colors">Home Storefront</a></li>
+                <li><a href="index.html#shop" onclick="switchView('shop'); window.scrollTo({top:0,behavior:'smooth'}); return false;" class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
+                <li><a href="customizer.html" class="hover:text-black transition-colors">3D Custom Studio</a></li>
                 <li><a href="preorders.html" class="hover:text-black transition-colors">Reserve Preorders</a></li>
-                <li><a href="javascript:void(0)" onclick="openOrderTrackingModal()" class="hover:text-black transition-colors">Track Order</a></li>
+                <li><button type="button" onclick="openOrderTrackingModal()" class="hover:text-black transition-colors text-left cursor-pointer">Track Order</button></li>
                 <li><a href="account.html" class="hover:text-black transition-colors">My Account & Sign In</a></li>
                 <li><a href="admin.html" class="hover:text-black transition-colors">Admin Portal</a></li>
               </ul>
@@ -1471,10 +1469,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261102_mfs3pay"></script>
+  <script src="firebase-sync.js?v=20261103_cleanlinks"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261102_mfs3pay"></script>
+  <script src="admin-db.js?v=20261103_cleanlinks"></script>
   <!-- Main Application JavaScript -->
-  <script src="app.js?v=20261102_mfs3pay"></script>
+  <script src="app.js?v=20261103_cleanlinks"></script>
 </body>
 </html>

@@ -207,11 +207,11 @@ function renderHeroBannerCarousel() {
             ${subtitle}
           </p>
           <div class="flex items-center gap-2.5 sm:gap-3">
-            <a href="javascript:void(0)" onclick="return safeSwitchView('shop', event)" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
+            <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer">
               <span>${cta1}</span>
               <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>
-            <a href="javascript:void(0)" onclick="return safeSwitchView('customizer', event)" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
+            <a href="customizer.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
               <span>${cta2}</span>
             </a>
           </div>
@@ -784,7 +784,8 @@ function switchView(viewName, updateUrl = true) {
     'preorder': 'shop',
     'preorders': 'shop'
   };
-  const normalized = aliasMap[viewName] || viewName;
+  const cleanName = (viewName || 'home').toString().replace(/^#/, '').toLowerCase().trim();
+  const normalized = aliasMap[cleanName] || cleanName;
 
   if (normalized === 'order-tracking') {
     if (typeof openOrderTrackingModal === 'function') {
@@ -794,7 +795,7 @@ function switchView(viewName, updateUrl = true) {
   }
 
   appState.activeView = normalized;
-  // Synchronize data-target-view on html element so anti-flash CSS rules never conflict
+  // Synchronize data-target-view on html element so CSS rules immediately match
   try {
     document.documentElement.setAttribute('data-target-view', normalized);
   } catch(e){}
@@ -802,12 +803,16 @@ function switchView(viewName, updateUrl = true) {
   // Hide all page views
   document.querySelectorAll('.page-view').forEach(view => {
     view.classList.remove('active');
+    view.style.display = 'none';
+    view.style.opacity = '0';
   });
 
   // Show target view
   const targetView = document.getElementById(`view-${normalized}`);
   if (targetView) {
     targetView.classList.add('active');
+    targetView.style.setProperty('display', 'block', 'important');
+    targetView.style.setProperty('opacity', '1', 'important');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -830,23 +835,23 @@ function switchView(viewName, updateUrl = true) {
     activeTab.className = "nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-primary font-bold bg-white shadow-sm";
   }
 
-  // View-specific initialization (Synchronous 0ms paint)
+  // View-specific initialization (Synchronous 0ms paint, wrapped in try/catch)
   if (normalized === 'shop') {
-    renderShopCategories();
-    renderShopProducts();
+    try { renderShopCategories(); } catch(e){ console.error('renderShopCategories:', e); }
+    try { renderShopProducts(); } catch(e){ console.error('renderShopProducts:', e); }
     try { shopCarouselGoto(0); } catch(e){}
   } else if (normalized === 'home') {
-    syncHomepageContent();
+    try { syncHomepageContent(); } catch(e){ console.error('syncHomepageContent:', e); }
   } else if (normalized === 'checkout') {
-    renderCart();
-    renderCheckoutPaymentMethods();
-    updateCheckoutCalculations();
+    try { renderCart(); } catch(e){}
+    try { renderCheckoutPaymentMethods(); } catch(e){}
+    try { updateCheckoutCalculations(); } catch(e){}
   }
 }
 
 // React to browser Back/Forward or direct link hash clicks
 window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.replace('#', '').trim() || 'home';
+  const hash = window.location.hash.replace('#', '').trim().toLowerCase() || 'home';
   if (hash === 'order-tracking') {
     if (typeof openOrderTrackingModal === 'function') openOrderTrackingModal();
     return;
@@ -857,7 +862,7 @@ window.addEventListener('hashchange', () => {
 });
 
 window.safeSwitchView = function(viewName, ev) {
-  if (ev) {
+  if (ev && typeof ev.preventDefault === 'function') {
     try { ev.preventDefault(); } catch(e){}
   }
   switchView(viewName);

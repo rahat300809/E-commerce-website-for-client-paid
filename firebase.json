@@ -43,7 +43,7 @@
       },
       {
         "source": "/customizer",
-        "destination": "/index.html"
+        "destination": "/customizer.html"
       },
       {
         "source": "/checkout",

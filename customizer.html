@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Custom Jersey Builder – ZENVY</title>
-<meta name="description" content="Design your ultimate performance gear with ZENVY Custom Jersey Builder."/>
+<title>Custom Team Jersey Studio & Builder – ZENVY</title>
+<meta name="description" content="Design custom team jerseys with ZENVY. Choose from shop pro templates or upload your own artwork. Specify sizes, quantities, and upload your team roster Excel file."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -16,9 +16,7 @@
           "background": "#f8f9fa",
           "surface": "#ffffff",
           "primary": "#000000",
-          "secondary": "#003ec6",
-          "on-surface": "#1b1c1c",
-          "on-surface-variant": "#5f6368",
+          "secondary": "#1e3a8a",
           "outline-variant": "#e2e8f0"
         },
         fontFamily: {
@@ -30,36 +28,50 @@
   }
 </script>
 <style>
-  .ambient-shadow{box-shadow:0 10px 30px rgba(0,0,0,0.04);}
-  .color-swatch{width:28px;height:28px;border-radius:9999px;cursor:pointer;transition:all .2s;}
-  .color-swatch.active{outline:2px solid #000;outline-offset:2px;}
-  .option-btn.active{background:#003ec6;color:#fff;border-color:#003ec6;}
-  #cart-drawer{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
-  #cart-drawer.open{transform:translateX(0);}
+  .ambient-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  .active-tab { background: #000; color: #fff; }
+  .inactive-tab { background: #f3f4f6; color: #4b5563; }
+  .template-card.active { border-color: #000; outline: 2px solid #000; outline-offset: 2px; }
+  #cart-drawer { transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); }
+  #cart-drawer.open { transform: translateX(0); }
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .material-symbols-outlined.fill-1 {
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  }
 </style>
 </head>
-<body class="bg-[#f8f9fa] text-[#1b1c1c] antialiased min-h-screen font-sans flex flex-col justify-between">
+<body class="bg-[#f8f9fa] text-[#111827] antialiased min-h-screen font-sans flex flex-col justify-between">
 
-<!-- NAV -->
-<nav class="bg-white border-b border-outline-variant sticky top-0 z-50">
-  <div class="max-w-[1340px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-    <a href="index.html" class="font-display text-2xl font-black tracking-tight text-primary">ZENVY</a>
+<!-- ===== HEADER NAVIGATION ===== -->
+<nav class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-[1360px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="font-display text-2xl sm:text-3xl font-black tracking-tight text-primary">ZENVY</a>
+      <span class="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest uppercase bg-black text-white px-2 py-0.5 rounded">CUSTOM STUDIO</span>
+    </div>
     
-    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
-      <a href="index.html" class="text-on-surface-variant hover:text-primary">Home</a>
-      <a href="index.html#shop" class="text-on-surface-variant hover:text-primary">Shop</a>
-      <a href="index.html?category=Club%20Jerseys#shop" class="text-on-surface-variant hover:text-primary">Club Kits</a>
-      <a href="index.html?category=National%20Team%20Jerseys#shop" class="text-on-surface-variant hover:text-primary">National Kits</a>
-      <a href="customizer.html" class="text-secondary font-bold border-b-2 border-secondary pb-1">Customizer</a>
-      <a href="preorders.html" class="text-on-surface-variant hover:text-primary">Preorders</a>
+    <div class="hidden md:flex items-center gap-7 text-xs font-bold uppercase tracking-wider text-gray-600">
+      <a href="index.html#home" class="hover:text-black transition-colors">Home</a>
+      <a href="index.html#shop" class="hover:text-black transition-colors">Shop Jerseys</a>
+      <a href="customizer.html" class="text-black font-black border-b-2 border-black pb-1">Custom Studio</a>
+      <a href="preorders.html" class="hover:text-black transition-colors">Preorders</a>
     </div>
 
-    <div class="flex items-center gap-5">
-      <button aria-label="Cart" onclick="openCart()" class="text-on-surface-variant hover:text-primary relative">
-        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
-        <span id="cart-count" class="hidden absolute -top-1 -right-2 bg-primary text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
+    <div class="flex items-center gap-3 sm:gap-4">
+      <a href="index.html#checkout" class="hidden sm:flex items-center gap-1 text-xs font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full transition-colors">
+        <span class="material-symbols-outlined text-[16px]">shopping_cart_checkout</span>
+        <span>Checkout</span>
+      </a>
+            <button onclick="toggleWishlistModal()" class="text-gray-700 hover:text-black p-2 rounded-full relative cursor-pointer" title="Wishlist">
+        <span class="material-symbols-outlined text-2xl">favorite</span>
+        <span id="wishlist-badge" class="hidden absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
       </button>
-      <a href="account.html" aria-label="Account" class="text-on-surface-variant hover:text-primary">
+      <button onclick="openCart()" class="text-gray-700 hover:text-black p-2 rounded-full relative cursor-pointer" title="Cart">
+        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+        <span id="cart-count" class="hidden absolute top-0.5 right-0.5 bg-black text-white rounded-full w-4 h-4 text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
+      <a href="account.html" class="text-gray-700 hover:text-black p-2 rounded-full cursor-pointer" title="Account">
         <span class="material-symbols-outlined text-2xl">person</span>
       </a>
     </div>
@@ -69,134 +81,344 @@
 <!-- ===== CART DRAWER ===== -->
 <div id="cart-overlay" class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity" onclick="closeCart()"></div>
 <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md z-[95] bg-white flex flex-col shadow-2xl">
-  <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant">
-    <h2 class="font-display text-xl font-bold text-primary">Your Bag</h2>
-    <button onclick="closeCart()"><span class="material-symbols-outlined">close</span></button>
+  <div class="flex justify-between items-center px-6 py-5 border-b border-gray-100">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-black">shopping_bag</span>
+      <h2 class="font-display text-lg font-black text-black">YOUR SHOPPING BAG</h2>
+    </div>
+    <button onclick="closeCart()" class="p-1 rounded-full text-gray-500 hover:text-black cursor-pointer"><span class="material-symbols-outlined">close</span></button>
   </div>
-  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4">
-    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center">
-      <span class="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-3">shopping_bag</span>
-      <p class="font-display text-lg text-primary font-bold mb-2">Your bag is empty</p>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+    <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
+      <span class="material-symbols-outlined text-5xl text-gray-300 mb-2">shopping_bag</span>
+      <p class="font-display text-base text-black font-bold">Your bag is empty</p>
+      <p class="text-xs text-gray-400 mt-1">Configure your custom team kit to proceed.</p>
     </div>
     <div id="cart-list" class="hidden space-y-4"></div>
   </div>
-  <div id="cart-footer" class="hidden border-t border-outline-variant px-6 py-5 bg-white">
-    <div class="flex justify-between items-center mb-4">
-      <span class="text-sm font-semibold text-on-surface-variant">Subtotal</span>
-      <span id="cart-subtotal" class="font-display text-lg font-bold text-primary">৳ 0</span>
+  <div id="cart-footer" class="hidden border-t border-gray-100 px-6 py-5 bg-gray-50">
+    <div class="flex justify-between items-center mb-3">
+      <span class="text-xs font-bold text-gray-500">Subtotal</span>
+      <span id="cart-subtotal" class="font-display text-lg font-black text-black">৳ 0</span>
     </div>
-    <a href="checkout.html" class="block w-full bg-primary text-white text-xs uppercase tracking-widest px-8 py-3.5 hover:bg-secondary transition-colors text-center rounded-xl font-bold">Checkout Securely</a>
+    <a href="index.html#checkout" class="block w-full bg-black text-white text-xs uppercase tracking-widest py-3.5 hover:bg-neutral-800 transition-all text-center rounded-xl font-bold shadow-md">Proceed to Checkout →</a>
   </div>
 </aside>
 
-<main class="max-w-[1340px] mx-auto px-4 md:px-8 py-8 w-full flex-1">
+<!-- ===== MAIN BUILDER VIEW ===== -->
+<main class="max-w-[1360px] mx-auto px-4 md:px-8 py-6 md:py-10 w-full flex-1">
 
-  <!-- PAGE TITLE (MATCHING SCREENSHOT 2) -->
-  <div class="mb-8">
-    <h1 class="font-display text-3xl font-black text-primary mb-1">Custom Jersey Builder</h1>
-    <p class="text-sm text-on-surface-variant font-semibold">Design your ultimate performance gear.</p>
+  <!-- Header Banner -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-4 border-b border-gray-200">
+    <div>
+      <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-900 bg-blue-50 px-2.5 py-1 rounded-full mb-2">
+        <span class="material-symbols-outlined text-sm">palette</span>
+        TEAM & CLUB CUSTOMIZATION STUDIO
+      </div>
+      <h1 class="font-display text-2xl sm:text-4xl font-black text-black tracking-tight">Custom Jersey Builder</h1>
+      <p class="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-medium">
+        Order custom kits for your squad, academy, tournament team, or club. Choose from ready-to-print shop designs or upload your own artwork with full size breakdowns and roster upload.
+      </p>
+    </div>
+    <div class="flex items-center gap-2 self-start md:self-auto text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-full shadow-2xs">
+      <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
+      <span>Tiered Bulk Discounts Applied</span>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-    <!-- ===== LEFT PANEL: CANVAS (7 COLS) ===== -->
-    <div class="lg:col-span-7 bg-white rounded-3xl p-8 min-h-[500px] flex flex-col justify-between items-center relative ambient-shadow border border-outline-variant">
+    <!-- ===== LEFT PANEL: INTERACTIVE JERSEY CANVAS (6 COLS) ===== -->
+    <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 flex flex-col justify-between items-center relative ambient-shadow border border-gray-200 min-h-[520px] sticky top-24">
       
-      <!-- Top Instruction Pill -->
-      <span class="absolute top-6 right-6 text-[11px] font-bold text-on-surface-variant/70 uppercase tracking-widest">
-        Drag to Rotate
-      </span>
-
-      <!-- Jersey Preview Canvas -->
-      <div class="relative w-full max-w-sm h-80 flex items-center justify-center my-auto">
-        <img id="builder-jersey-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" alt="Custom Jersey" class="w-full h-full object-contain filter drop-shadow-lg"/>
-        
-        <!-- Live Name & Number Overlay -->
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none pt-4">
-          <span id="cz-name-preview" class="font-display font-black text-xl uppercase tracking-widest text-primary drop-shadow">YOUR NAME</span>
-          <span id="cz-num-preview" class="font-display font-black text-6xl text-primary drop-shadow leading-none mt-1">00</span>
+      <!-- Top Badges -->
+      <div class="w-full flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="canvas-design-source-tag" class="text-[11px] font-mono font-black uppercase text-gray-700 tracking-wider">
+            SHOP DESIGN: AEROKNIT STEALTH
+          </span>
+        </div>
+        <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-full text-xs font-bold">
+          <button type="button" onclick="setCanvasView('front')" id="btn-view-front" class="px-3 py-1 rounded-full bg-black text-white text-[11px] font-bold shadow-xs cursor-pointer">Front</button>
+          <button type="button" onclick="setCanvasView('back')" id="btn-view-back" class="px-3 py-1 rounded-full text-gray-600 hover:text-black text-[11px] font-bold cursor-pointer">Back</button>
         </div>
       </div>
 
-      <!-- Bottom Controls Bar (Reset, Zoom Out, Zoom In) -->
-      <div class="bg-[#f8f9fa] rounded-full px-5 py-2 border border-outline-variant flex items-center gap-4 text-on-surface-variant text-sm font-bold shadow-sm">
-        <button onclick="resetBuilder()" class="hover:text-primary" title="Reset View">↺</button>
-        <button onclick="zoomBuilder(-10)" class="hover:text-primary" title="Zoom Out">🔍 -</button>
-        <button onclick="zoomBuilder(10)" class="hover:text-primary" title="Zoom In">🔍 +</button>
+      <!-- Jersey Preview Graphic Canvas -->
+      <div class="relative w-full max-w-md h-80 sm:h-96 flex items-center justify-center my-auto overflow-hidden">
+        <img id="builder-jersey-img" 
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P" 
+             alt="Custom Jersey" 
+             class="max-h-[320px] sm:max-h-[380px] w-auto object-contain filter drop-shadow-xl transition-all duration-300"/>
+        
+        <!-- Live Name & Number Overlay for Back View -->
+        <div id="canvas-back-overlay" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none pt-2 hidden">
+          <span id="cz-name-preview" class="font-display font-black text-lg sm:text-xl uppercase tracking-widest text-primary drop-shadow">SMITH</span>
+          <span id="cz-num-preview" class="font-display font-black text-5xl sm:text-6xl text-primary drop-shadow leading-none mt-1">10</span>
+        </div>
+
+        <!-- Custom Uploaded Artwork Overlay Tag -->
+        <div id="canvas-custom-art-badge" class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-full shadow hidden">
+          Custom Artwork Attached
+        </div>
+      </div>
+
+      <!-- Canvas Controls: Zoom & View Reset -->
+      <div class="mt-4 w-full flex items-center justify-between text-xs text-gray-500 font-mono">
+        <span id="canvas-sleeve-indicator">Sleeve: Half Sleeve</span>
+        <div class="bg-gray-100 rounded-full px-4 py-1.5 flex items-center gap-3 font-bold text-gray-700">
+          <button type="button" onclick="zoomBuilder(-10)" class="hover:text-black cursor-pointer" title="Zoom Out">−</button>
+          <span class="text-[11px]">Zoom</span>
+          <button type="button" onclick="zoomBuilder(10)" class="hover:text-black cursor-pointer" title="Zoom In">+</button>
+          <span class="text-gray-300">|</span>
+          <button type="button" onclick="resetBuilder()" class="hover:text-black cursor-pointer" title="Reset">↺ Reset</button>
+        </div>
+        <span>Fabric: 100% AeroKnit Pro</span>
       </div>
 
     </div>
 
-    <!-- ===== RIGHT PANEL: CONTROLS (5 COLS - MATCHING SCREENSHOT 2) ===== -->
-    <div class="lg:col-span-5 space-y-6">
+    <!-- ===== RIGHT PANEL: CONTROLS & FORM (6 COLS) ===== -->
+    <div class="lg:col-span-6 space-y-6">
 
-      <!-- 1. Design Options Card -->
-      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
-        <h3 class="font-display text-base font-bold text-primary mb-4">Design Options</h3>
-        
-        <!-- Base Style -->
-        <div class="mb-4">
-          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Base Style</label>
-          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-            <button onclick="setBaseStyle(this, 'ZENVY Pro')" class="option-btn active border border-outline-variant rounded-xl p-3 text-center">ZENVY Pro</button>
-            <button onclick="setBaseStyle(this, 'Classic Fit')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Classic Fit</button>
+      <!-- 1. DESIGN SOURCE SELECTOR (SHOP DESIGNS VS. UPLOAD OWN ARTWORK) -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 ambient-shadow border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-black flex items-center justify-center font-mono">1</span>
+            <h3 class="font-display text-sm sm:text-base font-black text-black uppercase tracking-tight">Jersey Design Choice</h3>
+          </div>
+          <span class="text-[11px] font-mono text-gray-500 font-bold">Shop Pre-Made or Custom</span>
+        </div>
+
+        <!-- Mode Toggle Tabs -->
+        <div class="grid grid-cols-2 gap-2 bg-gray-100 p-1.5 rounded-2xl">
+          <button type="button" onclick="switchDesignMode('shop')" id="tab-mode-shop" class="py-2.5 rounded-xl text-xs font-bold transition-all active-tab cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
+            <span class="material-symbols-outlined text-[16px]">style</span>
+            <span>Shop Pro Designs</span>
+          </button>
+          <button type="button" onclick="switchDesignMode('upload')" id="tab-mode-upload" class="py-2.5 rounded-xl text-xs font-bold transition-all inactive-tab cursor-pointer flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+            <span>Upload Your Artwork</span>
+          </button>
+        </div>
+
+        <!-- Mode A: Shop Provided Templates Gallery -->
+        <div id="section-shop-designs" class="space-y-3">
+          <p class="text-[11px] text-gray-500">Select any of our pre-engineered match templates. We will print your team badges, sponsor logos, names, and numbers on this cut.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto custom-scrollbar pr-1" id="shop-templates-grid">
+            <!-- Dynamically populated via JS -->
           </div>
         </div>
 
-        <!-- Base Color Swatches -->
-        <div class="mb-4">
-          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Base Color</label>
-          <div class="flex items-center gap-3">
-            <button onclick="setColor(this, '#ffffff')" class="color-swatch active bg-white border border-gray-300"></button>
-            <button onclick="setColor(this, '#000000')" class="color-swatch bg-black"></button>
-            <button onclick="setColor(this, '#003ec6')" class="color-swatch bg-[#003ec6]"></button>
-            <button onclick="setColor(this, '#ba1a1a')" class="color-swatch bg-[#ba1a1a]"></button>
-            <button onclick="setColor(this, '#e2e8f0')" class="color-swatch bg-[#e2e8f0]"></button>
+        <!-- Mode B: Customer's Own Design Upload Zone -->
+        <div id="section-upload-design" class="space-y-3 hidden">
+          <p class="text-[11px] text-gray-500">Have your own custom artwork or jersey mockup? Upload your files here (front, back, or vector AI/PDF). Our designers will inspect and prepare the sublimation print.</p>
+          
+          <div class="border-2 border-dashed border-gray-300 hover:border-black rounded-2xl p-6 text-center cursor-pointer transition-colors bg-gray-50/60" onclick="document.getElementById('custom-design-file').click()">
+            <input type="file" id="custom-design-file" accept="image/*,.pdf,.ai,.psd" class="hidden" onchange="handleDesignFileUpload(this)"/>
+            <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">upload_file</span>
+            <p class="font-bold text-xs sm:text-sm text-black">Click to Upload Your Jersey Artwork / Mockup</p>
+            <p class="text-[11px] text-gray-400 mt-1">Supports PNG, JPG, SVG, PDF, AI, PSD (Max 25MB)</p>
           </div>
-        </div>
 
-        <!-- Sleeve Style -->
-        <div>
-          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Sleeve Style</label>
-          <div class="grid grid-cols-3 gap-2 text-xs font-bold">
-            <button onclick="setSleeve(this, 'Short')" class="option-btn active border border-outline-variant rounded-xl p-3 text-center">Short</button>
-            <button onclick="setSleeve(this, 'Long')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Long</button>
-            <button onclick="setSleeve(this, 'Sleeveless')" class="option-btn border border-outline-variant rounded-xl p-3 text-center">Sleeveless</button>
+          <div id="uploaded-design-file-badge" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs font-bold text-emerald-900">
+            <div class="flex items-center gap-2 truncate">
+              <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+              <span id="uploaded-design-filename" class="truncate">artwork.png</span>
+            </div>
+            <button type="button" onclick="removeUploadedDesignFile()" class="text-red-500 hover:text-red-700 text-xs font-bold cursor-pointer">Remove</button>
           </div>
         </div>
       </div>
 
-      <!-- 2. Personalization Card -->
-      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
-        <h3 class="font-display text-base font-bold text-primary mb-4">Personalization</h3>
-        
-        <div class="mb-4">
-          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-1">Your Name</label>
-          <input type="text" id="builder-name" value="SMITH" placeholder="e.g. SMITH" oninput="updateBuilderText()" class="w-full border border-outline-variant rounded-xl p-3 text-sm font-bold uppercase bg-[#f8f9fa] outline-none focus:border-primary"/>
+      <!-- 2. TOTAL PIECES / QUANTITY NEEDED ("koy peice lagbe") -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 ambient-shadow border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-black flex items-center justify-center font-mono">2</span>
+            <h3 class="font-display text-sm sm:text-base font-black text-black uppercase tracking-tight">Order Quantity (Pieces)</h3>
+          </div>
+          <span id="tier-discount-badge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">5% Bulk Off (10+ Pcs)</span>
         </div>
 
-        <div>
-          <label class="text-xs uppercase font-bold text-on-surface-variant block mb-1">Your Number (0-99)</label>
-          <input type="text" id="builder-num" value="10" maxlength="2" placeholder="10" oninput="updateBuilderText()" class="w-full border border-outline-variant rounded-xl p-3 text-sm font-bold uppercase bg-[#f8f9fa] outline-none focus:border-primary"/>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center border border-gray-300 rounded-xl bg-white overflow-hidden h-12 w-36 flex-shrink-0 shadow-2xs">
+            <button type="button" onclick="adjustTotalQty(-1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base cursor-pointer">−</button>
+            <input type="number" id="builder-total-qty" value="15" min="1" max="500" onchange="onTotalQtyChange(this.value)" class="w-16 h-full text-center font-mono font-black text-sm text-black border-none focus:ring-0 p-0"/>
+            <button type="button" onclick="adjustTotalQty(1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base cursor-pointer">+</button>
+          </div>
+          <p class="text-[11px] text-gray-500 leading-tight">Total pieces needed for your team or batch. You can allocate sizes below.</p>
+        </div>
+
+        <!-- Quick Quantity Preset Pills -->
+        <div class="flex items-center gap-2 flex-wrap pt-1">
+          <span class="text-[11px] font-mono text-gray-400 font-bold">Quick Presets:</span>
+          <button type="button" onclick="setTotalQty(5)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:border-black cursor-pointer">5 pcs</button>
+          <button type="button" onclick="setTotalQty(11)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:border-black cursor-pointer bg-black/5">11 pcs (Squad)</button>
+          <button type="button" onclick="setTotalQty(15)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-black bg-black text-white cursor-pointer" id="pill-qty-15">15 pcs</button>
+          <button type="button" onclick="setTotalQty(20)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:border-black cursor-pointer">20 pcs</button>
+          <button type="button" onclick="setTotalQty(30)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:border-black cursor-pointer">30 pcs</button>
+          <button type="button" onclick="setTotalQty(50)" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:border-black cursor-pointer">50 pcs</button>
         </div>
       </div>
 
-      <!-- 3. Price & Add to Cart Card -->
-      <div class="bg-white rounded-3xl p-6 ambient-shadow border border-outline-variant">
-        <div class="flex justify-between items-center mb-4">
+      <!-- 3. SIZE BREAKDOWN MATRIX ("kon size koyta lagbe") -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 ambient-shadow border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-black flex items-center justify-center font-mono">3</span>
+            <h3 class="font-display text-sm sm:text-base font-black text-black uppercase tracking-tight">Size Breakdown (Pieces per Size)</h3>
+          </div>
+          <button type="button" onclick="distributeSizesEvenly()" class="text-[11px] font-mono font-bold text-blue-700 hover:underline cursor-pointer">Distribute Evenly</button>
+        </div>
+
+        <p class="text-[11px] text-gray-500">Specify how many jerseys you need for each size. The sum should match your total quantity.</p>
+
+        <!-- 6 Sizes Grid (S, M, L, XL, XXL, 3XL) -->
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">S</span>
+            <input type="number" id="size-qty-s" min="0" value="2" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">M</span>
+            <input type="number" id="size-qty-m" min="0" value="5" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">L</span>
+            <input type="number" id="size-qty-l" min="0" value="5" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">XL</span>
+            <input type="number" id="size-qty-xl" min="0" value="2" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">XXL</span>
+            <input type="number" id="size-qty-xxl" min="0" value="1" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+            <span class="font-headline font-black text-xs text-black block mb-1">3XL</span>
+            <input type="number" id="size-qty-3xl" min="0" value="0" oninput="recalculateSizeSum()" class="w-full text-center bg-white border border-gray-300 rounded-lg py-1.5 text-xs font-mono font-bold focus:border-black focus:outline-none"/>
+          </div>
+        </div>
+
+        <!-- Allocation Live Counter Badge -->
+        <div id="size-allocation-status" class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs font-bold text-emerald-900">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+            <span id="allocation-msg">Allocated: 15 of 15 pieces assigned</span>
+          </div>
+          <span id="allocation-sum-tag" class="font-mono font-black text-xs text-emerald-800">15 / 15 Pcs</span>
+        </div>
+      </div>
+
+      <!-- 4. PLAYER ROSTER EXCEL / CSV UPLOAD ("details er jnno akta excel file upload") -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 ambient-shadow border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-black flex items-center justify-center font-mono">4</span>
+            <h3 class="font-display text-sm sm:text-base font-black text-black uppercase tracking-tight">Team Roster File (Excel / CSV)</h3>
+          </div>
+          <button type="button" onclick="downloadSampleRosterCsv()" class="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 cursor-pointer">
+            <span class="material-symbols-outlined text-[14px]">download</span>
+            <span>Download Sample Excel</span>
+          </button>
+        </div>
+
+        <p class="text-[11px] text-gray-500 leading-relaxed">
+          Upload an Excel or CSV file containing your squad details (Jersey No, Player Name, Assigned Size, and Sleeve style). You can download our template above to fill out.
+        </p>
+
+        <!-- Roster Upload Dropzone -->
+        <div class="border-2 border-dashed border-gray-300 hover:border-black rounded-2xl p-4 text-center cursor-pointer transition-colors bg-gray-50/60" onclick="document.getElementById('roster-file-input').click()">
+          <input type="file" id="roster-file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleRosterFileUpload(this)"/>
+          <span class="material-symbols-outlined text-3xl text-gray-400 mb-1">table_view</span>
+          <p class="font-bold text-xs text-black">Upload Player Roster Spreadsheet (.xlsx, .xls, .csv)</p>
+          <p class="text-[10px] text-gray-400 mt-0.5">Click to browse your team's spreadsheet</p>
+        </div>
+
+        <div id="uploaded-roster-badge" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs font-bold text-emerald-900">
+          <div class="flex items-center gap-2 truncate">
+            <span class="material-symbols-outlined text-emerald-600">description</span>
+            <span id="uploaded-roster-filename" class="truncate font-mono">team_roster.xlsx</span>
+          </div>
+          <button type="button" onclick="removeUploadedRosterFile()" class="text-red-500 hover:text-red-700 text-xs font-bold cursor-pointer">Remove</button>
+        </div>
+
+        <!-- Optional Special Notes -->
+        <div>
+          <label class="block text-[11px] font-mono uppercase font-bold text-gray-600 mb-1">Special Design / Printing Notes (Optional)</label>
+          <textarea id="builder-order-notes" rows="2" placeholder="e.g. Captain arm band, chest club crest, sponsor logo on center front, gold typography..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs text-black focus:outline-none focus:border-black focus:bg-white transition-all"></textarea>
+        </div>
+      </div>
+
+      <!-- 5. SLEEVE & FABRIC SELECTION -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 ambient-shadow border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-black flex items-center justify-center font-mono">5</span>
+            <h3 class="font-display text-sm sm:text-base font-black text-black uppercase tracking-tight">Sleeve Style & Fabric</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <label class="flex items-center justify-between p-3 border-2 border-black bg-black/5 rounded-xl cursor-pointer" onclick="selectSleeveStyle('Half Sleeve', 0, this)">
+            <input type="radio" name="builder-sleeve" value="Half Sleeve" checked class="accent-black mr-2"/>
+            <div class="flex-1">
+              <span class="font-bold text-xs text-black block">Half Sleeve</span>
+              <span class="text-[10px] text-gray-500 font-mono">Standard Match Cut</span>
+            </div>
+            <span class="text-xs font-bold text-black font-mono">Included</span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 border-2 border-gray-200 hover:border-gray-400 bg-white rounded-xl cursor-pointer" onclick="selectSleeveStyle('Full Sleeve', 100, this)">
+            <input type="radio" name="builder-sleeve" value="Full Sleeve" class="accent-black mr-2"/>
+            <div class="flex-1">
+              <span class="font-bold text-xs text-black block">Full Sleeve</span>
+              <span class="text-[10px] text-gray-500 font-mono">Cold-Weather Edition</span>
+            </div>
+            <span class="text-xs font-bold text-black font-mono">+৳100 / pc</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 6. PRICE CALCULATION & ADD TO CART -->
+      <div class="bg-white rounded-3xl p-6 ambient-shadow border-2 border-black space-y-4 shadow-xl">
+        <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs text-on-surface-variant font-semibold">Total Price</p>
-            <p id="builder-total-price" class="font-display text-2xl font-black text-primary">৳2,750</p>
+            <span class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-bold block">TOTAL ORDER ESTIMATE</span>
+            <span id="builder-grand-total" class="font-display text-3xl font-black text-black">৳17,100</span>
           </div>
-          <div class="text-right text-xs text-on-surface-variant">
-            <p>Base: ৳2,000</p>
-            <p>Customization: ৳750</p>
+          <div class="text-right text-xs font-mono space-y-0.5">
+            <div class="text-gray-500">Unit: <strong id="builder-unit-price" class="text-black">৳1,140 / pc</strong></div>
+            <div class="text-emerald-700 font-bold" id="builder-discount-label">5% Bulk Discount Applied</div>
           </div>
         </div>
 
-        <button onclick="addBuilderToCart()" class="w-full bg-primary text-white font-bold text-sm px-6 py-4 rounded-xl hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-lg">
-          <span class="material-symbols-outlined text-base">shopping_cart</span>
-          <span>Add to Cart</span>
+        <div class="p-3 bg-gray-50 rounded-xl text-xs space-y-1 font-mono text-gray-600">
+          <div class="flex justify-between">
+            <span>Total Pieces:</span>
+            <strong id="summary-total-qty" class="text-black">15 pcs</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Size Breakdown:</span>
+            <strong id="summary-size-breakdown" class="text-black">S:2, M:5, L:5, XL:2, XXL:1</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Design:</span>
+            <strong id="summary-design-label" class="text-black truncate max-w-[220px]">AeroKnit Pro Stealth</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Roster Sheet:</span>
+            <strong id="summary-roster-status" class="text-emerald-700 font-bold">Attached</strong>
+          </div>
+        </div>
+
+        <button type="button" onclick="submitCustomTeamOrder()" class="w-full bg-black hover:bg-neutral-800 text-white py-4 rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
+          <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+          <span>ADD CUSTOM TEAM ORDER TO CART →</span>
         </button>
       </div>
 
@@ -206,119 +428,445 @@
 
 </main>
 
-<footer class="bg-white border-t border-outline-variant py-8 mt-12 text-center text-xs text-on-surface-variant">
-  <p>© 2026 ZENVY Sportswear. All rights reserved.</p>
+<!-- FOOTER -->
+<footer class="bg-white border-t border-gray-200 py-8 mt-12 text-center text-xs text-gray-500">
+  <div class="max-w-[1360px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <span class="font-display font-black text-sm text-black tracking-widest">ZENVY PERFORMANCE GEAR</span>
+    <p>© 2026 ZENVY Sports Fashion. Custom Sublimation & Athletic Engineering.</p>
+    <div class="flex items-center gap-4 text-xs font-mono">
+      <a href="index.html#shop" class="hover:text-black">Shop Catalog</a>
+      <span>•</span>
+      <a href="preorders.html" class="hover:text-black">Preorders</a>
+      <span>•</span>
+      <a href="index.html#checkout" class="hover:text-black">Checkout</a>
+    </div>
+  </div>
 </footer>
 
 <script>
-let selectedStyle = 'ZENVY Pro';
-let selectedSleeve = 'Short';
-let selectedColor = '#ffffff';
+// ─────────────────────────────────────────
+// Custom Studio Builder Logic
+// ─────────────────────────────────────────
+const SHOP_TEMPLATES = [
+  { id: 't1', name: 'AeroKnit Stealth Pro', color: 'White / Platinum', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P' },
+  { id: 't2', name: 'Striker Chevron', color: 'Royal Navy / Gold', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA' },
+  { id: 't3', name: 'Velocity Crimson', color: 'Deep Red / Gold', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEkIfW4povNNZmCZPpAtkbLE-KG7dymS7UvkxUxqgQLCfTYnQHY48OliKbOPxD4V1Krqxp6XqSFuA-NF73ut75mxMqPgULyY1TejG0qSMm8dZw6V6pLygkBx-CvLyIGmmGJLleT0_opdEUd36xIXylzO5tYti0T9C2k39YYp9yBFCfnh08ZuqeEa-LKdjw-ZQoSn86jCP351D4dTOZJ2dL_tDZKbLceB1OZSaeyoZ9CUE-wKzo0M9jOA' },
+  { id: 't4', name: 'Cyber Grid Match', color: 'Pitch Black / Cyan', img: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80' },
+  { id: 't5', name: 'Classic Retro Stripes', color: 'Sky Blue / Heritage White', img: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80' },
+  { id: 't6', name: 'Vortex Neon Volt', color: 'Obsidian / Electric Volt', img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&q=80' },
+  { id: 't7', name: 'Golden Champion Edition', color: 'Matte Black / Gold Crest', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRowvY21H_JGsJ0D3Rb2f-8naBTnt9Jms1AYjLFn11PTIGUdeUvabLQLyg4lHvBgCo5jnX53OLUb9GKGkPZlPEtwe5E_UcsL7SiN_hYTfVKeV0JQIpVQemU_qBThBMnnndy2kPH9nZcmp6Hmm0tFA4Exgg1FLktCNtYjxIzzjJym2AnNw8SHk89KELYY8NKiPRjJBKe24w3Jw3BSbAg0Ek1gn9WmcYadKUBFOCTZbCYAa1zL8H6y6JoA' },
+  { id: 't8', name: 'Azure Wave Pro', color: 'Ice Blue / Navy', img: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=600&q=80' }
+];
 
-function setBaseStyle(btn, style) {
-  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedStyle = style;
+const state = {
+  designMode: 'shop', // 'shop' | 'upload'
+  selectedTemplate: SHOP_TEMPLATES[0],
+  uploadedDesignDataUrl: null,
+  uploadedDesignName: null,
+  uploadedRosterFileName: null,
+  totalQty: 15,
+  sizes: { s: 2, m: 5, l: 5, xl: 2, xxl: 1, '3xl': 0 },
+  sleeve: 'Half Sleeve',
+  sleeveAddon: 0,
+  canvasView: 'front',
+  zoom: 1
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderShopTemplates();
+  updateCalculations();
+  updateCartCount();
+});
+
+function renderShopTemplates() {
+  const container = document.getElementById('shop-templates-grid');
+  if (!container) return;
+  container.innerHTML = SHOP_TEMPLATES.map((t, idx) => `
+    <div onclick="selectShopTemplate(${idx})" class="template-card ${state.selectedTemplate.id === t.id ? 'active' : ''} p-2 bg-gray-50 border-2 rounded-2xl cursor-pointer hover:border-gray-400 transition-all text-center flex flex-col justify-between">
+      <div class="h-20 w-full flex items-center justify-center p-1 bg-white rounded-xl mb-1.5 shadow-2xs">
+        <img src="${t.img}" class="max-h-full max-w-full object-contain" alt="${t.name}"/>
+      </div>
+      <div>
+        <p class="font-bold text-[11px] text-black leading-tight truncate">${t.name}</p>
+        <p class="text-[9px] text-gray-400 truncate">${t.color}</p>
+      </div>
+    </div>
+  `).join('');
 }
 
-function setSleeve(btn, sleeve) {
-  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedSleeve = sleeve;
+function selectShopTemplate(idx) {
+  state.selectedTemplate = SHOP_TEMPLATES[idx];
+  document.querySelectorAll('.template-card').forEach((c, i) => {
+    if (i === idx) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+
+  const canvasImg = document.getElementById('builder-jersey-img');
+  if (canvasImg) canvasImg.src = state.selectedTemplate.img;
+
+  const tag = document.getElementById('canvas-design-source-tag');
+  if (tag) tag.textContent = `SHOP DESIGN: ${state.selectedTemplate.name.toUpperCase()}`;
+
+  const summary = document.getElementById('summary-design-label');
+  if (summary) summary.textContent = state.selectedTemplate.name;
+
+  const badge = document.getElementById('canvas-custom-art-badge');
+  if (badge) badge.classList.add('hidden');
 }
 
-function setColor(btn, color) {
-  document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedColor = color;
+function switchDesignMode(mode) {
+  state.designMode = mode;
+  const tabShop = document.getElementById('tab-mode-shop');
+  const tabUpload = document.getElementById('tab-mode-upload');
+  const secShop = document.getElementById('section-shop-designs');
+  const secUpload = document.getElementById('section-upload-design');
+
+  if (mode === 'upload') {
+    tabShop.className = 'py-2.5 rounded-xl text-xs font-bold transition-all inactive-tab cursor-pointer flex items-center justify-center gap-1.5';
+    tabUpload.className = 'py-2.5 rounded-xl text-xs font-bold transition-all active-tab cursor-pointer flex items-center justify-center gap-1.5 shadow-xs';
+    secShop.classList.add('hidden');
+    secUpload.classList.remove('hidden');
+
+    if (state.uploadedDesignDataUrl) {
+      document.getElementById('builder-jersey-img').src = state.uploadedDesignDataUrl;
+      document.getElementById('canvas-design-source-tag').textContent = `CUSTOM ARTWORK: ${(state.uploadedDesignName || 'UPLOADED').toUpperCase()}`;
+      document.getElementById('canvas-custom-art-badge').classList.remove('hidden');
+    }
+  } else {
+    tabShop.className = 'py-2.5 rounded-xl text-xs font-bold transition-all active-tab cursor-pointer flex items-center justify-center gap-1.5 shadow-xs';
+    tabUpload.className = 'py-2.5 rounded-xl text-xs font-bold transition-all inactive-tab cursor-pointer flex items-center justify-center gap-1.5';
+    secShop.classList.remove('hidden');
+    secUpload.classList.add('hidden');
+
+    document.getElementById('builder-jersey-img').src = state.selectedTemplate.img;
+    document.getElementById('canvas-design-source-tag').textContent = `SHOP DESIGN: ${state.selectedTemplate.name.toUpperCase()}`;
+    document.getElementById('canvas-custom-art-badge').classList.add('hidden');
+  }
+
+  updateCalculations();
 }
 
-function updateBuilderText() {
-  const name = document.getElementById('builder-name').value.trim() || 'YOUR NAME';
-  const num = document.getElementById('builder-num').value.trim() || '00';
-  document.getElementById('cz-name-preview').textContent = name;
-  document.getElementById('cz-num-preview').textContent = num;
+function handleDesignFileUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  state.uploadedDesignName = file.name;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.uploadedDesignDataUrl = e.target.result;
+    document.getElementById('builder-jersey-img').src = state.uploadedDesignDataUrl;
+    document.getElementById('uploaded-design-filename').textContent = file.name;
+    document.getElementById('uploaded-design-file-badge').classList.remove('hidden');
+    document.getElementById('canvas-design-source-tag').textContent = `CUSTOM ARTWORK: ${file.name.toUpperCase()}`;
+    document.getElementById('canvas-custom-art-badge').classList.remove('hidden');
+    document.getElementById('summary-design-label').textContent = `Custom Artwork: ${file.name}`;
+    updateCalculations();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeUploadedDesignFile() {
+  state.uploadedDesignDataUrl = null;
+  state.uploadedDesignName = null;
+  document.getElementById('custom-design-file').value = '';
+  document.getElementById('uploaded-design-file-badge').classList.add('hidden');
+  document.getElementById('canvas-custom-art-badge').classList.add('hidden');
+  document.getElementById('builder-jersey-img').src = state.selectedTemplate.img;
+  document.getElementById('canvas-design-source-tag').textContent = `SHOP DESIGN: ${state.selectedTemplate.name.toUpperCase()}`;
+  document.getElementById('summary-design-label').textContent = state.selectedTemplate.name;
+  updateCalculations();
+}
+
+function setTotalQty(val) {
+  state.totalQty = Math.max(1, parseInt(val) || 1);
+  document.getElementById('builder-total-qty').value = state.totalQty;
+  distributeSizesEvenly();
+  updateCalculations();
+}
+
+function adjustTotalQty(delta) {
+  state.totalQty = Math.max(1, state.totalQty + delta);
+  document.getElementById('builder-total-qty').value = state.totalQty;
+  recalculateSizeSum();
+  updateCalculations();
+}
+
+function onTotalQtyChange(val) {
+  state.totalQty = Math.max(1, parseInt(val) || 1);
+  recalculateSizeSum();
+  updateCalculations();
+}
+
+function distributeSizesEvenly() {
+  const total = state.totalQty;
+  const numSizes = 5; // S, M, L, XL, XXL
+  const base = Math.floor(total / numSizes);
+  const rem = total % numSizes;
+
+  state.sizes = {
+    s: base,
+    m: base + (rem > 0 ? 1 : 0),
+    l: base + (rem > 1 ? 1 : 0),
+    xl: base + (rem > 2 ? 1 : 0),
+    xxl: base + (rem > 3 ? 1 : 0),
+    '3xl': 0
+  };
+
+  document.getElementById('size-qty-s').value = state.sizes.s;
+  document.getElementById('size-qty-m').value = state.sizes.m;
+  document.getElementById('size-qty-l').value = state.sizes.l;
+  document.getElementById('size-qty-xl').value = state.sizes.xl;
+  document.getElementById('size-qty-xxl').value = state.sizes.xxl;
+  document.getElementById('size-qty-3xl').value = state.sizes['3xl'];
+
+  recalculateSizeSum();
+  updateCalculations();
+}
+
+function recalculateSizeSum() {
+  const s = parseInt(document.getElementById('size-qty-s')?.value) || 0;
+  const m = parseInt(document.getElementById('size-qty-m')?.value) || 0;
+  const l = parseInt(document.getElementById('size-qty-l')?.value) || 0;
+  const xl = parseInt(document.getElementById('size-qty-xl')?.value) || 0;
+  const xxl = parseInt(document.getElementById('size-qty-xxl')?.value) || 0;
+  const s3xl = parseInt(document.getElementById('size-qty-3xl')?.value) || 0;
+
+  state.sizes = { s, m, l, xl, xxl, '3xl': s3xl };
+  const currentSum = s + m + l + xl + xxl + s3xl;
+  const total = state.totalQty;
+
+  const statusBox = document.getElementById('size-allocation-status');
+  const msgEl = document.getElementById('allocation-msg');
+  const sumEl = document.getElementById('allocation-sum-tag');
+
+  if (sumEl) sumEl.textContent = `${currentSum} / ${total} Pcs`;
+
+  if (currentSum === total) {
+    if (statusBox) statusBox.className = 'p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs font-bold text-emerald-900';
+    if (msgEl) msgEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span> <span>Perfect! All ${total} pieces assigned to sizes</span>`;
+  } else if (currentSum < total) {
+    const diff = total - currentSum;
+    if (statusBox) statusBox.className = 'p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs font-bold text-amber-900';
+    if (msgEl) msgEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-amber-600">info</span> <span>${diff} piece${diff > 1 ? 's' : ''} remaining to assign to sizes</span>`;
+  } else {
+    const diff = currentSum - total;
+    if (statusBox) statusBox.className = 'p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between text-xs font-bold text-red-900';
+    if (msgEl) msgEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-red-600">warning</span> <span>Assigned sizes exceed total quantity by ${diff} pieces</span>`;
+  }
+
+  const breakdownStr = Object.entries(state.sizes)
+    .filter(([_, q]) => q > 0)
+    .map(([sz, q]) => `${sz.toUpperCase()}:${q}`)
+    .join(', ') || 'None';
+  
+  const summaryBreakdown = document.getElementById('summary-size-breakdown');
+  if (summaryBreakdown) summaryBreakdown.textContent = breakdownStr;
+}
+
+function handleRosterFileUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  state.uploadedRosterFileName = file.name;
+
+  document.getElementById('uploaded-roster-filename').textContent = file.name;
+  document.getElementById('uploaded-roster-badge').classList.remove('hidden');
+  
+  const summaryRoster = document.getElementById('summary-roster-status');
+  if (summaryRoster) {
+    summaryRoster.textContent = file.name;
+    summaryRoster.className = 'text-emerald-700 font-bold truncate max-w-[160px]';
+  }
+}
+
+function removeUploadedRosterFile() {
+  state.uploadedRosterFileName = null;
+  document.getElementById('roster-file-input').value = '';
+  document.getElementById('uploaded-roster-badge').classList.add('hidden');
+  const summaryRoster = document.getElementById('summary-roster-status');
+  if (summaryRoster) {
+    summaryRoster.textContent = 'None';
+    summaryRoster.className = 'text-gray-400 font-medium';
+  }
+}
+
+function downloadSampleRosterCsv() {
+  const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(
+    'Jersey_Number,Player_Name,Size,Sleeve_Style,Position_or_Notes\n' +
+    '1,RAHIM,L,Full Sleeve,Goalkeeper\n' +
+    '7,RONALDO,M,Half Sleeve,Forward\n' +
+    '10,MESSI,M,Half Sleeve,Captain\n' +
+    '9,BENZEMA,XL,Half Sleeve,Striker\n' +
+    '4,VAN DIJK,XL,Half Sleeve,Defender\n'
+  );
+  const link = document.createElement('a');
+  link.setAttribute('href', csvContent);
+  link.setAttribute('download', 'zenvy_team_roster_template.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function selectSleeveStyle(style, addon, el) {
+  state.sleeve = style;
+  state.sleeveAddon = addon;
+  document.querySelectorAll('input[name="builder-sleeve"]').forEach(inp => {
+    inp.closest('label').className = (inp.value === style)
+      ? 'flex items-center justify-between p-3 border-2 border-black bg-black/5 rounded-xl cursor-pointer'
+      : 'flex items-center justify-between p-3 border-2 border-gray-200 hover:border-gray-400 bg-white rounded-xl cursor-pointer';
+  });
+
+  const sleeveInd = document.getElementById('canvas-sleeve-indicator');
+  if (sleeveInd) sleeveInd.textContent = `Sleeve: ${style}`;
+
+  updateCalculations();
+}
+
+function setCanvasView(view) {
+  state.canvasView = view;
+  const btnF = document.getElementById('btn-view-front');
+  const btnB = document.getElementById('btn-view-back');
+  const overlay = document.getElementById('canvas-back-overlay');
+
+  if (view === 'back') {
+    btnF.className = 'px-3 py-1 rounded-full text-gray-600 hover:text-black text-[11px] font-bold cursor-pointer';
+    btnB.className = 'px-3 py-1 rounded-full bg-black text-white text-[11px] font-bold shadow-xs cursor-pointer';
+    if (overlay) overlay.classList.remove('hidden');
+  } else {
+    btnF.className = 'px-3 py-1 rounded-full bg-black text-white text-[11px] font-bold shadow-xs cursor-pointer';
+    btnB.className = 'px-3 py-1 rounded-full text-gray-600 hover:text-black text-[11px] font-bold cursor-pointer';
+    if (overlay) overlay.classList.add('hidden');
+  }
+}
+
+function zoomBuilder(delta) {
+  state.zoom += delta > 0 ? 0.1 : -0.1;
+  state.zoom = Math.max(0.7, Math.min(1.4, state.zoom));
+  const img = document.getElementById('builder-jersey-img');
+  if (img) img.style.transform = `scale(${state.zoom})`;
 }
 
 function resetBuilder() {
-  document.getElementById('builder-name').value = 'SMITH';
-  document.getElementById('builder-num').value = '10';
-  updateBuilderText();
+  state.zoom = 1;
+  const img = document.getElementById('builder-jersey-img');
+  if (img) img.style.transform = 'scale(1)';
 }
 
-let zoomLevel = 1;
-function zoomBuilder(delta) {
-  zoomLevel += delta > 0 ? 0.1 : -0.1;
-  if (zoomLevel < 0.7) zoomLevel = 0.7;
-  if (zoomLevel > 1.4) zoomLevel = 1.4;
-  document.getElementById('builder-jersey-img').style.transform = `scale(${zoomLevel})`;
+function updateCalculations() {
+  const qty = state.totalQty;
+  let baseUnit = 1200;
+  let discountPct = 0;
+  let tierLabel = 'Standard Bulk Rate';
+
+  if (qty >= 50) {
+    discountPct = 15;
+    tierLabel = '15% Mega Squad Discount Applied';
+  } else if (qty >= 20) {
+    discountPct = 10;
+    tierLabel = '10% Team Discount Applied';
+  } else if (qty >= 10) {
+    discountPct = 5;
+    tierLabel = '5% Squad Discount Applied';
+  }
+
+  const discountedUnit = Math.round(baseUnit * (1 - (discountPct / 100)));
+  const unitWithSleeve = discountedUnit + state.sleeveAddon;
+  const grandTotal = unitWithSleeve * qty;
+
+  const totalEl = document.getElementById('builder-grand-total');
+  if (totalEl) totalEl.textContent = `৳${grandTotal.toLocaleString()}`;
+
+  const unitEl = document.getElementById('builder-unit-price');
+  if (unitEl) unitEl.textContent = `৳${unitWithSleeve.toLocaleString()} / pc`;
+
+  const discountLabel = document.getElementById('builder-discount-label');
+  if (discountLabel) discountLabel.textContent = tierLabel;
+
+  const tierBadge = document.getElementById('tier-discount-badge');
+  if (tierBadge) tierBadge.textContent = tierLabel;
+
+  const summaryQty = document.getElementById('summary-total-qty');
+  if (summaryQty) summaryQty.textContent = `${qty} pcs`;
+
+  const summaryDesign = document.getElementById('summary-design-label');
+  if (summaryDesign) {
+    summaryDesign.textContent = state.designMode === 'upload' 
+      ? (state.uploadedDesignName ? `Custom Artwork (${state.uploadedDesignName})` : 'Custom Uploaded Artwork')
+      : state.selectedTemplate.name;
+  }
 }
 
-let cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+function submitCustomTeamOrder() {
+  const designTitle = state.designMode === 'upload' 
+    ? `Custom Artwork Kit (${state.uploadedDesignName || 'Client Mockup'})`
+    : `Custom ${state.selectedTemplate.name}`;
+  
+  const breakdownStr = Object.entries(state.sizes)
+    .filter(([_, q]) => q > 0)
+    .map(([sz, q]) => `${sz.toUpperCase()}:${q}`)
+    .join(', ') || 'Standard Mix';
 
-function addBuilderToCart() {
-  const name = document.getElementById('builder-name').value.trim();
-  const num = document.getElementById('builder-num').value.trim();
+  const unitPrice = parseInt((document.getElementById('builder-unit-price')?.textContent || '').replace(/[^0-9]/g, '')) || 1140;
+  const grandTotal = unitPrice * state.totalQty;
 
-  const imgUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P';
-  const item = {
-    id: 'cz-' + Date.now(),
-    productId: 'custom_jersey_builder',
-    name: `Custom ${selectedStyle} Jersey`,
-    price: 2750,
-    size: 'M',
-    sleeve: selectedSleeve,
-    customName: name,
-    customNumber: num,
-    details: `Custom 3D Studio • Size: M • ${selectedSleeve} Sleeve • ${name} #${num}`,
-    customization: { name, number: num, sleeve: selectedSleeve, color: selectedColor },
-    image: imgUrl,
-    img: imgUrl,
-    qty: 1
+  const notes = (document.getElementById('builder-order-notes')?.value || '').trim();
+
+  const customOrderDetails = [
+    `Total: ${state.totalQty} Pieces`,
+    `Sizes: ${breakdownStr}`,
+    state.sleeve,
+    state.uploadedRosterFileName ? `Roster: ${state.uploadedRosterFileName}` : null,
+    notes ? `Note: ${notes}` : null
+  ].filter(Boolean).join(' • ');
+
+  const previewImg = (state.designMode === 'upload' && state.uploadedDesignDataUrl)
+    ? state.uploadedDesignDataUrl
+    : state.selectedTemplate.img;
+
+  const cartItem = {
+    id: 'team_custom_' + Date.now(),
+    productId: 'custom_studio_team',
+    name: designTitle,
+    price: unitPrice,
+    image: previewImg,
+    img: previewImg,
+    details: customOrderDetails,
+    qty: state.totalQty,
+    size: breakdownStr,
+    sleeve: state.sleeve,
+    isCustomTeamOrder: true,
+    rosterFile: state.uploadedRosterFileName || null,
+    customArtwork: state.designMode === 'upload' ? (state.uploadedDesignName || 'Attached') : null
   };
-  cart.push(item);
 
-  localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+  try {
+    const currentCart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+    currentCart.push(cartItem);
+    localStorage.setItem('zenvy_cart', JSON.stringify(currentCart));
+  } catch(e) {
+    console.error('Failed to save to cart', e);
+  }
+
   updateCartCount();
   try { window.dispatchEvent(new Event('storage')); } catch(e){}
+
+  // Direct smoothly to complete your order checkout
   window.location.href = 'index.html#checkout';
 }
 
 function updateCartCount() {
-  const currentCart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
-  const count = currentCart.reduce((s, i) => s + (i.qty || 1), 0);
-  const badge = document.getElementById('cart-count');
-  if (badge) {
-    if (count > 0) {
+  try {
+    const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+    const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) {
       badge.textContent = count;
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
+      badge.style.display = count > 0 ? 'flex' : 'none';
     }
-  }
+  } catch(e){}
 }
-updateCartCount();
-window.addEventListener('storage', () => {
-  updateCartCount();
-  if (document.getElementById('cart-drawer')?.classList.contains('open')) {
-    openCart();
-  }
-});
-
-function removeCustomizerCartItem(idx) {
-  cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
-  if (cart[idx]) {
-    cart.splice(idx, 1);
-    localStorage.setItem('zenvy_cart', JSON.stringify(cart));
-    updateCartCount();
-    openCart();
-    try { window.dispatchEvent(new Event('storage')); } catch(e){}
-  }
-}
-window.removeCustomizerCartItem = removeCustomizerCartItem;
 
 function openCart() {
-  cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
   const list = document.getElementById('cart-list');
   const empty = document.getElementById('cart-empty');
   const footer = document.getElementById('cart-footer');
@@ -334,19 +882,19 @@ function openCart() {
       const itemPrice = (item.price || 0) * (item.qty || 1);
       subtotal += itemPrice;
       const img = item.image || item.img || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80';
-      return `<div class="flex gap-4 py-3 border-b border-outline-variant items-center justify-between">
-        <div class="flex items-center gap-3 min-w-0">
-          <img src="${img}" class="w-14 h-14 object-contain rounded-xl bg-slate-100 flex-shrink-0" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'"/>
+      return `
+        <div class="flex gap-3 py-3 border-b border-gray-100 items-center justify-between">
+          <img src="${img}" class="w-12 h-12 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
           <div class="flex-1 min-w-0">
-            <p class="font-bold text-sm text-primary truncate">${item.name}</p>
-            <p class="text-[11px] text-on-surface-variant line-clamp-1">${item.details || 'Custom Jersey'}</p>
-            <p class="text-xs font-bold text-primary mt-1">৳ ${itemPrice.toLocaleString()}</p>
+            <p class="font-bold text-xs text-black truncate">${item.name}</p>
+            <p class="text-[10px] text-gray-500 line-clamp-1">${item.details || 'Custom Jersey'}</p>
+            <p class="text-xs font-black text-black mt-0.5">৳${itemPrice.toLocaleString()}</p>
           </div>
+          <button onclick="removeCustomizerCartItem(${idx})" class="text-gray-400 hover:text-red-500 p-1 cursor-pointer">✕</button>
         </div>
-        <button onclick="removeCustomizerCartItem(${idx})" class="text-xs text-red-500 hover:text-red-700 font-bold p-1 cursor-pointer" title="Remove">✕</button>
-      </div>`;
+      `;
     }).join('');
-    subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
+    if (subtotalEl) subtotalEl.textContent = '৳ ' + subtotal.toLocaleString();
   }
   document.getElementById('cart-drawer').classList.add('open');
   document.getElementById('cart-overlay').style.opacity = '1';
@@ -358,6 +906,51 @@ function closeCart() {
   document.getElementById('cart-overlay').style.opacity = '0';
   document.getElementById('cart-overlay').style.pointerEvents = 'none';
 }
+
+function removeCustomizerCartItem(idx) {
+  try {
+    const cart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+    cart.splice(idx, 1);
+    localStorage.setItem('zenvy_cart', JSON.stringify(cart));
+    updateCartCount();
+    openCart();
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
+}
 </script>
+
+<!-- ==================== WISHLIST SLIDING DRAWER ==================== -->
+<div id="wishlist-drawer-container" class="fixed inset-0 z-[100] pointer-events-none transition-opacity duration-300 opacity-0" style="display: none;">
+  <div onclick="toggleWishlistModal(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
+  <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-red-500 fill-1 text-2xl">favorite</span>
+        <h2 class="font-display text-base sm:text-lg font-black tracking-tight text-black">YOUR WISHLIST</h2>
+        <span id="wishlist-drawer-count" class="bg-red-500 text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded-full">0</span>
+      </div>
+      <button type="button" onclick="toggleWishlistModal(false)" class="p-1.5 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close Wishlist">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Drawer Items List -->
+    <div id="wishlist-drawer-items" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
+      <!-- Rendered dynamically via JS -->
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+      <button type="button" onclick="clearWishlist()" class="text-xs font-bold text-gray-500 hover:text-red-600 transition-colors cursor-pointer">Clear All</button>
+      <button type="button" onclick="addAllWishlistToCart()" class="bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+        <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+        <span>Add All to Bag</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script src="wishlist.js"></script>
 </body>
 </html>

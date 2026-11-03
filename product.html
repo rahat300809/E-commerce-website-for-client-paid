@@ -163,7 +163,10 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-  </style>
+    .material-symbols-outlined.fill-1 {
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  }
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-24 lg:pb-8">
 
@@ -201,6 +204,10 @@
         <a href="account.html" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Account">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">person</span>
         </a>
+                <button onclick="toggleWishlistModal()" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Wishlist">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">favorite</span>
+          <span id="wishlist-badge" class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
         <button onclick="toggleCartDrawer(true)" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Shopping Bag">
           <span class="material-symbols-outlined text-[22px] sm:text-[24px]">shopping_bag</span>
           <span id="header-cart-badge" class="absolute top-0 right-0 bg-black text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
@@ -464,6 +471,15 @@
               <span class="material-symbols-outlined text-[18px]">bolt</span>
               <span>Buy Now</span>
             </button>
+
+            <!-- Wishlist Heart Button -->
+            <button type="button" 
+                    id="product-wishlist-toggle-btn"
+                    onclick="toggleCurrentProductWishlist()" 
+                    class="h-12 w-12 rounded-xl border border-gray-300 hover:border-red-400 bg-white hover:bg-red-50/50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all shadow-2xs cursor-pointer flex-shrink-0" 
+                    title="Add to Wishlist">
+              <span id="product-wishlist-icon" class="material-symbols-outlined text-[22px]">favorite</span>
+            </button>
           </div>
 
           <!-- Total price indicator -->
@@ -690,7 +706,39 @@
     </div>
   </div>
 
-    <!-- ==================== SHOPPING CART DRAWER ==================== -->
+      <!-- ==================== WISHLIST SLIDING DRAWER ==================== -->
+  <div id="wishlist-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0" style="display: none;">
+    <div onclick="toggleWishlistModal(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
+    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
+      <!-- Drawer Header -->
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-red-500 fill-1 text-2xl">favorite</span>
+          <h2 class="font-headline text-base sm:text-lg font-black tracking-tight text-black">YOUR WISHLIST</h2>
+          <span id="wishlist-drawer-count" class="bg-red-500 text-white text-[11px] font-mono-ui font-bold px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <button type="button" onclick="toggleWishlistModal(false)" class="p-1.5 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close Wishlist">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Drawer Items List -->
+      <div id="wishlist-drawer-items" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+        <button type="button" onclick="clearWishlist()" class="text-xs font-bold text-gray-500 hover:text-red-600 transition-colors cursor-pointer">Clear All</button>
+        <button type="button" onclick="addAllWishlistToCart()" class="bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+          <span>Add All to Bag</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ==================== SHOPPING CART DRAWER ==================== -->
   <div id="cart-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300 opacity-0" style="display: none;">
     <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
     <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
@@ -814,6 +862,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-sync.js"></script>
   <script src="admin-db.js"></script>
+  <script src="wishlist.js"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -854,10 +903,52 @@
     }
 
     // ─────────────────────────────────────────
+        function toggleCurrentProductWishlist() {
+      const p = productState.product || {};
+      const name = document.getElementById('pd-title')?.textContent?.trim() || p.name || 'ZENVY Jersey';
+      const price = productState.basePrice || p.salePrice || p.basePrice || 1350;
+      const image = (productState.galleryImages && productState.galleryImages[0]) || (p.images && p.images[0]?.url) || p.image || DEFAULT_DETAIL_IMAGE;
+      const category = p.categoryName || "Men's Football";
+      if (typeof toggleWishlist === 'function') {
+        toggleWishlist({
+          id: p.id || ('prod_' + name.toLowerCase().replace(/\s+/g, '_')),
+          name: name,
+          price: price,
+          image: image,
+          category: category
+        });
+      }
+      syncProductWishlistButton();
+    }
+
+    function syncProductWishlistButton() {
+      const list = typeof getWishlist === 'function' ? getWishlist() : [];
+      const name = (document.getElementById('pd-title')?.textContent?.trim() || productState.product?.name || '').toLowerCase();
+      const id = String(productState.product?.id || '');
+      const isFav = list.some(x => (x.id && String(x.id) === id) || (x.name && x.name.toLowerCase() === name));
+      const icon = document.getElementById('product-wishlist-icon');
+      const btn = document.getElementById('product-wishlist-toggle-btn');
+      if (icon && btn) {
+        if (isFav) {
+          icon.classList.add('text-red-500', 'fill-1');
+          icon.classList.remove('text-gray-400');
+          btn.classList.add('border-red-300', 'bg-red-50/60');
+        } else {
+          icon.classList.remove('text-red-500', 'fill-1');
+          icon.classList.add('text-gray-400');
+          btn.classList.remove('border-red-300', 'bg-red-50/60');
+        }
+      }
+    }
+
+    window.toggleCurrentProductWishlist = toggleCurrentProductWishlist;
+    window.syncProductWishlistButton = syncProductWishlistButton;
+
     // Initialization
     // ─────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       loadDataFromAdminDB();
+      syncProductWishlistButton();
       calculateLiveTotal();
       updateCartBadge();
     });

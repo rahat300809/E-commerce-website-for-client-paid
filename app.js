@@ -14,6 +14,7 @@ const appState = {
     personalizePrice: 0.00
   }
 };
+window.appState = appState;
 
 // Shop State Globals (Initialized at top to prevent TDZ on quick routing)
 var shopCurrentPage = 1;
@@ -475,6 +476,8 @@ function resolveCartDeliveryAndAdvancePolicy() {
   let maxInsideDhaka = null;
   let maxOutsideDhaka = null;
   let hasAnyCustomDelivery = false;
+  let isDeliveryChargeMandatory = false;
+  let mandatoryDeliveryProducts = [];
   let productAdvanceModes = [];
   let productNotes = [];
 
@@ -482,6 +485,10 @@ function resolveCartDeliveryAndAdvancePolicy() {
     for (const item of appState.cart) {
       const prod = DB.products.byId(item.id || item.productId) || item.product || null;
       if (prod) {
+        if (prod.isDeliveryChargeMandatory) {
+          isDeliveryChargeMandatory = true;
+          mandatoryDeliveryProducts.push(prod.name || 'Kit');
+        }
         if (prod.hasCustomDelivery) {
           hasAnyCustomDelivery = true;
           const inside = parseFloat(prod.deliveryChargeInsideDhaka);
@@ -525,6 +532,8 @@ function resolveCartDeliveryAndAdvancePolicy() {
     deliveryChargeFreeThreshold: storePolicy.deliveryChargeFreeThreshold ?? 3000,
     deliveryChargeEnabled: storePolicy.deliveryChargeEnabled !== false,
     cashOnDelivery: storePolicy.cashOnDelivery !== false,
+    isDeliveryChargeMandatory: isDeliveryChargeMandatory,
+    mandatoryDeliveryProducts: mandatoryDeliveryProducts,
     minOrderAmount: storePolicy.minOrderAmount || 0,
     payFirstNote: storePolicy.payFirstNote || '',
     codNote: storePolicy.codNote || '',
@@ -532,12 +541,28 @@ function resolveCartDeliveryAndAdvancePolicy() {
   };
 }
 
+function copyMfsNumber(num) {
+  if (!num) return;
+  navigator.clipboard.writeText(num.replace(/[^0-9]/g, '')).then(() => {
+    const btn = document.getElementById('copy-btn-text');
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }
+    showToast(`Copied ${num} to clipboard`);
+  }).catch(() => {
+    showToast(`Account number: ${num}`);
+  });
+}
+window.copyMfsNumber = copyMfsNumber;
+
 function renderCheckoutPaymentMethods() {
   const container = document.getElementById('checkout-payment-methods-list') || document.getElementById('checkout-payment-methods');
   if (!container) return;
 
   const policy = resolveCartDeliveryAndAdvancePolicy();
-  const payConfig = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : { methods: [] };
+  const payConfig = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : {};
 
   // 1. Update Area Delivery Rate labels
   const rateDhaka = document.getElementById('rate-inside-dhaka');
@@ -554,52 +579,74 @@ function renderCheckoutPaymentMethods() {
 
   const advanceMode = policy.advancePaymentMode || 'customer_choice';
 
-  if (advanceMode === 'delivery_only') {
-    if (badgeEl) badgeEl.textContent = 'Delivery Advance Mandatory';
+  if (policy.isDeliveryChargeMandatory) {
+    if (badgeEl) badgeEl.textContent = 'Mandatory Delivery Fee';
+    if (titleEl) titleEl.textContent = '⚡ Mandatory Advance Delivery Charge';
+    if (descEl) descEl.textContent = `This kit (${(policy.mandatoryDeliveryProducts||[]).join(', ') || 'Custom Jersey'}) has a mandatory delivery charge. You must pay the delivery charge advance via bKash, Nagad, or Rocket to confirm your order. Product price will be collected on delivery.`;
+  } else if (advanceMode === 'delivery_only') {
+    if (badgeEl) badgeEl.textContent = 'Delivery Advance Policy';
     if (titleEl) titleEl.textContent = '⚡ Advance Delivery Charge Required';
-    if (descEl) descEl.textContent = policy.payFirstNote || 'Please pay the delivery charge upfront via bKash to confirm your order. Product price will be collected in cash on delivery.';
-    if (splitContainer) splitContainer.style.display = 'none';
+    if (descEl) descEl.textContent = policy.payFirstNote || 'Please pay the delivery charge upfront via bKash, Nagad, or Rocket to confirm your order. Product price will be collected in cash on delivery.';
   } else if (advanceMode === 'full_only') {
     if (badgeEl) badgeEl.textContent = '100% Full Payment Required';
     if (titleEl) titleEl.textContent = '🔒 Full Advance Payment Mandatory';
     if (descEl) descEl.textContent = 'Complete payment for product and shipping is required upfront to process your order.';
-    if (splitContainer) splitContainer.style.display = 'none';
   } else if (advanceMode === 'cod_only') {
     if (badgeEl) badgeEl.textContent = 'Cash on Delivery';
     if (titleEl) titleEl.textContent = '💵 Full Cash on Delivery';
     if (descEl) descEl.textContent = policy.codNote || 'Pay complete order value when the package is delivered.';
-    if (splitContainer) splitContainer.style.display = 'none';
   } else {
     // customer_choice
     if (badgeEl) badgeEl.textContent = 'Flexible Payment Choice';
     if (titleEl) titleEl.textContent = '✨ Choose How You Pay';
-    if (descEl) descEl.textContent = 'You can pay the full amount upfront, pay only the delivery charge in advance, or pay full cash on delivery.';
-    if (splitContainer) splitContainer.style.display = '';
+    if (descEl) descEl.textContent = 'Choose whether to pay only the delivery charge now, pay full amount upfront, or pay full cash on delivery.';
+  }
 
-    if (splitOptions) {
+  if (splitOptions && splitContainer) {
+    if (policy.isDeliveryChargeMandatory || advanceMode === 'delivery_only') {
+      splitOptions.innerHTML = `
+        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white col-span-1 md:col-span-2">
+          <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+          <div class="flex-1">
+            <span class="font-bold text-xs text-black block">⚡ Pay Mandatory Delivery Charge in Advance</span>
+            <span class="text-[11px] text-gray-500 block mt-0.5">Pay delivery fee upfront via bKash/Nagad/Rocket. Pay product price on arrival!</span>
+          </div>
+        </label>
+        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white col-span-1 md:col-span-2">
+          <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+          <div class="flex-1">
+            <span class="font-bold text-xs text-black block">🔒 Pay Full Amount Now (100% Advance)</span>
+            <span class="text-[11px] text-gray-500 block mt-0.5">Pay full product + delivery charge together. Zero hassle on arrival.</span>
+          </div>
+        </label>
+      `;
+    } else if (advanceMode === 'full_only') {
+      splitContainer.style.display = 'none';
+    } else if (advanceMode === 'cod_only') {
+      splitContainer.style.display = 'none';
+    } else {
+      splitContainer.style.display = '';
       splitOptions.innerHTML = `
         <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
           <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
           <div class="flex-1">
             <span class="font-bold text-xs text-black block">⚡ Pay Delivery Charge Only</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay delivery fee advance via bKash, pay product price on delivery</span>
+            <span class="text-[11px] text-gray-500 block mt-0.5">Pay delivery fee advance, pay product on delivery</span>
           </div>
         </label>
-
         <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
           <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
           <div class="flex-1">
             <span class="font-bold text-xs text-black block">🔒 Pay Full Amount Now</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">100% advance payment (Product + Delivery Charge)</span>
+            <span class="text-[11px] text-gray-500 block mt-0.5">100% advance payment (Product + Delivery)</span>
           </div>
         </label>
-
         ${policy.cashOnDelivery !== false ? `
         <label class="col-span-1 md:col-span-2 flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
           <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
           <div class="flex-1">
             <span class="font-bold text-xs text-black block">💵 Full Cash on Delivery</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay full total when jersey is delivered at your door</span>
+            <span class="text-[11px] text-gray-500 block mt-0.5">Pay complete total when kit arrives at your doorstep</span>
           </div>
         </label>
         ` : ''}
@@ -607,43 +654,48 @@ function renderCheckoutPaymentMethods() {
     }
   }
 
-  // 3. Render Payment Gateways
-  let methods = (payConfig.methods || []).filter(m => m.enabled);
-  if (advanceMode === 'full_only') {
-    methods = methods.filter(m => m.id !== 'cod');
-  }
+  // 3. Render ALL 4 Payment Gateways (bKash, Nagad, Rocket, Cash on Delivery)
+  const bkashNum = payConfig.bkash?.number || '01700-000000';
+  const nagadNum = payConfig.nagad?.number || '01800-000000';
+  const rocketNum = payConfig.rocket?.number || '01900-000000';
+  const bkashType = payConfig.bkash?.type || 'Personal';
+  const nagadType = payConfig.nagad?.type || 'Personal';
+  const rocketType = payConfig.rocket?.type || 'Personal';
 
-  if (methods.length === 0) {
-    container.innerHTML = `<p class="text-xs text-red-500 font-bold">No payment methods available. Please contact support.</p>`;
-    return;
-  }
+  const allMethods = [
+    { id: 'bkash', name: 'bKash', color: '#D12053', bg: '#fdf2f6', border: '#f472b6', num: bkashNum, type: bkashType, desc: 'Send Money via bKash App or *247#' },
+    { id: 'nagad', name: 'Nagad', color: '#EA580C', bg: '#fff7ed', border: '#fdba74', num: nagadNum, type: nagadType, desc: 'Send Money via Nagad App or *167#' },
+    { id: 'rocket', name: 'Rocket', color: '#7C3AED', bg: '#faf5ff', border: '#c4b5fd', num: rocketNum, type: rocketType, desc: 'Send Money via Rocket App or *322#' },
+    { id: 'cod', name: 'Cash on Delivery', color: '#16A34A', bg: '#f0fdf4', border: '#86efac', num: '', type: 'Courier COD', desc: 'Pay cash to delivery rider at your doorstep' }
+  ];
 
-  container.innerHTML = methods.map((m, idx) => {
-    const isBkash = m.id === 'bkash';
-    const isNagad = m.id === 'nagad';
-    const isRocket = m.id === 'rocket';
-    const isCod = m.id === 'cod';
-    const color = isBkash ? '#D12053' : (isNagad ? '#EA580C' : (isRocket ? '#7C3AED' : '#16A34A'));
-    const phoneNum = m.number || (isBkash ? payConfig.bkash?.number : isNagad ? payConfig.nagad?.number : isRocket ? payConfig.rocket?.number : '');
-    const accType = m.type || (isBkash ? payConfig.bkash?.type : isNagad ? payConfig.nagad?.type : isRocket ? payConfig.rocket?.type : '');
+  // If full advance only, hide cod
+  const visibleMethods = (advanceMode === 'full_only' || policy.isDeliveryChargeMandatory) 
+    ? allMethods.filter(m => m.id !== 'cod' || !policy.isDeliveryChargeMandatory)
+    : allMethods;
 
-    return `
-      <label class="flex items-center gap-3 p-3.5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
-        <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black" />
-        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold" style="background:${color};">
-          ${isCod ? '💵' : '৳'}
-        </div>
-        <div class="flex-1">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-xs text-black">${m.name}</span>
-            ${accType ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${color}15;color:${color};border:1px solid ${color}40;">${accType}</span>` : ''}
+  container.innerHTML = `
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+      ${visibleMethods.map((m, idx) => `
+        <label class="flex items-center gap-3 p-3.5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white group">
+          <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4" />
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-black text-sm shadow-2xs" style="background:${m.color};">
+            ${m.id === 'cod' ? '💵' : '৳'}
           </div>
-          ${phoneNum ? `<div class="text-[11px] text-gray-700 font-mono font-bold mt-0.5">Send to: ${phoneNum}</div>` : ''}
-          ${isCod && policy.codNote ? `<div class="text-[11px] text-gray-500 mt-0.5">${policy.codNote}</div>` : ''}
-        </div>
-      </label>
-    `;
-  }).join('');
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-black group-hover:text-blue-900 transition-colors">${m.name}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full" style="background:${m.color}15;color:${m.color};border:1px solid ${m.color}35;">${m.type}</span>
+            </div>
+            <div class="text-[10px] text-gray-500 truncate mt-0.5">${m.desc}</div>
+          </div>
+        </label>
+      `).join('')}
+    </div>
+
+    <!-- Active Payment Instructions Card (Dynamic TrxID / Number) -->
+    <div id="checkout-payment-instructions-card"></div>
+  `;
 
   updateCheckoutCalculations();
 }
@@ -668,7 +720,8 @@ function updateCheckoutCalculations() {
   if (zone === 'outside') baseShipping = policy.deliveryChargeOutsideDhaka || 130;
 
   const freeThreshold = policy.deliveryChargeFreeThreshold ?? 3000;
-  const isFree = (policy.deliveryChargeEnabled === false) || (freeThreshold > 0 && subtotal >= freeThreshold);
+  // If delivery is mandatory for any kit, free threshold cannot waive it!
+  const isFree = (!policy.isDeliveryChargeMandatory) && ((policy.deliveryChargeEnabled === false) || (freeThreshold > 0 && subtotal >= freeThreshold));
   const shippingFee = isFree ? 0 : baseShipping;
 
   const totalOrderValue = subtotal + shippingFee;
@@ -677,7 +730,11 @@ function updateCheckoutCalculations() {
   const advanceMode = policy.advancePaymentMode || 'customer_choice';
   let activeSplit = 'delivery_only';
 
-  if (advanceMode === 'delivery_only') {
+  if (policy.isDeliveryChargeMandatory) {
+    const splitInput = document.querySelector('input[name="checkout-payment-split"]:checked');
+    activeSplit = splitInput ? splitInput.value : 'delivery_only';
+    if (activeSplit === 'cod') activeSplit = 'delivery_only';
+  } else if (advanceMode === 'delivery_only') {
     activeSplit = 'delivery_only';
   } else if (advanceMode === 'full_only') {
     activeSplit = 'full';
@@ -688,38 +745,133 @@ function updateCheckoutCalculations() {
     activeSplit = splitInput ? splitInput.value : 'delivery_only';
   }
 
-  // 4. Compute Pay Now vs Due on Delivery
+  // 4. Selected Payment Gateway
+  const paymentInput = document.querySelector('input[name="payment-method"]:checked');
+  let selectedPaymentId = paymentInput ? paymentInput.value : 'bkash';
+
+  const payConfig = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : {};
+  const mfsNumbers = {
+    bkash: payConfig.bkash?.number || '01700-000000',
+    nagad: payConfig.nagad?.number || '01800-000000',
+    rocket: payConfig.rocket?.number || '01900-000000'
+  };
+  const mfsTypes = {
+    bkash: payConfig.bkash?.type || 'Personal',
+    nagad: payConfig.nagad?.type || 'Personal',
+    rocket: payConfig.rocket?.type || 'Personal'
+  };
+  const methodNames = {
+    bkash: 'bKash',
+    nagad: 'Nagad',
+    rocket: 'Rocket',
+    cod: 'Cash on Delivery'
+  };
+
+  const currentMethodName = methodNames[selectedPaymentId] || 'bKash';
+  const currentMethodUpper = currentMethodName.toUpperCase();
+
+  // 5. Compute Pay Now vs Due on Delivery
   let payNowAmount = 0;
   let dueAmount = 0;
-  let payNowDesc = 'Via bKash';
-  let btnLabel = 'CONFIRM ORDER';
+  let payNowDesc = `Via ${currentMethodName}`;
+  let btnLabel = `CONFIRM ORDER (${currentMethodUpper})`;
 
-  if (activeSplit === 'delivery_only') {
-    payNowAmount = shippingFee;
-    dueAmount = subtotal;
-    payNowDesc = `Delivery Charge (${zone === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka'}) via bKash`;
-    btnLabel = payNowAmount > 0 ? `PAY ৳${payNowAmount.toLocaleString()} DELIVERY CHARGE VIA BKASH` : 'PLACE ORDER (FREE DELIVERY)';
-  } else if (activeSplit === 'full') {
-    payNowAmount = totalOrderValue;
-    dueAmount = 0;
-    payNowDesc = '100% Full Payment (Product + Delivery Charge)';
-    btnLabel = `PAY FULL ৳${payNowAmount.toLocaleString()} VIA BKASH`;
-  } else {
-    // cod
+  if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
     payNowAmount = 0;
     dueAmount = totalOrderValue;
     payNowDesc = 'No advance payment required';
-    btnLabel = `PLACE CASH ON DELIVERY ORDER (৳${dueAmount.toLocaleString()})`;
+    btnLabel = `CONFIRM ORDER (CASH ON DELIVERY - ৳${dueAmount.toLocaleString()}) →`;
+  } else if (activeSplit === 'delivery_only') {
+    payNowAmount = shippingFee;
+    dueAmount = subtotal;
+    payNowDesc = `Delivery Charge (${zone === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka'}) via ${currentMethodName}`;
+    btnLabel = payNowAmount > 0 
+      ? `PAY ৳${payNowAmount.toLocaleString()} DELIVERY CHARGE VIA ${currentMethodUpper} →`
+      : `CONFIRM ORDER (${currentMethodUpper}) →`;
+  } else {
+    // full
+    payNowAmount = totalOrderValue;
+    dueAmount = 0;
+    payNowDesc = `100% Full Payment via ${currentMethodName}`;
+    btnLabel = `PAY FULL ৳${payNowAmount.toLocaleString()} VIA ${currentMethodUpper} →`;
   }
 
-  // 5. Update UI breakdown
+  // 6. Render Detailed Instructions Card for Selected Gateway
+  const detailsBox = document.getElementById('checkout-payment-instructions-card');
+  if (detailsBox) {
+    if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
+      detailsBox.innerHTML = `
+        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 shadow-2xs">
+          <div class="font-bold flex items-center gap-1.5 mb-1 text-emerald-800">
+            <span class="material-symbols-outlined text-base">local_shipping</span>
+            <span>Cash on Delivery (Courier Doorstep Handover)</span>
+          </div>
+          <p class="text-[11px] text-emerald-700 leading-relaxed">
+            No advance digital payment needed. Pay total cash of <strong>৳${dueAmount.toLocaleString()}</strong> to the Steadfast / Pathao courier delivery rider when your package arrives at your doorstep.
+          </p>
+        </div>
+      `;
+    } else {
+      const phone = mfsNumbers[selectedPaymentId] || '01700-000000';
+      const accType = mfsTypes[selectedPaymentId] || 'Personal';
+      const color = selectedPaymentId === 'bkash' ? '#D12053' : (selectedPaymentId === 'nagad' ? '#EA580C' : '#7C3AED');
+
+      detailsBox.innerHTML = `
+        <div class="p-4 bg-white border-2 rounded-2xl shadow-xs space-y-3" style="border-color:${color};">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full" style="background:${color};"></span>
+              <span class="font-headline font-black text-xs sm:text-sm text-black uppercase tracking-wider">${currentMethodName} Payment Details</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-white uppercase tracking-wider" style="background:${color};">${accType}</span>
+          </div>
+
+          <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between">
+            <div>
+              <div class="text-[10px] font-mono uppercase text-gray-500 font-bold">Send Money To (${currentMethodName}):</div>
+              <div class="font-mono text-sm sm:text-base font-black text-black tracking-wider" id="mfs-target-number">${phone}</div>
+            </div>
+            <button type="button" onclick="copyMfsNumber('${phone}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span>
+              <span id="copy-btn-text">Copy</span>
+            </button>
+          </div>
+
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            Advance Amount to Send: <strong class="text-black font-black font-mono">৳${payNowAmount.toLocaleString()}</strong>. Send Money from your ${currentMethodName} app, then enter the TrxID below to confirm your order:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <div>
+              <label class="block text-[10px] font-mono uppercase font-bold text-gray-600 mb-1">Sender Mobile Phone No.</label>
+              <input type="tel" id="checkout-sender-phone" placeholder="01XXXXXXXXX" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold text-black focus:outline-none focus:border-black font-mono shadow-2xs"/>
+            </div>
+            <div>
+              <label class="block text-[10px] font-mono uppercase font-bold text-gray-600 mb-1">Transaction ID (TrxID) *</label>
+              <input type="text" id="checkout-trxid" placeholder="e.g. 9J2K8L1P" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold text-black uppercase tracking-wider focus:outline-none focus:border-black font-mono shadow-2xs"/>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // 7. Update UI breakdown
   const subEl = document.getElementById('checkout-subtotal');
   if (subEl) subEl.textContent = `৳${subtotal.toLocaleString()}`;
 
   const delEl = document.getElementById('checkout-delivery-fee');
   if (delEl) {
-    delEl.textContent = isFree ? 'FREE' : `৳${shippingFee.toLocaleString()}`;
-    delEl.className = isFree ? 'font-bold text-emerald-600' : 'font-bold text-black';
+    if (policy.isDeliveryChargeMandatory) {
+      delEl.innerHTML = `৳${shippingFee.toLocaleString()} <span class="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black px-1.5 py-0.5 rounded ml-1">MANDATORY</span>`;
+      delEl.className = 'font-bold text-black flex items-center justify-end';
+    } else if (isFree) {
+      delEl.textContent = 'FREE';
+      delEl.className = 'font-bold text-emerald-600';
+    } else {
+      delEl.textContent = `৳${shippingFee.toLocaleString()}`;
+      delEl.className = 'font-bold text-black';
+    }
   }
 
   const totalEl = document.getElementById('checkout-total');
@@ -740,7 +892,7 @@ function updateCheckoutCalculations() {
     if (btnSpan) btnSpan.textContent = btnLabel;
   }
 
-  // 6. Check Min order
+  // 8. Check Min order
   const minOrderEl = document.getElementById('checkout-min-order-notice');
   if (minOrderEl) {
     const minOrder = policy.minOrderAmount || 0;
@@ -919,7 +1071,7 @@ function renderCart() {
       const drawerItemHtml = `
         <div class="flex gap-3 p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/30 relative group shadow-sm">
           <div class="w-20 h-24 bg-surface-container-low rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-            <img src="${item.image}" class="cutout-image object-contain w-full h-full p-1.5" alt="${item.name}"/>
+            <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80'}" class="cutout-image object-contain w-full h-full p-1.5" alt="${item.name}"/>
           </div>
           <div class="flex-grow flex flex-col justify-between">
             <div>
@@ -948,7 +1100,7 @@ function renderCart() {
       if (checkoutList) {
         const checkoutItemHtml = `
           <div class="flex gap-3 p-3 bg-white rounded-xl border border-outline-variant/30">
-            <img src="${item.image}" class="w-16 h-16 object-contain bg-surface-container-low rounded-lg p-1" alt="${item.name}"/>
+            <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80'}" class="w-16 h-16 object-contain bg-surface-container-low rounded-lg p-1" alt="${item.name}"/>
             <div class="flex-grow flex flex-col justify-center">
               <h4 class="font-body-md text-xs font-bold text-primary">${item.name}</h4>
               <p class="font-mono-ui text-[11px] text-secondary">${item.details} • Qty: ${item.qty}</p>
@@ -1984,6 +2136,19 @@ function placeOrder() {
     selectedPaymentId = 'bkash';
   }
 
+  const trxId = document.getElementById('checkout-trxid')?.value.trim() || '';
+  const senderPhone = document.getElementById('checkout-sender-phone')?.value.trim() || '';
+
+  // Validate TrxID if advance payment via MFS is chosen
+  if (payableNow > 0 && selectedPaymentId !== 'cod') {
+    if (!trxId) {
+      showToast(`⚠️ Please enter the ${selectedPaymentId.toUpperCase()} Transaction ID (TrxID) after sending ৳${payableNow.toLocaleString()}.`);
+      const trxEl = document.getElementById('checkout-trxid');
+      if (trxEl) trxEl.focus();
+      return;
+    }
+  }
+
   let createdOrder = null;
   if (typeof DB !== 'undefined' && DB.orders) {
     createdOrder = DB.orders.create({
@@ -2000,9 +2165,12 @@ function placeOrder() {
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
       paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
-      paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
+      paymentTrxId: trxId,
+      senderPhone: senderPhone,
+      isDeliveryChargeMandatory: policy.isDeliveryChargeMandatory || false,
+      paymentStatus: payableNow > 0 ? (trxId ? 'ADVANCE_VERIFY_PENDING' : 'AWAITING_ADVANCE_PAYMENT') : 'PENDING_COD',
       status: 'PENDING',
-      notes: `Plan: ${planLabel} • Zone: ${zoneName} • Delivery Charge: ৳${shippingFee}`
+      notes: `Plan: ${planLabel} • Zone: ${zoneName} • Delivery: ৳${shippingFee}${policy.isDeliveryChargeMandatory ? ' [MANDATORY]' : ''}${trxId ? ' • TrxID: ' + trxId : ''}${senderPhone ? ' • Sender: ' + senderPhone : ''}`
     });
 
     if (DB.customers) {
@@ -2322,15 +2490,240 @@ function scrollSlider(amount) {
   }
 }
 
-function toggleWishlist(name, price) {
-  appState.wishlistCount += 1;
-  const badge = document.getElementById('wishlist-badge');
-  if (badge) badge.innerText = appState.wishlistCount;
-  showToast(`Saved "${name}" to your Wishlist`);
+// ─────────────────────────────────────────
+// Persistent Wishlist System & Drawer
+// ─────────────────────────────────────────
+function getWishlist() {
+  try {
+    return JSON.parse(localStorage.getItem('zenvy_wishlist') || '[]');
+  } catch(e) {
+    return [];
+  }
 }
 
-function toggleWishlistModal() {
-  showToast(`Wishlist contains ${appState.wishlistCount} saved item(s)`);
+function saveWishlist(list) {
+  try {
+    localStorage.setItem('zenvy_wishlist', JSON.stringify(list));
+    updateWishlistBadges();
+    syncWishlistHeartButtons();
+    renderWishlistDrawer();
+    window.dispatchEvent(new Event('storage'));
+  } catch(e) {}
+}
+
+function toggleWishlist(productOrName, price, image, category) {
+  let item = null;
+  if (typeof productOrName === 'object' && productOrName !== null) {
+    item = {
+      id: productOrName.id || ('wish_' + Date.now()),
+      name: productOrName.name || 'ZENVY Jersey',
+      price: productOrName.salePrice || productOrName.basePrice || 1450,
+      image: (productOrName.images && productOrName.images[0]?.url) || productOrName.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80',
+      category: productOrName.categoryName || "Men's Football"
+    };
+  } else {
+    // Try to find product in DB
+    const p = (typeof DB !== 'undefined' && DB.products) ? DB.products.byId(productOrName) : null;
+    if (p) {
+      item = {
+        id: p.id,
+        name: p.name,
+        price: p.salePrice || p.basePrice || 1450,
+        image: (p.images && p.images[0]?.url) || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80',
+        category: p.categoryName || "Men's Football"
+      };
+    } else {
+      item = {
+        id: 'wish_' + String(productOrName).replace(/\s+/g, '_').toLowerCase(),
+        name: String(productOrName),
+        price: parseFloat(price) || 1450,
+        image: image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80',
+        category: category || "Performance Jersey"
+      };
+    }
+  }
+
+  const list = getWishlist();
+  const index = list.findIndex(x => (x.id && String(x.id) === String(item.id)) || (x.name && x.name.toLowerCase() === item.name.toLowerCase()));
+
+  if (index > -1) {
+    list.splice(index, 1);
+    saveWishlist(list);
+    showToast(`Removed "${item.name}" from Wishlist`);
+  } else {
+    list.push(item);
+    saveWishlist(list);
+    showToast(`Saved "${item.name}" to your Wishlist ❤️`);
+  }
+}
+
+function updateWishlistBadges() {
+  const list = getWishlist();
+  const count = list.length;
+  appState.wishlistCount = count;
+  document.querySelectorAll('#wishlist-badge, .wishlist-badge-count').forEach(b => {
+    b.textContent = count;
+    b.style.display = count > 0 ? 'flex' : 'none';
+  });
+  const drawerCount = document.getElementById('wishlist-drawer-count');
+  if (drawerCount) drawerCount.textContent = count;
+}
+
+function syncWishlistHeartButtons() {
+  const list = getWishlist();
+  const names = list.map(x => (x.name || '').toLowerCase());
+  const ids = list.map(x => String(x.id || ''));
+
+  document.querySelectorAll('.favourite-btn, [data-wishlist-name], [data-wishlist-id]').forEach(btn => {
+    const bName = (btn.getAttribute('data-wishlist-name') || '').toLowerCase();
+    const bId = String(btn.getAttribute('data-wishlist-id') || '');
+    const isFav = (bId && ids.includes(bId)) || (bName && names.includes(bName));
+    const icon = btn.querySelector('.material-symbols-outlined') || btn;
+    if (isFav) {
+      icon.classList.add('text-red-500', 'fill-1');
+      icon.classList.remove('text-gray-400', 'text-gray-500');
+    } else {
+      icon.classList.remove('text-red-500', 'fill-1');
+      icon.classList.add('text-gray-400');
+    }
+  });
+}
+
+function toggleWishlistModal(forceOpen = null) {
+  const container = document.getElementById('wishlist-drawer-container');
+  const drawer = container ? container.querySelector('aside') : null;
+  if (!container || !drawer) return;
+
+  const isHidden = container.style.display === 'none' || container.classList.contains('pointer-events-none');
+  const shouldOpen = forceOpen !== null ? forceOpen : isHidden;
+
+  if (shouldOpen) {
+    renderWishlistDrawer();
+    container.style.display = 'block';
+    void container.offsetWidth;
+    container.classList.remove('pointer-events-none', 'opacity-0');
+    container.classList.add('pointer-events-auto', 'opacity-100');
+    drawer.style.transform = 'translateX(0)';
+  } else {
+    container.classList.add('pointer-events-none', 'opacity-0');
+    container.classList.remove('pointer-events-auto', 'opacity-100');
+    drawer.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (container.classList.contains('pointer-events-none')) {
+        container.style.display = 'none';
+      }
+    }, 300);
+  }
+}
+
+function renderWishlistDrawer() {
+  const container = document.getElementById('wishlist-drawer-items');
+  if (!container) return;
+  const list = getWishlist();
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-12 text-gray-400">
+        <span class="material-symbols-outlined text-5xl mb-2 text-gray-300">favorite</span>
+        <p class="text-sm font-bold text-gray-700">Your Wishlist is empty</p>
+        <p class="text-xs text-gray-400 mt-1">Click the heart icon on any jersey in the shop to save it here.</p>
+        <button onclick="toggleWishlistModal(false); switchView('shop')" class="mt-4 px-4 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-neutral-800 transition-all cursor-pointer">
+          Explore Jerseys
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map((item, idx) => `
+    <div class="flex gap-3 p-3 bg-white border border-gray-100 rounded-2xl shadow-xs hover:border-gray-300 transition-all">
+      <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'}" class="w-14 h-14 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-start">
+          <h4 class="font-bold text-xs text-black truncate cursor-pointer hover:underline" onclick="window.location.href='product.html?id=${item.id}'">${item.name}</h4>
+          <button onclick="removeWishlistItem(${idx})" class="text-gray-400 hover:text-red-500 p-0.5 cursor-pointer" title="Remove">
+            <span class="material-symbols-outlined text-base">close</span>
+          </button>
+        </div>
+        <p class="text-[10px] text-gray-500 mt-0.5">${item.category || "Men's Football"}</p>
+        <div class="flex justify-between items-center mt-2">
+          <span class="font-mono-ui font-black text-xs text-black">৳${Math.round(item.price || 1450).toLocaleString()}</span>
+          <div class="flex items-center gap-1.5">
+            <a href="product.html?id=${item.id}" class="text-[11px] font-bold text-blue-700 hover:underline">View Kit</a>
+            <button onclick="addWishlistItemToCart(${idx})" class="bg-black hover:bg-neutral-800 text-white text-[10px] font-bold px-2.5 py-1 rounded-full cursor-pointer flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">add_shopping_cart</span>
+              <span>Add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeWishlistItem(idx) {
+  const list = getWishlist();
+  if (list[idx]) {
+    const name = list[idx].name;
+    list.splice(idx, 1);
+    saveWishlist(list);
+    showToast(`Removed "${name}" from Wishlist`);
+  }
+}
+
+function clearWishlist() {
+  saveWishlist([]);
+  showToast('Wishlist cleared');
+}
+
+function addWishlistItemToCart(idx) {
+  const list = getWishlist();
+  if (!list[idx]) return;
+  const item = list[idx];
+  addToCart({
+    id: item.id || ('prod_' + Date.now()),
+    productId: item.id,
+    name: item.name,
+    price: item.price || 1450,
+    image: item.image,
+    details: 'Size: M • Half Sleeve',
+    qty: 1
+  });
+  showToast(`Added ${item.name} to Bag!`);
+}
+
+function addAllWishlistToCart() {
+  const list = getWishlist();
+  if (list.length === 0) {
+    showToast('Wishlist is empty!');
+    return;
+  }
+  list.forEach(item => {
+    addToCart({
+      id: item.id || ('prod_' + Date.now()),
+      productId: item.id,
+      name: item.name,
+      price: item.price || 1450,
+      image: item.image,
+      details: 'Size: M • Half Sleeve',
+      qty: 1
+    });
+  });
+  showToast(`Added all ${list.length} item(s) to Bag!`);
+  toggleWishlistModal(false);
+  toggleCart(true);
+}
+
+// Global window bindings
+if (typeof window !== 'undefined') {
+  window.getWishlist = getWishlist;
+  window.saveWishlist = saveWishlist;
+  window.toggleWishlist = toggleWishlist;
+  window.toggleWishlistModal = toggleWishlistModal;
+  window.removeWishlistItem = removeWishlistItem;
+  window.clearWishlist = clearWishlist;
+  window.addWishlistItemToCart = addWishlistItemToCart;
+  window.addAllWishlistToCart = addAllWishlistToCart;
 }
 
 function showToast(message) {

@@ -1354,6 +1354,38 @@
     </aside>
   </div>
 
+  <!-- ==================== WISHLIST SLIDING DRAWER ==================== -->
+  <div id="wishlist-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0" style="display: none;">
+    <div onclick="toggleWishlistModal(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
+    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
+      <!-- Drawer Header -->
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-red-500 fill-1 text-2xl">favorite</span>
+          <h2 class="font-headline text-base sm:text-lg font-black tracking-tight text-black">YOUR WISHLIST</h2>
+          <span id="wishlist-drawer-count" class="bg-red-500 text-white text-[11px] font-mono-ui font-bold px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <button type="button" onclick="toggleWishlistModal(false)" class="p-1.5 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close Wishlist">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Drawer Items List -->
+      <div id="wishlist-drawer-items" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+        <button type="button" onclick="clearWishlist()" class="text-xs font-bold text-gray-500 hover:text-red-600 transition-colors cursor-pointer">Clear All</button>
+        <button type="button" onclick="addAllWishlistToCart()" class="bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+          <span>Add All to Bag</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
 
   <!-- ==================== INTERACTIVE 3D PREVIEW MODAL ==================== -->
   <div id="modal-3d" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
@@ -1567,6 +1599,7 @@
   <!-- Admin DB & Store State -->
   <script src="admin-db.js?v=20261103_live_v2"></script>
   <!-- Main Application JavaScript -->
+  <script src="wishlist.js?v=20261103_live_v2"></script>
   <script src="app.js?v=20261103_live_v2"></script>
 </body>
 </html>

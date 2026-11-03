@@ -1214,6 +1214,17 @@ function openProductForm(id = null) {
           </select>
         </div>
 
+        <!-- Mandatory Delivery Charge Toggle -->
+        <div style="margin-bottom:14px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:12px;padding:12px 14px;">
+          <label class="checkbox-chip ${product?.isDeliveryChargeMandatory ? 'selected' : ''}" style="margin-bottom:6px;display:inline-flex;">
+            <input type="checkbox" name="isDeliveryChargeMandatory" ${product?.isDeliveryChargeMandatory ? 'checked' : ''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked);"/>
+            ⚡ Mandatory Delivery Charge for this Product
+          </label>
+          <div style="font-size:11px;color:#92400E;line-height:1.4;">
+            When checked, the delivery charge for this product is <strong>MANDATORY</strong> (must be paid by customer; cannot be skipped or waived by free shipping thresholds). When unchecked, delivery charge remains optional/standard according to store policy.
+          </div>
+        </div>
+
         <div class="form-group" style="margin-bottom:16px;">
           <label class="form-label" style="font-weight:800;font-size:13px;color:#0F172A;margin-bottom:4px;">Custom Delivery Charges for this Product</label>
           <label class="checkbox-chip ${product?.hasCustomDelivery ? 'selected' : ''}" style="margin-bottom:12px;display:inline-flex;">
@@ -1679,6 +1690,7 @@ function saveProduct(e, id, asDraft = false) {
     preorderDesc: get('preorderDesc'),
     advancePaymentMode: get('advancePaymentMode') || 'default',
     hasCustomDelivery: fd.get('hasCustomDelivery') === 'on',
+    isDeliveryChargeMandatory: fd.get('isDeliveryChargeMandatory') === 'on',
     deliveryChargeInsideDhaka: parseFloat(get('deliveryChargeInsideDhaka')) || 80,
     deliveryChargeOutsideDhaka: parseFloat(get('deliveryChargeOutsideDhaka')) || 130,
     deliveryNote: get('deliveryNote') || '',

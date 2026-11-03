@@ -233,9 +233,18 @@
   <!-- ═══════════════════════════════════════════
        MAIN PRODUCT DETAIL VIEW
   ════════════════════════════════════════════ -->
-  <main class="flex-grow max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-10">
+  <main class="flex-grow max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 md:py-8">
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-12 items-start">
+    <!-- Breadcrumbs Navigation (matching Screenshot 1) -->
+    <nav class="text-xs font-mono-ui text-gray-500 mb-3 sm:mb-4 flex items-center gap-1.5 flex-wrap">
+      <a href="index.html" class="hover:text-black">Home</a>
+      <span>/</span>
+      <a href="index.html#shop" id="pd-breadcrumb-cat" class="hover:text-black">Men's Football</a>
+      <span>/</span>
+      <span id="pd-breadcrumb-title" class="text-black font-bold truncate max-w-[220px] sm:max-w-md">Aura Strike Pro Jersey</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10 items-start">
       
       <!-- ─────────────────────────────────────────
            LEFT COLUMN: VISUAL GALLERY & 3D PREVIEW
@@ -314,211 +323,187 @@
 
 
       <!-- ─────────────────────────────────────────
-           RIGHT COLUMN: PRODUCT DETAILS & OPTIONS
+           RIGHT COLUMN: PRODUCT DETAILS & OPTIONS (MATCHING SCREENSHOT 1)
       ────────────────────────────────────────── -->
-      <div class="lg:col-span-6 xl:col-span-5 flex flex-col gap-4 sm:gap-5">
+      <div class="lg:col-span-6 xl:col-span-5 flex flex-col gap-3.5 sm:gap-4">
         
         <!-- Header Info -->
-        <div class="space-y-1 sm:space-y-1.5">
-          <div class="text-[10px] sm:text-[11px] font-mono-ui font-bold tracking-[0.12em] text-gray-500 uppercase flex items-center gap-2">
-            <span id="pd-category-tag">MEN'S FOOTBALL</span>
+        <div class="space-y-1">
+          <!-- Product Title -->
+          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight">
+            Real Madrid 12/13 Home Full sleeve
+          </h1>
+
+          <!-- Subtitle / Team / Category -->
+          <div class="text-xs font-mono-ui font-bold text-blue-900 flex items-center gap-2">
+            <span id="pd-subtitle-tags">Real Madrid, Retro Edition</span>
             <span>•</span>
             <span id="pd-stock-tag" class="text-emerald-700 font-black">IN STOCK</span>
           </div>
 
-          <!-- Product Title -->
-          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight">
-            ZENVY AeroKnit Pro Jersey
-          </h1>
-
-          <!-- Reviews Rating -->
-          <div class="flex items-center gap-2.5 pt-0.5">
-            <div class="flex text-amber-400 text-xs">
-              <span class="material-symbols-outlined text-[15px] fill-1">star</span>
-              <span class="material-symbols-outlined text-[15px] fill-1">star</span>
-              <span class="material-symbols-outlined text-[15px] fill-1">star</span>
-              <span class="material-symbols-outlined text-[15px] fill-1">star</span>
-              <span class="material-symbols-outlined text-[15px]">star_half</span>
-            </div>
-            <span class="text-[11px] font-mono-ui font-bold text-black">4.9</span>
-            <span class="text-[11px] text-gray-400 font-medium">(128 Reviews)</span>
-          </div>
-
           <!-- Price Display -->
-          <div class="mt-2.5 flex items-baseline gap-2.5">
-            <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black">৳1,450</span>
-            <span id="pd-original-price" class="font-mono-ui text-sm text-gray-400 line-through hidden">৳1,800</span>
-            <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">SAVE 20%</span>
+          <div class="pt-1 flex items-baseline gap-2.5">
+            <span id="pd-original-price" class="font-mono-ui text-base text-gray-400 line-through">1,450.00৳</span>
+            <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black">1,350.00৳</span>
+            <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">SALE</span>
           </div>
         </div>
 
-        <hr class="border-gray-100"/>
+        <hr class="border-gray-100 my-0.5"/>
 
-        <!-- ── 1. SELECT SIZE ── -->
+        <!-- ── SELECT SIZE (DROPDOWN + QUICK PILLS MATCHING SCREENSHOT 1) ── -->
         <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase flex items-center gap-1.5">
-              <span>SELECT SIZE:</span>
-              <span id="selected-size-chip" class="text-black font-black bg-gray-100 px-2 py-0.5 rounded text-[11px]">M</span>
-            </label>
-            <button type="button" onclick="openSizeGuideModal()" class="text-xs text-gray-500 underline hover:text-black font-semibold">
-              Size Guide
-            </button>
-          </div>
-
-          <!-- Size Buttons -->
-          <div id="size-options-container" class="grid grid-cols-5 sm:grid-cols-8 gap-1.5">
-            <button type="button" onclick="selectSize('S', this)" class="size-btn py-2.5 rounded-lg text-xs font-bold text-center">S</button>
-            <button type="button" onclick="selectSize('M', this)" class="size-btn active py-2.5 rounded-lg text-xs font-bold text-center">M</button>
-            <button type="button" onclick="selectSize('L', this)" class="size-btn py-2.5 rounded-lg text-xs font-bold text-center">L</button>
-            <button type="button" onclick="selectSize('XL', this)" class="size-btn py-2.5 rounded-lg text-xs font-bold text-center">XL</button>
-            <button type="button" onclick="selectSize('XXL', this)" class="size-btn py-2.5 rounded-lg text-xs font-bold text-center">XXL</button>
-          </div>
-        </div>
-
-        <!-- ── 2. SLEEVE STYLE ── -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase flex items-center gap-1.5">
-              <span>SLEEVE STYLE:</span>
-              <span id="selected-sleeve-chip" class="text-black font-black bg-gray-100 px-2 py-0.5 rounded text-[11px]">Half Sleeve</span>
-            </label>
-          </div>
-
-          <div id="sleeve-options-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <div onclick="selectSleeve('short', 0, 'Half Sleeve', this)" class="sleeve-card active flex flex-col justify-center">
-              <div class="text-xs font-bold text-black">Half Sleeve</div>
-              <div class="text-[10px] text-gray-500 font-medium mt-0.5">Included</div>
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
+                Select Size
+              </label>
+              <!-- Small quick button to view size chart image or guide requested by user -->
+              <button type="button" onclick="openSizeGuideModal(true)" id="btn-quick-chart-img" class="inline-flex items-center gap-1 text-[11px] font-mono-ui font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-0.5 rounded-full cursor-pointer transition-colors shadow-2xs" title="Click to view size guide & chart">
+                <span class="material-symbols-outlined text-[13px]">straighten</span>
+                <span>Size Chart</span>
+              </button>
             </div>
+            <span id="selected-size-chip" class="text-black font-mono-ui font-black text-xs bg-gray-100 px-2 py-0.5 rounded">M</span>
+          </div>
+          <div class="relative">
+            <select id="pd-size-select" onchange="selectSize(this.value)" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-black appearance-none cursor-pointer shadow-2xs">
+              <option value="S">S</option>
+              <option value="M" selected>M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-lg">expand_more</span>
+          </div>
 
-            <div onclick="selectSleeve('long', 300, 'Full Sleeve', this)" class="sleeve-card flex flex-col justify-center">
-              <div class="text-xs font-bold text-black">Full Sleeve</div>
-              <div class="text-[10px] text-gray-500 font-medium mt-0.5">+৳300</div>
+          <!-- Quick click size buttons -->
+          <div id="size-options-container" class="grid grid-cols-5 gap-1.5 mt-2">
+            <button type="button" onclick="selectSize('S', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">S</button>
+            <button type="button" onclick="selectSize('M', this)" class="size-btn active py-2 rounded-lg text-xs font-bold text-center">M</button>
+            <button type="button" onclick="selectSize('L', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">L</button>
+            <button type="button" onclick="selectSize('XL', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">XL</button>
+            <button type="button" onclick="selectSize('XXL', this)" class="size-btn py-2 rounded-lg text-xs font-bold text-center">XXL</button>
+          </div>
+        </div>
+
+        <!-- ── SLEEVE STYLE (Compact) ── -->
+        <div id="sleeve-section" class="pt-0.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
+              Sleeve Style
+            </label>
+            <span id="selected-sleeve-chip" class="text-black font-bold text-xs bg-gray-100 px-2 py-0.5 rounded">Half Sleeve</span>
+          </div>
+          <div id="sleeve-options-container" class="grid grid-cols-2 gap-2">
+            <div onclick="selectSleeve('short', 0, 'Half Sleeve', this)" class="sleeve-card active flex items-center justify-between p-2.5">
+              <span class="text-xs font-bold text-black">Half Sleeve</span>
+              <span class="text-[10px] text-gray-500 font-mono-ui font-medium">Included</span>
+            </div>
+            <div onclick="selectSleeve('long', 300, 'Full Sleeve', this)" class="sleeve-card flex items-center justify-between p-2.5">
+              <span class="text-xs font-bold text-black">Full Sleeve</span>
+              <span class="text-[10px] text-gray-500 font-mono-ui font-medium">+৳300</span>
             </div>
           </div>
         </div>
 
-        <!-- ── 3. QUANTITY SELECTOR ── -->
-        <div class="flex items-center justify-between py-2 border-y border-gray-100">
-          <span class="text-[11px] font-mono-ui font-bold tracking-wider text-gray-700 uppercase">QUANTITY</span>
-          <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
-            <button type="button" onclick="changeQty(-1)" class="w-9 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 text-sm font-black transition-colors">−</button>
-            <span id="pd-qty-display" class="px-3 text-xs font-mono-ui font-black text-black min-w-[32px] text-center">1</span>
-            <button type="button" onclick="changeQty(1)" class="w-9 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 text-sm font-black transition-colors">+</button>
+        <!-- ── ADD-ONS (PATCHES LIST MATCHING SCREENSHOT 1) ── -->
+        <div class="pt-1">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-headline font-black text-black uppercase tracking-wider">Add-ons</h3>
+            <span class="text-[10px] font-mono-ui text-gray-400">Official tournament badges</span>
+          </div>
+
+          <div id="patches-list-container" class="space-y-2">
+            <!-- Populated dynamically: 1. UCL Ball patch, 2. 9 Trophy patch, 3. Respect patch -->
           </div>
         </div>
 
-        <!-- ── 4. PERSONALIZATION TOGGLE ── -->
-        <div class="bg-[#f9fafb] border border-gray-200 rounded-xl p-3 sm:p-4 transition-all">
+        <!-- ── CUSTOM NAME & NUMBER (+250৳) MATCHING SCREENSHOT 1 ── -->
+        <div class="pt-1">
+          <div class="flex items-center justify-between mb-1.5">
+            <h3 id="custom-section-heading" class="text-xs font-headline font-black text-black uppercase tracking-wider">
+              Custom Name & Number (+250৳)
+            </h3>
+            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED</span>
+          </div>
           
-          <div class="flex items-center justify-between cursor-pointer" onclick="togglePersonalization()">
-            <div>
-              <span class="text-xs font-black text-black tracking-wide">PERSONALIZATION</span>
-              <span id="personalize-cost-tag" class="text-xs text-gray-500 font-bold ml-1.5">(+৳300)</span>
-            </div>
-            
-            <!-- Toggle Switch -->
-            <label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
-              <input type="checkbox" id="personalize-toggle" onchange="onPersonalizeToggleChange(this.checked)" class="sr-only custom-switch-input"/>
-              <div class="custom-switch-track w-11 h-6 bg-gray-200 rounded-full transition-colors relative">
-                <div class="custom-switch-thumb w-5 h-5 bg-white rounded-full shadow absolute left-0.5 top-0.5 transition-transform duration-200"></div>
-              </div>
-            </label>
+          <div class="relative">
+            <input type="text" 
+                   id="custom-name-number-input" 
+                   oninput="onCustomNameNumberChange(this.value)"
+                   placeholder="Enter Name + Number (e.g. RONALDO 7)" 
+                   class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-black uppercase tracking-wider focus:outline-none focus:border-black placeholder:text-gray-400 placeholder:font-normal placeholder:normal-case shadow-2xs"/>
           </div>
-
-          <!-- Expandable Personalization Fields -->
-          <div id="personalization-fields" class="mt-3 pt-3 border-t border-gray-200 flex flex-col gap-3 hidden">
-            
-            <!-- Name Input -->
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="text-[10px] sm:text-[11px] font-bold text-gray-700 uppercase">Player / Custom Name</label>
-                <span class="text-[10px] text-gray-400 font-mono-ui">Max 12 chars</span>
-              </div>
-              <input type="text" 
-                     id="custom-name-input" 
-                     maxlength="12" 
-                     value="R. CHANDLER" 
-                     oninput="updateCustomName(this.value)"
-                     placeholder="e.g. RONALDO" 
-                     class="w-full text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg uppercase tracking-wider font-bold focus:outline-none focus:border-black"/>
-            </div>
-
-            <!-- Number Input -->
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="text-[10px] sm:text-[11px] font-bold text-gray-700 uppercase">Squad Number</label>
-                <span class="text-[10px] text-gray-400 font-mono-ui">0 - 99</span>
-              </div>
-              <input type="number" 
-                     id="custom-number-input" 
-                     min="0" 
-                     max="99" 
-                     value="24" 
-                     oninput="updateCustomNumber(this.value)"
-                     placeholder="e.g. 7" 
-                     class="w-full text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg font-bold focus:outline-none focus:border-black"/>
-            </div>
-
-            <!-- Patches Selection -->
-            <div>
-              <label class="text-[10px] sm:text-[11px] font-bold text-gray-700 uppercase block mb-1.5">Official Sleeve Badges</label>
-              <div id="patches-list-container" class="grid grid-cols-1 gap-1.5">
-                <label class="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-black transition-all text-xs">
-                  <div class="flex items-center gap-2">
-                    <input type="checkbox" name="patch" value="ucl" data-name="UEFA Champions League" data-price="150" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
-                    <span class="font-bold text-gray-800 text-[11px]">UEFA Champions League Starball</span>
-                  </div>
-                  <span class="font-mono-ui text-gray-700 font-bold text-[11px]">+৳150</span>
-                </label>
-                
-                <label class="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-black transition-all text-xs">
-                  <div class="flex items-center gap-2">
-                    <input type="checkbox" name="patch" value="respect" data-name="UEFA Foundation / Respect" data-price="100" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
-                    <span class="font-bold text-gray-800 text-[11px]">UEFA Foundation / Respect</span>
-                  </div>
-                  <span class="font-mono-ui text-gray-700 font-bold text-[11px]">+৳100</span>
-                </label>
-              </div>
-            </div>
-
-          </div>
-
+          <p class="text-[10px] text-gray-400 mt-1 font-mono-ui">Official match typography. Leave blank if you want an unprinted plain kit.</p>
         </div>
 
-        <!-- ── 5. DESKTOP TOTAL & ACTIONS (Hidden on mobile; mobile uses sticky bottom bar) ── -->
-        <div class="hidden lg:block pt-1">
-          <div class="flex items-baseline justify-between mb-3">
-            <span class="font-headline font-bold text-base text-gray-600">Total Price:</span>
-            <span id="pd-final-total" class="font-headline font-black text-3xl text-black">৳1,450</span>
-          </div>
+        <!-- ── QUANTITY & ADD TO CART (MATCHING SCREENSHOT 1) ── -->
+        <div class="pt-2">
+          <div class="flex items-center gap-3">
+            <!-- Qty Counter -->
+            <div class="flex items-center border border-gray-300 rounded-xl bg-white overflow-hidden h-12 flex-shrink-0 shadow-2xs">
+              <button type="button" onclick="changeQty(-1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base transition-colors cursor-pointer">−</button>
+              <span id="pd-qty-display" class="w-10 text-center font-mono-ui font-black text-sm text-black">1</span>
+              <button type="button" onclick="changeQty(1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base transition-colors cursor-pointer">+</button>
+            </div>
 
-          <div class="flex items-center gap-2.5">
+            <!-- Add to Cart Button (Screenshot 1 style: Dark blue / primary) -->
             <button type="button" 
                     id="add-to-cart-btn"
                     onclick="handleAddToCart()" 
-                    class="flex-1 bg-black text-white hover:bg-neutral-800 active:scale-[0.99] font-headline font-bold text-xs tracking-wider uppercase py-3.5 rounded-full flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer">
+                    class="flex-1 h-12 bg-[#1b2a4a] hover:bg-[#121c33] active:scale-[0.99] text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
-              <span>Add to Bag</span>
+              <span>Add to cart</span>
             </button>
+
+            <!-- Buy Now Button -->
             <button type="button" 
                     onclick="buyNowDirect()" 
-                    class="bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-black font-headline font-black text-xs tracking-wider uppercase py-3.5 px-6 rounded-full flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer">
+                    class="h-12 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-black font-headline font-black text-xs uppercase tracking-wider px-5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">bolt</span>
               <span>Buy Now</span>
             </button>
           </div>
 
-          <!-- Trust Badges -->
-          <div class="flex items-center justify-center gap-5 mt-3 text-xs text-gray-500 font-medium">
-            <div class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px] text-emerald-600">local_shipping</span>
-              <span>24–48h Delivery</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px] text-blue-600">verified</span>
-              <span>100% Authentic Match Grade</span>
-            </div>
+          <!-- Total price indicator -->
+          <div class="flex items-center justify-between text-xs text-gray-500 font-mono-ui mt-2 px-1">
+            <span>Item Subtotal:</span>
+            <span id="pd-final-total" class="font-headline font-black text-base text-black">1,350.00৳</span>
+          </div>
+
+          <!-- VIEW SIZE CHART BUTTON (MATCHING SCREENSHOT 1) -->
+          <button type="button" 
+                  onclick="openSizeGuideModal()" 
+                  id="btn-view-size-chart" 
+                  class="w-full mt-3 py-3 px-4 rounded-xl border border-[#2b6cb0] hover:bg-[#f0f6fc] text-[#1e4e8c] font-headline font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
+            <span class="material-symbols-outlined text-base">straighten</span>
+            <span id="btn-size-chart-label">View Retro Size Chart</span>
+          </button>
+        </div>
+
+        <!-- Metadata & Trust info -->
+        <div class="pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1.5">
+          <div><strong class="text-black font-semibold">Categories:</strong> <span id="pd-meta-categories">Real Madrid, Retro Edition</span></div>
+          <div><strong class="text-black font-semibold">Brand:</strong> <span id="pd-meta-brand">Adidas</span></div>
+        </div>
+
+        <!-- Description & Reviews Tabs -->
+        <div class="pt-3 border-t border-gray-100">
+          <div class="flex border-b border-gray-200">
+            <button type="button" onclick="switchProductTab('desc')" id="tab-btn-desc" class="py-2 px-4 text-xs font-headline font-black text-black border-b-2 border-black -mb-px">Description</button>
+            <button type="button" onclick="switchProductTab('reviews')" id="tab-btn-reviews" class="py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black">Reviews (0)</button>
+          </div>
+          <div id="tab-content-desc" class="py-3 text-xs text-gray-600 leading-relaxed space-y-2">
+            <p id="pd-full-description">Men's authentic match-grade jersey with micro-perforated AeroKnit weave. Crafted for pro endurance, optimal moisture-wicking and comfort.</p>
+            <ul class="list-disc pl-4 space-y-1 text-gray-500">
+              <li>100% Breathable AeroKnit performance polyester</li>
+              <li>Reinforced heat-sealed cuffs and neckline</li>
+              <li>Official tournament starball badges & name-number printing</li>
+            </ul>
+          </div>
+          <div id="tab-content-reviews" class="py-3 text-xs text-gray-500 hidden">
+            <p>There are no customer reviews for this kit yet. Be the first to review after ordering!</p>
           </div>
         </div>
 
@@ -616,44 +601,96 @@
 
 
   <!-- ═══════════════════════════════════════════
-       SIZE GUIDE MODAL
+       SIZE GUIDE & MAPPING MODAL (MATCHING SCREENSHOT 2)
   ════════════════════════════════════════════ -->
-  <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl animate-slide-up">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-headline font-bold text-base sm:text-lg text-black">ZENVY Official Size Guide</h3>
-        <button onclick="closeSizeGuideModal()" class="text-gray-500 hover:text-black">✕</button>
-      </div>
-      <p class="text-xs text-gray-500 mb-3">Pro-Athlete specification fit. If you prefer a loose casual fit, we suggest picking one size up.</p>
+  <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md sm:max-w-lg w-full shadow-2xl overflow-hidden animate-slide-up border border-gray-100">
       
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left">
-          <thead class="bg-gray-100 text-gray-700 font-mono-ui uppercase">
-            <tr>
-              <th class="p-2">Size</th>
-              <th class="p-2">Chest (in)</th>
-              <th class="p-2">Length (in)</th>
-              <th class="p-2">Fit Style</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr><td class="p-2 font-bold">S</td><td class="p-2">36 - 38</td><td class="p-2">27.5</td><td class="p-2">Slim Pro</td></tr>
-            <tr class="bg-gray-50"><td class="p-2 font-bold">M</td><td class="p-2">38 - 40</td><td class="p-2">28.5</td><td class="p-2">Standard Fit</td></tr>
-            <tr><td class="p-2 font-bold">L</td><td class="p-2">40 - 42</td><td class="p-2">29.5</td><td class="p-2">Standard Fit</td></tr>
-            <tr class="bg-gray-50"><td class="p-2 font-bold">XL</td><td class="p-2">42 - 44</td><td class="p-2">30.5</td><td class="p-2">Relaxed Fit</td></tr>
-            <tr><td class="p-2 font-bold">2XL</td><td class="p-2">44 - 46</td><td class="p-2">31.5</td><td class="p-2">Relaxed Fit</td></tr>
-          </tbody>
-        </table>
+      <!-- Modal Header (Yellow / Athletic styling matching Screenshot 2) -->
+      <div class="bg-[#fef9c3] p-5 sm:p-6 text-center border-b border-amber-200/70 relative">
+        <button onclick="closeSizeGuideModal()" class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-gray-700 flex items-center justify-center text-sm font-bold shadow-xs cursor-pointer">✕</button>
+        
+        <div class="inline-flex items-center justify-center gap-1.5 mb-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+          <span class="text-[11px] font-mono-ui font-black uppercase tracking-widest text-amber-900">SIZE CHART</span>
+        </div>
+        <h3 id="modal-sizechart-edition" class="font-headline font-black text-2xl sm:text-3xl text-black uppercase tracking-tight">
+          PLAYER EDITION
+        </h3>
+        <p class="text-[11px] text-amber-900/80 mt-0.5 font-medium">All measurements in inches. Slim pro athlete fit.</p>
       </div>
 
-      <div class="mt-4 text-right">
-        <button onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-4 py-2 rounded-full">Got It</button>
+      <!-- View Toggle: If image is set, can toggle between Table and Image -->
+      <div id="sizechart-view-toggle" class="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-center gap-2 hidden">
+        <button type="button" onclick="switchSizeChartTab('table')" id="btn-chart-table" class="px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs">Measurements Table</button>
+        <button type="button" onclick="switchSizeChartTab('image')" id="btn-chart-image" class="px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black">Size Chart Image</button>
       </div>
+
+      <!-- Measurements Table View (Matching Screenshot 2) -->
+      <div id="sizechart-table-container" class="p-4 sm:p-6">
+        <div class="rounded-2xl border border-gray-200 overflow-hidden shadow-2xs">
+          <table class="w-full text-xs sm:text-sm text-center">
+            <thead>
+              <tr class="bg-gray-100 text-gray-700 font-mono-ui uppercase font-black border-b border-gray-200">
+                <th class="py-2.5 px-3">SIZE</th>
+                <th class="py-2.5 px-3">HEIGHT (INCH)</th>
+                <th class="py-2.5 px-3">WIDTH (INCH)</th>
+              </tr>
+            </thead>
+            <tbody id="modal-size-tbody" class="divide-y divide-gray-100 font-bold">
+              <tr onclick="selectSizeAndCloseModal('S')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
+                <td class="py-2.5 px-3 font-black text-black">S</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-s-h">26</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-s-w">36</td>
+              </tr>
+              <tr onclick="selectSizeAndCloseModal('M')" class="hover:bg-amber-50/70 transition-colors cursor-pointer bg-gray-50/50">
+                <td class="py-2.5 px-3 font-black text-black">M</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-m-h">27</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-m-w">38</td>
+              </tr>
+              <tr onclick="selectSizeAndCloseModal('L')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
+                <td class="py-2.5 px-3 font-black text-black">L</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-l-h">28</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-l-w">40</td>
+              </tr>
+              <tr onclick="selectSizeAndCloseModal('XL')" class="hover:bg-amber-50/70 transition-colors cursor-pointer bg-gray-50/50">
+                <td class="py-2.5 px-3 font-black text-black">XL</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-xl-h">29</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-xl-w">42</td>
+              </tr>
+              <tr onclick="selectSizeAndCloseModal('XXL')" class="hover:bg-amber-50/70 transition-colors cursor-pointer">
+                <td class="py-2.5 px-3 font-black text-black">XXL</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-xxl-h">30</td>
+                <td class="py-2.5 px-3 text-gray-600" id="td-xxl-w">44</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tagline matching Screenshot 2 -->
+        <div class="mt-4 text-center">
+          <span class="font-headline font-black text-xs sm:text-sm text-black tracking-widest uppercase">
+            WE BELIEVE IN QUALITY
+          </span>
+          <p class="text-[10px] text-gray-400 mt-0.5">Click any size row to select that size</p>
+        </div>
+      </div>
+
+      <!-- Size Chart Image View (If admin uploaded/provided image) -->
+      <div id="sizechart-image-container" class="p-4 hidden text-center">
+        <img id="modal-sizechart-img" src="" alt="Size Chart Graphic" class="max-h-[380px] w-auto mx-auto rounded-xl shadow-md border border-gray-100 object-contain"/>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+        <span class="text-xs text-gray-500">Selected size: <strong id="modal-active-size-tag" class="text-black">M</strong></span>
+        <button onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-5 py-2 rounded-full cursor-pointer hover:bg-neutral-800">Done</button>
+      </div>
+
     </div>
   </div>
 
-
-  <!-- ==================== SHOPPING CART DRAWER ==================== -->
+    <!-- ==================== SHOPPING CART DRAWER ==================== -->
   <div id="cart-drawer-container" class="fixed inset-0 z-50 pointer-events-none transition-all duration-300 opacity-0" style="display: none;">
     <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto cursor-pointer"></div>
     <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto transition-transform duration-300 ease-out z-10" style="transform: translateX(100%);">
@@ -783,16 +820,16 @@
     // ─────────────────────────────────────────
     const productState = {
       product: null,
-      basePrice: 1450.00,
+      basePrice: 1350.00,
       selectedSize: 'M',
       selectedSleeve: 'short',
       selectedSleeveName: 'Half Sleeve',
       sleevePrice: 0.00,
       quantity: 1,
       isPersonalized: false,
-      personalizeFee: 300.00,
-      customName: 'R. CHANDLER',
-      customNumber: '24',
+      personalizeFee: 250.00,
+      customName: '',
+      customNumber: '',
       patchPrice: 0.00,
       selectedPatches: [],
       selectedPatchNames: [],
@@ -1029,6 +1066,87 @@
             stockEl.className = 'text-emerald-700 font-bold';
           }
         }
+
+        // Breadcrumbs matching Screenshot 1
+        const breadCat = document.getElementById('pd-breadcrumb-cat');
+        if (breadCat) breadCat.textContent = targetProduct.categoryName || "Men's Football";
+        const breadTitle = document.getElementById('pd-breadcrumb-title');
+        if (breadTitle) breadTitle.textContent = targetProduct.name;
+
+        // Subtitle / Team tags matching Screenshot 1
+        const subTags = document.getElementById('pd-subtitle-tags');
+        if (subTags) {
+          const parts = [targetProduct.team || targetProduct.categoryName || 'Real Madrid', targetProduct.sizeChartType || 'Retro Edition'];
+          subTags.textContent = parts.filter(Boolean).join(', ');
+        }
+
+        // Categories & Brand metadata matching Screenshot 1
+        const metaCat = document.getElementById('pd-meta-categories');
+        if (metaCat) {
+          const parts = [targetProduct.categoryName || 'Real Madrid', targetProduct.sizeChartType || 'Retro Edition'];
+          metaCat.textContent = parts.filter(Boolean).join(', ');
+        }
+        const metaBrand = document.getElementById('pd-meta-brand');
+        if (metaBrand) metaBrand.textContent = targetProduct.brand || 'Adidas';
+
+        if (targetProduct.description) {
+          const descEl = document.getElementById('pd-full-description');
+          if (descEl) descEl.textContent = targetProduct.description;
+        }
+
+        // Custom Name & Number Section Heading
+        const customHeading = document.getElementById('custom-section-heading');
+        if (customHeading) {
+          customHeading.textContent = `Custom Name & Number (+${formatCurrency(productState.personalizeFee)})`;
+        }
+
+        // Size Chart Edition Button Label & Modal Header
+        const chartEdition = targetProduct.sizeChartType || 'Retro Edition';
+        const sizeChartBtnLabel = document.getElementById('btn-size-chart-label');
+        if (sizeChartBtnLabel) sizeChartBtnLabel.textContent = `View ${chartEdition} Size Chart`;
+
+        const modalEdition = document.getElementById('modal-sizechart-edition');
+        if (modalEdition) modalEdition.textContent = chartEdition.toUpperCase();
+
+        // Render Dynamic Measurements Mapping Table (Screenshot 2)
+        const defaultMapping = {
+          S: { height: 26, width: 36 },
+          M: { height: 27, width: 38 },
+          L: { height: 28, width: 40 },
+          XL: { height: 29, width: 42 },
+          XXL: { height: 30, width: 44 }
+        };
+        const mapping = targetProduct.sizeMapping || defaultMapping;
+        const tbody = document.getElementById('modal-size-tbody');
+        if (tbody) {
+          const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+          tbody.innerHTML = sizes.map((s, idx) => {
+            const row = mapping[s] || defaultMapping[s] || { height: 26 + idx, width: 36 + (idx * 2) };
+            const isSelected = (productState.selectedSize === s);
+            return `
+              <tr onclick="selectSizeAndCloseModal('${s}')" class="hover:bg-amber-50/70 transition-colors cursor-pointer ${idx % 2 === 1 ? 'bg-gray-50/50' : ''} ${isSelected ? 'bg-amber-100/70 font-black' : ''}">
+                <td class="py-2.5 px-3 font-black text-black">${s}</td>
+                <td class="py-2.5 px-3 text-gray-700 font-bold" id="td-${s.toLowerCase()}-h">${row.height}</td>
+                <td class="py-2.5 px-3 text-gray-700 font-bold" id="td-${s.toLowerCase()}-w">${row.width}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Size Chart Image View Setup
+        const chartImg = targetProduct.sizeChartImage || '';
+        const toggleCont = document.getElementById('sizechart-view-toggle');
+        const imgEl = document.getElementById('modal-sizechart-img');
+        if (chartImg) {
+          if (toggleCont) toggleCont.classList.remove('hidden');
+          if (imgEl) imgEl.src = chartImg;
+        } else {
+          if (toggleCont) toggleCont.classList.add('hidden');
+          switchSizeChartTab('table');
+        }
+
+        // Sync initial size selection
+        selectSize(productState.selectedSize || 'M');
       }
 
       calculateLiveTotal();
@@ -1094,15 +1212,30 @@
     function renderDynamicPatches(patches) {
       const container = document.getElementById('patches-list-container');
       if (!container) return;
-      container.innerHTML = patches.map(p => `
-        <label class="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-black transition-all text-xs">
-          <div class="flex items-center gap-2">
-            <input type="checkbox" name="patch" value="${p.id}" data-name="${p.name}" data-price="${p.price||0}" onchange="calculateLiveTotal()" class="rounded text-black focus:ring-black"/>
-            <span class="font-bold text-gray-800 text-[11px]">${p.name}</span>
-          </div>
-          <span class="font-mono-ui text-gray-700 font-bold text-[11px]">${p.price > 0 ? '+' + formatCurrency(p.price) : 'Free'}</span>
-        </label>
-      `).join('');
+      container.innerHTML = patches.map((p, idx) => {
+        const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="%23f3f4f6" stroke="%23cbd5e1" stroke-width="4"/><text x="50" y="55" font-size="28" font-family="Arial" font-weight="bold" text-anchor="middle" fill="%2364748b">${idx + 1}</text></svg>`;
+        const imgSrc = p.imageUrl || fallbackSvg;
+        const priceText = p.price > 0 ? `+${p.price}৳` : 'Free';
+        const isChecked = productState.selectedPatches.includes(p.id);
+
+        return `
+          <label class="flex items-center justify-between p-2.5 sm:p-3 bg-white border border-gray-200 hover:border-gray-400 rounded-2xl cursor-pointer transition-all shadow-2xs group">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="font-headline font-black text-xs sm:text-sm text-gray-700 w-5 flex-shrink-0">${idx + 1}.</span>
+              <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 p-1 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-2xs">
+                <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-contain" onerror="this.src='${fallbackSvg}'"/>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-bold text-xs sm:text-sm text-black group-hover:text-blue-900 transition-colors truncate">${p.name}</span>
+                <span class="font-mono-ui font-semibold text-[11px] sm:text-xs text-gray-500 mt-0.5">${priceText}</span>
+              </div>
+            </div>
+            <div class="pl-3 pr-1 flex items-center">
+              <input type="checkbox" name="patch" value="${p.id}" data-name="${p.name}" data-price="${p.price || 0}" ${isChecked ? 'checked' : ''} onchange="calculateLiveTotal()" class="w-5 h-5 rounded border-gray-300 text-black focus:ring-black cursor-pointer"/>
+            </div>
+          </label>
+        `;
+      }).join('');
     }
 
     function renderDynamicSleeves(sleeves) {
@@ -1144,16 +1277,45 @@
     // ─────────────────────────────────────────
     function selectSize(size, btnEl) {
       productState.selectedSize = size;
+
+      // Sync dropdown select
+      const selectEl = document.getElementById('pd-size-select');
+      if (selectEl && selectEl.value !== size) {
+        selectEl.value = size;
+      }
+
+      // Sync pills buttons
       document.querySelectorAll('.size-btn').forEach(b => {
-        b.classList.remove('active');
+        if (b.textContent.trim() === size) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
       });
       if (btnEl) btnEl.classList.add('active');
 
+      // Sync chips and modal displays
       const chip = document.getElementById('selected-size-chip');
       if (chip) chip.textContent = size;
 
+      const modalActiveTag = document.getElementById('modal-active-size-tag');
+      if (modalActiveTag) modalActiveTag.textContent = size;
+
       const modalSize = document.getElementById('modal-preview-size');
       if (modalSize) modalSize.textContent = size;
+
+      // Update table row highlight in modal
+      const tbody = document.getElementById('modal-size-tbody');
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(row => {
+          const firstTd = row.querySelector('td');
+          if (firstTd && firstTd.textContent.trim() === size) {
+            row.classList.add('bg-amber-100/70', 'font-black');
+          } else {
+            row.classList.remove('bg-amber-100/70', 'font-black');
+          }
+        });
+      }
 
       updateMobileBarSummary();
       calculateLiveTotal();
@@ -1576,7 +1738,93 @@
     }
 
     // ─────────────────────────────────────────
-    // Modals (3D & Size Guide)
+    // Custom Name & Number Single-Field Handler (Screenshot 1)
+    // ─────────────────────────────────────────
+    function onCustomNameNumberChange(val) {
+      const raw = (val || '').trim();
+      const feeTag = document.getElementById('custom-badge-status');
+
+      if (!raw) {
+        productState.isPersonalized = false;
+        productState.customName = '';
+        productState.customNumber = '';
+        if (feeTag) feeTag.classList.add('hidden');
+      } else {
+        productState.isPersonalized = true;
+        if (feeTag) feeTag.classList.remove('hidden');
+
+        // Extract trailing digits if present: e.g. "RONALDO 7", "MESSI 10", "BENZEMA #9"
+        const match = raw.match(/^(.*?)(?:\s+#?|\s+)(\d{1,2})$/);
+        if (match) {
+          productState.customName = match[1].trim().toUpperCase();
+          productState.customNumber = match[2].trim();
+        } else if (/^\d{1,2}$/.test(raw)) {
+          productState.customName = '';
+          productState.customNumber = raw;
+        } else {
+          productState.customName = raw.toUpperCase();
+          productState.customNumber = '';
+        }
+      }
+
+      // Update Back Overlays & Live Previews
+      const ovName = document.getElementById('live-overlay-name');
+      const ovNum = document.getElementById('live-overlay-number');
+      const textOverlay = document.getElementById('live-custom-text-overlay');
+      const thName = document.getElementById('thumb-name-preview');
+      const thNum = document.getElementById('thumb-number-preview');
+
+      if (ovName) ovName.textContent = productState.customName || 'NAME';
+      if (ovNum) ovNum.textContent = productState.customNumber || '00';
+      if (thName) thName.textContent = productState.customName || 'NAME';
+      if (thNum) thNum.textContent = productState.customNumber || '00';
+
+      if (textOverlay) {
+        if (productState.isPersonalized && productState.currentAngle === 'back') {
+          textOverlay.classList.remove('hidden');
+        } else if (!productState.isPersonalized) {
+          textOverlay.classList.add('hidden');
+        }
+      }
+
+      // Update 3D Modal Overlays
+      const modName = document.getElementById('modal-3d-name');
+      const modNum = document.getElementById('modal-3d-number');
+      const modOverlay = document.getElementById('modal-3d-custom-overlay');
+      if (modName) modName.textContent = productState.customName || 'NAME';
+      if (modNum) modNum.textContent = productState.customNumber || '00';
+      if (modOverlay) {
+        if (productState.isPersonalized) modOverlay.classList.remove('hidden');
+        else modOverlay.classList.add('hidden');
+      }
+
+      calculateLiveTotal();
+    }
+
+    // ─────────────────────────────────────────
+    // Product Detail Tabs (Description / Reviews)
+    // ─────────────────────────────────────────
+    function switchProductTab(tab) {
+      const descContent = document.getElementById('tab-content-desc');
+      const revContent = document.getElementById('tab-content-reviews');
+      const descBtn = document.getElementById('tab-btn-desc');
+      const revBtn = document.getElementById('tab-btn-reviews');
+
+      if (tab === 'reviews') {
+        if (descContent) descContent.classList.add('hidden');
+        if (revContent) revContent.classList.remove('hidden');
+        if (descBtn) descBtn.className = 'py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black cursor-pointer';
+        if (revBtn) revBtn.className = 'py-2 px-4 text-xs font-headline font-black text-black border-b-2 border-black -mb-px cursor-pointer';
+      } else {
+        if (descContent) descContent.classList.remove('hidden');
+        if (revContent) revContent.classList.add('hidden');
+        if (descBtn) descBtn.className = 'py-2 px-4 text-xs font-headline font-black text-black border-b-2 border-black -mb-px cursor-pointer';
+        if (revBtn) revBtn.className = 'py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black cursor-pointer';
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Modals (3D & Size Guide Matching Screenshot 2)
     // ─────────────────────────────────────────
     function open3DModal() {
       const m = document.getElementById('modal-3d');
@@ -1605,9 +1853,46 @@
       }
     }
 
-    function openSizeGuideModal() {
+    function switchSizeChartTab(tab) {
+      const tableCont = document.getElementById('sizechart-table-container');
+      const imgCont = document.getElementById('sizechart-image-container');
+      const btnTable = document.getElementById('btn-chart-table');
+      const btnImg = document.getElementById('btn-chart-image');
+
+      if (tab === 'image') {
+        if (tableCont) tableCont.classList.add('hidden');
+        if (imgCont) imgCont.classList.remove('hidden');
+        if (btnTable) {
+          btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black cursor-pointer';
+        }
+        if (btnImg) {
+          btnImg.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs cursor-pointer';
+        }
+      } else {
+        if (tableCont) tableCont.classList.remove('hidden');
+        if (imgCont) imgCont.classList.add('hidden');
+        if (btnTable) {
+          btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-xs cursor-pointer';
+        }
+        if (btnImg) {
+          btnImg.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black cursor-pointer';
+        }
+      }
+    }
+
+    function selectSizeAndCloseModal(size) {
+      selectSize(size);
+      closeSizeGuideModal();
+    }
+
+    function openSizeGuideModal(preferImage = false) {
       const m = document.getElementById('modal-size-guide');
       if (m) m.classList.remove('hidden');
+      if (preferImage && productState.product?.sizeChartImage) {
+        switchSizeChartTab('image');
+      } else {
+        switchSizeChartTab('table');
+      }
     }
 
     function closeSizeGuideModal() {

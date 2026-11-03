@@ -1020,7 +1020,52 @@ const DB = {
 
   // ── Patches ──
   patches: {
-    all() { return Store.get('patches').sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0)); },
+    defaultItems: [
+      {
+        id: 'patch_ucl',
+        name: 'UCL Ball patch',
+        price: 100,
+        description: 'Official UEFA Champions League Starball sleeve badge',
+        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="%23ffffff" stroke="%23111827" stroke-width="6"/><polygon points="50,15 58,35 79,38 64,52 68,73 50,62 32,73 36,52 21,38 42,35" fill="%23111827"/></svg>',
+        isEnabled: true,
+        displayOrder: 1
+      },
+      {
+        id: 'patch_trophy',
+        name: '9 Trophy patch',
+        price: 100,
+        description: 'UEFA Champions League Badge of Honour Trophy patch',
+        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M26 18 C26 18 22 52 50 68 C78 52 74 18 74 18 Z" fill="%23111827"/><text x="50" y="47" font-size="28" font-family="Arial" font-weight="900" text-anchor="middle" fill="%23ffffff">9</text><path d="M34 72 L66 72 L58 84 L42 84 Z" fill="%23111827"/></svg>',
+        isEnabled: true,
+        displayOrder: 2
+      },
+      {
+        id: 'patch_respect',
+        name: 'Respect patch',
+        price: 100,
+        description: 'Official UEFA Foundation / Respect sleeve patch',
+        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 44"><rect width="100" height="44" rx="8" fill="%231e3a8a"/><text x="50" y="28" font-size="15" font-family="Arial" font-weight="900" letter-spacing="2" text-anchor="middle" fill="%23ffffff">RESPECT</text></svg>',
+        isEnabled: true,
+        displayOrder: 3
+      },
+      {
+        id: 'patch_epl',
+        name: 'Premier League patch',
+        price: 150,
+        description: 'Official Premier League sleeve patch',
+        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="%2338003c"/><text x="50" y="58" font-size="20" font-family="Arial" font-weight="900" text-anchor="middle" fill="%2300ff85">PL</text></svg>',
+        isEnabled: true,
+        displayOrder: 4
+      }
+    ],
+    all() {
+      let items = Store.get('patches');
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = this.defaultItems;
+        Store.set('patches', items);
+      }
+      return items.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+    },
     enabled() { return DB.patches.all().filter(p => p.isEnabled); },
     byId(id) { return Store.get('patches').find(p => p.id === id); },
     create(data) {

@@ -1011,6 +1011,7 @@ function openProductForm(id = null) {
       <div class="admin-tab" onclick="switchProdTab('custom',this)">Customization</div>
       <div class="admin-tab" onclick="switchProdTab('preorder',this)">Preorder</div>
       <div class="admin-tab" onclick="switchProdTab('seo',this)">SEO</div>
+      <div class="admin-tab" onclick="switchProdTab('sizechart',this)">Size Chart</div>
     </div>
 
     <form id="product-form" onsubmit="saveProduct(event,'${id||''}')">
@@ -1395,6 +1396,69 @@ function openProductForm(id = null) {
         </div>
       </div>
 
+      <!-- TAB: SIZE CHART & MAPPING -->
+      <div id="prod-tab-sizechart" class="prod-tab hidden">
+        <div style="margin-bottom:14px;">
+          <h4 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Product Size Chart & Measurements Mapping</h4>
+          <p style="font-size:12px;color:#6B7280;">Set the size chart edition, custom measurements table (inches), and optional size chart graphic image for this product.</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Size Chart Edition / Type</label>
+            <select name="sizeChartType" id="prod-sizechart-type" class="form-select" onchange="window.applySizePreset(this.value)">
+              <option value="Player Edition" ${(!product?.sizeChartType || product.sizeChartType==='Player Edition')?'selected':''}>Player Edition (Slim Match-Day Cut)</option>
+              <option value="Fan Edition" ${product?.sizeChartType==='Fan Edition'?'selected':''}>Fan Edition (Standard Regular Fit)</option>
+              <option value="Retro Edition" ${product?.sizeChartType==='Retro Edition'?'selected':''}>Retro Edition (Vintage Classic Fit)</option>
+              <option value="Kids Edition" ${product?.sizeChartType==='Kids Edition'?'selected':''}>Kids Edition (Youth Academy Fit)</option>
+              <option value="Custom" ${product?.sizeChartType==='Custom'?'selected':''}>Custom Measurements</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Size Chart Image URL (Optional graphic image view)</label>
+            <input type="text" name="sizeChartImage" id="prod-sizechart-img" class="form-input" value="${product?.sizeChartImage||''}" placeholder="https://... size-chart-image.jpg"/>
+          </div>
+        </div>
+
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:12px;font-weight:800;color:#111827;text-transform:uppercase;letter-spacing:0.05em;">Measurements Mapping Table (Inches)</span>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Player Edition')">Player Cut</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Fan Edition')">Fan Cut</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Retro Edition')">Retro Cut</button>
+            </div>
+          </div>
+
+          <table style="width:100%;border-collapse:collapse;font-size:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+            <thead>
+              <tr style="background:#f3f4f6;text-align:left;border-bottom:1px solid #e5e7eb;">
+                <th style="padding:10px 14px;font-weight:800;width:20%;">Size</th>
+                <th style="padding:10px 14px;font-weight:800;width:40%;">Height / Length (Inch)</th>
+                <th style="padding:10px 14px;font-weight:800;width:40%;">Width / Chest (Inch)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${['S','M','L','XL','XXL'].map(s => {
+                const map = product?.sizeMapping?.[s] || (s==='S'?{height:26,width:36}:s==='M'?{height:27,width:38}:s==='L'?{height:28,width:40}:s==='XL'?{height:29,width:42}:{height:30,width:44});
+                return `
+                  <tr style="border-bottom:1px solid #f3f4f6;">
+                    <td style="padding:8px 14px;font-weight:800;color:#111827;">${s}</td>
+                    <td style="padding:8px 14px;">
+                      <input type="number" step="0.5" name="size_height_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.height}"/>
+                    </td>
+                    <td style="padding:8px 14px;">
+                      <input type="number" step="0.5" name="size_width_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.width}"/>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+          <p style="font-size:11px;color:#9ca3af;margin-top:8px;">These exact values will be displayed to customers when they click "View Size Chart" on this product's page.</p>
+        </div>
+      </div>
+
     </form>
   `;
 
@@ -1617,7 +1681,16 @@ function saveProduct(e, id, asDraft = false) {
     hasCustomDelivery: fd.get('hasCustomDelivery') === 'on',
     deliveryChargeInsideDhaka: parseFloat(get('deliveryChargeInsideDhaka')) || 80,
     deliveryChargeOutsideDhaka: parseFloat(get('deliveryChargeOutsideDhaka')) || 130,
-    deliveryNote: get('deliveryNote') || ''
+    deliveryNote: get('deliveryNote') || '',
+    sizeChartType: get('sizeChartType') || 'Player Edition',
+    sizeChartImage: get('sizeChartImage') || '',
+    sizeMapping: {
+      S: { height: parseFloat(get('size_height_S')) || 26, width: parseFloat(get('size_width_S')) || 36 },
+      M: { height: parseFloat(get('size_height_M')) || 27, width: parseFloat(get('size_width_M')) || 38 },
+      L: { height: parseFloat(get('size_height_L')) || 28, width: parseFloat(get('size_width_L')) || 40 },
+      XL: { height: parseFloat(get('size_height_XL')) || 29, width: parseFloat(get('size_width_XL')) || 42 },
+      XXL: { height: parseFloat(get('size_height_XXL')) || 30, width: parseFloat(get('size_width_XXL')) || 44 }
+    }
   };
 
   if (id) {
@@ -5980,3 +6053,22 @@ function emptyState(icon, title, sub = '', btnLabel = '', btnAction = '') {
     ${btnLabel?`<button class="btn btn-primary btn-sm" onclick="${btnAction}"><span class="material-symbols-outlined">add</span> ${btnLabel}</button>`:''}
   </div>`;
 }
+
+// ── Size Chart Presets for Admin Product Form ──
+window.applySizePreset = function(presetName) {
+  const presets = {
+    'Player Edition': { S: { height: 26, width: 36 }, M: { height: 27, width: 38 }, L: { height: 28, width: 40 }, XL: { height: 29, width: 42 }, XXL: { height: 30, width: 44 } },
+    'Fan Edition': { S: { height: 27, width: 38 }, M: { height: 28, width: 40 }, L: { height: 29, width: 42 }, XL: { height: 30, width: 44 }, XXL: { height: 31, width: 46 } },
+    'Retro Edition': { S: { height: 26, width: 36 }, M: { height: 27, width: 38 }, L: { height: 28, width: 40 }, XL: { height: 29, width: 42 }, XXL: { height: 30, width: 44 } },
+    'Kids Edition': { S: { height: 20, width: 28 }, M: { height: 22, width: 30 }, L: { height: 24, width: 32 }, XL: { height: 25, width: 34 }, XXL: { height: 26, width: 36 } }
+  };
+  const p = presets[presetName] || presets['Player Edition'];
+  ['S','M','L','XL','XXL'].forEach(s => {
+    const hInput = document.querySelector(`[name="size_height_${s}"]`);
+    const wInput = document.querySelector(`[name="size_width_${s}"]`);
+    if (hInput && p[s]) hInput.value = p[s].height;
+    if (wInput && p[s]) wInput.value = p[s].width;
+  });
+  const typeSelect = document.getElementById('prod-sizechart-type');
+  if (typeSelect) typeSelect.value = presetName;
+};

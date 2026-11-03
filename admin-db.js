@@ -675,8 +675,75 @@ const DB = {
 
   // ── Categories ──
   categories: {
+    defaultItems: [
+      {
+        id: 'cat_club_match_kits',
+        name: 'Club Match Kits',
+        slug: 'club-match-kits',
+        description: 'Official tournament jerseys engineered with micro-perforated Aeroknit weave.',
+        imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
+        displayOrder: 1,
+        isActive: true,
+        badge: 'TOP CHOICE'
+      },
+      {
+        id: 'cat_national_teams',
+        name: 'National Teams',
+        slug: 'national-teams',
+        description: 'National team tournament kits with authentic gold badges and match typography.',
+        imageUrl: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
+        displayOrder: 2,
+        isActive: true,
+        badge: 'LIMITED DROP'
+      },
+      {
+        id: 'cat_mens_football',
+        name: "Men's Football",
+        slug: 'mens-football',
+        description: 'Authentic breathable match jerseys with AeroKnit technology.',
+        imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80',
+        displayOrder: 3,
+        isActive: true,
+        badge: 'POPULAR'
+      },
+      {
+        id: 'cat_training_gear',
+        name: 'Training Gear',
+        slug: 'training-gear',
+        description: 'Technical windbreakers, compression layers, bibs and workout shorts.',
+        imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80',
+        displayOrder: 4,
+        isActive: true,
+        badge: 'PRO TRAINING'
+      },
+      {
+        id: 'cat_outerwear',
+        name: 'Outerwear',
+        slug: 'outerwear',
+        description: 'Technical weather-resistant jackets and performance track tops.',
+        imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&q=80',
+        displayOrder: 5,
+        isActive: true,
+        badge: 'NEW DROP'
+      },
+      {
+        id: 'cat_kids_collection',
+        name: 'Kids Collection',
+        slug: 'kids-collection',
+        description: 'Junior sizing and youth football academy kits built for young athletes.',
+        imageUrl: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1200&q=80',
+        displayOrder: 6,
+        isActive: true,
+        badge: 'ACADEMY'
+      }
+    ],
     all() {
-      return Store.get('categories').sort((a,b) => (parseInt(a.displayOrder) || 0) - (parseInt(b.displayOrder) || 0));
+      let items = Store.get('categories');
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = this.defaultItems;
+        Store.set('categories', items);
+      }
+      return items.sort((a,b) => (parseInt(a.displayOrder) || 0) - (parseInt(b.displayOrder) || 0));
     },
     byId(id) {
       if (!id) return null;
@@ -1955,7 +2022,7 @@ const DB = {
         name: 'Rahim Chowdhury',
         designation: 'Dhaka Premier League Midfielder',
         quote: 'The AeroKnit weave feels weightless during 90 minutes on the pitch. The customization precision on the player name and UCL starball badge is unmatched in Bangladesh.',
-        src: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
+        src: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80',
         jerseyName: 'AeroKnit Pro Match Kit',
         isActive: true,
         displayOrder: 1
@@ -1992,11 +2059,21 @@ const DB = {
       }
     ],
     all() {
-      const items = Store.get('modelShowcase', null);
+      let items = Store.get('modelShowcase', null);
       if (!items || !Array.isArray(items) || items.length === 0) {
         Store.set('modelShowcase', this.defaultItems);
         return this.defaultItems;
       }
+      // Upgrade any old placeholder images to pro athlete portraits
+      let changed = false;
+      items = items.map(m => {
+        if (!m.src || m.src.includes('photo-1574629810360-7efbbe195018')) {
+          m.src = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
+          changed = true;
+        }
+        return m;
+      });
+      if (changed) Store.set('modelShowcase', items);
       return items;
     },
     active() {

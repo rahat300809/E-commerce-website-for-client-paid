@@ -348,18 +348,23 @@ function syncHomepageContent() {
     ];
 
     if (categories && categories.length > 0) {
-      const displayCats = categories.slice(0, 3);
+      const displayCats = categories.slice(0, 6);
       bentoContainer.innerHTML = displayCats.map((c, idx) => {
         const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
-        const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => (p.categoryName || '').toLowerCase() === c.name.toLowerCase() || p.categoryId === c.id).length : 0;
+        const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => {
+          const pCat = (p.categoryName || '').toLowerCase();
+          const cName = c.name.toLowerCase();
+          return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id;
+        }).length : 0;
+        const countBadge = prodCount > 0 ? `${prodCount} KITS AVAILABLE` : 'EXPLORE COLLECTION';
         return `
-          <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
+          <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
             <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
                  style="background-image: url('${bgImg}')">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
             <div class="absolute bottom-0 left-0 p-5 w-full">
-              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${prodCount} KITS AVAILABLE</span>
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.badge ? `${c.badge} • ` : ''}${countBadge}</span>
               <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
               <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
             </div>
@@ -1690,7 +1695,7 @@ function renderShopProducts() {
 }
 
 // ── Shop Banner Carousel ──
-let shopCarouselIndex = 0;
+// shopCarouselIndex declared at top of file
 
 function getShopSlides() {
   if (typeof DB !== 'undefined') {
@@ -1745,7 +1750,11 @@ function shopCarouselGoto(index) {
   
   const bannerEl = document.getElementById('shop-banner-slide');
   if (bannerEl && slide) {
-    bannerEl.style.backgroundImage = `url('${slide.bg}')`;
+    bannerEl.style.opacity = '0.35';
+    setTimeout(() => {
+      bannerEl.style.backgroundImage = `url('${slide.bg}')`;
+      bannerEl.style.opacity = '1';
+    }, 120);
   }
   const tagEl = document.getElementById('shop-banner-tag');
   if (tagEl && slide) tagEl.textContent = slide.tag || 'ZENVY Collection';
@@ -2398,7 +2407,7 @@ function getShowcaseModels() {
       name: 'Rahim Chowdhury',
       designation: 'Dhaka Premier League Midfielder',
       quote: 'The AeroKnit weave feels weightless during 90 minutes on the pitch. The customization precision on the player name and UCL starball badge is unmatched in Bangladesh.',
-      src: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
+      src: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80',
       jerseyName: 'AEROKNIT PRO MATCH KIT'
     },
     {
@@ -2457,8 +2466,11 @@ function syncModelShowcase() {
       style = `opacity:1; pointer-events:auto; z-index:2; transform:translateX(${gap}px) translateY(-${stickUp}px) scale(0.85) rotateY(-15deg);`;
     }
 
+    const fallbackAthlete = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
+    const imgSrc = (m.src && !m.src.includes('photo-1574629810360-7efbbe195018')) ? m.src : fallbackAthlete;
     return `
-      <img src="${m.src}" alt="${m.name}"
+      <img src="${imgSrc}" alt="${m.name}"
+           onerror="this.onerror=null; this.src='${fallbackAthlete}'"
            class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
            onclick="gotoShowcaseModel(${index})"
            style="${style} will-change:transform,opacity;"/>

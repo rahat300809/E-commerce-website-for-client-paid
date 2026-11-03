@@ -21,14 +21,20 @@
     // Instant 0ms initial view detection before DOM paint
     (function() {
       try {
-        var rawHash = (window.location.hash || '').replace('#', '').trim();
-        var urlParams = new URLSearchParams(window.location.search);
-        var cat = urlParams.get('category') || urlParams.get('cat');
-        var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
-        var target = urlParams.get('view') || rawHash || (path === 'shop' || cat ? 'shop' : (path === 'customizer' ? 'customizer' : (path === 'checkout' ? 'checkout' : 'home')));
-        if (target && target !== 'home') {
-          document.documentElement.setAttribute('data-target-view', target);
+        function detectTargetView() {
+          var rawHash = (window.location.hash || '').replace('#', '').trim();
+          var urlParams = new URLSearchParams(window.location.search);
+          var cat = urlParams.get('category') || urlParams.get('cat');
+          var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+          var target = urlParams.get('view') || rawHash || (path === 'shop' || cat ? 'shop' : (path === 'customizer' ? 'customizer' : (path === 'checkout' ? 'checkout' : 'home')));
+          if (target && target !== 'home') {
+            document.documentElement.setAttribute('data-target-view', target);
+          } else {
+            document.documentElement.removeAttribute('data-target-view');
+          }
         }
+        detectTargetView();
+        window.addEventListener('hashchange', detectTargetView);
       } catch(e){}
     })();
   </script>
@@ -51,6 +57,28 @@
     html[data-target-view="customizer"] #view-home { display: none !important; }
     html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
     html[data-target-view="checkout"] #view-home { display: none !important; }
+
+    /* Instant navbar sync so nav-btn-home is never falsely highlighted on shop or customizer */
+    html[data-target-view="shop"] #nav-btn-home,
+    html[data-target-view="customizer"] #nav-btn-home,
+    html[data-target-view="checkout"] #nav-btn-home {
+      color: #5c5f61 !important;
+      font-weight: 500 !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+    html[data-target-view="shop"] #nav-btn-shop {
+      color: #000000 !important;
+      font-weight: 700 !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
+    html[data-target-view="customizer"] #nav-btn-customizer {
+      color: #000000 !important;
+      font-weight: 700 !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
   </style>
 
   <script id="tailwind-config">
@@ -295,7 +323,45 @@
         </div>
 
         <div id="collections-bento-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
-          <!-- Populated dynamically from DB.homepage.collections -->
+          <div onclick="goToShopCategory('Club Match Kits')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">TOP CHOICE • OFFICIAL KITS</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">Club Match Kits</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">Official tournament jerseys engineered with Aeroknit weave.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Club Match Kits</span>
+            </div>
+          </div>
+          <div onclick="goToShopCategory('National Teams')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">LIMITED DROP • TOURNAMENT</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">National Teams</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">National team tournament kits with authentic gold badges.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop National Teams</span>
+            </div>
+          </div>
+          <div onclick="goToShopCategory('Training Gear')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 sm:col-span-2 md:col-span-1">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">PRO TRAINING • PERFORMANCE</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">Training Gear</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">Technical windbreakers, bibs and pace shorts built for all climates.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Training Gear</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -424,7 +490,26 @@
               <div class="px-5 py-4 border-b border-gray-100">
                 <p class="font-mono-ui text-[11px] text-gray-400 uppercase tracking-wider font-bold mb-3">Categories</p>
                 <div id="shop-category-list" class="flex flex-col gap-2">
-                  <!-- Rendered dynamically from DB.categories -->
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="radio" name="shop-category-radio" checked onchange="selectCategory('all')" class="shop-cat-radio w-4 h-4 rounded-full border-gray-300 accent-black">
+                    <span class="font-body-md text-sm text-on-surface font-semibold">All Categories</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="radio" name="shop-category-radio" onchange="selectCategory('Club Match Kits')" class="shop-cat-radio w-4 h-4 rounded-full border-gray-300 accent-black">
+                    <span class="font-body-md text-sm text-on-surface">Club Match Kits</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="radio" name="shop-category-radio" onchange="selectCategory('National Teams')" class="shop-cat-radio w-4 h-4 rounded-full border-gray-300 accent-black">
+                    <span class="font-body-md text-sm text-on-surface">National Teams</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="radio" name="shop-category-radio" onchange="selectCategory('Men\'s Football')" class="shop-cat-radio w-4 h-4 rounded-full border-gray-300 accent-black">
+                    <span class="font-body-md text-sm text-on-surface">Men's Football</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="radio" name="shop-category-radio" onchange="selectCategory('Training Gear')" class="shop-cat-radio w-4 h-4 rounded-full border-gray-300 accent-black">
+                    <span class="font-body-md text-sm text-on-surface">Training Gear</span>
+                  </label>
                 </div>
               </div>
 
@@ -450,7 +535,11 @@
 
             <!-- Horizontal Category Chips (Quick 1-Click Filter) -->
             <div id="shop-category-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-4">
-              <!-- Rendered dynamically from DB.categories -->
+              <button onclick="selectCategory('all',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer bg-black text-white font-bold shadow-2xs">All Jerseys</button>
+              <button onclick="selectCategory('Club Match Kits',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer bg-white border border-gray-200 hover:border-black text-gray-700 font-medium">Club Match Kits</button>
+              <button onclick="selectCategory('National Teams',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer bg-white border border-gray-200 hover:border-black text-gray-700 font-medium">National Teams</button>
+              <button onclick="selectCategory('Men\'s Football',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer bg-white border border-gray-200 hover:border-black text-gray-700 font-medium">Men's Football</button>
+              <button onclick="selectCategory('Training Gear',this)" class="cat-pill whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-headline transition-all cursor-pointer bg-white border border-gray-200 hover:border-black text-gray-700 font-medium">Training Gear</button>
             </div>
 
             <!-- Header Row: Title + View Switcher + Sort -->
@@ -1095,7 +1184,12 @@
           
           <!-- 3D Image Perspective Box -->
           <div class="w-full md:w-1/2 h-72 sm:h-80 md:h-96 relative" id="showcase-3d-images-box" style="perspective:1000px;">
-            <!-- Populated via JS: Left, Active, Right images with 3D transform -->
+            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80" alt="Rahim Chowdhury"
+                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 style="opacity:1; pointer-events:auto; z-index:3; transform:translateX(0px) translateY(0px) scale(1) rotateY(0deg); will-change:transform,opacity;"/>
+            <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80" alt="Tariqul Islam"
+                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 style="opacity:1; pointer-events:auto; z-index:2; transform:translateX(80px) translateY(-60px) scale(0.85) rotateY(-15deg); will-change:transform,opacity;"/>
           </div>
 
           <!-- Testimonial Content & Controls -->
@@ -1469,10 +1563,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261103_cleanlinks"></script>
+  <script src="firebase-sync.js?v=20261103_live_v2"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261103_cleanlinks"></script>
+  <script src="admin-db.js?v=20261103_live_v2"></script>
   <!-- Main Application JavaScript -->
-  <script src="app.js?v=20261103_cleanlinks"></script>
+  <script src="app.js?v=20261103_live_v2"></script>
 </body>
 </html>

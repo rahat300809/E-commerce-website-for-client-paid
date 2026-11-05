@@ -18,19 +18,23 @@
   <link rel="stylesheet" href="styles.css">
 
   <script>
-    // Instant 0ms initial view detection before DOM paint
+    // Instant 0ms initial view detection before DOM paint (Strict Anti-Flash)
     (function() {
       try {
         function detectTargetView() {
-          var rawHash = (window.location.hash || '').replace('#', '').trim();
+          var rawHash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
           var urlParams = new URLSearchParams(window.location.search);
           var cat = urlParams.get('category') || urlParams.get('cat');
-          var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
-          var target = urlParams.get('view') || rawHash || (path === 'shop' || cat ? 'shop' : (path === 'customizer' ? 'customizer' : (path === 'checkout' ? 'checkout' : 'home')));
-          if (target && target !== 'home') {
+          var target = urlParams.get('view') || rawHash;
+          if (!target || target === 'home') {
+            target = cat ? 'shop' : 'home';
+          }
+          if (target === 'studio' || target === 'customizer') target = 'customizer';
+          if (target === 'preorder' || target === 'preorders') target = 'shop';
+          if (['shop', 'customizer', 'checkout', 'home'].indexOf(target) !== -1) {
             document.documentElement.setAttribute('data-target-view', target);
           } else {
-            document.documentElement.removeAttribute('data-target-view');
+            document.documentElement.setAttribute('data-target-view', 'home');
           }
         }
         detectTargetView();
@@ -39,11 +43,10 @@
     })();
   </script>
   <style>
-    /* Clean View switching: active view is always visible and cannot be blocked */
+    /* Clean View switching: instantaneous zero-flash swap without dual-view overlap */
     .page-view {
       display: none;
-      opacity: 0;
-      transition: opacity 0.25s ease-in-out;
+      opacity: 1;
     }
     .page-view.active {
       display: block !important;
@@ -51,14 +54,46 @@
     }
 
     /* Instant anti-flash on page load for deep-linked hash/view */
-    html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
-    html[data-target-view="shop"] #view-home { display: none !important; }
-    html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
-    html[data-target-view="customizer"] #view-home { display: none !important; }
-    html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
-    html[data-target-view="checkout"] #view-home { display: none !important; }
+    html[data-target-view="home"] #view-home { display: block !important; opacity: 1 !important; }
+    html[data-target-view="home"] #view-shop,
+    html[data-target-view="home"] #view-customizer,
+    html[data-target-view="home"] #view-checkout,
+    html[data-target-view="home"] #view-admin { display: none !important; }
 
-    /* Instant navbar sync so nav-btn-home is never falsely highlighted on shop or customizer */
+    html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
+    html[data-target-view="shop"] #view-home,
+    html[data-target-view="shop"] #view-customizer,
+    html[data-target-view="shop"] #view-checkout,
+    html[data-target-view="shop"] #view-admin { display: none !important; }
+
+    html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
+    html[data-target-view="customizer"] #view-home,
+    html[data-target-view="customizer"] #view-shop,
+    html[data-target-view="customizer"] #view-checkout,
+    html[data-target-view="customizer"] #view-admin { display: none !important; }
+
+    html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
+    html[data-target-view="checkout"] #view-home,
+    html[data-target-view="checkout"] #view-shop,
+    html[data-target-view="checkout"] #view-customizer,
+    html[data-target-view="checkout"] #view-admin { display: none !important; }
+
+    /* Instant navbar sync so nav-btn matches target view without flash */
+    html[data-target-view="home"] #nav-btn-home {
+      color: #000000 !important;
+      font-weight: 700 !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
+    html[data-target-view="home"] #nav-btn-shop,
+    html[data-target-view="home"] #nav-btn-customizer,
+    html[data-target-view="home"] #nav-btn-preorders {
+      color: #5c5f61 !important;
+      font-weight: 500 !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
     html[data-target-view="shop"] #nav-btn-home,
     html[data-target-view="customizer"] #nav-btn-home,
     html[data-target-view="checkout"] #nav-btn-home {
@@ -426,6 +461,77 @@
         </div>
       </section>
 
+    <!-- ==================== ATHLETE & MODEL CIRCULAR SHOWCASE ==================== -->
+    <section id="model-showcase-section" class="w-full bg-[#f8f9fa] text-gray-900 py-16 sm:py-24 relative overflow-hidden border-t border-gray-200/80">
+      <!-- Subtle ambient lighting -->
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <div class="text-center mb-10 sm:mb-14">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-800 font-mono-ui text-[11px] font-bold uppercase tracking-widest mb-2 shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            PRO ATHLETES & JERSEY MODELS
+          </span>
+          <h2 class="font-headline font-black text-2xl sm:text-4xl text-gray-900 tracking-tight mt-1">
+            Worn by Champions On & Off the Pitch
+          </h2>
+          <p class="font-body text-xs sm:text-sm text-gray-600 max-w-lg mx-auto mt-2 leading-relaxed">
+            Real athlete experiences wearing ZENVY Match & Training Editions. Verified pro durability, AeroKnit airflow, and tailored precision.
+          </p>
+        </div>
+
+        <!-- 3D Circular Testimonials Carousel Container -->
+        <div class="relative w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-14">
+          
+          <!-- 3D Image Perspective Box -->
+          <div class="w-full md:w-1/2 h-72 sm:h-80 md:h-96 relative" id="showcase-3d-images-box" style="perspective:1000px;">
+            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80" alt="Rahim Chowdhury"
+                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 style="opacity:1; pointer-events:auto; z-index:3; transform:translateX(0px) translateY(0px) scale(1) rotateY(0deg); will-change:transform,opacity;"/>
+            <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80" alt="Tariqul Islam"
+                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 style="opacity:1; pointer-events:auto; z-index:2; transform:translateX(80px) translateY(-60px) scale(0.85) rotateY(-15deg); will-change:transform,opacity;"/>
+          </div>
+
+          <!-- Testimonial Content & Controls -->
+          <div class="w-full md:w-1/2 flex flex-col justify-between text-left">
+            <div id="showcase-content-box" class="min-h-[170px] flex flex-col justify-center">
+              <span id="showcase-jersey-tag" class="inline-block bg-white text-amber-800 border border-amber-300/80 shadow-2xs font-mono-ui text-[10px] font-bold px-3 py-1 rounded-full w-max mb-2">
+                AEROKNIT PRO KIT
+              </span>
+              <h3 id="showcase-name" class="font-headline font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
+                Rahim Chowdhury
+              </h3>
+              <p id="showcase-designation" class="font-mono-ui text-xs text-gray-500 mb-3">
+                Dhaka Premier League Midfielder
+              </p>
+              <p id="showcase-quote" class="font-body text-sm sm:text-base text-gray-700 leading-relaxed italic">
+                "The AeroKnit weave feels weightless during 90 minutes on the pitch. The customization precision on the player name and UCL starball badge is unmatched in Bangladesh."
+              </p>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-3 pt-6 border-t border-gray-200/80 mt-4">
+              <button onclick="prevShowcaseModel()" class="w-11 h-11 rounded-full bg-white hover:bg-black text-gray-800 hover:text-white border border-gray-200 shadow-sm flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Previous Model">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+              </button>
+              <button onclick="nextShowcaseModel()" class="w-11 h-11 rounded-full bg-black hover:bg-amber-500 text-white hover:text-black flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Next Model">
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
+              <div class="flex items-center gap-1.5 ml-4" id="showcase-dots">
+                <!-- Dots populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
     </div>
 
 
@@ -433,8 +539,8 @@
     <div id="view-shop" class="page-view bg-[#f8f8f8]">
 
       <!-- ── Minimal Centered Banner ── -->
-      <div class="w-full flex justify-center pt-6 pb-2 px-4">
-        <div class="relative w-full max-w-3xl rounded-2xl overflow-hidden shadow-lg" style="height:clamp(140px,22vw,200px);">
+      <div class="w-full flex justify-center pt-3 sm:pt-6 pb-1 sm:pb-2 px-3 sm:px-4">
+        <div class="relative w-full max-w-3xl rounded-xl sm:rounded-2xl overflow-hidden shadow-md" style="height:clamp(115px,18vw,180px);">
           <!-- Background image -->
           <div id="shop-banner-slide" class="absolute inset-0 transition-opacity duration-700"
                style="background:url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80') center/cover no-repeat;"></div>
@@ -465,7 +571,7 @@
       </div>
 
       <!-- ── Main Shop Layout ── -->
-      <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+      <div class="max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-10 py-3 sm:py-6">
 
         <!-- Mobile: Filter Toggle Button -->
         <button onclick="toggleMobileFilter()" class="lg:hidden w-full mb-4 bg-white border border-gray-200 rounded-xl px-4 py-3 flex justify-between items-center text-sm font-bold text-primary shadow-sm">
@@ -571,7 +677,7 @@
             </div>
 
             <!-- Product Grid (Spacious 3-column desktop layout so buttons NEVER get squished) -->
-            <div id="shop-product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            <div id="shop-product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
               <!-- Rendered dynamically from DB.products.published() -->
             </div><!-- /product grid -->
 
@@ -1157,76 +1263,6 @@
         </div>
       </div>
     </div> <!-- End of view-admin -->
-
-    <!-- ==================== ATHLETE & MODEL CIRCULAR SHOWCASE ==================== -->
-    <section id="model-showcase-section" class="w-full bg-[#f8f9fa] text-gray-900 py-16 sm:py-24 relative overflow-hidden border-t border-gray-200/80">
-      <!-- Subtle ambient lighting -->
-      <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        <div class="text-center mb-10 sm:mb-14">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-800 font-mono-ui text-[11px] font-bold uppercase tracking-widest mb-2 shadow-2xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-            PRO ATHLETES & JERSEY MODELS
-          </span>
-          <h2 class="font-headline font-black text-2xl sm:text-4xl text-gray-900 tracking-tight mt-1">
-            Worn by Champions On & Off the Pitch
-          </h2>
-          <p class="font-body text-xs sm:text-sm text-gray-600 max-w-lg mx-auto mt-2 leading-relaxed">
-            Real athlete experiences wearing ZENVY Match & Training Editions. Verified pro durability, AeroKnit airflow, and tailored precision.
-          </p>
-        </div>
-
-        <!-- 3D Circular Testimonials Carousel Container -->
-        <div class="relative w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-14">
-          
-          <!-- 3D Image Perspective Box -->
-          <div class="w-full md:w-1/2 h-72 sm:h-80 md:h-96 relative" id="showcase-3d-images-box" style="perspective:1000px;">
-            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80" alt="Rahim Chowdhury"
-                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
-                 style="opacity:1; pointer-events:auto; z-index:3; transform:translateX(0px) translateY(0px) scale(1) rotateY(0deg); will-change:transform,opacity;"/>
-            <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80" alt="Tariqul Islam"
-                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
-                 style="opacity:1; pointer-events:auto; z-index:2; transform:translateX(80px) translateY(-60px) scale(0.85) rotateY(-15deg); will-change:transform,opacity;"/>
-          </div>
-
-          <!-- Testimonial Content & Controls -->
-          <div class="w-full md:w-1/2 flex flex-col justify-between text-left">
-            <div id="showcase-content-box" class="min-h-[170px] flex flex-col justify-center">
-              <span id="showcase-jersey-tag" class="inline-block bg-white text-amber-800 border border-amber-300/80 shadow-2xs font-mono-ui text-[10px] font-bold px-3 py-1 rounded-full w-max mb-2">
-                AEROKNIT PRO KIT
-              </span>
-              <h3 id="showcase-name" class="font-headline font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
-                Rahim Chowdhury
-              </h3>
-              <p id="showcase-designation" class="font-mono-ui text-xs text-gray-500 mb-3">
-                Dhaka Premier League Midfielder
-              </p>
-              <p id="showcase-quote" class="font-body text-sm sm:text-base text-gray-700 leading-relaxed italic">
-                "The AeroKnit weave feels weightless during 90 minutes on the pitch. The customization precision on the player name and UCL starball badge is unmatched in Bangladesh."
-              </p>
-            </div>
-
-            <!-- Navigation Controls -->
-            <div class="flex items-center gap-3 pt-6 border-t border-gray-200/80 mt-4">
-              <button onclick="prevShowcaseModel()" class="w-11 h-11 rounded-full bg-white hover:bg-black text-gray-800 hover:text-white border border-gray-200 shadow-sm flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Previous Model">
-                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-              </button>
-              <button onclick="nextShowcaseModel()" class="w-11 h-11 rounded-full bg-black hover:bg-amber-500 text-white hover:text-black flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer" aria-label="Next Model">
-                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-              </button>
-              <div class="flex items-center gap-1.5 ml-4" id="showcase-dots">
-                <!-- Dots populated dynamically -->
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
 
     <!-- ==================== GLOBAL FOOTER ==================== -->
     <footer class="bg-[#fbfbfb] border-t border-gray-100 py-8 sm:py-14 mt-auto">

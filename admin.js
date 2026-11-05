@@ -2230,9 +2230,24 @@ function openPatchForm(id = null) {
   let imgUrl = patch?.imageUrl || '';
   const html = `
     <form id="patch-form">
-      <div class="form-group"><label class="form-label">Patch Name<span class="req">*</span></label><input type="text" name="name" class="form-input" required value="${patch?.name||''}" placeholder="UEFA Champions League"/></div>
-      <div class="form-group"><label class="form-label">Patch Image</label><div id="patch-img-zone"></div></div>
-      <div class="form-group"><label class="form-label">Description</label><input type="text" name="description" class="form-input" value="${patch?.description||''}" placeholder="Official sleeve patch"/></div>
+      <div class="form-group">
+        <label class="form-label">Patch Name<span class="req">*</span></label>
+        <input type="text" name="name" class="form-input" required value="${patch?.name||''}" placeholder="e.g. UEFA Champions League, Premier League"/>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Patch Badge Image (Upload or Paste URL)</label>
+        <div id="patch-img-zone" style="margin-bottom:8px;"></div>
+        <input type="text" name="imageUrl" id="patch-img-url-input" class="form-input" value="${imgUrl}" placeholder="Or paste image URL (https://... or data:image/...)"/>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:#6b7280;">Quick Presets:</span>
+          <button type="button" class="btn btn-ghost btn-xs" onclick="window.setPatchPreset('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz48cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPjxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz48cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz48L3N2Zz4=')">UCL Starball</button>
+          <button type="button" class="btn btn-ghost btn-xs" onclick="window.setPatchPreset('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz48cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPjxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPjxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz48Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+PHBhdGggZD0nTTQ3IDcwIFE1MCA3MyA1MyA3MCcgc3Ryb2tlPScjMzgwMDNjJyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz48L3N2Zz4=')">Premier League</button>
+          <button type="button" class="btn btn-ghost btn-xs" onclick="window.setPatchPreset('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz48cGF0aCBkPSdNMzIgMjYgTDQ0IDI2IEw0NCA2NCBMNjYgNjQgTDY2IDc0IEwzMiA3NCBaJyBmaWxsPScjZWE1ODBjJy8+PHBhdGggZD0nTTQ4IDM2IEw1OCAzNiBMNTggNTQgTDcyIDU0IEw3MiA2MiBMNDggNjIgWicgZmlsbD0nIzExMTgyNycvPjwvc3ZnPg==')">La Liga</button>
+        </div>
+      </div>
+
+      <div class="form-group"><label class="form-label">Description</label><input type="text" name="description" class="form-input" value="${patch?.description||''}" placeholder="Official tournament sleeve badge"/></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Price (৳)<span class="req">*</span></label><input type="number" name="price" class="form-input" min="0" required value="${patch?.price||0}"/></div>
         <div class="form-group"><label class="form-label">Display Order</label><input type="number" name="displayOrder" class="form-input" value="${patch?.displayOrder||0}"/></div>
@@ -2244,8 +2259,25 @@ function openPatchForm(id = null) {
   `;
   const footer = `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="savePatch('${id||''}')">Save Patch</button>`;
   openModal(patch?`Edit: ${patch.name}`:'New Patch', html, footer, 'modal-sm');
+  
+  window.setPatchPreset = function(dataUrl) {
+    window._patchImgUrl = dataUrl;
+    const input = document.getElementById('patch-img-url-input');
+    if (input) input.value = dataUrl;
+    toast('Badge preset applied', 'info');
+  };
+
   setTimeout(() => {
-    const zone = Uploader.createSingleZone({ id:'patch-img', value:imgUrl, placeholder:'Upload patch image', onchange: v => window._patchImgUrl = v });
+    const zone = Uploader.createSingleZone({ 
+      id:'patch-img', 
+      value:imgUrl, 
+      placeholder:'Click or drop badge image file (PNG, JPG, SVG)', 
+      onchange: v => {
+        window._patchImgUrl = v;
+        const input = document.getElementById('patch-img-url-input');
+        if (input) input.value = v;
+      }
+    });
     document.getElementById('patch-img-zone')?.appendChild(zone);
     window._patchImgUrl = imgUrl;
   }, 100);
@@ -2256,10 +2288,20 @@ function savePatch(id) {
   const fd = new FormData(form);
   const name = fd.get('name')?.trim();
   if (!name) { toast('Name required', 'error'); return; }
-  const data = { name, imageUrl: window._patchImgUrl||'', description: fd.get('description'), price: parseFloat(fd.get('price'))||0, displayOrder: parseInt(fd.get('displayOrder'))||0, isEnabled: fd.get('isEnabled')==='on' };
+  const inputEl = document.getElementById('patch-img-url-input');
+  const imageUrl = (inputEl?.value || window._patchImgUrl || '').trim();
+  const data = { 
+    name, 
+    imageUrl, 
+    description: fd.get('description'), 
+    price: parseFloat(fd.get('price'))||0, 
+    displayOrder: parseInt(fd.get('displayOrder'))||0, 
+    isEnabled: fd.get('isEnabled')==='on' 
+  };
   if (id) { DB.patches.update(id, data); toast('Patch updated', 'success'); }
   else { DB.patches.create(data); toast('Patch created', 'success'); }
-  closeModal(); renderPatches(document.getElementById('admin-content'));
+  closeModal(); 
+  renderPatches(document.getElementById('admin-content'));
 }
 
 // ── SLEEVES ──

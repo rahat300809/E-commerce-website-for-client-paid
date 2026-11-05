@@ -172,3 +172,28 @@ body {
 .animate-slide-up {
   animation: slideUp 0.28s cubic-bezier(0.34, 1.1, 0.64, 1) both;
 }
+
+/* Shop Layout & Product Cards Mobile Responsiveness */
+#view-shop {
+  overflow-x: hidden;
+}
+
+#shop-product-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.shop-card {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+#shop-category-pills {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+

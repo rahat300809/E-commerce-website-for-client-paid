@@ -431,49 +431,49 @@
           <p class="text-[10px] text-gray-400 mt-1 font-mono-ui">Official match typography. Leave blank if you want an unprinted plain kit.</p>
         </div>
 
-        <!-- ── QUANTITY & ADD TO CART (MATCHING SCREENSHOT 1) ── -->
-        <div class="pt-2">
-          <div class="flex items-center gap-3">
+        <!-- ── QUANTITY & ACTION BUTTONS (CLEAN, BEAUTIFUL, NEVER CRAMPED) ── -->
+        <div class="pt-2 space-y-2.5">
+          <!-- Row 1: Quantity Counter + Add to Cart + Wishlist -->
+          <div class="flex items-center gap-2 sm:gap-2.5">
             <!-- Qty Counter -->
-            <div class="flex items-center border border-gray-300 rounded-xl bg-white overflow-hidden h-12 flex-shrink-0 shadow-2xs">
-              <button type="button" onclick="changeQty(-1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base transition-colors cursor-pointer">−</button>
-              <span id="pd-qty-display" class="w-10 text-center font-mono-ui font-black text-sm text-black">1</span>
-              <button type="button" onclick="changeQty(1)" class="w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-100 font-black text-base transition-colors cursor-pointer">+</button>
+            <div class="flex items-center border border-gray-300 rounded-xl bg-gray-50/80 overflow-hidden h-12 w-28 sm:w-32 flex-shrink-0 shadow-2xs">
+              <button type="button" onclick="changeQty(-1)" class="w-8 sm:w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-lg transition-colors cursor-pointer active:scale-95">−</button>
+              <span id="pd-qty-display" class="flex-1 text-center font-mono-ui font-black text-sm text-black">1</span>
+              <button type="button" onclick="changeQty(1)" class="w-8 sm:w-10 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-lg transition-colors cursor-pointer active:scale-95">+</button>
             </div>
 
-            <!-- Add to Cart Button (Screenshot 1 style: Dark blue / primary) -->
+            <!-- Add to Cart Button (Spacious horizontal layout, single line text) -->
             <button type="button" 
                     id="add-to-cart-btn"
                     onclick="handleAddToCart()" 
-                    class="flex-1 h-12 bg-[#1b2a4a] hover:bg-[#121c33] active:scale-[0.99] text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
-              <span>Add to cart</span>
-            </button>
-
-            <!-- Buy Now Button -->
-            <button type="button" 
-                    onclick="buyNowDirect()" 
-                    class="h-12 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-black font-headline font-black text-xs uppercase tracking-wider px-5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">bolt</span>
-              <span>Buy Now</span>
+                    class="flex-1 h-12 bg-[#121c33] hover:bg-black active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
+              <span class="whitespace-nowrap">Add to cart</span>
             </button>
 
             <!-- Wishlist Heart Button -->
             <button type="button" 
                     id="product-wishlist-toggle-btn"
                     onclick="toggleCurrentProductWishlist()" 
-                    class="h-12 w-12 rounded-xl border border-gray-300 hover:border-red-400 bg-white hover:bg-red-50/50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all shadow-2xs cursor-pointer flex-shrink-0" 
+                    class="h-12 w-12 rounded-xl border border-gray-300 hover:border-red-400 bg-white hover:bg-red-50/50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all shadow-2xs cursor-pointer flex-shrink-0 active:scale-95" 
                     title="Add to Wishlist">
-              <span id="product-wishlist-icon" class="material-symbols-outlined text-[22px]">favorite</span>
+              <span id="product-wishlist-icon" class="material-symbols-outlined text-[20px]">favorite</span>
             </button>
           </div>
 
-          <!-- Total price indicator -->
-          <div class="flex items-center justify-between text-xs text-gray-500 font-mono-ui mt-2 px-1">
-            <span>Item Subtotal:</span>
-            <span id="pd-final-total" class="font-headline font-black text-base text-black">1,350.00৳</span>
-          </div>
+          <!-- Row 2: Instant Buy Now (High-converting, vibrant amber, full-width) -->
+          <button type="button" 
+                  onclick="buyNowDirect()" 
+                  class="w-full h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] text-black font-headline font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[19px]">bolt</span>
+            <span>Instant Buy Now</span>
+          </button>
 
+          <!-- Total price indicator -->
+          <div class="flex items-center justify-between text-xs text-gray-500 font-mono-ui pt-1 px-1">
+            <span>Item Subtotal:</span>
+            <span id="pd-final-total" class="font-headline font-black text-base sm:text-lg text-black">1,350.00৳</span>
+          </div>
           <!-- VIEW SIZE CHART BUTTON (MATCHING SCREENSHOT 1) -->
           <button type="button" 
                   onclick="openSizeGuideModal()" 
@@ -1224,49 +1224,67 @@
       }
     }
 
+    function getFallbackPatchBadge(name) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('champion') || n.includes('ucl') || n.includes('starball')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+';
+      if (n.includes('premier') || n.includes('epl')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPgogIDxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPgogIDxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz4KICA8Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+CiAgPHBhdGggZD0nTTQ3IDcwIFE1MCA3MyA1MyA3MCcgc3Ryb2tlPScjMzgwMDNjJyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KPC9zdmc+';
+      if (n.includes('liga') || n.includes('spain')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzIgMjYgTDQ0IDI2IEw0NCA2NCBMNjYgNjQgTDY2IDc0IEwzMiA3NCBaJyBmaWxsPScjZWE1ODBjJy8+CiAgPHBhdGggZD0nTTQ4IDM2IEw1OCAzNiBMNTggNTQgTDcyIDU0IEw3MiA2MiBMNDggNjIgWicgZmlsbD0nIzExMTgyNycvPgo8L3N2Zz4=';
+      if (n.includes('trophy') || n.includes('9') || n.includes('cup')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8cGF0aCBkPSdNMjYgMTggQzI2IDE4IDIyIDUyIDUwIDY4IEM3OCA1MiA3NCAxOCA3NCAxOCBaJyBmaWxsPScjMGYxNzJhJyBzdHJva2U9JyNjYmQ1ZTEnIHN0cm9rZS13aWR0aD0nMycvPgogIDx0ZXh0IHg9JzUwJyB5PSc0OCcgZm9udC1zaXplPScyOCcgZm9udC1mYW1pbHk9J0FyaWFsLCBzYW5zLXNlcmlmJyBmb250LXdlaWdodD0nOTAwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjZmZmZmZmJz45PC90ZXh0PgogIDxwYXRoIGQ9J00zNCA3MiBMNjYgNzIgTDU4IDg0IEw0MiA4NCBaJyBmaWxsPScjMGYxNzJhJy8+Cjwvc3ZnPg==';
+      if (n.includes('respect')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgNTAnPgogIDxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nNTAnIHJ4PScxMCcgZmlsbD0nIzFlM2E4YScgc3Ryb2tlPScjM2I4MmY2JyBzdHJva2Utd2lkdGg9JzInLz4KICA8dGV4dCB4PSc1MCcgeT0nMzInIGZvbnQtc2l6ZT0nMTYnIGZvbnQtZmFtaWx5PSdBcmlhbCwgc2Fucy1zZXJpZicgZm9udC13ZWlnaHQ9JzkwMCcgbGV0dGVyLXNwYWNpbmc9JzInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyNmZmZmZmYnPlJFU1BFQ1Q8L3RleHQ+Cjwvc3ZnPg==';
+      return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+';
+    }
+
     function renderDynamicPatches(patches) {
       const container = document.getElementById('patches-list-container');
       if (!container) return;
-      container.innerHTML = patches.map((p, idx) => {
-        const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="%23f3f4f6" stroke="%23cbd5e1" stroke-width="4"/><text x="50" y="55" font-size="28" font-family="Arial" font-weight="bold" text-anchor="middle" fill="%2364748b">${idx + 1}</text></svg>`;
-        const imgSrc = p.imageUrl || fallbackSvg;
+
+      // Deduplicate patches by normalized name so no duplicate rows appear
+      const seen = new Set();
+      const unique = [];
+      (patches || []).forEach(p => {
+        const norm = (p.name || '').trim().toLowerCase();
+        if (norm && !seen.has(norm)) {
+          seen.add(norm);
+          unique.push(p);
+        }
+      });
+
+      if (unique.length === 0) {
+        unique.push(
+          { id: 'patch_ucl', name: 'UEFA Champions League', price: 250, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+', isEnabled: true },
+          { id: 'patch_epl', name: 'Premier League', price: 200, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPgogIDxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPgogIDxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz4KICA8Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+CiAgPHBhdGggZD0nTTQ3IDcwIFE1MCA3MyA1MyA3MCcgc3Ryb2tlPScjMzgwMDNjJyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KPC9zdmc+', isEnabled: true },
+          { id: 'patch_laliga', name: 'La Liga', price: 200, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzIgMjYgTDQ0IDI2IEw0NCA2NCBMNjYgNjQgTDY2IDc0IEwzMiA3NCBaJyBmaWxsPScjZWE1ODBjJy8+CiAgPHBhdGggZD0nTTQ4IDM2IEw1OCAzNiBMNTggNTQgTDcyIDU0IEw3MiA2MiBMNDggNjIgWicgZmlsbD0nIzExMTgyNycvPgo8L3N2Zz4=', isEnabled: true }
+        );
+      }
+
+      container.innerHTML = unique.map((p, idx) => {
+        const fallbackBadge = getFallbackPatchBadge(p.name);
+        const imgSrc = (p.imageUrl && p.imageUrl.trim().length > 5) ? p.imageUrl : fallbackBadge;
         const priceText = p.price > 0 ? `+${p.price}৳` : 'Free';
         const isChecked = productState.selectedPatches.includes(p.id);
 
         return `
-          <label class="flex items-center justify-between p-2.5 sm:p-3 bg-white border border-gray-200 hover:border-gray-400 rounded-2xl cursor-pointer transition-all shadow-2xs group">
-            <div class="flex items-center gap-3 min-w-0">
-              <span class="font-headline font-black text-xs sm:text-sm text-gray-700 w-5 flex-shrink-0">${idx + 1}.</span>
-              <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 p-1 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-2xs">
-                <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-contain" onerror="this.src='${fallbackSvg}'"/>
+          <label class="flex items-center justify-between p-2.5 sm:p-3 bg-white hover:bg-gray-50/70 border border-gray-200 hover:border-gray-400 rounded-xl cursor-pointer transition-all shadow-2xs group active:scale-[0.99]">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <span class="font-headline font-black text-xs text-gray-400 w-4 flex-shrink-0">${idx + 1}.</span>
+              <!-- Delicate small badge image (ekhne jeno chotto kore dkhae) -->
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-gray-200/90 p-1 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-2xs">
+                <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-contain" onerror="this.src='${fallbackBadge}'"/>
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="font-bold text-xs sm:text-sm text-black group-hover:text-blue-900 transition-colors truncate">${p.name}</span>
-                <span class="font-mono-ui font-semibold text-[11px] sm:text-xs text-gray-500 mt-0.5">${priceText}</span>
+                <span class="font-headline font-bold text-xs sm:text-sm text-gray-900 group-hover:text-blue-900 transition-colors truncate">${p.name}</span>
+                <span class="font-mono-ui font-bold text-[11px] sm:text-xs text-blue-700 mt-0.5">${priceText}</span>
               </div>
             </div>
-            <div class="pl-3 pr-1 flex items-center">
-              <input type="checkbox" name="patch" value="${p.id}" data-name="${p.name}" data-price="${p.price || 0}" ${isChecked ? 'checked' : ''} onchange="calculateLiveTotal()" class="w-5 h-5 rounded border-gray-300 text-black focus:ring-black cursor-pointer"/>
+            <div class="pl-2 pr-1 flex items-center">
+              <input type="checkbox" name="patch" value="${p.id}" data-name="${p.name}" data-price="${p.price || 0}" ${isChecked ? 'checked' : ''} onchange="calculateLiveTotal()" class="w-5 h-5 rounded-md border-gray-300 text-black focus:ring-black cursor-pointer"/>
             </div>
           </label>
         `;
       }).join('');
     }
 
-    
-
-    
-
-    // ─────────────────────────────────────────
-    // User Selection Handlers
-    // ─────────────────────────────────────────
-    
-
-
-
-    
-
-    function changeQty(delta) {
+        function changeQty(delta) {
       productState.quantity = Math.max(1, productState.quantity + delta);
       const qtyEl = document.getElementById('pd-qty-display');
       if (qtyEl) qtyEl.textContent = productState.quantity;

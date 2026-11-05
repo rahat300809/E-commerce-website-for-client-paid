@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261105_mobile_v3">
 
   <script>
     // Instant 0ms initial view detection before DOM paint (Strict Anti-Flash)
@@ -571,7 +571,7 @@
       </div>
 
       <!-- ── Main Shop Layout ── -->
-      <div class="max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-10 py-3 sm:py-6">
+      <div class="max-w-[1280px] mx-auto px-2 sm:px-6 lg:px-10 py-3 sm:py-6 w-full overflow-hidden">
 
         <!-- Mobile: Filter Toggle Button -->
         <button onclick="toggleMobileFilter()" class="lg:hidden w-full mb-4 bg-white border border-gray-200 rounded-xl px-4 py-3 flex justify-between items-center text-sm font-bold text-primary shadow-sm">
@@ -649,35 +649,37 @@
             </div>
 
             <!-- Header Row: Title + View Switcher + Sort -->
-            <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-3 mb-5 pb-3 border-b border-gray-200/80">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 mb-4 sm:mb-5 pb-3 border-b border-gray-200/80 w-full">
               <div>
-                <h1 class="font-headline text-xl sm:text-2xl font-black text-black leading-tight">Match Kits & Apparel</h1>
-                <p class="font-mono-ui text-xs text-gray-500 mt-0.5"><span id="product-count" class="font-bold text-black">6</span> Products available</p>
+                <h1 class="font-headline text-lg sm:text-2xl font-black text-black leading-tight">Match Kits & Apparel</h1>
+                <p class="font-mono-ui text-[11px] sm:text-xs text-gray-500 mt-0.5"><span id="product-count" class="font-bold text-black">6</span> Products available</p>
               </div>
-              <div class="flex items-center gap-2 flex-shrink-0 self-end xs:self-auto">
+              <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                 <!-- Grid View Switcher -->
                 <div class="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200" id="shop-view-toggles">
                   <button type="button" onclick="setShopViewMode('grid-2')" id="btn-view-grid-2" class="p-1.5 rounded-md text-primary bg-white shadow-2xs transition-all cursor-pointer" title="Grid View">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
                   </button>
                   <button type="button" onclick="setShopViewMode('grid-1')" id="btn-view-grid-1" class="p-1.5 rounded-md text-gray-500 hover:text-black transition-all cursor-pointer" title="List View">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M4 6h16v3H4V6zm0 5h16v3H4v-3zm0 5h16v3H4v-3z"/></svg>
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24"><path d="M4 6h16v3H4V6zm0 5h16v3H4v-3zm0 5h16v3H4v-3z"/></svg>
                   </button>
                 </div>
 
-                <span class="font-body-md text-xs text-gray-500 hidden sm:inline">Sort:</span>
-                <select id="sort-select" onchange="sortProducts(this.value)"
-                        class="bg-white border border-gray-200 rounded-lg px-2.5 sm:px-3 py-1.5 font-headline font-bold text-xs text-black focus:outline-none focus:ring-1 focus:ring-black cursor-pointer shadow-2xs">
-                  <option value="newest">Newest</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
-                </select>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-body-md text-xs text-gray-500 hidden sm:inline">Sort:</span>
+                  <select id="sort-select" onchange="sortProducts(this.value)"
+                          class="bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 font-headline font-bold text-xs text-black focus:outline-none focus:ring-1 focus:ring-black cursor-pointer shadow-2xs">
+                    <option value="newest">Newest</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <!-- Product Grid (Spacious 3-column desktop layout, 2-column mobile layout) -->
-            <div id="shop-product-grid" class="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
+            <!-- Product Grid (Compact 2-column mobile layout, spacious desktop layout) -->
+            <div id="shop-product-grid" class="w-full max-w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-5 box-border">
               <!-- Rendered dynamically from DB.products.published() -->
             </div><!-- /product grid -->
 
@@ -1346,7 +1348,7 @@
 
 
   <!-- ==================== SHOPPING CART DRAWER OVERLAY ==================== -->
-  <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0">
+  <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0 overflow-hidden">
     <!-- Backdrop -->
     <div onclick="toggleCartDrawer()" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
     
@@ -1631,11 +1633,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261103_live_v2"></script>
+  <script src="firebase-sync.js?v=20261105_mobile_v3"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261103_live_v2"></script>
+  <script src="admin-db.js?v=20261105_mobile_v3"></script>
   <!-- Main Application JavaScript -->
-  <script src="wishlist.js?v=20261103_live_v2"></script>
-  <script src="app.js?v=20261103_live_v2"></script>
+  <script src="wishlist.js?v=20261105_mobile_v3"></script>
+  <script src="app.js?v=20261105_mobile_v3"></script>
 </body>
 </html>

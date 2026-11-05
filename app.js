@@ -1509,11 +1509,17 @@ window.setShopViewMode = function(mode) {
   const btn2 = document.getElementById('btn-view-grid-2');
   const btn1 = document.getElementById('btn-view-grid-1');
   if (!grid) return;
-  // Always 2 columns on phones/mobile, 3 on tablet, 4 on desktop
-  grid.className = 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-5';
-  if (btn2) { btn2.classList.add('bg-white', 'text-primary', 'shadow-2xs'); btn2.classList.remove('text-gray-500'); }
-  if (btn1) { btn1.classList.remove('bg-white', 'text-primary', 'shadow-2xs'); btn1.classList.add('text-gray-500'); }
-  try { localStorage.setItem('zenvy_shop_view_mode', 'grid-2'); } catch(e){}
+  if (mode === 'grid-1') {
+    grid.className = 'w-full max-w-full grid grid-cols-1 gap-3';
+    if (btn1) { btn1.classList.add('bg-white', 'text-primary', 'shadow-2xs'); btn1.classList.remove('text-gray-500'); }
+    if (btn2) { btn2.classList.remove('bg-white', 'text-primary', 'shadow-2xs'); btn2.classList.add('text-gray-500'); }
+    try { localStorage.setItem('zenvy_shop_view_mode', 'grid-1'); } catch(e){}
+  } else {
+    grid.className = 'w-full max-w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-5';
+    if (btn2) { btn2.classList.add('bg-white', 'text-primary', 'shadow-2xs'); btn2.classList.remove('text-gray-500'); }
+    if (btn1) { btn1.classList.remove('bg-white', 'text-primary', 'shadow-2xs'); btn1.classList.add('text-gray-500'); }
+    try { localStorage.setItem('zenvy_shop_view_mode', 'grid-2'); } catch(e){}
+  }
 };
 
 // ── Dynamic Shop Categories & Products Engine ──
@@ -1783,61 +1789,61 @@ function renderShopProducts() {
     const badgeClass = p.isPreorder ? 'bg-purple-600 text-white' : (p.stock === 0 ? 'bg-neutral-800 text-white' : 'bg-red-50 text-red-600 border border-red-200');
 
     return `
-      <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-150 sm:border-gray-100 shadow-2xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between"
+      <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-150 sm:border-gray-100 shadow-2xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between w-full max-w-full"
            data-id="${p.id}" data-price="${p.salePrice || p.basePrice}" data-category="${p.categoryName || ''}">
         
         <!-- Image Area: Compact aspect-square with smooth zoom & interactive wishlist -->
-        <div class="relative overflow-hidden bg-[#f7f7f9] cursor-pointer aspect-square flex items-center justify-center p-2 sm:p-3"
+        <div class="relative overflow-hidden bg-[#f7f7f9] cursor-pointer aspect-square flex items-center justify-center p-1.5 sm:p-3"
              onclick="openProduct('${p.id}')">
-          <img src="${imgUrl}" class="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
+          <img src="${imgUrl}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
           
-          ${badgeText ? `<span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 ${badgeClass} font-mono-ui font-black text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full shadow-2xs">${badgeText}</span>` : ''}
+          ${badgeText ? `<span class="absolute top-1 left-1 sm:top-2 sm:left-2 ${badgeClass} font-mono-ui font-black text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded-full shadow-2xs">${badgeText}</span>` : ''}
           
           <button type="button" 
                   onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.salePrice || p.basePrice})"
-                  class="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/95 backdrop-blur-xs shadow-2xs flex items-center justify-center text-gray-400 hover:text-red-500 active:scale-85 transition-all cursor-pointer z-10"
+                  class="absolute top-1 right-1 sm:top-2 sm:right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/95 backdrop-blur-xs shadow-2xs flex items-center justify-center text-gray-400 hover:text-red-500 active:scale-85 transition-all cursor-pointer z-10"
                   title="Add to Wishlist">
-            <span class="material-symbols-outlined text-[14px] sm:text-[18px]">favorite</span>
+            <span class="material-symbols-outlined text-[13px] sm:text-[16px]">favorite</span>
           </button>
         </div>
 
         <!-- Details & Actions: Compact for phones so 2 products fit cleanly per row -->
-        <div class="p-2 sm:p-3.5 flex flex-col flex-1 justify-between">
+        <div class="p-2 sm:p-3 flex flex-col flex-1 justify-between gap-1.5">
           <div>
-            <div class="flex items-center justify-between text-[9px] sm:text-[10px] font-mono-ui uppercase tracking-wider text-gray-400 mb-0.5 sm:mb-1">
+            <div class="flex items-center justify-between text-[8px] sm:text-[10px] font-mono-ui uppercase tracking-wider text-gray-400 mb-0.5">
               <span class="truncate max-w-[65%] font-medium">${p.categoryName || 'KIT'}</span>
               <span class="flex items-center gap-0.5 text-amber-500 font-bold flex-shrink-0">
-                <span class="material-symbols-outlined text-[11px] sm:text-[13px] fill-1">star</span>
-                <span class="text-[9px] sm:text-[11px]">4.9</span>
+                <span class="material-symbols-outlined text-[10px] sm:text-[12px] fill-1">star</span>
+                <span class="text-[8px] sm:text-[10px]">4.9</span>
               </span>
             </div>
 
-            <h3 class="font-headline font-bold text-xs sm:text-sm text-black leading-snug cursor-pointer hover:text-gray-600 transition-colors line-clamp-1" 
+            <h3 class="font-headline font-bold text-[11px] sm:text-sm text-black leading-tight cursor-pointer hover:text-gray-600 transition-colors line-clamp-2 min-h-[2rem]" 
                 onclick="openProduct('${p.id}')" title="${p.name}">
               ${p.name}
             </h3>
 
             <!-- Price -->
-            <div class="mt-1 sm:mt-1.5 flex items-baseline gap-1.5 flex-wrap">
-              <span class="font-headline font-black text-xs sm:text-base text-black">${priceFormatted}</span>
-              ${origFormatted ? `<span class="font-mono-ui text-[10px] sm:text-xs text-gray-400 line-through">${origFormatted}</span>` : ''}
+            <div class="mt-1 flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+              <span class="font-headline font-black text-xs sm:text-sm text-black whitespace-nowrap">${priceFormatted}</span>
+              ${origFormatted ? `<span class="font-mono-ui text-[9px] sm:text-[11px] text-gray-400 line-through whitespace-nowrap">${origFormatted}</span>` : ''}
             </div>
           </div>
 
           <!-- Action Buttons: Clean, Compact & Interactive -->
-          <div class="grid grid-cols-2 gap-1 sm:gap-1.5 pt-2 border-t border-gray-100 mt-2 sm:mt-2.5">
+          <div class="grid grid-cols-2 gap-1 pt-1.5 border-t border-gray-100 mt-1">
             <button type="button" 
                     onclick="openProduct('${p.id}')"
-                    class="py-1.5 sm:py-2 px-1 rounded-lg sm:rounded-xl border border-gray-200 hover:border-black text-black font-headline font-bold text-[10px] sm:text-xs transition-colors text-center cursor-pointer hover:bg-gray-50 active:scale-95"
+                    class="py-1 px-1 rounded-md sm:rounded-lg border border-gray-200 hover:border-black text-black font-headline font-bold text-[9px] sm:text-xs transition-colors text-center cursor-pointer hover:bg-gray-50 active:scale-95 whitespace-nowrap"
                     title="View Product">
               View
             </button>
             <button type="button" 
                     onclick="quickAddToCart('${p.id}')"
-                    class="py-1.5 sm:py-2 px-1 rounded-lg sm:rounded-xl bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[10px] sm:text-xs transition-colors flex items-center justify-center gap-0.5 sm:gap-1 cursor-pointer shadow-2xs active:scale-95"
+                    class="py-1 px-1 rounded-md sm:rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[9px] sm:text-xs transition-colors flex items-center justify-center gap-0.5 cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
                     title="Add to Bag">
-              <span class="material-symbols-outlined text-[13px] sm:text-[15px]">shopping_bag</span>
-              <span>+ Bag</span>
+              <span class="material-symbols-outlined text-[11px] sm:text-[14px]">shopping_bag</span>
+              <span>+Bag</span>
             </button>
           </div>
         </div>

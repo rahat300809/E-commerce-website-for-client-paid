@@ -17,6 +17,15 @@
   --outline-variant: #c7c6ca;
 }
 
+/* Critical utility fallbacks to prevent flash/flicker before Tailwind CDN initializes */
+.hidden {
+  display: none !important;
+}
+
+.page-view:not(.active) {
+  display: none !important;
+}
+
 body {
   background-color: #f9f9f9;
   font-family: 'DM Sans', sans-serif;

@@ -465,17 +465,61 @@ function deleteProduct(id) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// GENERIC MODAL
+// GENERIC MODAL WITH UNSAVED EDITS PROTECTION
 // ──────────────────────────────────────────────────────────────
+let _modalFormDirty = false;
+let _isSavingModalForm = false;
+
+function hasUnsavedModalChanges() {
+  if (_isSavingModalForm) return false;
+  const body = document.getElementById('generic-modal-body');
+  if (!body) return false;
+  const form = body.querySelector('form');
+  if (!form) return false;
+  if (_modalFormDirty) return true;
+  
+  // Check text, number, date inputs and textareas
+  const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea');
+  for (let el of inputs) {
+    if (el.value && el.value.trim().length > 0 && el.value !== el.defaultValue) {
+      return true;
+    }
+  }
+  if (window._patchImgUrl || (window._productImages && window._productImages.length > 0)) {
+    return true;
+  }
+  return false;
+}
+
 function openModal(title, bodyHtml, footer = '', size = 'modal-lg') {
+  _modalFormDirty = false;
+  _isSavingModalForm = false;
   document.getElementById('generic-modal-title').textContent = title;
   document.getElementById('generic-modal-body').innerHTML = bodyHtml;
   document.getElementById('generic-modal-footer').innerHTML = footer;
   const box = document.getElementById('generic-modal-box');
   box.className = `modal-box ${size}`;
   document.getElementById('generic-modal').classList.remove('hidden');
+
+  // Track any form input activity
+  setTimeout(() => {
+    const form = document.querySelector('#generic-modal-body form');
+    if (form) {
+      form.addEventListener('input', () => { _modalFormDirty = true; }, { passive: true });
+      form.addEventListener('change', () => { _modalFormDirty = true; }, { passive: true });
+    }
+  }, 80);
 }
-function closeModal() { 
+
+function closeModal(force = false) {
+  if (!force && !_isSavingModalForm && hasUnsavedModalChanges()) {
+    const ok = confirm('⚠️ আপনি কি নিশ্চিত যে এটি বন্ধ করতে চান? আপনার এডিটিং করা তথ্য মুছে যেতে পারে।\n\nAre you sure you want to close? Any unsaved edits will be discarded.');
+    if (!ok) return;
+  }
+  _modalFormDirty = false;
+  _isSavingModalForm = false;
+  window._patchImgUrl = null;
+  window._productImages = null;
   document.getElementById('generic-modal').classList.add('hidden'); 
   if (window._pendingLiveRefresh) {
     window._pendingLiveRefresh = false;
@@ -507,15 +551,19 @@ function showLiveSyncPill(text = '🔄 Live Synced') {
   }, 2200);
 }
 
-// Close modals on backdrop click
+// Modal actions and backdrop click handling with unsaved changes protection
 document.addEventListener('click', e => {
+  const saveBtn = e.target.closest('#generic-modal .btn-primary, #generic-modal [type="submit"], #generic-modal button[onclick*="save"], #generic-modal button[onclick*="update"], #generic-modal button[onclick*="create"]');
+  if (saveBtn) {
+    _isSavingModalForm = true;
+  }
   if (e.target.id === 'generic-modal') closeModal();
   if (e.target.id === 'confirm-modal') closeConfirm();
   // Close action menus
   if (!e.target.closest('.action-menu')) {
     document.querySelectorAll('.action-menu-dropdown.open').forEach(m => m.classList.remove('open'));
   }
-});
+}, true);
 
 // ──────────────────────────────────────────────────────────────
 // Global Search
@@ -5495,6 +5543,31 @@ function renderSettingsStore(container) {
       </div>
     </div>
 
+    <!-- WhatsApp Order Integration -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <span class="material-symbols-outlined" style="color:#25D366;">chat</span>
+        <span class="form-section-title">WhatsApp Direct Order Configuration</span>
+      </div>
+      <div class="form-section-body">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" style="font-size:12px;font-weight:700;">WhatsApp Business Phone Number</label>
+            <input type="text" id="policy-whatsapp-number" class="form-input" placeholder="88017XXXXXXXX" value="${policy.whatsappNumber || '8801700000000'}" onchange="saveStorePolicyLive()"/>
+            <div style="font-size:11px;color:#64748B;margin-top:3px;">Numbers with country code (e.g. 88017XXXXXXXX). Connects the "Order via WhatsApp" button on product pages.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-size:12px;font-weight:700;">WhatsApp Order Button Display</label>
+            <select id="policy-whatsapp-enabled" class="form-select" onchange="saveStorePolicyLive()">
+              <option value="true" ${policy.whatsappEnabled !== false ? 'selected' : ''}>Active / Visible on Storefront</option>
+              <option value="false" ${policy.whatsappEnabled === false ? 'selected' : ''}>Disabled / Hidden</option>
+            </select>
+            <div style="font-size:11px;color:#64748B;margin-top:3px;">Shows a prominent WhatsApp button next to Add to Cart on product pages.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Store Policies & Legal Terms -->
     <div class="form-section">
       <div class="form-section-header"><span class="material-symbols-outlined">gavel</span><span class="form-section-title">Store Policies & Legal Terms</span></div>
@@ -5551,7 +5624,9 @@ function saveStorePolicyLive() {
     minOrderAmount: parseFloat(document.getElementById('policy-minorder')?.value) || 0,
     payFirstNote: document.getElementById('policy-payfirstnote')?.value || 'Advance payment required to confirm your order.',
     cashOnDelivery: advanceMode !== 'full_only',
-    deliveryChargeEnabled: true
+    deliveryChargeEnabled: true,
+    whatsappNumber: document.getElementById('policy-whatsapp-number')?.value?.trim() || DB.storeSettings.get().whatsappNumber || '8801700000000',
+    whatsappEnabled: document.getElementById('policy-whatsapp-enabled')?.value !== 'false'
   };
 
   DB.storeSettings.save(policy);

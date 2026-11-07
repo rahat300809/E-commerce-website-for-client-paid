@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261105_mobile_v3">
+  <link rel="stylesheet" href="styles.css?v=20261107_v1">
 
   <script>
     // Instant 0ms initial view detection before DOM paint (Strict Anti-Flash)
@@ -31,7 +31,7 @@
           }
           if (target === 'studio' || target === 'customizer') target = 'customizer';
           if (target === 'preorder' || target === 'preorders') target = 'shop';
-          if (['shop', 'customizer', 'checkout', 'home'].indexOf(target) !== -1) {
+          if (['shop', 'customizer', 'checkout', 'order-confirmation', 'home'].indexOf(target) !== -1) {
             document.documentElement.setAttribute('data-target-view', target);
           } else {
             document.documentElement.setAttribute('data-target-view', 'home');
@@ -43,6 +43,11 @@
     })();
   </script>
   <style>
+    /* Critical utility fallbacks to prevent flash/flicker */
+    .hidden {
+      display: none !important;
+    }
+
     /* Clean View switching: instantaneous zero-flash swap without dual-view overlap */
     .page-view {
       display: none;
@@ -58,25 +63,31 @@
     html[data-target-view="home"] #view-shop,
     html[data-target-view="home"] #view-customizer,
     html[data-target-view="home"] #view-checkout,
-    html[data-target-view="home"] #view-admin { display: none !important; }
+    html[data-target-view="home"] #view-order-confirmation { display: none !important; }
 
     html[data-target-view="shop"] #view-shop { display: block !important; opacity: 1 !important; }
     html[data-target-view="shop"] #view-home,
     html[data-target-view="shop"] #view-customizer,
     html[data-target-view="shop"] #view-checkout,
-    html[data-target-view="shop"] #view-admin { display: none !important; }
+    html[data-target-view="shop"] #view-order-confirmation { display: none !important; }
 
     html[data-target-view="customizer"] #view-customizer { display: block !important; opacity: 1 !important; }
     html[data-target-view="customizer"] #view-home,
     html[data-target-view="customizer"] #view-shop,
     html[data-target-view="customizer"] #view-checkout,
-    html[data-target-view="customizer"] #view-admin { display: none !important; }
+    html[data-target-view="customizer"] #view-order-confirmation { display: none !important; }
 
     html[data-target-view="checkout"] #view-checkout { display: block !important; opacity: 1 !important; }
     html[data-target-view="checkout"] #view-home,
     html[data-target-view="checkout"] #view-shop,
     html[data-target-view="checkout"] #view-customizer,
-    html[data-target-view="checkout"] #view-admin { display: none !important; }
+    html[data-target-view="checkout"] #view-order-confirmation { display: none !important; }
+
+    html[data-target-view="order-confirmation"] #view-order-confirmation { display: block !important; opacity: 1 !important; }
+    html[data-target-view="order-confirmation"] #view-home,
+    html[data-target-view="order-confirmation"] #view-shop,
+    html[data-target-view="order-confirmation"] #view-customizer,
+    html[data-target-view="order-confirmation"] #view-checkout { display: none !important; }
 
     /* Instant navbar sync so nav-btn matches target view without flash */
     html[data-target-view="home"] #nav-btn-home {
@@ -1062,209 +1073,128 @@
       </main>
     </div>
 
-    <!-- ==================== VIEW 5: ADMIN MANAGEMENT SUITE (Screen 9d16cf19ed1f4f42b706478c60aa5ff6) ==================== -->
-    <div id="view-admin" class="page-view">
-      <div class="min-h-screen flex">
+    <!-- ==================== VIEW 5: ORDER CONFIRMATION / SUCCESS ==================== -->
+    <div id="view-order-confirmation" class="page-view">
+      <main class="w-full max-w-4xl mx-auto px-4 py-8 md:py-14">
         
-        <!-- Side Navigation Bar -->
-        <aside class="hidden md:flex flex-col p-6 bg-white border-r border-outline-variant shadow-sm h-screen w-64 fixed left-0 top-[60px] z-40">
-          <div class="mb-6">
-            <h1 class="font-headline-lg text-2xl font-black text-primary tracking-tighter">ZENVY Admin</h1>
-            <p class="text-secondary font-mono-ui text-[11px] uppercase tracking-widest mt-0.5">Management Suite</p>
+        <!-- Success Banner Card -->
+        <div class="glass-panel p-6 sm:p-10 rounded-3xl border border-white/80 shadow-xl text-center relative overflow-hidden bg-white/95">
+          
+          <!-- Animated Checkmark Icon -->
+          <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 rounded-full bg-emerald-50 border-4 border-emerald-200 flex items-center justify-center text-emerald-600 shadow-lg">
+            <span class="material-symbols-outlined text-4xl sm:text-5xl font-black">check</span>
           </div>
-          <nav class="flex flex-col gap-2 flex-1">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-semibold font-mono-ui text-xs">
-              <span class="material-symbols-outlined fill-1">inventory_2</span>
-              Products Management
-            </a>
-            <a href="#" onclick="showToast('Admin Orders: 1,042 Orders Pending'); return false;" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container-high rounded-xl font-mono-ui text-xs transition-transform hover:translate-x-1">
-              <span class="material-symbols-outlined">shopping_bag</span>
-              Orders & Shipping
-            </a>
-            <a href="#" onclick="showToast('Customer Database: 12.4K Active Members'); return false;" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container-high rounded-xl font-mono-ui text-xs transition-transform hover:translate-x-1">
-              <span class="material-symbols-outlined">group</span>
-              Customers
-            </a>
-            <a href="#" onclick="showToast('Analytics: Revenue +8.4% this month'); return false;" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container-high rounded-xl font-mono-ui text-xs transition-transform hover:translate-x-1">
-              <span class="material-symbols-outlined">leaderboard</span>
-              Analytics & Sales
-            </a>
-          </nav>
-          <div class="mt-auto pt-4 border-t border-outline-variant/30 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs font-mono-ui">
-              AD
-            </div>
-            <div>
-              <p class="font-mono-ui text-xs font-bold text-primary">Admin User</p>
-              <p class="font-mono-ui text-[11px] text-secondary">admin@zenvy.com</p>
-            </div>
-          </div>
-        </aside>
 
-        <!-- Admin Main Content Area -->
-        <main class="flex-1 ml-0 md:ml-64 p-6 md:p-10 min-h-screen">
-          <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div>
-              <h2 class="font-headline-lg text-3xl font-bold text-primary">Product Inventory Management</h2>
-              <p class="text-secondary font-mono-ui text-xs mt-1">Manage stock, pre-orders, and Stitch design themes.</p>
-            </div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <div class="relative flex-1 sm:w-64">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm">search</span>
-                <input type="text" id="admin-search" oninput="filterAdminTable()" placeholder="Search products..." 
-                       class="w-full pl-9 pr-4 py-2 bg-white border border-outline-variant rounded-xl font-mono-ui text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm"/>
-              </div>
-              <button onclick="toggleAddProductModal()" class="bg-primary text-white px-5 py-2.5 rounded-xl font-label-caps text-xs flex items-center justify-center gap-2 hover:bg-black/90 transition-colors shadow-lg">
-                <span class="material-symbols-outlined text-sm">add</span>
-                Add Product
-              </button>
-            </div>
-          </header>
+          <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-mono-ui font-black px-3.5 py-1 rounded-full uppercase tracking-wider mb-2">Order Confirmed • অর্ডার গৃহীত হয়েছে</span>
+          <h1 class="font-headline-lg text-2xl sm:text-4xl font-extrabold text-primary mb-2">Thank You for Your Order!</h1>
+          <p class="font-body-md text-sm sm:text-base text-secondary max-w-lg mx-auto">
+            Your match kit order has been placed successfully. A delivery rider from Steadfast / Pathao will deliver your package.
+          </p>
 
-          <!-- Stats Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2 relative border border-white/80">
-              <div class="flex justify-between items-start">
-                <p class="text-secondary font-label-caps text-xs uppercase tracking-wider">Total Inventory</p>
-                <span class="material-symbols-outlined text-secondary">inventory</span>
-              </div>
-              <p id="stat-total-products" class="font-display-sm text-4xl font-extrabold text-primary">248</p>
-              <p class="text-xs font-mono-ui text-emerald-600 font-semibold mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs">trending_up</span> +12 added this month
-              </p>
+          <!-- Order Reference Box -->
+          <div class="mt-6 p-4 sm:p-5 bg-surface-container-low rounded-2xl max-w-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 border border-outline-variant/30">
+            <div class="text-left">
+              <span class="text-[11px] font-mono-ui uppercase text-secondary font-bold block">Order Number</span>
+              <span id="confirmed-order-number" class="font-mono text-lg sm:text-xl font-black text-primary tracking-wider">#ZNV-000000</span>
             </div>
-
-            <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2 relative border border-white/80">
-              <div class="flex justify-between items-start">
-                <p class="text-secondary font-label-caps text-xs uppercase tracking-wider">Active Pre-orders</p>
-                <span class="material-symbols-outlined text-secondary">hourglass_top</span>
-              </div>
-              <p class="font-display-sm text-4xl font-extrabold text-primary">1,042</p>
-              <p class="text-xs font-mono-ui text-secondary mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs">local_shipping</span> Fulfillment in 14 days
-              </p>
-            </div>
-
-            <div class="glass-panel rounded-2xl p-6 flex flex-col gap-2 relative border border-white/80">
-              <div class="flex justify-between items-start">
-                <p class="text-secondary font-label-caps text-xs uppercase tracking-wider">Monthly Revenue</p>
-                <span class="material-symbols-outlined text-secondary">payments</span>
-              </div>
-              <p class="font-display-sm text-4xl font-extrabold text-primary">$84.2K</p>
-              <p class="text-xs font-mono-ui text-emerald-600 font-semibold mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs">trending_up</span> +8.4% vs last month
-              </p>
+            <div class="text-right">
+              <span class="text-[11px] font-mono-ui uppercase text-secondary font-bold block">Order Date</span>
+              <span id="confirmed-order-date" class="font-mono-ui text-xs font-bold text-gray-700">Today</span>
             </div>
           </div>
 
-          <!-- Product Table -->
-          <div class="glass-panel rounded-2xl overflow-hidden bg-white border border-white/80 shadow-lg">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="bg-surface-container-low/70 border-b border-outline-variant/40">
-                    <th class="p-4 font-label-caps text-xs text-secondary">Product</th>
-                    <th class="p-4 font-label-caps text-xs text-secondary">Category</th>
-                    <th class="p-4 font-label-caps text-xs text-secondary">Price</th>
-                    <th class="p-4 font-label-caps text-xs text-secondary">Stock</th>
-                    <th class="p-4 font-label-caps text-xs text-secondary">Status</th>
-                    <th class="p-4 font-label-caps text-xs text-secondary text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-table-body" class="font-mono-ui text-xs divide-y divide-outline-variant/20">
-                  <!-- Row 1 -->
-                  <tr class="hover:bg-surface-container-lowest transition-colors group">
-                    <td class="p-4">
-                      <div class="flex items-center gap-3">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1r_iDUKzPPDKlnqAQN-5km-XExJi9maoBa_NQQsla6f_fGGVGGe_G9HhS9JKSz4Mvoq-bNcwfbCwmYrxbx8Oq1BJX8U8ycNNs5LEHz_hPFVFPRLNGlrDuPMi7YX_nrDMPrzpzHVDBEdrs_rfsw8drna2KPqBiGiWEkXHa5X0Kh0Rg9Cnu4BGOqE8R_VWucpatBrfE6LBsrezQd_kA8wBUMP9t8EM5NMM6wEL5Y17GWQWqBkM_kv87xQ" 
-                             class="w-10 h-10 rounded-lg object-cover bg-surface-container" alt="Product"/>
-                        <div>
-                          <p class="font-bold text-primary">Aero-Mesh Pro Jersey</p>
-                          <p class="text-[11px] text-secondary">SKU: ZNV-AM-001</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="p-4 text-secondary">Jerseys</td>
-                    <td class="p-4 font-bold text-primary">$120.00</td>
-                    <td class="p-4">
-                      <span class="inline-flex items-center gap-1.5 text-emerald-600 font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> In Stock (145)
-                      </span>
-                    </td>
-                    <td class="p-4">
-                      <span class="px-2.5 py-1 rounded-md bg-surface-container text-[11px] font-semibold text-secondary">Standard</span>
-                    </td>
-                    <td class="p-4 text-right">
-                      <button onclick="removeAdminRow(this)" class="p-1.5 text-secondary hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                        <span class="material-symbols-outlined text-sm">delete</span>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- Row 2 -->
-                  <tr class="hover:bg-surface-container-lowest transition-colors group">
-                    <td class="p-4">
-                      <div class="flex items-center gap-3">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRtghZsGtFKHlZIYqaxAa8EcbW83K4egjcrZw6V4BKNThg-IAlTlMAK7mBkx_cl17Vu7d2UuuImJuqgR8VWEBruONytgmwd_u56NZOtXfIj4EccnfmiRjMoLpTVBSjXF2sCqgz2Xbmmtc4gMfUG1L_-q82tQjpjnb76hU4-UPXEwVHQis53FgqSKTFOUlJYAHop_oph-8ZHd2YUllJzjsxTPEerlfKDZ2ysTRoudBnK-P0058K9dNXJA" 
-                             class="w-10 h-10 rounded-lg object-cover bg-surface-container" alt="Product"/>
-                        <div>
-                          <p class="font-bold text-primary">Nimbus Windbreaker</p>
-                          <p class="text-[11px] text-secondary">SKU: ZNV-NW-042</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="p-4 text-secondary">Outerwear</td>
-                    <td class="p-4 font-bold text-primary">$210.00</td>
-                    <td class="p-4">
-                      <span class="inline-flex items-center gap-1.5 text-amber-600 font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pre-order Active
-                      </span>
-                    </td>
-                    <td class="p-4">
-                      <span class="px-2.5 py-1 rounded-md bg-black text-white text-[11px] font-semibold">Pre-Order (842)</span>
-                    </td>
-                    <td class="p-4 text-right">
-                      <button onclick="removeAdminRow(this)" class="p-1.5 text-secondary hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                        <span class="material-symbols-outlined text-sm">delete</span>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- Row 3 -->
-                  <tr class="hover:bg-surface-container-lowest transition-colors group">
-                    <td class="p-4">
-                      <div class="flex items-center gap-3">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdrHGOJS9K9Dx6dVSPoJ_SGiI8tAw468IkyTlwqwfJ_F69I65_HFdL1UKHuF-fgcAqHQ_DDAlWoni-aH4o4Vm23f2ukVSa41w9u0HN5a7NOxZQWpwchqISVp0PsACFROT5K1qrpE1HRvQvbWNsqy6zoA08LT1RD7uHcrXZucUWqCLhhafRjAysB9SOCvXR0Ys_NECSakQLgYSPQVvz5YauxnM85T3DSvY2lNg1kEh_DzfIYDUXr8Li-w" 
-                             class="w-10 h-10 rounded-lg object-cover bg-surface-container" alt="Product"/>
-                        <div>
-                          <p class="font-bold text-primary">Core Pace Shorts</p>
-                          <p class="text-[11px] text-secondary">SKU: ZNV-CS-011</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="p-4 text-secondary">Bottoms</td>
-                    <td class="p-4 font-bold text-primary">$85.00</td>
-                    <td class="p-4">
-                      <span class="inline-flex items-center gap-1.5 text-red-600 font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-red-500"></span> Low Stock (4)
-                      </span>
-                    </td>
-                    <td class="p-4">
-                      <span class="px-2.5 py-1 rounded-md bg-surface-container text-[11px] font-semibold text-secondary">Standard</span>
-                    </td>
-                    <td class="p-4 text-right">
-                      <button onclick="removeAdminRow(this)" class="p-1.5 text-secondary hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                        <span class="material-symbols-outlined text-sm">delete</span>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <!-- Order Summary Details Grid -->
+          <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+            
+            <!-- Left: Items Ordered -->
+            <div class="p-5 bg-white rounded-2xl border border-outline-variant/40 shadow-xs">
+              <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
+                <h3 class="font-headline font-bold text-sm text-black flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base text-black">shopping_bag</span>
+                  <span>Items in Your Order</span>
+                </h3>
+                <span id="confirmed-items-count" class="text-xs font-mono-ui font-bold bg-black text-white px-2 py-0.5 rounded-full">0</span>
+              </div>
+              <div id="confirmed-order-items" class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                <!-- Rendered dynamically -->
+              </div>
             </div>
+
+            <!-- Right: Shipping & Payment Summary -->
+            <div class="p-5 bg-white rounded-2xl border border-outline-variant/40 shadow-xs space-y-4">
+              <div class="border-b border-gray-100 pb-3">
+                <h3 class="font-headline font-bold text-sm text-black flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base text-black">local_shipping</span>
+                  <span>Delivery & Customer Details</span>
+                </h3>
+                <div class="mt-2 text-xs text-gray-600 space-y-1 font-body-md">
+                  <div><strong>Name:</strong> <span id="confirmed-customer-name">-</span></div>
+                  <div><strong>Phone:</strong> <span id="confirmed-customer-phone">-</span></div>
+                  <div><strong>Address:</strong> <span id="confirmed-customer-address">-</span></div>
+                </div>
+              </div>
+
+              <!-- Payment Breakdown -->
+              <div>
+                <h3 class="font-headline font-bold text-sm text-black flex items-center gap-1.5 mb-2">
+                  <span class="material-symbols-outlined text-base text-black">receipt_long</span>
+                  <span>Payment Breakdown</span>
+                </h3>
+                <div class="space-y-1.5 font-mono-ui text-xs">
+                  <div class="flex justify-between text-gray-500">
+                    <span>Product Subtotal</span>
+                    <span id="confirmed-subtotal" class="font-bold text-black">৳0</span>
+                  </div>
+                  <div class="flex justify-between text-gray-500">
+                    <span>Delivery Fee</span>
+                    <span id="confirmed-shipping" class="font-bold text-black">৳0</span>
+                  </div>
+                  <div class="flex justify-between text-black font-extrabold text-sm border-t border-dashed border-gray-200 pt-1.5">
+                    <span>Total Order Value</span>
+                    <span id="confirmed-total">৳0</span>
+                  </div>
+                  
+                  <div id="confirmed-paid-row" class="flex justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg font-bold">
+                    <span>Advance Paid (<span id="confirmed-pay-method">bKash</span>)</span>
+                    <span id="confirmed-paid">৳0</span>
+                  </div>
+
+                  <div id="confirmed-trx-row" class="text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded-lg">
+                    <span>TrxID: </span><span id="confirmed-trxid" class="font-mono font-bold text-black">-</span>
+                  </div>
+
+                  <div id="confirmed-due-row" class="flex justify-between text-amber-800 bg-amber-50 px-2 py-1 rounded-lg font-extrabold">
+                    <span>Due on Delivery (Cash)</span>
+                    <span id="confirmed-due">৳0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onclick="switchView('shop')" class="w-full sm:w-auto px-6 py-3 bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-base">storefront</span>
+              <span>Continue Shopping</span>
+            </button>
+            <button onclick="if(typeof openOrderTrackingModal==='function') openOrderTrackingModal();" class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-100 border border-gray-300 text-black font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-base">local_shipping</span>
+              <span>Track Your Order</span>
+            </button>
+            <button id="confirmed-whatsapp-btn" onclick="contactSupportWhatsApp()" class="w-full sm:w-auto px-6 py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+              </svg>
+              <span>WhatsApp Support</span>
+            </button>
+          </div>
+
         </div>
-      </div>
-    </div> <!-- End of view-admin -->
+
+      </main>
+    </div>
 
     <!-- ==================== GLOBAL FOOTER ==================== -->
     <footer class="bg-[#fbfbfb] border-t border-gray-100 py-8 sm:py-14 mt-auto">
@@ -1633,11 +1563,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261105_mobile_v3"></script>
+  <script src="firebase-sync.js?v=20261107_v1"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261105_mobile_v3"></script>
+  <script src="admin-db.js?v=20261107_v1"></script>
   <!-- Main Application JavaScript -->
-  <script src="wishlist.js?v=20261105_mobile_v3"></script>
-  <script src="app.js?v=20261105_mobile_v3"></script>
+  <script src="wishlist.js?v=20261107_v1"></script>
+  <script src="app.js?v=20261107_v1"></script>
 </body>
 </html>

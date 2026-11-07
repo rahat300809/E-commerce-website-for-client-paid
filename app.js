@@ -1019,7 +1019,7 @@ window.addEventListener('hashchange', () => {
     if (typeof openOrderTrackingModal === 'function') openOrderTrackingModal();
     return;
   }
-  if (['home', 'shop', 'customizer', 'studio', 'checkout', 'preorder', 'preorders'].includes(hash)) {
+  if (['home', 'shop', 'customizer', 'studio', 'checkout', 'preorder', 'preorders', 'order-confirmation'].includes(hash)) {
     switchView(hash, false);
   }
 });
@@ -2167,7 +2167,7 @@ function placeOrder() {
       shippingFee,
       totalAmount,
       advancePlan: activeSplit,
-      paidAmount: 0,
+      paidAmount: (trxId && payableNow > 0) ? payableNow : 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
       paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
@@ -2209,14 +2209,23 @@ function placeOrder() {
       shippingFee,
       totalAmount,
       advancePlan: activeSplit,
-      paidAmount: 0,
+      paidAmount: (trxId && payableNow > 0) ? payableNow : 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
       paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
-      paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
+      paymentTrxId: trxId,
+      senderPhone: senderPhone,
+      paymentStatus: payableNow > 0 ? (trxId ? 'ADVANCE_VERIFY_PENDING' : 'AWAITING_ADVANCE_PAYMENT') : 'PENDING_COD',
       status: 'PENDING',
       createdAt: new Date().toISOString()
     };
+  }
+
+  // Telegram Bot Notification
+  if (typeof DB !== 'undefined' && DB.telegram && DB.telegram.sendOrderNotification) {
+    try {
+      DB.telegram.sendOrderNotification(createdOrder);
+    } catch(e) { console.error('Telegram error:', e); }
   }
 
   // Clear cart
@@ -2224,17 +2233,107 @@ function placeOrder() {
   saveCartState();
   renderCart();
 
-  // If advance payment is required via bKash, Nagad or Rocket, open payment modal
-  if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket')) {
+  // If advance payment was chosen and NO TrxID was provided (edge-case fallback), open popup
+  if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket') && !trxId) {
     openMfsPaymentModal(createdOrder, selectedPaymentId, payableNow, activeSplit, dueOnDelivery);
     return;
   }
 
-  // Pure COD Order Confirmation
-  const orderNumEl = document.getElementById('confirmed-order-number');
-  if (orderNumEl) orderNumEl.textContent = createdOrder.orderNumber;
+  // Direct Order Confirmation Flow (No multiple redundant pay screens!)
+  renderOrderConfirmation(createdOrder);
   switchView('order-confirmation');
-  showToast('🎉 Order placed successfully!');
+  showToast('🎉 Order placed successfully! Thank you for ordering with ZENVY.');
+}
+
+// ──────────────────────────────────────────────────────────────
+// Render Order Confirmation Details
+// ──────────────────────────────────────────────────────────────
+function renderOrderConfirmation(order) {
+  if (!order) return;
+
+  const orderNumEl = document.getElementById('confirmed-order-number');
+  if (orderNumEl) orderNumEl.textContent = '#' + (order.orderNumber || order.id || 'ZNV-100001');
+
+  const dateEl = document.getElementById('confirmed-order-date');
+  if (dateEl) {
+    const d = order.createdAt ? new Date(order.createdAt) : new Date();
+    dateEl.textContent = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  const nameEl = document.getElementById('confirmed-customer-name');
+  if (nameEl) nameEl.textContent = order.customerName || '-';
+
+  const phoneEl = document.getElementById('confirmed-customer-phone');
+  if (phoneEl) phoneEl.textContent = order.customerPhone || '-';
+
+  const addrEl = document.getElementById('confirmed-customer-address');
+  if (addrEl) addrEl.textContent = order.shippingAddress || '-';
+
+  const countEl = document.getElementById('confirmed-items-count');
+  if (countEl) countEl.textContent = (order.items || []).length;
+
+  const itemsContainer = document.getElementById('confirmed-order-items');
+  if (itemsContainer && order.items) {
+    itemsContainer.innerHTML = order.items.map(item => `
+      <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+        <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100'}" 
+             class="w-12 h-12 rounded-lg object-cover bg-white flex-shrink-0" alt="${item.name || 'Jersey'}"/>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-xs text-primary truncate">${item.name || 'Jersey Kit'}</p>
+          <p class="text-[10px] text-gray-500 font-mono-ui">
+            Size: <b>${item.size || 'M'}</b> • ${item.sleeve || 'Half Sleeve'} • Qty: <b>${item.qty || 1}</b>
+          </p>
+          ${item.customName ? `<p class="text-[10px] text-blue-600 font-mono-ui font-semibold">Print: ${item.customName} ${item.customNumber || ''}</p>` : ''}
+          ${item.patchName ? `<p class="text-[10px] text-amber-600 font-mono-ui">Badges: ${item.patchName}</p>` : ''}
+        </div>
+        <div class="font-mono-ui font-black text-xs text-black flex-shrink-0">
+          ৳${((parseFloat(item.price) || 0) * (parseInt(item.qty) || 1)).toLocaleString()}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const subtotalEl = document.getElementById('confirmed-subtotal');
+  if (subtotalEl) subtotalEl.textContent = `৳${(order.subtotal || 0).toLocaleString()}`;
+
+  const shippingEl = document.getElementById('confirmed-shipping');
+  if (shippingEl) shippingEl.textContent = `৳${(order.shippingFee || 0).toLocaleString()}`;
+
+  const totalEl = document.getElementById('confirmed-total');
+  if (totalEl) totalEl.textContent = `৳${(order.totalAmount || 0).toLocaleString()}`;
+
+  const paidAmount = order.paidAmount || (order.paymentTrxId ? (order.payableNowAmount || order.shippingFee || 0) : 0);
+  const paidEl = document.getElementById('confirmed-paid');
+  if (paidEl) paidEl.textContent = `৳${paidAmount.toLocaleString()}`;
+
+  const methodEl = document.getElementById('confirmed-pay-method');
+  if (methodEl) methodEl.textContent = order.paymentMethod || 'bKash';
+
+  const trxRow = document.getElementById('confirmed-trx-row');
+  const trxIdEl = document.getElementById('confirmed-trxid');
+  if (order.paymentTrxId || order.trxId) {
+    if (trxRow) trxRow.style.display = 'block';
+    if (trxIdEl) trxIdEl.textContent = order.paymentTrxId || order.trxId;
+  } else {
+    if (trxRow) trxRow.style.display = 'none';
+  }
+
+  const dueEl = document.getElementById('confirmed-due');
+  const dueRow = document.getElementById('confirmed-due-row');
+  const dueAmt = order.dueAmount !== undefined ? order.dueAmount : Math.max(0, (order.totalAmount || 0) - paidAmount);
+  if (dueEl) dueEl.textContent = `৳${dueAmt.toLocaleString()}`;
+  if (dueRow) dueRow.style.display = dueAmt > 0 ? 'flex' : 'none';
+
+  // WhatsApp Support Button Handler
+  window.contactSupportWhatsApp = function() {
+    const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
+    let phone = settings.whatsappNumber || '8801700000000';
+    phone = phone.replace(/[^0-9]/g, '');
+    if (phone.startsWith('01')) phone = '88' + phone;
+
+    const msg = `Salam ZENVY, I have placed Order #${order.orderNumber || order.id}.\nCustomer: ${order.customerName}\nPhone: ${order.customerPhone}\nTotal: ৳${order.totalAmount}\nPlease confirm receipt. Thank you!`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
 }
 
 function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, activeSplit = 'delivery_only', dueOnDelivery = 0) {
@@ -2381,7 +2480,13 @@ function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode)
   if (modal) modal.remove();
 
   showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
-  switchView('home');
+  const updatedOrder = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.byId(orderId) : null;
+  if (updatedOrder) {
+    renderOrderConfirmation(updatedOrder);
+    switchView('order-confirmation');
+  } else {
+    switchView('order-confirmation');
+  }
 }
 
 // Admin Management Suite Logic

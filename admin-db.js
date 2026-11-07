@@ -1576,7 +1576,9 @@ const DB = {
         requirePayFirst: false,
         minOrderAmount: 0,
         codNote: 'Pay remaining product balance when your order arrives.',
-        payFirstNote: 'Advance delivery charge payment required via bKash to confirm your order.'
+        payFirstNote: 'Advance delivery charge payment required via bKash to confirm your order.',
+        whatsappNumber: '8801700000000',
+        whatsappEnabled: true
       };
       const saved = Store.getObj('storeSettings', def);
       return { ...def, ...saved };
@@ -1589,6 +1591,20 @@ const DB = {
       }
       DB.log('Store advance payment & delivery charge policy updated');
       return updated;
+    }
+  },
+
+  // ── WhatsApp Direct Order Integration ──
+  whatsapp: {
+    get() {
+      const settings = DB.storeSettings.get();
+      return {
+        number: settings.whatsappNumber || '8801700000000',
+        enabled: settings.whatsappEnabled !== false
+      };
+    },
+    save(number, enabled = true) {
+      return DB.storeSettings.save({ whatsappNumber: number, whatsappEnabled: enabled });
     }
   },
 

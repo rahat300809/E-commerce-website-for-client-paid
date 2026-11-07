@@ -23,13 +23,17 @@
       try {
         function detectTargetView() {
           var rawHash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+          var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
           var urlParams = new URLSearchParams(window.location.search);
           var cat = urlParams.get('category') || urlParams.get('cat');
           var target = urlParams.get('view') || rawHash;
-          if (!target || target === 'home') {
-            target = cat ? 'shop' : 'home';
+          if (!target) {
+            if (path === 'shop' || path === 'shop.html' || cat) target = 'shop';
+            else if (path === 'customizer' || path === 'customizer.html') target = 'customizer';
+            else if (path === 'checkout' || path === 'checkout.html') target = 'checkout';
+            else target = 'home';
           }
-          if (target === 'studio' || target === 'customizer') target = 'customizer';
+          if (target === 'studio') target = 'customizer';
           if (target === 'preorder' || target === 'preorders') target = 'shop';
           if (['shop', 'customizer', 'checkout', 'order-confirmation', 'home'].indexOf(target) !== -1) {
             document.documentElement.setAttribute('data-target-view', target);

@@ -760,9 +760,6 @@ function renderCheckoutPaymentMethods() {
   updateCheckoutCalculations();
 }
 
-  updateCheckoutCalculations();
-}
-
 // ── Real-time calculation of Subtotal, Shipping, Advance Payable & Due Balance ──
 function updateCheckoutCalculations() {
   const policy = resolveCartDeliveryAndAdvancePolicy();
@@ -2479,8 +2476,6 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
       </div>
     </div>
   `;
-  document.body.appendChild(modal);
-}
   document.body.appendChild(modal);
 }
 

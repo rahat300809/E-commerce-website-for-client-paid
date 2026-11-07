@@ -979,37 +979,37 @@
           <!-- Section 3: Payment Type & Advance Policy -->
           <section class="glass-panel p-6 rounded-2xl border border-white/80 space-y-4">
             <div class="flex items-center justify-between border-b border-surface-variant pb-2">
-              <h2 class="font-label-caps text-xs text-secondary uppercase tracking-widest font-bold">
-                3. Payment Plan & Payment Method
+              <h2 class="font-label-caps text-xs text-neutral-900 uppercase tracking-widest font-bold">
+                3. Payment Terms & Gateway
               </h2>
-              <span id="checkout-policy-badge" class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Advance Policy</span>
+              <span id="checkout-policy-badge" class="font-mono-ui text-[10px] uppercase font-bold tracking-wider bg-neutral-900 text-white px-2.5 py-0.5 rounded-full">Secure Policy</span>
             </div>
 
             <!-- Min order notice -->
-            <div id="checkout-min-order-notice" class="hidden text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"></div>
+            <div id="checkout-min-order-notice" class="hidden text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"></div>
 
             <!-- Policy Alert Box -->
-            <div id="checkout-policy-notice-box" class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed">
-              <div class="font-bold flex items-center gap-1.5 mb-1">
-                <span class="material-symbols-outlined text-base text-blue-600">verified_user</span>
-                <span id="checkout-policy-title">Advance Delivery Charge Policy</span>
+            <div id="checkout-policy-notice-box" class="p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs text-neutral-800 leading-relaxed shadow-xs">
+              <div class="font-bold flex items-center gap-2 mb-1 text-black font-mono-ui text-xs tracking-wide">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="checkout-policy-title">Payment Settlement Terms</span>
               </div>
-              <p id="checkout-policy-desc" class="text-[11px] text-blue-700">
-                You can pay the delivery charge in advance via bKash to confirm your order, and pay the product price on delivery.
+              <p id="checkout-policy-desc" class="text-[11px] text-neutral-600 leading-relaxed">
+                Choose whether to pay the advance delivery fee online, settle full payment, or choose cash on delivery.
               </p>
             </div>
 
             <!-- Payment Split Choice Selector (when mode is customer_choice) -->
             <div id="checkout-split-choice-container" class="space-y-2">
-              <label class="block font-mono-ui text-xs font-bold text-gray-700 mb-1">Select Payment Preference:</label>
+              <label class="block font-mono-ui text-[11px] uppercase tracking-wider font-bold text-neutral-700 mb-1">Select Payment Preference</label>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="checkout-split-options">
                 <!-- Injected via JS based on policy -->
               </div>
             </div>
 
-            <!-- Dynamic Payment Gateway Selector (bKash / COD) -->
+            <!-- Dynamic Payment Gateway Selector (bKash / Nagad / Rocket / COD) -->
             <div class="pt-2">
-              <label class="block font-mono-ui text-xs font-bold text-gray-700 mb-2">Select Payment Gateway:</label>
+              <label class="block font-mono-ui text-[11px] uppercase tracking-wider font-bold text-neutral-700 mb-2">Select Payment Gateway</label>
               <div id="checkout-payment-methods" class="space-y-2">
                 <!-- Rendered by renderCheckoutPaymentMethods() -->
               </div>

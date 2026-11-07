@@ -66,4 +66,6 @@ export const CircularTestimonialsDemo = () => (
   </section>
 );
 
-export default CircularTestimonialsDemo;
+export { CircularTestimonialsDemo } from "./demo";
+export { DishOrbitCarouselDemo } from "./dish-orbit-demo";
+

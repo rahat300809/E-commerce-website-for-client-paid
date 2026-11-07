@@ -132,33 +132,41 @@
           <!-- Payment Method Selection (bKash, Nagad, Rocket, COD) -->
           <div>
             <label class="text-xs uppercase font-bold text-on-surface-variant block mb-2">Select Payment Method</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold">
               <div>
                 <input type="radio" name="pay-method" id="pay-bkash" value="bKash" checked onchange="window.selectPaymentMethod('bkash')" class="hidden payment-radio"/>
-                <label for="pay-bkash" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#D12053] transition-all bg-white">
-                  <span class="w-8 h-8 rounded-lg bg-[#D12053] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
-                  <span class="text-xs font-extrabold text-gray-900">bKash</span>
+                <label for="pay-bkash" class="flex flex-col items-center justify-center border-2 border-neutral-200 rounded-2xl p-3 text-center cursor-pointer hover:border-black transition-all bg-white hover:-translate-y-0.5 shadow-2xs hover:shadow-md">
+                  <div class="w-12 h-9 rounded-lg bg-white border border-neutral-200 flex items-center justify-center p-1 mb-1.5 shadow-2xs">
+                    <img src="img/mfs/bkash.png" class="max-h-full max-w-full object-contain" alt="bKash" />
+                  </div>
+                  <span class="text-xs font-extrabold text-neutral-900">bKash</span>
                 </label>
               </div>
               <div>
                 <input type="radio" name="pay-method" id="pay-nagad" value="Nagad" onchange="window.selectPaymentMethod('nagad')" class="hidden payment-radio"/>
-                <label for="pay-nagad" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#EA580C] transition-all bg-white">
-                  <span class="w-8 h-8 rounded-lg bg-[#EA580C] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
-                  <span class="text-xs font-extrabold text-gray-900">Nagad</span>
+                <label for="pay-nagad" class="flex flex-col items-center justify-center border-2 border-neutral-200 rounded-2xl p-3 text-center cursor-pointer hover:border-black transition-all bg-white hover:-translate-y-0.5 shadow-2xs hover:shadow-md">
+                  <div class="w-12 h-9 rounded-lg bg-white border border-neutral-200 flex items-center justify-center p-1 mb-1.5 shadow-2xs">
+                    <img src="img/mfs/nagad.png" class="max-h-full max-w-full object-contain" alt="Nagad" />
+                  </div>
+                  <span class="text-xs font-extrabold text-neutral-900">Nagad</span>
                 </label>
               </div>
               <div>
                 <input type="radio" name="pay-method" id="pay-rocket" value="Rocket" onchange="window.selectPaymentMethod('rocket')" class="hidden payment-radio"/>
-                <label for="pay-rocket" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#7C3AED] transition-all bg-white">
-                  <span class="w-8 h-8 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">৳</span>
-                  <span class="text-xs font-extrabold text-gray-900">Rocket</span>
+                <label for="pay-rocket" class="flex flex-col items-center justify-center border-2 border-neutral-200 rounded-2xl p-3 text-center cursor-pointer hover:border-black transition-all bg-white hover:-translate-y-0.5 shadow-2xs hover:shadow-md">
+                  <div class="w-12 h-9 rounded-lg bg-white border border-neutral-200 flex items-center justify-center p-1 mb-1.5 shadow-2xs">
+                    <img src="img/mfs/rocket.png" class="max-h-full max-w-full object-contain" alt="Rocket" />
+                  </div>
+                  <span class="text-xs font-extrabold text-neutral-900">Rocket</span>
                 </label>
               </div>
               <div>
                 <input type="radio" name="pay-method" id="pay-cod" value="COD" onchange="window.selectPaymentMethod('cod')" class="hidden payment-radio"/>
-                <label for="pay-cod" class="flex flex-col items-center justify-center border border-outline-variant rounded-xl p-2.5 text-center cursor-pointer hover:border-[#16A34A] transition-all bg-white">
-                  <span class="w-8 h-8 rounded-lg bg-[#16A34A] text-white flex items-center justify-center font-bold text-sm mb-1 shadow-sm">💵</span>
-                  <span class="text-xs font-extrabold text-gray-900">Cash on Delivery</span>
+                <label for="pay-cod" class="flex flex-col items-center justify-center border-2 border-neutral-200 rounded-2xl p-3 text-center cursor-pointer hover:border-black transition-all bg-white hover:-translate-y-0.5 shadow-2xs hover:shadow-md">
+                  <div class="w-12 h-9 rounded-lg bg-neutral-900 text-white font-mono font-black text-xs flex items-center justify-center p-1 mb-1.5 shadow-2xs">
+                    COD
+                  </div>
+                  <span class="text-xs font-extrabold text-neutral-900">Cash on Delivery</span>
                 </label>
               </div>
             </div>

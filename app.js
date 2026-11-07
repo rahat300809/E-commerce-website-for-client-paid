@@ -584,43 +584,49 @@ function renderCheckoutPaymentMethods() {
   const advanceMode = policy.advancePaymentMode || 'customer_choice';
 
   if (policy.isDeliveryChargeMandatory) {
-    if (badgeEl) badgeEl.textContent = 'Mandatory Delivery Fee';
-    if (titleEl) titleEl.textContent = '⚡ Mandatory Advance Delivery Charge';
-    if (descEl) descEl.textContent = `This kit (${(policy.mandatoryDeliveryProducts||[]).join(', ') || 'Custom Jersey'}) has a mandatory delivery charge. You must pay the delivery charge advance via bKash, Nagad, or Rocket to confirm your order. Product price will be collected on delivery.`;
+    if (badgeEl) badgeEl.textContent = 'MANDATORY DELIVERY FEE';
+    if (titleEl) titleEl.textContent = 'Delivery Fee Advance Required';
+    if (descEl) descEl.textContent = `This kit (${(policy.mandatoryDeliveryProducts||[]).join(', ') || 'Custom Apparel'}) requires the delivery fee in advance. Settle the delivery fee via bKash, Nagad, or Rocket to confirm your order. Product price will be collected upon delivery.`;
   } else if (advanceMode === 'delivery_only') {
-    if (badgeEl) badgeEl.textContent = 'Delivery Advance Policy';
-    if (titleEl) titleEl.textContent = '⚡ Advance Delivery Charge Required';
-    if (descEl) descEl.textContent = policy.payFirstNote || 'Please pay the delivery charge upfront via bKash, Nagad, or Rocket to confirm your order. Product price will be collected in cash on delivery.';
+    if (badgeEl) badgeEl.textContent = 'DELIVERY ADVANCE POLICY';
+    if (titleEl) titleEl.textContent = 'Advance Delivery Fee Required';
+    if (descEl) descEl.textContent = policy.payFirstNote || 'Please pay the delivery fee in advance via bKash, Nagad, or Rocket to confirm order dispatch. The product price is collected in cash upon doorstep arrival.';
   } else if (advanceMode === 'full_only') {
-    if (badgeEl) badgeEl.textContent = '100% Full Payment Required';
-    if (titleEl) titleEl.textContent = '🔒 Full Advance Payment Mandatory';
-    if (descEl) descEl.textContent = 'Complete payment for product and shipping is required upfront to process your order.';
+    if (badgeEl) badgeEl.textContent = '100% PREPAID ONLY';
+    if (titleEl) titleEl.textContent = 'Full Payment Required';
+    if (descEl) descEl.textContent = 'Complete payment for product and shipping is required upfront to process and dispatch your order.';
   } else if (advanceMode === 'cod_only') {
-    if (badgeEl) badgeEl.textContent = 'Cash on Delivery';
-    if (titleEl) titleEl.textContent = '💵 Full Cash on Delivery';
-    if (descEl) descEl.textContent = policy.codNote || 'Pay complete order value when the package is delivered.';
+    if (badgeEl) badgeEl.textContent = 'CASH ON DELIVERY';
+    if (titleEl) titleEl.textContent = 'Doorstep Cash Payment';
+    if (descEl) descEl.textContent = policy.codNote || 'Pay the complete order value to the delivery courier upon arrival.';
   } else {
     // customer_choice
-    if (badgeEl) badgeEl.textContent = 'Flexible Payment Choice';
-    if (titleEl) titleEl.textContent = '✨ Choose How You Pay';
-    if (descEl) descEl.textContent = 'Choose whether to pay only the delivery charge now, pay full amount upfront, or pay full cash on delivery.';
+    if (badgeEl) badgeEl.textContent = 'FLEXIBLE PAYMENT';
+    if (titleEl) titleEl.textContent = 'Payment Terms & Preference';
+    if (descEl) descEl.textContent = 'Select whether to pay the advance delivery fee online, pay the full order value upfront, or settle full cash on delivery.';
   }
 
   if (splitOptions && splitContainer) {
     if (policy.isDeliveryChargeMandatory || advanceMode === 'delivery_only') {
       splitOptions.innerHTML = `
-        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white col-span-1 md:col-span-2">
-          <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm col-span-1 md:col-span-2 group">
+          <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
-            <span class="font-bold text-xs text-black block">⚡ Pay Mandatory Delivery Charge in Advance</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay delivery fee upfront via bKash/Nagad/Rocket. Pay product price on arrival!</span>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge in Advance</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full">Required</span>
+            </div>
+            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Pay shipping fee upfront via bKash / Nagad / Rocket. Pay product price on arrival!</p>
           </div>
         </label>
-        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white col-span-1 md:col-span-2">
-          <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm col-span-1 md:col-span-2 group">
+          <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
-            <span class="font-bold text-xs text-black block">🔒 Pay Full Amount Now (100% Advance)</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay full product + delivery charge together. Zero hassle on arrival.</span>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount (100% Prepaid)</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-semibold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">Prepaid</span>
+            </div>
+            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Pay product + delivery charge upfront online. Zero payment needed at doorstep.</p>
           </div>
         </label>
       `;
@@ -631,26 +637,35 @@ function renderCheckoutPaymentMethods() {
     } else {
       splitContainer.style.display = '';
       splitOptions.innerHTML = `
-        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
-          <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+          <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
-            <span class="font-bold text-xs text-black block">⚡ Pay Delivery Charge Only</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay delivery fee advance, pay product on delivery</span>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge Only</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">Popular</span>
+            </div>
+            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Advance delivery fee via MFS • Balance collected on arrival</p>
           </div>
         </label>
-        <label class="flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
-          <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+          <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
-            <span class="font-bold text-xs text-black block">🔒 Pay Full Amount Now</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">100% advance payment (Product + Delivery)</span>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount Now</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-semibold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">100% Online</span>
+            </div>
+            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Full settlement upfront • Contactless doorstep drop</p>
           </div>
         </label>
         ${policy.cashOnDelivery !== false ? `
-        <label class="col-span-1 md:col-span-2 flex items-start gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white">
-          <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-black mt-0.5" />
+        <label class="col-span-1 md:col-span-2 relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+          <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
-            <span class="font-bold text-xs text-black block">💵 Full Cash on Delivery</span>
-            <span class="text-[11px] text-gray-500 block mt-0.5">Pay complete total when kit arrives at your doorstep</span>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Full Cash on Delivery (COD)</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">Courier COD</span>
+            </div>
+            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">No advance digital payment • Pay total cash directly to delivery rider</p>
           </div>
         </label>
         ` : ''}
@@ -658,7 +673,7 @@ function renderCheckoutPaymentMethods() {
     }
   }
 
-  // 3. Render ALL 4 Payment Gateways (bKash, Nagad, Rocket, Cash on Delivery)
+  // 3. Render ALL 4 Payment Gateways with Real Logos and 3D Interactive Design
   const bkashNum = payConfig.bkash?.number || '01700-000000';
   const nagadNum = payConfig.nagad?.number || '01800-000000';
   const rocketNum = payConfig.rocket?.number || '01900-000000';
@@ -667,10 +682,46 @@ function renderCheckoutPaymentMethods() {
   const rocketType = payConfig.rocket?.type || 'Personal';
 
   const allMethods = [
-    { id: 'bkash', name: 'bKash', color: '#D12053', bg: '#fdf2f6', border: '#f472b6', num: bkashNum, type: bkashType, desc: 'Send Money via bKash App or *247#' },
-    { id: 'nagad', name: 'Nagad', color: '#EA580C', bg: '#fff7ed', border: '#fdba74', num: nagadNum, type: nagadType, desc: 'Send Money via Nagad App or *167#' },
-    { id: 'rocket', name: 'Rocket', color: '#7C3AED', bg: '#faf5ff', border: '#c4b5fd', num: rocketNum, type: rocketType, desc: 'Send Money via Rocket App or *322#' },
-    { id: 'cod', name: 'Cash on Delivery', color: '#16A34A', bg: '#f0fdf4', border: '#86efac', num: '', type: 'Courier COD', desc: 'Pay cash to delivery rider at your doorstep' }
+    { 
+      id: 'bkash', 
+      name: 'bKash', 
+      logo: 'img/mfs/bkash.png', 
+      brandColor: '#D12053',
+      num: bkashNum, 
+      type: bkashType, 
+      badgeClass: 'bg-rose-50 text-[#D12053] border border-rose-200',
+      desc: `Send Money to ${bkashNum} • bKash App or *247#` 
+    },
+    { 
+      id: 'nagad', 
+      name: 'Nagad', 
+      logo: 'img/mfs/nagad.png', 
+      brandColor: '#EA580C',
+      num: nagadNum, 
+      type: nagadType, 
+      badgeClass: 'bg-orange-50 text-[#EA580C] border border-orange-200',
+      desc: `Send Money to ${nagadNum} • Nagad App or *167#` 
+    },
+    { 
+      id: 'rocket', 
+      name: 'Rocket', 
+      logo: 'img/mfs/rocket.png', 
+      brandColor: '#7C3AED',
+      num: rocketNum, 
+      type: rocketType, 
+      badgeClass: 'bg-purple-50 text-[#7C3AED] border border-purple-200',
+      desc: `Send Money to ${rocketNum} • Rocket App or *322#` 
+    },
+    { 
+      id: 'cod', 
+      name: 'Cash on Delivery', 
+      logo: null,
+      brandColor: '#0f172a',
+      num: '', 
+      type: 'Courier COD', 
+      badgeClass: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+      desc: 'Pay cash to delivery rider at your doorstep' 
+    }
   ];
 
   // If full advance only, hide cod
@@ -679,19 +730,24 @@ function renderCheckoutPaymentMethods() {
     : allMethods;
 
   container.innerHTML = `
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-3">
       ${visibleMethods.map((m, idx) => `
-        <label class="flex items-center gap-3 p-3.5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-black has-[:checked]:bg-black/5 border-gray-200 hover:border-gray-400 bg-white group">
-          <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4" />
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-black text-sm shadow-2xs" style="background:${m.color};">
-            ${m.id === 'cod' ? '💵' : '৳'}
+        <label class="relative flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+          <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer shrink-0" />
+          
+          <div class="w-12 h-10 sm:w-14 sm:h-11 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+            ${m.logo 
+              ? `<img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" />` 
+              : `<div class="w-full h-full bg-neutral-900 rounded-lg flex items-center justify-center text-white font-mono-ui font-black text-xs tracking-wider">COD</div>`
+            }
           </div>
+
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-xs sm:text-sm text-black group-hover:text-blue-900 transition-colors">${m.name}</span>
-              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full" style="background:${m.color}15;color:${m.color};border:1px solid ${m.color}35;">${m.type}</span>
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black tracking-tight">${m.name}</span>
+              <span class="font-mono-ui text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${m.badgeClass}">${m.type}</span>
             </div>
-            <div class="text-[10px] text-gray-500 truncate mt-0.5">${m.desc}</div>
+            <div class="text-[11px] text-neutral-500 truncate mt-0.5 font-normal">${m.desc}</div>
           </div>
         </label>
       `).join('')}
@@ -700,6 +756,9 @@ function renderCheckoutPaymentMethods() {
     <!-- Active Payment Instructions Card (Dynamic TrxID / Number) -->
     <div id="checkout-payment-instructions-card"></div>
   `;
+
+  updateCheckoutCalculations();
+}
 
   updateCheckoutCalculations();
 }
@@ -2341,6 +2400,7 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
   const providerColor = isNagad ? '#EA580C' : isRocket ? '#7C3AED' : '#D12053';
   const providerBg = isNagad ? '#FFF7ED' : isRocket ? '#FAF5FF' : '#FFF1F5';
   const providerBorder = isNagad ? '#FED7AA' : isRocket ? '#E9D5FF' : '#FCE7F3';
+  const providerLogo = isNagad ? 'img/mfs/nagad.png' : isRocket ? 'img/mfs/rocket.png' : 'img/mfs/bkash.png';
 
   const cfgObj = isNagad ? (payCfg.nagad || {}) : isRocket ? (payCfg.rocket || {}) : (payCfg.bkash || {});
   const phoneNum = cfgObj.number || (payCfg.uddoktaPay?.merchantNumber || '01700000000');
@@ -2359,26 +2419,26 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
       <!-- MFS Header -->
       <div style="background:${providerColor};" class="p-6 text-white text-center relative">
         <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-bold text-base transition-colors cursor-pointer" title="Close / বন্ধ করুন">✕</button>
-        <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-3">
-          <span class="text-3xl font-black" style="color:${providerColor};">৳</span>
+        <div class="w-16 h-12 bg-white rounded-xl mx-auto flex items-center justify-center shadow-md mb-3 p-1.5 border border-white/50">
+          <img src="${providerLogo}" class="max-h-full max-w-full object-contain" alt="${providerName}" />
         </div>
-        <h3 class="text-xl font-bold font-headline tracking-wide">${providerName} Payment Gateway</h3>
-        <p class="text-xs text-white/90 mt-1">${providerName} ${accType} Verification</p>
+        <h3 class="text-xl font-bold font-headline tracking-wide">${providerName} Transfer Details</h3>
+        <p class="text-xs text-white/90 font-mono-ui mt-0.5 tracking-wide">${providerName} ${accType} Verification</p>
       </div>
 
       <!-- Body -->
       <div class="p-6 space-y-4">
         <!-- Payable Highlight -->
-        <div style="background:${providerBg};border:1px solid ${providerBorder};" class="rounded-2xl p-4 flex justify-between items-center">
+        <div style="background:${providerBg};border:1px solid ${providerBorder};" class="rounded-2xl p-4 flex justify-between items-center shadow-2xs">
           <div>
-            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-              ${isDeliveryOnly ? '⚡ Delivery Charge Advance' : '🔒 Full Order Amount'}
+            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider font-mono-ui">
+              ${isDeliveryOnly ? 'Advance Delivery Fee' : 'Full Order Amount (100% Prepaid)'}
             </div>
-            <div class="text-2xl font-black font-mono-ui" style="color:${providerColor};">৳${amount.toLocaleString()}</div>
-            ${isDeliveryOnly ? `<div class="text-[11px] text-gray-600 mt-0.5">Remaining <b>৳${dueOnDelivery.toLocaleString()}</b> Due on Delivery</div>` : ''}
+            <div class="text-2xl font-black font-mono-ui mt-0.5" style="color:${providerColor};">৳${amount.toLocaleString()}</div>
+            ${isDeliveryOnly ? `<div class="text-[11px] text-gray-600 mt-1 font-mono-ui">Remaining <b>৳${dueOnDelivery.toLocaleString()}</b> Due on Delivery</div>` : ''}
           </div>
           <div class="text-right">
-            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Order ID</div>
+            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider font-mono-ui">Order ID</div>
             <div class="text-sm font-bold font-mono text-gray-800">#${order.orderNumber || order.id}</div>
           </div>
         </div>
@@ -2388,7 +2448,7 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
             <span class="flex items-center gap-1.5" style="color:${providerColor};">
               <span class="material-symbols-outlined text-sm">touch_app</span> ${providerName} Instructions:
             </span>
-            <button type="button" onclick="navigator.clipboard.writeText('${phoneNum}');this.textContent='Copied!';" class="text-[11px] font-bold text-white px-2 py-0.5 rounded shadow-sm cursor-pointer" style="background:${providerColor};">
+            <button type="button" onclick="navigator.clipboard.writeText('${phoneNum}');this.textContent='Copied!';" class="text-[11px] font-bold text-white px-2.5 py-1 rounded-lg shadow-sm cursor-pointer transition-transform active:scale-95" style="background:${providerColor};">
               Copy Number
             </button>
           </div>
@@ -2400,7 +2460,7 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
 
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-1">Enter ${providerName} Transaction ID (TrxID)<span class="text-red-500">*</span></label>
-          <input type="text" id="bkash-trx-input" placeholder="e.g. 9B7X2K4M" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:outline-none focus:ring-2 bg-white" />
+          <input type="text" id="bkash-trx-input" placeholder="e.g. 9B7X2K4M" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white" />
         </div>
 
         <div>
@@ -2409,16 +2469,18 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-base">verified</span> Verify & Confirm Order
+          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-base">verified</span> Confirm & Verify TrxID
           </button>
           <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 transition-colors cursor-pointer">
-            Cancel / বাতিল
+            Cancel
           </button>
         </div>
       </div>
     </div>
   `;
+  document.body.appendChild(modal);
+}
   document.body.appendChild(modal);
 }
 

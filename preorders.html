@@ -339,41 +339,45 @@
 
       <div class="space-y-3 mb-5">
         <!-- bKash -->
-        <div id="po-pay-bkash" onclick="selectPoPayment('bkash')" class="border-2 border-primary rounded-xl p-4 cursor-pointer transition-all">
+        <div id="po-pay-bkash" onclick="selectPoPayment('bkash')" class="border-2 border-primary rounded-xl p-4 cursor-pointer transition-all bg-white hover:shadow-sm">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[#E2136E] rounded-lg flex items-center justify-center text-white font-black text-lg">b</div>
+              <div class="w-12 h-9 bg-white rounded-lg flex items-center justify-center p-1 border border-neutral-200 shadow-2xs">
+                <img src="img/mfs/bkash.png" class="max-h-full max-w-full object-contain" alt="bKash" />
+              </div>
               <div>
-                <p class="font-label-md text-label-md text-primary">bKash</p>
-                <p class="font-caption text-caption text-on-surface-variant">Send to: <strong>01700-XXXXXX</strong></p>
+                <p class="font-label-md text-label-md text-primary font-bold">bKash</p>
+                <p class="font-caption text-caption text-on-surface-variant font-mono">Send to: <strong class="text-primary">01700-000000</strong></p>
               </div>
             </div>
             <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">radio_button_checked</span>
           </div>
           <div id="po-bkash-instructions" class="mt-4 bg-pink-50 rounded-lg p-4 border border-pink-100">
-            <p class="font-label-md text-label-md text-primary mb-2">How to pay via bKash:</p>
+            <p class="font-label-md text-label-md text-primary mb-2 font-bold">How to pay via bKash:</p>
             <ol class="font-body-md text-body-md text-on-surface-variant space-y-1 list-decimal list-inside text-sm">
               <li>Open bKash app → Send Money</li>
-              <li>Number: <strong class="text-primary">01700-000000</strong></li>
+              <li>Number: <strong class="text-primary font-mono">01700-000000</strong></li>
               <li>Amount: <strong class="text-primary" id="bkash-advance-amt">৳ 700</strong></li>
               <li>Reference: Your phone number</li>
               <li>Enter your TrxID below after payment</li>
             </ol>
             <div class="field-wrap mt-3 mb-0">
-              <label>bKash Transaction ID</label>
-              <input type="text" id="po-bkash-trxid" placeholder="e.g. 8AB7C2D3E4"/>
+              <label class="text-xs font-bold">bKash Transaction ID (TrxID)</label>
+              <input type="text" id="po-bkash-trxid" placeholder="e.g. 8AB7C2D3E4" class="font-mono uppercase"/>
             </div>
           </div>
         </div>
 
         <!-- Nagad -->
-        <div id="po-pay-nagad" onclick="selectPoPayment('nagad')" class="border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/50">
+        <div id="po-pay-nagad" onclick="selectPoPayment('nagad')" class="border border-outline-variant rounded-xl p-4 cursor-pointer transition-all hover:border-primary/50 bg-white">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[#F05A28] rounded-lg flex items-center justify-center text-white font-black text-base">N</div>
+              <div class="w-12 h-9 bg-white rounded-lg flex items-center justify-center p-1 border border-neutral-200 shadow-2xs">
+                <img src="img/mfs/nagad.png" class="max-h-full max-w-full object-contain" alt="Nagad" />
+              </div>
               <div>
-                <p class="font-label-md text-label-md text-primary">Nagad</p>
-                <p class="font-caption text-caption text-on-surface-variant">Send to: <strong>01700-XXXXXX</strong></p>
+                <p class="font-label-md text-label-md text-primary font-bold">Nagad</p>
+                <p class="font-caption text-caption text-on-surface-variant font-mono">Send to: <strong class="text-primary">01800-000000</strong></p>
               </div>
             </div>
             <span class="material-symbols-outlined text-on-surface-variant text-xl">radio_button_unchecked</span>

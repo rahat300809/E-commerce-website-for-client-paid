@@ -800,7 +800,7 @@ function updateCheckoutCalculations() {
     btnLabel = `PAY FULL ৳${payNowAmount.toLocaleString()} VIA ${currentMethodUpper} →`;
   }
 
-  // 6. Render Detailed Instructions Card for Selected Gateway
+  // 6. Keep checkout page clean — Payment details will be shown in the dedicated popup on clicking Pay
   const detailsBox = document.getElementById('checkout-payment-instructions-card');
   if (detailsBox) {
     if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
@@ -816,47 +816,7 @@ function updateCheckoutCalculations() {
         </div>
       `;
     } else {
-      const phone = mfsNumbers[selectedPaymentId] || '01700-000000';
-      const accType = mfsTypes[selectedPaymentId] || 'Personal';
-      const color = selectedPaymentId === 'bkash' ? '#D12053' : (selectedPaymentId === 'nagad' ? '#EA580C' : '#7C3AED');
-
-      detailsBox.innerHTML = `
-        <div class="p-4 bg-white border-2 rounded-2xl shadow-xs space-y-3" style="border-color:${color};">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full" style="background:${color};"></span>
-              <span class="font-headline font-black text-xs sm:text-sm text-black uppercase tracking-wider">${currentMethodName} Payment Details</span>
-            </div>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-white uppercase tracking-wider" style="background:${color};">${accType}</span>
-          </div>
-
-          <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between">
-            <div>
-              <div class="text-[10px] font-mono uppercase text-gray-500 font-bold">Send Money To (${currentMethodName}):</div>
-              <div class="font-mono text-sm sm:text-base font-black text-black tracking-wider" id="mfs-target-number">${phone}</div>
-            </div>
-            <button type="button" onclick="copyMfsNumber('${phone}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
-              <span class="material-symbols-outlined text-[14px]">content_copy</span>
-              <span id="copy-btn-text">Copy</span>
-            </button>
-          </div>
-
-          <p class="text-[11px] text-gray-600 leading-relaxed">
-            Advance Amount to Send: <strong class="text-black font-black font-mono">৳${payNowAmount.toLocaleString()}</strong>. Send Money from your ${currentMethodName} app, then enter the TrxID below to confirm your order:
-          </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <div>
-              <label class="block text-[10px] font-mono uppercase font-bold text-gray-600 mb-1">Sender Mobile Phone No.</label>
-              <input type="tel" id="checkout-sender-phone" placeholder="01XXXXXXXXX" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold text-black focus:outline-none focus:border-black font-mono shadow-2xs"/>
-            </div>
-            <div>
-              <label class="block text-[10px] font-mono uppercase font-bold text-gray-600 mb-1">Transaction ID (TrxID) *</label>
-              <input type="text" id="checkout-trxid" placeholder="e.g. 9J2K8L1P" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold text-black uppercase tracking-wider focus:outline-none focus:border-black font-mono shadow-2xs"/>
-            </div>
-          </div>
-        </div>
-      `;
+      detailsBox.innerHTML = '';
     }
   }
 
@@ -2142,19 +2102,6 @@ function placeOrder() {
     selectedPaymentId = 'bkash';
   }
 
-  const trxId = document.getElementById('checkout-trxid')?.value.trim() || '';
-  const senderPhone = document.getElementById('checkout-sender-phone')?.value.trim() || '';
-
-  // Validate TrxID if advance payment via MFS is chosen
-  if (payableNow > 0 && selectedPaymentId !== 'cod') {
-    if (!trxId) {
-      showToast(`⚠️ Please enter the ${selectedPaymentId.toUpperCase()} Transaction ID (TrxID) after sending ৳${payableNow.toLocaleString()}.`);
-      const trxEl = document.getElementById('checkout-trxid');
-      if (trxEl) trxEl.focus();
-      return;
-    }
-  }
-
   let createdOrder = null;
   if (typeof DB !== 'undefined' && DB.orders) {
     createdOrder = DB.orders.create({
@@ -2167,16 +2114,16 @@ function placeOrder() {
       shippingFee,
       totalAmount,
       advancePlan: activeSplit,
-      paidAmount: (trxId && payableNow > 0) ? payableNow : 0,
+      paidAmount: 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
       paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
-      paymentTrxId: trxId,
-      senderPhone: senderPhone,
+      paymentTrxId: '',
+      senderPhone: '',
       isDeliveryChargeMandatory: policy.isDeliveryChargeMandatory || false,
-      paymentStatus: payableNow > 0 ? (trxId ? 'ADVANCE_VERIFY_PENDING' : 'AWAITING_ADVANCE_PAYMENT') : 'PENDING_COD',
+      paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
       status: 'PENDING',
-      notes: `Plan: ${planLabel} • Zone: ${zoneName} • Delivery: ৳${shippingFee}${policy.isDeliveryChargeMandatory ? ' [MANDATORY]' : ''}${trxId ? ' • TrxID: ' + trxId : ''}${senderPhone ? ' • Sender: ' + senderPhone : ''}`
+      notes: `Plan: ${planLabel} • Zone: ${zoneName} • Delivery: ৳${shippingFee}${policy.isDeliveryChargeMandatory ? ' [MANDATORY]' : ''}`
     });
 
     if (DB.customers) {
@@ -2209,37 +2156,36 @@ function placeOrder() {
       shippingFee,
       totalAmount,
       advancePlan: activeSplit,
-      paidAmount: (trxId && payableNow > 0) ? payableNow : 0,
+      paidAmount: 0,
       dueAmount: dueOnDelivery,
       payableNowAmount: payableNow,
       paymentMethod: selectedPaymentId === 'bkash' ? `bKash (${planLabel})` : selectedPaymentId === 'nagad' ? `Nagad (${planLabel})` : selectedPaymentId === 'rocket' ? `Rocket (${planLabel})` : 'Cash on Delivery',
-      paymentTrxId: trxId,
-      senderPhone: senderPhone,
-      paymentStatus: payableNow > 0 ? (trxId ? 'ADVANCE_VERIFY_PENDING' : 'AWAITING_ADVANCE_PAYMENT') : 'PENDING_COD',
+      paymentTrxId: '',
+      senderPhone: '',
+      paymentStatus: payableNow > 0 ? 'AWAITING_ADVANCE_PAYMENT' : 'PENDING_COD',
       status: 'PENDING',
       createdAt: new Date().toISOString()
     };
   }
 
-  // Telegram Bot Notification
+  // If advance payment via bKash / Nagad / Rocket is required, open the popup directly!
+  if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket')) {
+    openMfsPaymentModal(createdOrder, selectedPaymentId, payableNow, activeSplit, dueOnDelivery);
+    return;
+  }
+
+  // Pure Cash on Delivery flow
   if (typeof DB !== 'undefined' && DB.telegram && DB.telegram.sendOrderNotification) {
     try {
       DB.telegram.sendOrderNotification(createdOrder);
     } catch(e) { console.error('Telegram error:', e); }
   }
 
-  // Clear cart
+  // Clear cart for COD
   appState.cart = [];
   saveCartState();
   renderCart();
 
-  // If advance payment was chosen and NO TrxID was provided (edge-case fallback), open popup
-  if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket') && !trxId) {
-    openMfsPaymentModal(createdOrder, selectedPaymentId, payableNow, activeSplit, dueOnDelivery);
-    return;
-  }
-
-  // Direct Order Confirmation Flow (No multiple redundant pay screens!)
   renderOrderConfirmation(createdOrder);
   switchView('order-confirmation');
   showToast('🎉 Order placed successfully! Thank you for ordering with ZENVY.');
@@ -2361,10 +2307,12 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
   const modal = document.createElement('div');
   modal.id = 'bkash-payment-modal';
   modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md';
+  modal.setAttribute('onclick', 'if(event.target===this)this.remove();');
   modal.innerHTML = `
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-gray-100">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-gray-100 relative">
       <!-- MFS Header -->
       <div style="background:${providerColor};" class="p-6 text-white text-center relative">
+        <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-bold text-base transition-colors cursor-pointer" title="Close / বন্ধ করুন">✕</button>
         <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-3">
           <span class="text-3xl font-black" style="color:${providerColor};">৳</span>
         </div>
@@ -2394,7 +2342,7 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
             <span class="flex items-center gap-1.5" style="color:${providerColor};">
               <span class="material-symbols-outlined text-sm">touch_app</span> ${providerName} Instructions:
             </span>
-            <button type="button" onclick="navigator.clipboard.writeText('${phoneNum}');this.textContent='Copied!';" class="text-[11px] font-bold text-white px-2 py-0.5 rounded shadow-sm" style="background:${providerColor};">
+            <button type="button" onclick="navigator.clipboard.writeText('${phoneNum}');this.textContent='Copied!';" class="text-[11px] font-bold text-white px-2 py-0.5 rounded shadow-sm cursor-pointer" style="background:${providerColor};">
               Copy Number
             </button>
           </div>
@@ -2415,11 +2363,11 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-lg flex items-center justify-center gap-2 transition-all">
+          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer">
             <span class="material-symbols-outlined text-base">verified</span> Verify & Confirm Order
           </button>
-          <button onclick="document.getElementById('bkash-payment-modal').remove(); switchView('home');" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold text-xs hover:bg-gray-50">
-            Pay Later
+          <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 transition-colors cursor-pointer">
+            Cancel / বাতিল
           </button>
         </div>
       </div>
@@ -2478,6 +2426,11 @@ function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode)
 
   const modal = document.getElementById('bkash-payment-modal');
   if (modal) modal.remove();
+
+  // Clear cart now that payment is confirmed
+  appState.cart = [];
+  saveCartState();
+  renderCart();
 
   showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
   const updatedOrder = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.byId(orderId) : null;

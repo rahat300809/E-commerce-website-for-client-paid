@@ -673,7 +673,7 @@ function renderCheckoutPaymentMethods() {
     }
   }
 
-  // 3. Render ALL 4 Payment Gateways with Real Logos and 3D Interactive Design
+  // 3. Render Digital Payment Gateways (bKash, Nagad, Rocket) with Real Logos and 3D Interactive Design
   const bkashNum = payConfig.bkash?.number || '01700-000000';
   const nagadNum = payConfig.nagad?.number || '01800-000000';
   const rocketNum = payConfig.rocket?.number || '01900-000000';
@@ -681,7 +681,7 @@ function renderCheckoutPaymentMethods() {
   const nagadType = payConfig.nagad?.type || 'Personal';
   const rocketType = payConfig.rocket?.type || 'Personal';
 
-  const allMethods = [
+  const mfsMethods = [
     { 
       id: 'bkash', 
       name: 'bKash', 
@@ -711,49 +711,32 @@ function renderCheckoutPaymentMethods() {
       type: rocketType, 
       badgeClass: 'bg-purple-50 text-[#7C3AED] border border-purple-200',
       desc: `Send Money to ${rocketNum} • Rocket App or *322#` 
-    },
-    { 
-      id: 'cod', 
-      name: 'Cash on Delivery', 
-      logo: null,
-      brandColor: '#0f172a',
-      num: '', 
-      type: 'Courier COD', 
-      badgeClass: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
-      desc: 'Pay cash to delivery rider at your doorstep' 
     }
   ];
 
-  // If full advance only, hide cod
-  const visibleMethods = (advanceMode === 'full_only' || policy.isDeliveryChargeMandatory) 
-    ? allMethods.filter(m => m.id !== 'cod' || !policy.isDeliveryChargeMandatory)
-    : allMethods;
-
   container.innerHTML = `
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-3">
-      ${visibleMethods.map((m, idx) => `
-        <label class="relative flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
-          <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer shrink-0" />
-          
-          <div class="w-12 h-10 sm:w-14 sm:h-11 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
-            ${m.logo 
-              ? `<img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" />` 
-              : `<div class="w-full h-full bg-neutral-900 rounded-lg flex items-center justify-center text-white font-mono-ui font-black text-xs tracking-wider">COD</div>`
-            }
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+      ${mfsMethods.map((m, idx) => `
+        <label class="relative flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+          <div class="flex items-center justify-between w-full">
+            <div class="w-12 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+              <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" />
+            </div>
+            <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer" />
           </div>
 
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-0 sm:w-full mt-0 sm:mt-1">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black tracking-tight">${m.name}</span>
               <span class="font-mono-ui text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${m.badgeClass}">${m.type}</span>
             </div>
-            <div class="text-[11px] text-neutral-500 truncate mt-0.5 font-normal">${m.desc}</div>
+            <div class="text-[10px] text-neutral-500 truncate mt-0.5 font-normal">${m.desc}</div>
           </div>
         </label>
       `).join('')}
     </div>
 
-    <!-- Active Payment Instructions Card (Dynamic TrxID / Number) -->
+    <!-- Active Payment Instructions Card (Dynamic TrxID / Number / COD Info) -->
     <div id="checkout-payment-instructions-card"></div>
   `;
 
@@ -805,21 +788,25 @@ function updateCheckoutCalculations() {
     activeSplit = splitInput ? splitInput.value : 'delivery_only';
   }
 
+  const isCodSelected = (activeSplit === 'cod');
+
+  // Toggle Visibility of Payment Gateway selection (Hide when COD is selected)
+  const gatewayGroup = document.getElementById('checkout-gateway-group');
+  if (gatewayGroup) {
+    gatewayGroup.style.display = isCodSelected ? 'none' : '';
+  }
+
   // 4. Selected Payment Gateway
-  const paymentInput = document.querySelector('input[name="payment-method"]:checked');
-  let selectedPaymentId = paymentInput ? paymentInput.value : 'bkash';
+  let selectedPaymentId = 'bkash';
+  if (isCodSelected) {
+    selectedPaymentId = 'cod';
+  } else {
+    const paymentInput = document.querySelector('input[name="payment-method"]:checked');
+    selectedPaymentId = paymentInput ? paymentInput.value : 'bkash';
+    if (selectedPaymentId === 'cod') selectedPaymentId = 'bkash';
+  }
 
   const payConfig = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : {};
-  const mfsNumbers = {
-    bkash: payConfig.bkash?.number || '01700-000000',
-    nagad: payConfig.nagad?.number || '01800-000000',
-    rocket: payConfig.rocket?.number || '01900-000000'
-  };
-  const mfsTypes = {
-    bkash: payConfig.bkash?.type || 'Personal',
-    nagad: payConfig.nagad?.type || 'Personal',
-    rocket: payConfig.rocket?.type || 'Personal'
-  };
   const methodNames = {
     bkash: 'bKash',
     nagad: 'Nagad',
@@ -836,15 +823,15 @@ function updateCheckoutCalculations() {
   let payNowDesc = `Via ${currentMethodName}`;
   let btnLabel = `CONFIRM ORDER (${currentMethodUpper})`;
 
-  if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
+  if (isCodSelected) {
     payNowAmount = 0;
     dueAmount = totalOrderValue;
-    payNowDesc = 'No advance payment required';
-    btnLabel = `CONFIRM ORDER (CASH ON DELIVERY - ৳${dueAmount.toLocaleString()}) →`;
+    payNowDesc = 'No advance digital payment required';
+    btnLabel = `CONFIRM CASH ON DELIVERY ORDER (৳${dueAmount.toLocaleString()}) →`;
   } else if (activeSplit === 'delivery_only') {
     payNowAmount = shippingFee;
     dueAmount = subtotal;
-    payNowDesc = `Delivery Charge (${zone === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka'}) via ${currentMethodName}`;
+    payNowDesc = `Advance Delivery Charge (${zone === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka'}) via ${currentMethodName}`;
     btnLabel = payNowAmount > 0 
       ? `PAY ৳${payNowAmount.toLocaleString()} DELIVERY CHARGE VIA ${currentMethodUpper} →`
       : `CONFIRM ORDER (${currentMethodUpper}) →`;
@@ -856,8 +843,25 @@ function updateCheckoutCalculations() {
     btnLabel = `PAY FULL ৳${payNowAmount.toLocaleString()} VIA ${currentMethodUpper} →`;
   }
 
-  // 6. Keep checkout page clean — Payment details will be shown in the dedicated popup on clicking Pay
+  // 6. Active Payment Instructions Card (Dynamic TrxID / Number / COD Info)
   const detailsBox = document.getElementById('checkout-payment-instructions-card');
+  if (detailsBox) {
+    if (isCodSelected) {
+      detailsBox.innerHTML = `
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 shadow-2xs">
+          <div class="font-bold flex items-center gap-2 mb-1.5 text-emerald-800 font-mono-ui text-xs tracking-wide">
+            <span class="material-symbols-outlined text-base">local_shipping</span>
+            <span>Full Cash on Delivery (Doorstep Courier Handover)</span>
+          </div>
+          <p class="text-[12px] text-emerald-700 leading-relaxed">
+            No advance digital payment needed. Pay total cash of <strong>৳${dueAmount.toLocaleString()}</strong> directly to the Steadfast / Pathao courier delivery rider when your package arrives at your doorstep.
+          </p>
+        </div>
+      `;
+    } else {
+      detailsBox.innerHTML = '';
+    }
+  }
   if (detailsBox) {
     if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
       detailsBox.innerHTML = `
@@ -2196,10 +2200,13 @@ function placeOrder() {
   }
 
   // Get selected payment gateway
-  const paymentInput = document.querySelector('input[name="payment-method"]:checked');
-  let selectedPaymentId = paymentInput ? paymentInput.value : 'bkash';
-  if (payableNow > 0 && selectedPaymentId === 'cod') {
-    selectedPaymentId = 'bkash';
+  let selectedPaymentId = 'bkash';
+  if (activeSplit === 'cod') {
+    selectedPaymentId = 'cod';
+  } else {
+    const paymentInput = document.querySelector('input[name="payment-method"]:checked');
+    selectedPaymentId = paymentInput ? paymentInput.value : 'bkash';
+    if (selectedPaymentId === 'cod') selectedPaymentId = 'bkash';
   }
 
   let createdOrder = null;

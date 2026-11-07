@@ -26,6 +26,23 @@
   display: none !important;
 }
 
+/* Material Symbols ligature protection to avoid text-flash before font loads */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+}
+
 body {
   background-color: #f9f9f9;
   font-family: 'DM Sans', sans-serif;

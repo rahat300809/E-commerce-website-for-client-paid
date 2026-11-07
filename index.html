@@ -300,14 +300,14 @@
 
       <!-- ── Main Hero Banner Carousel (Auto-scrolling, Mobile-Optimized, Multi-Banner Support) ── -->
       <section id="hero-banner-section" class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8 pb-3">
-        <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100/80 bg-neutral-900 h-[280px] xs:h-[320px] sm:h-[400px] md:h-[440px] flex items-center group">
+        <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100/80 h-[280px] xs:h-[320px] sm:h-[400px] md:h-[440px] flex items-center group" style="background: radial-gradient(circle at 75% 30%, #134e2f 0%, #062314 55%, #05140c 100%);">
           
           <!-- Banner Slides Container (Rendered dynamically from DB.banners.active()) -->
           <div id="hero-slides-wrapper" class="absolute inset-0 w-full h-full">
             <!-- Populated via renderHeroBannerCarousel() in app.js -->
             <div class="hero-slide active absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-100 z-10 flex items-center">
               <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" 
-                   style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80')"></div>
+                   style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1280&q=75&auto=format')"></div>
               <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25 sm:to-transparent"></div>
               <div class="relative z-10 max-w-xl p-5 sm:p-10 md:p-12 text-white">
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-xs font-mono-ui font-bold uppercase tracking-widest mb-2 sm:mb-3 border border-white/20">
@@ -323,7 +323,7 @@
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
                     <span>SHOP CATALOG</span>
-                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    <svg class="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </a>
                   <a href="customizer.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
                     <span>3D Studio</span>
@@ -333,12 +333,12 @@
             </div>
           </div>
 
-          <!-- Carousel Controls (Previous / Next Arrows) -->
+          <!-- Carousel Controls (Previous / Next Arrows with SVG to prevent raw text flash) -->
           <button type="button" onclick="prevHeroBannerSlide()" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-80 hover:opacity-100 active:scale-95 cursor-pointer shadow border border-white/10" aria-label="Previous Slide">
-            <span class="material-symbols-outlined text-lg sm:text-xl">chevron_left</span>
+            <svg class="w-4 sm:w-5 h-4 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <button type="button" onclick="nextHeroBannerSlide()" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-80 hover:opacity-100 active:scale-95 cursor-pointer shadow border border-white/10" aria-label="Next Slide">
-            <span class="material-symbols-outlined text-lg sm:text-xl">chevron_right</span>
+            <svg class="w-4 sm:w-5 h-4 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </button>
 
           <!-- Carousel Dots Indicator -->

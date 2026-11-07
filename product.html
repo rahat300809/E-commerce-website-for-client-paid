@@ -1674,7 +1674,7 @@
     // ─────────────────────────────────────────
     // Cart Handling & 1-Click Buy Now
     // ─────────────────────────────────────────
-    function handleAddToCart() {
+    function handleAddToCart(openDrawer = true) {
       const titleEl = document.getElementById('pd-title');
       const itemTitle = (titleEl ? titleEl.textContent : (productState.product?.name || 'ZENVY AeroKnit Jersey')).trim();
       const unitPrice = productState.basePrice + productState.sleevePrice + (productState.isPersonalized ? productState.personalizeFee : 0) + productState.patchPrice;
@@ -1738,8 +1738,10 @@
       try { window.dispatchEvent(new CustomEvent('zenvy-store-updated')); } catch(e){}
 
       updateCartBadge();
-      toggleCartDrawer(true);
-      showToast(`Added ${productState.quantity}x ${itemTitle} (${productState.selectedSize}) to bag!`);
+      if (openDrawer) {
+        toggleCartDrawer(true);
+        showToast(`Added ${productState.quantity}x ${itemTitle} (${productState.selectedSize}) to bag!`);
+      }
 
       // Feedback animation on desktop & mobile buttons
       const btn = document.getElementById('add-to-cart-btn');
@@ -1766,10 +1768,11 @@
     }
 
     function buyNowDirect() {
-      handleAddToCart();
-      setTimeout(() => {
-        window.location.href = 'index.html#checkout';
-      }, 250);
+      // Add quietly to cart without triggering drawer
+      handleAddToCart(false);
+      try { toggleCartDrawer(false); } catch(e){}
+      // Direct redirect to checkout
+      window.location.href = 'index.html#checkout';
     }
 
     // ─────────────────────────────────────────

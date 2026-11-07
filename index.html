@@ -903,109 +903,112 @@
         
         <!-- Left Column: Delivery & Payment Details (7 Cols) -->
         <div class="lg:col-span-7 space-y-8">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-surface-variant/60">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-neutral-200">
             <div>
-              <h1 class="font-display-sm text-3xl md:text-4xl text-primary font-bold">Complete Your Order</h1>
-              <p class="font-body-lg text-secondary mt-1">Review your delivery details and choose a payment method.</p>
+              <h1 class="font-headline text-2xl sm:text-3xl md:text-4xl text-neutral-900 font-black tracking-tight">Complete Your Order</h1>
+              <p class="font-body text-sm sm:text-base text-neutral-700 font-medium mt-1">Review your delivery details and choose a payment method.</p>
             </div>
-            <div class="inline-flex items-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-200/60 px-3 py-1.5 rounded-full text-xs font-mono-ui font-semibold self-start sm:self-center shadow-xs">
-              <span class="material-symbols-outlined text-[16px]">lock</span>
-              256-Bit SSL Encrypted Checkout
+            <div class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-mono-ui font-bold self-start sm:self-center shadow-2xs">
+              <span class="material-symbols-outlined text-[16px] text-emerald-700">lock</span>
+              <span>256-Bit SSL Encrypted Checkout</span>
             </div>
           </div>
 
           <!-- Section 1: Address -->
-          <section class="glass-panel p-6 rounded-2xl border border-white/80 space-y-4">
-            <h2 class="font-label-caps text-xs text-secondary uppercase tracking-widest border-b border-surface-variant pb-2 font-bold">
-              1. Delivery Address
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-5">
+            <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest border-b border-neutral-200 pb-2.5 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">1</span>
+              <span>Delivery Address</span>
             </h2>
             <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block font-mono-ui text-xs text-secondary mb-1">Full Name</label>
-                <input type="text" id="checkout-name" placeholder="Your full name" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Full Name</label>
+                <input type="text" id="checkout-name" placeholder="Your full name" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
               <div>
-                <label class="block font-mono-ui text-xs text-secondary mb-1">Phone Number</label>
-                <input type="tel" id="checkout-phone" placeholder="+880 17XX-XXXXXX" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Phone Number</label>
+                <input type="tel" id="checkout-phone" placeholder="+880 17XX-XXXXXX" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
               <div class="col-span-1 md:col-span-2">
-                <label class="block font-mono-ui text-xs text-secondary mb-1">Email Address (Optional)</label>
-                <input type="email" id="checkout-email" placeholder="your@email.com (optional)" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Email Address (Optional)</label>
+                <input type="email" id="checkout-email" placeholder="your@email.com (optional)" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
               <div class="col-span-1 md:col-span-2">
-                <label class="block font-mono-ui text-xs text-secondary mb-1">Delivery Address</label>
-                <input type="text" id="checkout-address" placeholder="House #, Road, Area, City" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Delivery Address</label>
+                <input type="text" id="checkout-address" placeholder="House #, Road, Area, City" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
               <div>
-                <label class="block font-mono-ui text-xs text-secondary mb-1">City</label>
-                <input type="text" id="checkout-city" value="Dhaka" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">City</label>
+                <input type="text" id="checkout-city" value="Dhaka" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
               <div>
-                <label class="block font-mono-ui text-xs text-secondary mb-1">Postal Code</label>
-                <input type="text" id="checkout-zip" value="1213" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 font-body-md text-sm focus:ring-2 focus:ring-primary"/>
+                <label class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Postal Code</label>
+                <input type="text" id="checkout-zip" value="1213" class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all"/>
               </div>
             </form>
           </section>
 
           <!-- Section 2: Delivery Area & Method -->
-          <section class="glass-panel p-6 rounded-2xl border border-white/80 space-y-4">
-            <div class="flex items-center justify-between border-b border-surface-variant pb-2">
-              <h2 class="font-label-caps text-xs text-secondary uppercase tracking-widest font-bold">
-                2. Delivery Zone & Shipping Fee
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-4">
+            <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
+              <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">2</span>
+                <span>Delivery Zone & Shipping Fee</span>
               </h2>
-              <span class="text-[11px] text-gray-500 font-mono-ui">Pre-calculated Rates</span>
+              <span class="text-xs text-neutral-700 font-bold font-mono-ui bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">Pre-calculated Rates</span>
             </div>
             <div id="checkout-delivery-options" class="space-y-3">
-              <label class="flex items-center p-4 border-2 border-black bg-black/5 rounded-xl cursor-pointer transition-all hover:bg-black/10">
+              <label class="flex items-center p-4 border-2 border-black bg-neutral-50/80 rounded-2xl cursor-pointer transition-all hover:bg-neutral-100 shadow-2xs">
                 <input type="radio" name="checkout-delivery-zone" value="inside" checked onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5">
                 <div class="ml-4 flex-grow flex justify-between items-center">
                   <div>
-                    <p class="font-bold text-sm text-primary">Inside Dhaka</p>
-                    <p class="font-mono-ui text-xs text-secondary">Delivered within 24–48 Hours</p>
+                    <p class="font-headline font-bold text-sm sm:text-base text-neutral-900">Inside Dhaka</p>
+                    <p class="font-mono-ui text-xs text-neutral-700 font-medium mt-0.5">Delivered within 24–48 Hours</p>
                   </div>
-                  <span id="rate-inside-dhaka" class="font-mono-ui text-sm font-bold text-black">৳80</span>
+                  <span id="rate-inside-dhaka" class="font-mono-ui text-base font-extrabold text-neutral-900">৳80</span>
                 </div>
               </label>
 
-              <label class="flex items-center p-4 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container-low transition-colors bg-white">
+              <label class="flex items-center p-4 border-2 border-neutral-200 rounded-2xl cursor-pointer hover:border-neutral-400 bg-white transition-all shadow-2xs">
                 <input type="radio" name="checkout-delivery-zone" value="outside" onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5">
                 <div class="ml-4 flex-grow flex justify-between items-center">
                   <div>
-                    <p class="font-bold text-sm text-primary">Outside Dhaka (All Bangladesh)</p>
-                    <p class="font-mono-ui text-xs text-secondary">Steadfast / Pathao Courier (2–3 Days)</p>
+                    <p class="font-headline font-bold text-sm sm:text-base text-neutral-900">Outside Dhaka (All Bangladesh)</p>
+                    <p class="font-mono-ui text-xs text-neutral-700 font-medium mt-0.5">Steadfast / Pathao Courier (2–3 Days)</p>
                   </div>
-                  <span id="rate-outside-dhaka" class="font-mono-ui text-sm font-bold text-black">৳130</span>
+                  <span id="rate-outside-dhaka" class="font-mono-ui text-base font-extrabold text-neutral-900">৳130</span>
                 </div>
               </label>
             </div>
           </section>
 
           <!-- Section 3: Payment Type & Advance Policy -->
-          <section class="glass-panel p-6 rounded-2xl border border-white/80 space-y-4">
-            <div class="flex items-center justify-between border-b border-surface-variant pb-2">
-              <h2 class="font-label-caps text-xs text-neutral-900 uppercase tracking-widest font-bold">
-                3. Payment Terms & Gateway
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-5">
+            <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
+              <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">3</span>
+                <span>Payment Terms & Gateway</span>
               </h2>
-              <span id="checkout-policy-badge" class="font-mono-ui text-[10px] uppercase font-bold tracking-wider bg-neutral-900 text-white px-2.5 py-0.5 rounded-full">Secure Policy</span>
+              <span id="checkout-policy-badge" class="font-mono-ui text-[10px] uppercase font-black tracking-wider bg-black text-white px-2.5 py-1 rounded-full shadow-2xs">Secure Policy</span>
             </div>
 
             <!-- Min order notice -->
-            <div id="checkout-min-order-notice" class="hidden text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"></div>
+            <div id="checkout-min-order-notice" class="hidden text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3"></div>
 
             <!-- Policy Alert Box -->
-            <div id="checkout-policy-notice-box" class="p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs text-neutral-800 leading-relaxed shadow-xs">
-              <div class="font-bold flex items-center gap-2 mb-1 text-black font-mono-ui text-xs tracking-wide">
+            <div id="checkout-policy-notice-box" class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 shadow-2xs">
+              <div class="font-bold flex items-center gap-2 mb-1 text-neutral-900 font-headline text-xs tracking-wide">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="checkout-policy-title">Payment Settlement Terms</span>
               </div>
-              <p id="checkout-policy-desc" class="text-[11px] text-neutral-600 leading-relaxed">
+              <p id="checkout-policy-desc" class="text-xs text-neutral-700 font-medium leading-relaxed">
                 Choose whether to pay the advance delivery fee online, settle full payment, or choose cash on delivery.
               </p>
             </div>
 
             <!-- Payment Split Choice Selector (when mode is customer_choice) -->
             <div id="checkout-split-choice-container" class="space-y-2">
-              <label class="block font-mono-ui text-[11px] uppercase tracking-wider font-bold text-neutral-700 mb-1">Select Payment Preference</label>
+              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">Select Payment Preference</label>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="checkout-split-options">
                 <!-- Injected via JS based on policy -->
               </div>
@@ -1013,7 +1016,7 @@
 
             <!-- Dynamic Payment Gateway Selector (bKash / Nagad / Rocket) -->
             <div id="checkout-gateway-group" class="pt-2">
-              <label class="block font-mono-ui text-[11px] uppercase tracking-wider font-bold text-neutral-700 mb-2">Select Payment Gateway</label>
+              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">Select Payment Gateway</label>
               <div id="checkout-payment-methods" class="space-y-2">
                 <!-- Rendered by renderCheckoutPaymentMethods() -->
               </div>
@@ -1023,52 +1026,52 @@
 
         <!-- Right Column: Order Summary (5 Cols) -->
         <div class="lg:col-span-5 relative">
-          <aside class="glass-panel sticky top-28 rounded-2xl p-6 flex flex-col border border-white/80 shadow-xl">
-            <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-4">
-              <h2 class="font-headline-lg text-xl font-bold text-primary">Order Summary</h2>
-              <span id="checkout-items-badge" class="font-mono-ui text-xs bg-primary text-white px-3 py-1 rounded-full">0 Items</span>
+          <aside class="bg-white rounded-2xl p-6 sm:p-7 flex flex-col border border-neutral-200 shadow-xl sticky top-28">
+            <div class="flex justify-between items-center mb-5 border-b border-neutral-200 pb-4">
+              <h2 class="font-headline text-xl font-black text-neutral-900">Order Summary</h2>
+              <span id="checkout-items-badge" class="font-mono-ui text-xs font-bold bg-black text-white px-3 py-1 rounded-full shadow-2xs">0 Items</span>
             </div>
 
             <!-- Items List -->
-            <div id="checkout-items-list" class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+            <div id="checkout-items-list" class="space-y-3 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
               <!-- Rendered via JS -->
             </div>
 
             <!-- Price Totals Breakdown -->
-            <div class="mt-6 border-t border-outline-variant/30 pt-4 space-y-2.5 font-mono-ui text-xs">
-              <div class="flex justify-between text-secondary">
-                <span>Product Subtotal</span>
-                <span id="checkout-subtotal" class="font-bold text-black">৳0</span>
+            <div class="mt-5 border-t border-neutral-200 pt-4 space-y-3 font-mono-ui text-xs">
+              <div class="flex justify-between items-center text-neutral-700">
+                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">Product Subtotal</span>
+                <span id="checkout-subtotal" class="font-bold text-sm text-neutral-900">৳0</span>
               </div>
-              <div class="flex justify-between text-secondary">
-                <span>Delivery Charge</span>
-                <span id="checkout-delivery-fee" class="font-bold text-black">৳80</span>
+              <div class="flex justify-between items-center text-neutral-700">
+                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">Delivery Charge</span>
+                <span id="checkout-delivery-fee" class="font-bold text-sm text-neutral-900">৳80</span>
               </div>
-              <div class="flex justify-between font-bold text-sm text-primary pt-2 border-t border-dashed border-gray-200">
-                <span>Total Order Value</span>
-                <span id="checkout-total" class="text-base font-black">৳0</span>
+              <div class="flex justify-between items-center font-bold text-sm text-neutral-900 pt-3 border-t border-dashed border-neutral-200">
+                <span class="font-headline font-extrabold text-sm uppercase tracking-wide">Total Order Value</span>
+                <span id="checkout-total" class="text-base sm:text-lg font-black text-neutral-900">৳0</span>
               </div>
 
               <!-- Pay Now Highlight Box -->
-              <div id="checkout-pay-now-container" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex justify-between items-center text-emerald-900 mt-2">
+              <div id="checkout-pay-now-container" class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-3.5 flex justify-between items-center text-emerald-950 mt-3 shadow-2xs">
                 <div>
-                  <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Payable Now (Advance)</div>
-                  <div class="text-[11px] text-emerald-600 font-medium" id="checkout-pay-now-desc">Via bKash</div>
+                  <div class="text-xs font-black uppercase tracking-wider text-emerald-900 font-headline">Payable Now (Advance)</div>
+                  <div class="text-xs text-emerald-800 font-semibold mt-0.5" id="checkout-pay-now-desc">Via bKash</div>
                 </div>
-                <span id="checkout-pay-now-amount" class="text-lg font-black text-emerald-700">৳80</span>
+                <span id="checkout-pay-now-amount" class="text-xl font-black text-emerald-900 font-mono-ui">৳80</span>
               </div>
 
               <!-- Cash Due on Delivery Box -->
-              <div id="checkout-due-container" class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex justify-between items-center text-amber-900">
+              <div id="checkout-due-container" class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3.5 flex justify-between items-center text-amber-950 shadow-2xs">
                 <div>
-                  <div class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Cash Due on Delivery</div>
-                  <div class="text-[11px] text-amber-600 font-medium">Pay to rider when jersey arrives</div>
+                  <div class="text-xs font-black uppercase tracking-wider text-amber-900 font-headline">Cash Due on Delivery</div>
+                  <div class="text-xs text-amber-800 font-semibold mt-0.5">Pay to rider when jersey arrives</div>
                 </div>
-                <span id="checkout-due-amount" class="text-lg font-black text-amber-700">৳0</span>
+                <span id="checkout-due-amount" class="text-xl font-black text-amber-900 font-mono-ui">৳0</span>
               </div>
             </div>
 
-            <button id="checkout-place-order-btn" onclick="placeOrder()" class="w-full mt-6 bg-primary text-on-primary py-4 rounded-xl font-label-caps text-xs tracking-widest uppercase hover:bg-black/90 transition-all shadow-xl flex justify-center items-center gap-2 font-bold">
+            <button id="checkout-place-order-btn" onclick="placeOrder()" class="w-full mt-6 bg-black hover:bg-neutral-800 text-white py-4 rounded-xl font-headline font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-xl hover:shadow-2xl active:scale-[0.99] flex justify-center items-center gap-2 cursor-pointer">
               <span>CONFIRM ORDER</span>
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
@@ -1499,18 +1502,25 @@
           </div>
         </div>
 
-        <!-- Qty + Add to Cart -->
-        <div class="flex items-center gap-3 mt-auto pt-2">
-          <!-- Quantity -->
-          <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden flex-shrink-0">
-            <button onclick="changePdQty(-1)" class="w-9 h-10 flex items-center justify-center text-primary hover:bg-gray-50 font-bold text-lg transition-colors">−</button>
-            <span id="pd-qty" class="w-9 text-center font-mono-ui text-sm font-bold text-primary">1</span>
-            <button onclick="changePdQty(1)" class="w-9 h-10 flex items-center justify-center text-primary hover:bg-gray-50 font-bold text-lg transition-colors">+</button>
+        <!-- Qty + Add to Cart + Instant Buy -->
+        <div class="flex flex-col gap-2.5 mt-auto pt-2">
+          <div class="flex items-center gap-3">
+            <!-- Quantity -->
+            <div class="flex items-center border border-neutral-300 rounded-xl overflow-hidden flex-shrink-0 bg-white">
+              <button onclick="changePdQty(-1)" class="w-9 h-10 flex items-center justify-center text-primary hover:bg-gray-50 font-bold text-lg transition-colors cursor-pointer">−</button>
+              <span id="pd-qty" class="w-9 text-center font-mono-ui text-sm font-bold text-primary">1</span>
+              <button onclick="changePdQty(1)" class="w-9 h-10 flex items-center justify-center text-primary hover:bg-gray-50 font-bold text-lg transition-colors cursor-pointer">+</button>
+            </div>
+            <!-- Add to Cart -->
+            <button onclick="addProductToCart()" class="flex-1 bg-white border border-neutral-300 hover:border-black text-black font-headline font-bold text-xs py-3 rounded-xl transition-colors shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+              <span>ADD TO BAG</span>
+            </button>
           </div>
-          <!-- Add to Cart -->
-          <button onclick="addProductToCart()" class="flex-1 bg-primary text-white font-label-caps text-sm py-3 rounded-xl hover:bg-black/80 transition-colors font-bold shadow flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-base">shopping_bag</span>
-            ADD TO CART
+          <!-- Instant Buy Now -->
+          <button onclick="instantBuyProductModal()" class="w-full bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">bolt</span>
+            <span>INSTANT BUY NOW</span>
           </button>
         </div>
 

@@ -637,35 +637,35 @@ function renderCheckoutPaymentMethods() {
     } else {
       splitContainer.style.display = '';
       splitOptions.innerHTML = `
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
           <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge Only</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">Popular</span>
+              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge Only</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-neutral-900 text-white px-2 py-0.5 rounded-full shadow-2xs">Popular</span>
             </div>
-            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Advance delivery fee via MFS • Balance collected on arrival</p>
+            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">Advance delivery fee via MFS • Balance collected on arrival</p>
           </div>
         </label>
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
           <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount Now</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-semibold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">100% Online</span>
+              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount Now</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-neutral-900 text-white px-2 py-0.5 rounded-full shadow-2xs">100% Online</span>
             </div>
-            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Full settlement upfront • Contactless doorstep drop</p>
+            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">Full settlement upfront • Contactless doorstep drop</p>
           </div>
         </label>
         ${policy.cashOnDelivery !== false ? `
-        <label class="col-span-1 md:col-span-2 relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+        <label class="col-span-1 md:col-span-2 relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
           <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
           <div class="flex-1">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Full Cash on Delivery (COD)</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">Courier COD</span>
+              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Full Cash on Delivery (COD)</span>
+              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full shadow-2xs">Courier COD</span>
             </div>
-            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">No advance digital payment • Pay total cash directly to delivery rider</p>
+            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">No advance digital payment • Pay total cash directly to delivery rider</p>
           </div>
         </label>
         ` : ''}
@@ -689,7 +689,7 @@ function renderCheckoutPaymentMethods() {
       brandColor: '#D12053',
       num: bkashNum, 
       type: bkashType, 
-      badgeClass: 'bg-rose-50 text-[#D12053] border border-rose-200',
+      badgeClass: 'bg-rose-100 text-[#9f1239] border border-rose-300',
       desc: `Send Money to ${bkashNum} • bKash App or *247#` 
     },
     { 
@@ -699,7 +699,7 @@ function renderCheckoutPaymentMethods() {
       brandColor: '#EA580C',
       num: nagadNum, 
       type: nagadType, 
-      badgeClass: 'bg-orange-50 text-[#EA580C] border border-orange-200',
+      badgeClass: 'bg-orange-100 text-[#9a3412] border border-orange-300',
       desc: `Send Money to ${nagadNum} • Nagad App or *167#` 
     },
     { 
@@ -709,7 +709,7 @@ function renderCheckoutPaymentMethods() {
       brandColor: '#7C3AED',
       num: rocketNum, 
       type: rocketType, 
-      badgeClass: 'bg-purple-50 text-[#7C3AED] border border-purple-200',
+      badgeClass: 'bg-purple-100 text-[#581c87] border border-purple-300',
       desc: `Send Money to ${rocketNum} • Rocket App or *322#` 
     }
   ];
@@ -717,9 +717,9 @@ function renderCheckoutPaymentMethods() {
   container.innerHTML = `
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
       ${mfsMethods.map((m, idx) => `
-        <label class="relative flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm group">
+        <label class="relative flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
           <div class="flex items-center justify-between w-full">
-            <div class="w-12 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+            <div class="w-14 h-11 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
               <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" />
             </div>
             <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer" />
@@ -727,10 +727,10 @@ function renderCheckoutPaymentMethods() {
 
           <div class="flex-1 min-w-0 sm:w-full mt-0 sm:mt-1">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black tracking-tight">${m.name}</span>
-              <span class="font-mono-ui text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${m.badgeClass}">${m.type}</span>
+              <span class="font-headline font-bold text-sm sm:text-base text-neutral-900 group-hover:text-black tracking-tight">${m.name}</span>
+              <span class="font-mono-ui text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full ${m.badgeClass}">${m.type}</span>
             </div>
-            <div class="text-[10px] text-neutral-500 truncate mt-0.5 font-normal">${m.desc}</div>
+            <div class="text-xs text-neutral-700 font-medium mt-1 leading-snug break-words">${m.desc}</div>
           </div>
         </label>
       `).join('')}
@@ -1070,6 +1070,7 @@ function switchView(viewName, updateUrl = true) {
   } else if (normalized === 'home') {
     try { syncHomepageContent(); } catch(e){ console.error('syncHomepageContent:', e); }
   } else if (normalized === 'checkout') {
+    try { toggleCartDrawer(false); } catch(e){}
     try { renderCart(); } catch(e){}
     try { renderCheckoutPaymentMethods(); } catch(e){}
     try { updateCheckoutCalculations(); } catch(e){}
@@ -1169,12 +1170,12 @@ function renderCart() {
       // Checkout Summary Item Markup
       if (checkoutList) {
         const checkoutItemHtml = `
-          <div class="flex gap-3 p-3 bg-white rounded-xl border border-outline-variant/30">
-            <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80'}" class="w-16 h-16 object-contain bg-surface-container-low rounded-lg p-1" alt="${item.name}"/>
+          <div class="flex gap-3 p-3 bg-neutral-50 rounded-xl border border-neutral-200 shadow-2xs">
+            <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80'}" class="w-16 h-16 object-contain bg-white rounded-lg p-1 border border-neutral-100" alt="${item.name}"/>
             <div class="flex-grow flex flex-col justify-center">
-              <h4 class="font-body-md text-xs font-bold text-primary">${item.name}</h4>
-              <p class="font-mono-ui text-[11px] text-secondary">${item.details} • Qty: ${item.qty}</p>
-              <span class="font-mono-ui text-xs font-bold text-primary mt-1">${formatMoney(item.price * item.qty)}</span>
+              <h4 class="font-headline text-xs sm:text-sm font-bold text-neutral-900">${item.name}</h4>
+              <p class="font-mono-ui text-xs text-neutral-600 font-medium mt-0.5">${item.details} • Qty: ${item.qty}</p>
+              <span class="font-mono-ui text-xs sm:text-sm font-extrabold text-neutral-900 mt-1">${formatMoney(item.price * item.qty)}</span>
             </div>
           </div>
         `;
@@ -1211,7 +1212,7 @@ function renderCart() {
   if (checkoutTotal) checkoutTotal.innerText = formatMoney(subtotal > 0 ? subtotal + shippingCost : 0);
 }
 
-function addToCart(product, quantity = 1) {
+function addToCart(product, quantity = 1, openDrawer = true) {
   if (!product) return;
   const prodId = String(product.id || Date.now());
   const prodName = product.name || 'ZENVY Jersey';
@@ -1255,7 +1256,9 @@ function addToCart(product, quantity = 1) {
   saveCartState();
   renderCart();
   showToast(`Added ${addQty > 1 ? addQty + 'x ' : ''}"${prodName}" to cart`);
-  toggleCartDrawer(true);
+  if (openDrawer) {
+    toggleCartDrawer(true);
+  }
 }
 
 function removeFromCart(index) {
@@ -1278,22 +1281,25 @@ function updateQty(index, delta) {
   renderCart();
 }
 
-function toggleCartDrawer(forceOpen = false) {
+function toggleCartDrawer(forceOpen = null) {
   const drawer = document.getElementById('cart-drawer');
   if (!drawer) return;
 
   const panel = drawer.querySelector('aside');
-  if (forceOpen || drawer.classList.contains('pointer-events-none')) {
+  const isCurrentlyClosed = drawer.classList.contains('pointer-events-none') || drawer.classList.contains('opacity-0');
+  const shouldOpen = (forceOpen !== null) ? Boolean(forceOpen) : isCurrentlyClosed;
+
+  if (shouldOpen) {
     drawer.classList.remove('pointer-events-none', 'opacity-0');
-    panel.classList.remove('translate-x-full');
+    if (panel) panel.classList.remove('translate-x-full');
   } else {
     drawer.classList.add('pointer-events-none', 'opacity-0');
-    panel.classList.add('translate-x-full');
+    if (panel) panel.classList.add('translate-x-full');
   }
 }
 
 function proceedToCheckout() {
-  toggleCartDrawer();
+  toggleCartDrawer(false);
   switchView('checkout');
 }
 
@@ -1477,6 +1483,30 @@ function rotate3DView(type) {
 }
 
 // ── Storefront Global Interactive Helpers ──
+window.instantBuy = function(productId) {
+  if (typeof DB === 'undefined' || !DB.products) return;
+  const p = DB.products.byId(productId);
+  if (!p) return;
+  const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
+  const price = p.salePrice || p.basePrice || 1450;
+
+  // 1. Force cart drawer to stay closed
+  try { toggleCartDrawer(false); } catch(e){}
+
+  // 2. Add product quietly to cart with openDrawer = false
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: price,
+    image: imgUrl,
+    details: `${p.categoryName || 'Standard Edition'} • M`
+  }, 1, false);
+
+  // 3. Immediately switch directly to checkout view
+  switchView('checkout');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 window.quickAddToCart = function(productId) {
   if (typeof DB === 'undefined' || !DB.products) return;
   const p = DB.products.byId(productId);
@@ -1895,19 +1925,19 @@ function renderShopProducts() {
           </div>
 
           <!-- Action Buttons: Clean, Compact & Interactive -->
-          <div class="grid grid-cols-2 gap-1 pt-1.5 border-t border-gray-100 mt-1">
+          <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-gray-100 mt-1.5">
             <button type="button" 
                     onclick="openProduct('${p.id}')"
-                    class="py-1 px-1 rounded-md sm:rounded-lg border border-gray-200 hover:border-black text-black font-headline font-bold text-[9px] sm:text-xs transition-colors text-center cursor-pointer hover:bg-gray-50 active:scale-95 whitespace-nowrap"
-                    title="View Product">
+                    class="py-1.5 px-2 rounded-lg border border-gray-300 hover:border-black text-black font-headline font-bold text-[10px] sm:text-xs transition-colors text-center cursor-pointer hover:bg-gray-50 active:scale-95 whitespace-nowrap shadow-2xs"
+                    title="View Product Details">
               View
             </button>
             <button type="button" 
-                    onclick="quickAddToCart('${p.id}')"
-                    class="py-1 px-1 rounded-md sm:rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[9px] sm:text-xs transition-colors flex items-center justify-center gap-0.5 cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
-                    title="Add to Bag">
-              <span class="material-symbols-outlined text-[11px] sm:text-[14px]">shopping_bag</span>
-              <span>+Bag</span>
+                    onclick="instantBuy('${p.id}')"
+                    class="py-1.5 px-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
+                    title="Instant Buy Now">
+              <span class="material-symbols-outlined text-[13px] sm:text-[14px]">bolt</span>
+              <span>Instant Buy</span>
             </button>
           </div>
         </div>
@@ -2066,6 +2096,22 @@ function addProductToCart() {
     details: `Size: ${pdState.size}`
   }, pdState.qty);
   closeProduct();
+}
+
+function instantBuyProductModal() {
+  if (!pdState.product) return;
+  const p = pdState.product;
+  closeProduct();
+  try { toggleCartDrawer(false); } catch(e){}
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: p.image,
+    details: `Size: ${pdState.size}`
+  }, pdState.qty, false);
+  switchView('checkout');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Keyboard close

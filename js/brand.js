@@ -29,11 +29,11 @@ export async function loadBrandSettings() {
     if (snap.exists()) {
       const data = snap.data();
       // Ensure legacy "APEX ELITE" name is replaced with ZENVY
-      if (!data.brandName || data.brandName.includes('APEX') || data.brandName.includes('Apex')) {
-        data.brandName = 'ZENVY';
-        await setDoc(docRef, { brandName: 'ZENVY' }, { merge: true });
+      let currentBrandName = data.brandName;
+      if (!currentBrandName || currentBrandName.includes('APEX') || currentBrandName.includes('Apex')) {
+        currentBrandName = 'ZENVY';
       }
-      brandSettings = { ...DEFAULT_BRAND, ...data, brandName: 'ZENVY' };
+      brandSettings = { ...DEFAULT_BRAND, ...data, brandName: currentBrandName };
     } else {
       await setDoc(docRef, DEFAULT_BRAND);
       brandSettings = { ...DEFAULT_BRAND };
@@ -51,14 +51,15 @@ export function getBrand() {
 }
 
 function applyBrandToPage(brand) {
+  const brandName = brand.brandName || 'ZENVY';
   // Update all brand name elements
   document.querySelectorAll('[data-brand-name], [data-brand-name-text]').forEach(el => {
-    el.textContent = 'ZENVY';
+    el.textContent = brandName;
   });
 
   // Update document title if it contains Apex Elite
   if (document.title.includes('Apex Elite') || document.title.includes('APEX ELITE')) {
-    document.title = document.title.replace(/Apex Elite/g, 'ZENVY').replace(/APEX ELITE/g, 'ZENVY');
+    document.title = document.title.replace(/Apex Elite/g, brandName).replace(/APEX ELITE/g, brandName);
   }
 
   // Update tagline elements

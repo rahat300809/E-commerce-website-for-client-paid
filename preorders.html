@@ -72,7 +72,7 @@
 <!-- ===== NAV ===== -->
 <nav class="fixed w-full top-0 left-0 z-50 bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.06)] border-b border-outline-variant/50">
   <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
-    <a class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
+    <a data-brand-name class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
     <div class="hidden md:flex gap-8 items-center">
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="index.html#shop">Shop & Kits</a>
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="preorders.html">Preorders</a>
@@ -472,8 +472,8 @@
 <!-- FOOTER -->
 <footer class="bg-background border-t border-outline-variant py-12">
   <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4">
-    <a class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
-    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant">© 2026 ZENVY. ALL RIGHTS RESERVED. BDT (৳)</p>
+    <a data-brand-name class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
+    <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant">© 2026 <span data-brand-name>ZENVY</span>. ALL RIGHTS RESERVED. BDT (৳)</p>
     <div class="flex gap-6">
       <a href="shop.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Shop</a>
       <a href="customizer.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Customizer</a>
@@ -492,6 +492,17 @@
 import { getPreorderProducts, placePreorder, formatExpectedDate } from './js/preorders.js';
 
 // ---- State ----
+function syncBrandName() {
+  try {
+    const brand = JSON.parse(localStorage.getItem('zenvy_v2_brand') || '{}');
+    const name = brand.brandName || 'ZENVY';
+    document.querySelectorAll('[data-brand-name]').forEach(el => el.textContent = name);
+  } catch(e){}
+}
+syncBrandName();
+window.addEventListener('storage', syncBrandName);
+window.addEventListener('zenvy-store-updated', syncBrandName);
+
 let currentProduct = null;
 let modalQty = 1;
 let modalSelectedSize = '';

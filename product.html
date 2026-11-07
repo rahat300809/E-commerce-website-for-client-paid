@@ -185,7 +185,7 @@
           <span class="material-symbols-outlined text-[20px] sm:text-[24px]">arrow_back</span>
         </a>
         <a href="index.html#home" class="flex items-center gap-2">
-          <span class="font-headline font-black text-xl sm:text-2xl tracking-[0.16em] text-black">ZENVY</span>
+          <span id="site-brand-logo" data-brand-name class="font-headline font-black text-xl sm:text-2xl tracking-[0.16em] text-black">ZENVY</span>
         </a>
       </div>
 
@@ -747,8 +747,8 @@
         <!-- Column 1: Brand & Tagline -->
         <div class="md:col-span-5 flex flex-col justify-between">
           <div>
-            <a href="index.html" class="font-headline font-black text-2xl tracking-[0.16em] text-black">ZENVY</a>
-            <p class="font-body text-xs sm:text-sm text-gray-500 leading-relaxed mt-2 max-w-sm">
+            <a href="index.html" id="footer-brand-logo" data-brand-name class="font-headline font-black text-2xl tracking-[0.16em] text-black">ZENVY</a>
+            <p class="font-body text-xs sm:text-sm text-gray-500 leading-relaxed mt-2 max-w-sm" id="footer-brand-desc">
               Elevating athletic performance through premium design and technical innovation. The ethereal-technical standard.
             </p>
           </div>
@@ -758,7 +758,7 @@
           </div>
         </div>
 
-        <!-- Column 2 & 3: Compact 2-column Grid on Mobile -->
+        <!-- Column 2 & 3: Quick Links & Connect Socials -->
         <div class="md:col-span-7 grid grid-cols-2 gap-4 sm:gap-6">
           <div>
             <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2 sm:mb-3">LINKS</h4>
@@ -771,11 +771,28 @@
           </div>
 
           <div>
-            <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2 sm:mb-3">SERVICE</h4>
-            <p class="text-[11px] sm:text-xs text-gray-500 leading-relaxed mb-2">
-              WhatsApp & Phone Support
-            </p>
-            <div class="flex items-center gap-1.5 text-xs font-mono-ui font-bold text-black">
+            <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2 sm:mb-3">CONNECT</h4>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <a id="footer-social-wa" href="https://wa.me/8801700000000" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white flex items-center justify-center transition-all shadow-2xs" title="Official WhatsApp">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              </a>
+              <a id="footer-social-fb" href="https://facebook.com/zenvy" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white text-gray-700 flex items-center justify-center transition-all shadow-2xs" title="Facebook">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <a id="footer-social-ig" href="https://instagram.com/zenvy" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white text-gray-700 flex items-center justify-center transition-all shadow-2xs" title="Instagram">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+              <a id="footer-social-x" href="https://twitter.com/zenvy" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white text-gray-700 flex items-center justify-center transition-all shadow-2xs" title="Twitter / X">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <a id="footer-social-tiktok" href="https://tiktok.com/@zenvy" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white text-gray-700 flex items-center justify-center transition-all shadow-2xs" title="TikTok">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+              </a>
+              <a id="footer-social-yt" href="https://youtube.com/@zenvy" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white text-gray-700 flex items-center justify-center transition-all shadow-2xs" title="YouTube">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs font-mono-ui font-bold text-black" id="footer-support-phone">
               <span class="material-symbols-outlined text-[15px] text-emerald-600">call</span>
               <span>+880 1800-ZENVY</span>
             </div>
@@ -786,7 +803,7 @@
 
       <!-- Bottom Copyright Row -->
       <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
-        <div>
+        <div id="footer-copyright">
           © 2026 ZENVY Sports Fashion. All rights reserved.
         </div>
         <div class="flex items-center gap-4">
@@ -895,16 +912,84 @@
       syncProductWishlistButton();
       calculateLiveTotal();
       updateCartBadge();
+      syncBrandAndSocialSettings();
     });
 
     window.addEventListener('storage', () => {
       loadDataFromAdminDB();
       updateCartBadge();
+      syncBrandAndSocialSettings();
     });
     window.addEventListener('zenvy-store-updated', () => {
       loadDataFromAdminDB();
       updateCartBadge();
+      syncBrandAndSocialSettings();
     });
+
+    function syncBrandAndSocialSettings() {
+      if (typeof DB === 'undefined' || !DB.brand) return;
+      const brand = DB.brand.get() || {};
+      const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
+      const brandName = (brand.brandName || 'ZENVY').trim();
+
+      // 1. Update Brand Name across all elements
+      document.querySelectorAll('[data-brand-name], #site-brand-logo, #footer-brand-logo').forEach(el => {
+        el.textContent = brandName;
+      });
+
+      const copyrightEl = document.getElementById('footer-copyright');
+      if (copyrightEl) {
+        copyrightEl.textContent = `© ${new Date().getFullYear()} ${brandName} Sports Fashion. All rights reserved.`;
+      }
+
+      // 2. WhatsApp Number Resolution
+      let rawWa = brand.socialWhatsApp || settings.whatsappNumber || brand.phone || '8801700000000';
+      let cleanWa = rawWa.replace(/[^0-9]/g, '');
+      if (cleanWa.startsWith('01')) cleanWa = '88' + cleanWa;
+
+      // 3. Social Links
+      const fbEl = document.getElementById('footer-social-fb');
+      if (fbEl && brand.socialFacebook) fbEl.href = brand.socialFacebook;
+
+      const igEl = document.getElementById('footer-social-ig');
+      if (igEl && brand.socialInstagram) igEl.href = brand.socialInstagram;
+
+      const xEl = document.getElementById('footer-social-x');
+      if (xEl && brand.socialTwitter) xEl.href = brand.socialTwitter;
+
+      const ttEl = document.getElementById('footer-social-tiktok');
+      if (ttEl && brand.socialTikTok) ttEl.href = brand.socialTikTok;
+
+      const ytEl = document.getElementById('footer-social-yt');
+      if (ytEl && brand.socialYoutube) ytEl.href = brand.socialYoutube;
+
+      const waEl = document.getElementById('footer-social-wa');
+      if (waEl) {
+        waEl.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I would like to make an inquiry.')}`;
+      }
+
+      const phoneEl = document.getElementById('footer-support-phone');
+      if (phoneEl) {
+        phoneEl.innerHTML = `<span class="material-symbols-outlined text-[15px] text-emerald-600">call</span><span>${brand.phone || ('+' + cleanWa)}</span>`;
+      }
+
+      // 4. Global Floating WhatsApp Chat Button
+      let floatingWa = document.getElementById('floating-whatsapp-btn');
+      if (!floatingWa) {
+        floatingWa = document.createElement('a');
+        floatingWa.id = 'floating-whatsapp-btn';
+        floatingWa.target = '_blank';
+        floatingWa.rel = 'noopener';
+        floatingWa.className = 'fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group';
+        floatingWa.setAttribute('title', 'Chat on WhatsApp');
+        floatingWa.innerHTML = `
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Chat with us</span>
+        `;
+        document.body.appendChild(floatingWa);
+      }
+      floatingWa.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about this product: ' + window.location.href)}`;
+    }
 
     // ─────────────────────────────────────────
     // Load Product & Config from admin-db.js
@@ -1691,15 +1776,17 @@
     // Direct WhatsApp Ordering
     // ─────────────────────────────────────────
     function orderViaWhatsApp() {
+      const brand = (typeof DB !== 'undefined' && DB.brand) ? DB.brand.get() : {};
       const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
-      let phone = settings.whatsappNumber || '8801700000000';
+      const brandName = brand.brandName || 'ZENVY';
+      let phone = brand.socialWhatsApp || settings.whatsappNumber || brand.phone || '8801700000000';
       phone = phone.replace(/[^0-9]/g, '');
       if (phone.startsWith('01')) {
         phone = '88' + phone;
       }
 
       const p = productState.product || {};
-      const title = (document.getElementById('pd-title')?.textContent || p.name || 'ZENVY Match Kit Jersey').trim();
+      const title = (document.getElementById('pd-title')?.textContent || p.name || `${brandName} Match Kit Jersey`).trim();
       const size = productState.selectedSize || 'M';
       const sleeve = productState.selectedSleeveName || (productState.selectedSleeve === 'long' ? 'Full Sleeve' : 'Half Sleeve');
       
@@ -1717,7 +1804,7 @@
       const productUrl = window.location.href;
 
       const message = 
-`Salam ZENVY, I would like to order:
+`Salam ${brandName}, I would like to order:
 📦 *Product:* ${title}
 📏 *Size:* ${size}
 👕 *Sleeve:* ${sleeve}

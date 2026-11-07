@@ -17,6 +17,7 @@ const PAGE_SIZE = 20;
 // Boot
 // ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  syncAdminBrandDisplay();
   // Step 1: Instant 0ms Local-First Paint (Eliminates white screen on reload)
   if (DB.auth.isLoggedIn()) {
     const user = DB.auth.getCurrentUser();
@@ -5322,18 +5323,37 @@ function renderActivity(container) {
 // ── Brand Settings ──
 function renderSettingsBrand(container) {
   const brand = DB.brand.get();
+  const storeCfg = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
+  let currentWhatsApp = brand.socialWhatsApp || storeCfg.whatsappNumber || brand.phone || '8801700000000';
   let logoUrl = brand.logoUrl || '';
   let faviconUrl = brand.faviconUrl || '';
+
   container.innerHTML = `
     <div class="page-title mb-4">Brand Settings</div>
+    
+    <!-- Brand Identity -->
     <div class="form-section">
-      <div class="form-section-header"><span class="material-symbols-outlined">branding_watermark</span><span class="form-section-title">Brand Identity</span></div>
+      <div class="form-section-header">
+        <span class="material-symbols-outlined">branding_watermark</span>
+        <span class="form-section-title">Brand Identity & Storefront Name</span>
+      </div>
       <div class="form-section-body">
-        <div class="form-row">
-          <div class="form-group"><label class="form-label">Brand Name<span class="req">*</span></label><input type="text" id="brand-name" class="form-input" value="${brand.brandName||'ZENVY'}"/></div>
-          <div class="form-group"><label class="form-label">Tagline</label><input type="text" id="brand-tagline" class="form-input" value="${brand.tagline||''}"/></div>
+        <div class="form-group" style="background:#F8FAFC;border:1.5px solid #E2E8F0;padding:14px;border-radius:12px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="form-label" style="margin:0;font-weight:800;font-size:13px;color:#0F172A;">Official Brand Name<span class="req">*</span></label>
+            <span style="font-size:10px;font-weight:700;background:#E2E8F0;color:#334155;padding:2px 8px;border-radius:99px;">SITE-WIDE NAME</span>
+          </div>
+          <input type="text" id="brand-name" class="form-input" value="${brand.brandName||'ZENVY'}" placeholder="e.g. ZENVY" style="font-size:16px;font-weight:800;letter-spacing:0.04em;background:white;"/>
+          <p style="font-size:11px;color:#64748B;margin-top:6px;line-height:1.4;">
+            Changing this name will update the brand name in real time across the website header, footer, product page, order confirmations, receipts, and invoices.
+          </p>
         </div>
-        <div class="form-group"><label class="form-label">Description</label><textarea id="brand-desc" class="form-textarea">${brand.description||''}</textarea></div>
+
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tagline / Motto</label><input type="text" id="brand-tagline" class="form-input" value="${brand.tagline||'The New Era of Performance'}"/></div>
+          <div class="form-group"><label class="form-label">Contact / Support Email</label><input type="email" id="brand-email" class="form-input" value="${brand.email||'support@zenvy.com'}"/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Description</label><textarea id="brand-desc" class="form-textarea" placeholder="Brand story and editorial note...">${brand.description||''}</textarea></div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Logo</label>
@@ -5349,22 +5369,40 @@ function renderSettingsBrand(container) {
       </div>
     </div>
 
+    <!-- Contact Info -->
     <div class="form-section">
-      <div class="form-section-header"><span class="material-symbols-outlined">contact_page</span><span class="form-section-title">Contact Info</span></div>
+      <div class="form-section-header"><span class="material-symbols-outlined">contact_page</span><span class="form-section-title">Contact Information</span></div>
       <div class="form-section-body">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Phone</label><input type="text" id="brand-phone" class="form-input" value="${brand.phone||''}"/></div>
-          <div class="form-group"><label class="form-label">Email</label><input type="email" id="brand-email" class="form-input" value="${brand.email||''}"/></div>
+          <div class="form-group"><label class="form-label">Phone Hotline</label><input type="text" id="brand-phone" class="form-input" value="${brand.phone||'+880 1700-000000'}"/></div>
+          <div class="form-group"><label class="form-label">Support Email</label><input type="email" id="brand-contact-email" class="form-input" value="${brand.email||'support@zenvy.com'}"/></div>
         </div>
-        <div class="form-group"><label class="form-label">Address</label><input type="text" id="brand-address" class="form-input" value="${brand.address||''}"/></div>
+        <div class="form-group"><label class="form-label">Office / Store Address</label><input type="text" id="brand-address" class="form-input" value="${brand.address||'Dhaka, Bangladesh'}"/></div>
         <button class="btn btn-primary btn-sm" onclick="saveBrandContact()">Save Contact</button>
       </div>
     </div>
 
+    <!-- Social Media Links & WhatsApp -->
     <div class="form-section">
-      <div class="form-section-header"><span class="material-symbols-outlined">share</span><span class="form-section-title">Social Media Links</span></div>
+      <div class="form-section-header"><span class="material-symbols-outlined">share</span><span class="form-section-title">Social Media Links & WhatsApp</span></div>
       <div class="form-section-body">
-        <p style="font-size:12px;color:#6B7280;margin-bottom:12px">These links will automatically update on the website and product page footers in real time.</p>
+        <p style="font-size:12px;color:#6B7280;margin-bottom:14px">These links and WhatsApp number will automatically update on the website and product page footers in real time.</p>
+        
+        <!-- WhatsApp Phone Sync Input -->
+        <div class="form-group" style="background:#F0FDF4;border:1.5px solid #BBF7D0;padding:14px;border-radius:14px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="form-label" style="margin:0;font-weight:800;color:#166534;display:flex;align-items:center;gap:6px;font-size:13px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#25D366;border-radius:50%;color:white;font-size:13px;">💬</span>
+              Official WhatsApp Phone Number
+            </label>
+            <span style="font-size:10px;font-weight:700;background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:99px;border:1px solid #86EFAC;">SITE-WIDE LIVE SYNC</span>
+          </div>
+          <input type="text" id="social-socialWhatsApp" class="form-input" value="${currentWhatsApp}" placeholder="017XXXXXXXX or 88017XXXXXXXX" style="background:white;font-weight:700;font-size:14px;font-family:monospace;letter-spacing:0.02em;"/>
+          <p style="font-size:11px;color:#15803D;margin-top:6px;line-height:1.4;">
+            Updating this number will instantly synchronize all WhatsApp buttons on the site: <b>Product Page "Order via WhatsApp" button</b>, <b>Floating WhatsApp widget</b>, <b>Order Confirmation support button</b>, and <b>Website footers</b>.
+          </p>
+        </div>
+
         ${[
           ['Facebook', 'facebook', 'socialFacebook', 'https://facebook.com/zenvy'],
           ['Instagram', 'instagram', 'socialInstagram', 'https://instagram.com/zenvy'],
@@ -5377,7 +5415,7 @@ function renderSettingsBrand(container) {
             <input type="url" id="social-${field}" class="form-input" value="${brand[field]||''}" placeholder="${placeholder}"/>
           </div>
         `).join('')}
-        <button class="btn btn-primary btn-sm" onclick="saveSocialSettings()">Save Social Links</button>
+        <button class="btn btn-primary" onclick="saveSocialSettings()">Save Social Links</button>
       </div>
     </div>
   `;
@@ -5392,25 +5430,68 @@ function renderSettingsBrand(container) {
   }, 100);
 }
 
+function syncAdminBrandDisplay() {
+  if (typeof DB === 'undefined' || !DB.brand) return;
+  const brand = DB.brand.get() || {};
+  const name = brand.brandName || 'ZENVY';
+  document.querySelectorAll('.sidebar-brand-name, .login-logo').forEach(el => {
+    el.textContent = name;
+  });
+}
+
 function saveBrandSettings() {
-  DB.brand.save({ brandName: document.getElementById('brand-name')?.value, tagline: document.getElementById('brand-tagline')?.value, description: document.getElementById('brand-desc')?.value, logoUrl: window._brandLogoUrl||DB.brand.get().logoUrl, faviconUrl: window._brandFaviconUrl||DB.brand.get().faviconUrl });
-  toast('Brand settings saved', 'success');
+  const brandName = document.getElementById('brand-name')?.value?.trim() || 'ZENVY';
+  const tagline = document.getElementById('brand-tagline')?.value?.trim() || '';
+  const description = document.getElementById('brand-desc')?.value?.trim() || '';
+  const email = document.getElementById('brand-email')?.value?.trim() || '';
+
+  DB.brand.save({ 
+    brandName, 
+    tagline, 
+    description, 
+    email,
+    logoUrl: window._brandLogoUrl || DB.brand.get().logoUrl, 
+    faviconUrl: window._brandFaviconUrl || DB.brand.get().faviconUrl 
+  });
+
+  syncAdminBrandDisplay();
+  toast(`Brand settings saved! Brand name set to "${brandName}".`, 'success');
 }
 
 function saveBrandContact() {
-  DB.brand.save({ phone: document.getElementById('brand-phone')?.value, email: document.getElementById('brand-email')?.value, address: document.getElementById('brand-address')?.value });
-  toast('Contact info saved', 'success');
+  DB.brand.save({ 
+    phone: document.getElementById('brand-phone')?.value?.trim(), 
+    email: document.getElementById('brand-contact-email')?.value?.trim(), 
+    address: document.getElementById('brand-address')?.value?.trim() 
+  });
+  toast('Contact info saved successfully!', 'success');
 }
 
 function saveSocialSettings() {
+  const rawWa = document.getElementById('social-socialWhatsApp')?.value?.trim() || '';
+  let cleanWa = rawWa.replace(/[^0-9]/g, '');
+  if (cleanWa.startsWith('01')) cleanWa = '88' + cleanWa;
+
   DB.brand.save({ 
-    socialFacebook: document.getElementById('social-socialFacebook')?.value, 
-    socialInstagram: document.getElementById('social-socialInstagram')?.value, 
-    socialTwitter: document.getElementById('social-socialTwitter')?.value, 
-    socialTikTok: document.getElementById('social-socialTikTok')?.value, 
-    socialYoutube: document.getElementById('social-socialYoutube')?.value 
+    socialWhatsApp: rawWa || cleanWa,
+    socialFacebook: document.getElementById('social-socialFacebook')?.value?.trim(), 
+    socialInstagram: document.getElementById('social-socialInstagram')?.value?.trim(), 
+    socialTwitter: document.getElementById('social-socialTwitter')?.value?.trim(), 
+    socialTikTok: document.getElementById('social-socialTikTok')?.value?.trim(), 
+    socialYoutube: document.getElementById('social-socialYoutube')?.value?.trim() 
   });
-  toast('Social links saved successfully! Website footer updated.', 'success');
+
+  // Synchronize with storeSettings policy and direct WhatsApp config
+  if (cleanWa) {
+    if (typeof DB !== 'undefined' && DB.storeSettings) {
+      DB.storeSettings.save({ whatsappNumber: cleanWa });
+    }
+    if (typeof DB !== 'undefined' && DB.whatsapp && DB.whatsapp.save) {
+      DB.whatsapp.save(cleanWa, true);
+    }
+  }
+
+  toast('Social links and WhatsApp number saved! Live synced everywhere on the website.', 'success');
 }
 
 // ── Store Settings ──

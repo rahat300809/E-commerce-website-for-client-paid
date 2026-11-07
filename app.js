@@ -1070,6 +1070,12 @@ function switchView(viewName, updateUrl = true) {
   } else if (normalized === 'home') {
     try { syncHomepageContent(); } catch(e){ console.error('syncHomepageContent:', e); }
   } else if (normalized === 'checkout') {
+    // If cart is empty, do NOT hold user on order page in a 0 item state — redirect to shopping page!
+    if (!appState.cart || appState.cart.length === 0) {
+      showToast('Your cart is empty. Explore our jerseys collection!');
+      switchView('shop');
+      return;
+    }
     try { toggleCartDrawer(false); } catch(e){}
     try { renderCart(); } catch(e){}
     try { renderCheckoutPaymentMethods(); } catch(e){}
@@ -2339,9 +2345,92 @@ function placeOrder() {
   saveCartState();
   renderCart();
 
-  renderOrderConfirmation(createdOrder);
-  switchView('order-confirmation');
+  // Redirect directly to shopping page
+  switchView('shop');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Show celebratory success popup
+  showOrderSuccessCelebration(createdOrder);
   showToast('🎉 Order placed successfully! Thank you for ordering with ZENVY.');
+}
+
+// ──────────────────────────────────────────────────────────────
+// Order Success Celebration Modal Popup
+// ──────────────────────────────────────────────────────────────
+function showOrderSuccessCelebration(order) {
+  if (!order) return;
+  const existing = document.getElementById('order-success-modal');
+  if (existing) existing.remove();
+
+  const brand = (typeof DB !== 'undefined' && DB.brand) ? DB.brand.get() : {};
+  const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
+  let phone = brand.socialWhatsApp || settings.whatsappNumber || brand.phone || '8801700000000';
+  phone = phone.replace(/[^0-9]/g, '');
+  if (phone.startsWith('01')) phone = '88' + phone;
+
+  const orderNum = order.orderNumber || order.id || 'ZNV-100001';
+  const total = order.totalAmount || order.total || 0;
+  const method = order.paymentMethod || 'Cash on Delivery';
+
+  const waMsg = encodeURIComponent(`Hi ZENVY, I have placed order #${orderNum} for ৳${total.toLocaleString()} via ${method}. Please confirm!`);
+  const waUrl = `https://wa.me/${phone}?text=${waMsg}`;
+
+  const modal = document.createElement('div');
+  modal.id = 'order-success-modal';
+  modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+  modal.innerHTML = `
+    <div class="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center border border-neutral-200 animate-slide-up">
+      <!-- Close Button -->
+      <button type="button" onclick="document.getElementById('order-success-modal').remove()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+
+      <!-- Animated Success Check -->
+      <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-emerald-50 border-4 border-emerald-200 flex items-center justify-center text-emerald-600 shadow-md">
+        <span class="material-symbols-outlined text-3xl sm:text-4xl font-black">check</span>
+      </div>
+
+      <span class="inline-block bg-emerald-100 text-emerald-900 text-[11px] font-mono-ui font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider mb-2">
+        Order Placed Successfully • অর্ডার গৃহীত হয়েছে
+      </span>
+
+      <h3 class="font-headline text-xl sm:text-2xl font-black text-neutral-900 mb-1">
+        Thank You for Your Order!
+      </h3>
+      <p class="font-body text-xs sm:text-sm text-neutral-600 leading-relaxed mb-4">
+        Your match kit order has been placed successfully. A delivery rider from Steadfast / Pathao will deliver your package.
+      </p>
+
+      <!-- Order ID and Total Card -->
+      <div class="p-4 bg-neutral-50 rounded-2xl border border-neutral-200 mb-5 text-left font-mono-ui text-xs space-y-1.5">
+        <div class="flex justify-between items-center">
+          <span class="text-neutral-500 uppercase font-bold text-[10px]">Order Number</span>
+          <span class="font-headline font-black text-sm text-neutral-900">#${orderNum}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-neutral-500 uppercase font-bold text-[10px]">Payment Method</span>
+          <span class="font-bold text-neutral-800">${method}</span>
+        </div>
+        <div class="flex justify-between items-center pt-1 border-t border-dashed border-neutral-200">
+          <span class="text-neutral-800 font-bold uppercase text-[10px]">Total Order Value</span>
+          <span class="font-black text-sm text-neutral-900">৳${total.toLocaleString()}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-2.5">
+        <button type="button" onclick="document.getElementById('order-success-modal').remove()" class="w-full py-3.5 px-5 bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-base">storefront</span>
+          <span>Continue Shopping</span>
+        </button>
+        <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-5 bg-[#25D366] hover:bg-[#20ba5a] text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          <span>Get Order Update on WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -2588,14 +2677,21 @@ function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode)
   saveCartState();
   renderCart();
 
-  showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
   const updatedOrder = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.byId(orderId) : null;
-  if (updatedOrder) {
-    renderOrderConfirmation(updatedOrder);
-    switchView('order-confirmation');
-  } else {
-    switchView('order-confirmation');
-  }
+  const finalOrder = updatedOrder || {
+    id: orderId,
+    orderNumber: orderId,
+    totalAmount: paidAmount + dueAmount,
+    paymentMethod: providerName
+  };
+
+  // Redirect directly to shopping page
+  switchView('shop');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Show celebratory success popup on shop
+  showOrderSuccessCelebration(finalOrder);
+  showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
 }
 
 // Admin Management Suite Logic

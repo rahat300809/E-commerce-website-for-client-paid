@@ -35,6 +35,12 @@
           }
           if (target === 'studio') target = 'customizer';
           if (target === 'preorder' || target === 'preorders') target = 'shop';
+          if (target === 'checkout') {
+            try {
+              var storedCart = JSON.parse(localStorage.getItem('zenvy_cart') || '[]');
+              if (!storedCart || storedCart.length === 0) target = 'shop';
+            } catch(e){}
+          }
           if (['shop', 'customizer', 'checkout', 'order-confirmation', 'home'].indexOf(target) !== -1) {
             document.documentElement.setAttribute('data-target-view', target);
           } else {

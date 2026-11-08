@@ -2235,3 +2235,9 @@ const DB = {
 
 // ── Init ──
 seedDefaultData();
+
+// Expose globally on window for all views, modals, and integrations
+if (typeof window !== 'undefined') {
+  window.DB = DB;
+  window.Store = Store;
+}

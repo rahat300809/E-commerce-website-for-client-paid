@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="firebase-sync.js"></script>
 <script src="admin-db.js"></script>
 <script id="tailwind-config">
@@ -41,6 +42,265 @@
   /* Skeleton */
   .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  /* Orbit Carousel Styles */
+  .dsh-root {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    background: radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);
+    color: #ffffff;
+    font-family: 'Montserrat', Inter, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dsh-canvas {
+    position: relative;
+    width: 100%;
+    max-width: 1060px;
+    height: 520px;
+    margin: 0 auto;
+  }
+  .dsh-arc {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .dsh-pager {
+    position: absolute;
+    left: 14px;
+    top: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 20;
+  }
+  .dsh-dot {
+    width: 16px;
+    height: 12px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .dsh-dot i {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 4px;
+    background: #ffffff;
+    opacity: 0.35;
+    transition: height 0.4s ease, opacity 0.3s;
+  }
+  .dsh-dot.active i {
+    height: 22px;
+    opacity: 1;
+    background: #ffffff;
+  }
+  .dsh-plates {
+    position: absolute;
+    left: 60px;
+    top: 70px;
+    width: 280px;
+    height: 280px;
+    z-index: 10;
+  }
+  .dsh-orbit {
+    position: absolute;
+    inset: 0;
+    transform-origin: 69% -217%;
+    visibility: hidden;
+    will-change: transform;
+    cursor: pointer;
+  }
+  .dsh-orbit > img {
+    display: block;
+    width: 280px;
+    height: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.65)) drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
+  }
+  .dsh-orbit:hover > img {
+    transform: scale(1.04);
+  }
+  .dsh-head {
+    position: absolute;
+    left: 370px;
+    top: 80px;
+    width: 380px;
+    height: 150px;
+    z-index: 10;
+  }
+  .dsh-hd {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+  }
+  .dsh-eye {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #a1a1aa;
+    margin-bottom: 6px;
+  }
+  .dsh-t1, .dsh-t2 {
+    display: block;
+    white-space: nowrap;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .dsh-t1 {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: -0.015em;
+    margin-top: 4px;
+    color: #ffffff;
+  }
+  .dsh-t2 {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+  .dsh-acts {
+    position: absolute;
+    left: 370px;
+    top: 265px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 15;
+  }
+  .dsh-card {
+    position: absolute;
+    right: 20px;
+    top: 70px;
+    width: 275px;
+    padding: 22px 20px;
+    border-radius: 22px;
+    background: rgba(24, 24, 27, 0.78);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+    z-index: 10;
+  }
+  .dsh-card-body {
+    display: none;
+  }
+  .dsh-card-body.active {
+    display: block;
+  }
+  .dsh-strip {
+    position: absolute;
+    left: 60px;
+    bottom: 20px;
+    width: 580px;
+    height: 115px;
+    display: flex;
+    align-items: center;
+    z-index: 20;
+  }
+  .dsh-th-btn {
+    width: 84px;
+    height: 108px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .dsh-th-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .dsh-th-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+    box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
+  }
+  .dsh-th-btn img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+  .dsh-th-btn.active img {
+    transform: scale(1.12);
+  }
+
+  /* Responsive Mobile Layout */
+  @media (max-width: 820px) {
+    .dsh-canvas {
+      height: auto;
+      padding: 30px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dsh-arc { display: none; }
+    .dsh-pager { display: none; }
+    .dsh-plates {
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 240px;
+      height: 240px;
+      margin: 0 auto;
+    }
+    .dsh-orbit > img {
+      width: 240px;
+      height: 240px;
+    }
+    .dsh-head {
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 100%;
+      height: auto;
+      text-align: center;
+      margin-top: 14px;
+    }
+    .dsh-t1 { font-size: 18px; }
+    .dsh-t2 { font-size: 24px; }
+    .dsh-acts {
+      position: relative;
+      left: auto;
+      top: auto;
+      margin-top: 16px;
+      justify-content: center;
+      width: 100%;
+    }
+    .dsh-card {
+      position: relative;
+      right: auto;
+      top: auto;
+      width: 100%;
+      max-width: 420px;
+      margin-top: 24px;
+    }
+    .dsh-strip {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: 100%;
+      margin-top: 24px;
+      justify-content: center;
+    }
+  }
 </style>
 </head>
 <body class="bg-background text-on-background antialiased min-h-screen font-body-md overflow-x-hidden">
@@ -95,35 +355,69 @@
 
 <main class="pt-20">
 
-  <!-- ===== HERO BANNER ===== -->
-  <section class="relative py-20 md:py-28 px-margin-mobile md:px-margin-desktop bg-primary text-on-primary overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-      <div class="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary-container rounded-full blur-2xl transform -translate-x-1/3 translate-y-1/3"></div>
-    </div>
-    <div class="max-w-container-max mx-auto relative z-10">
-      <div class="max-w-2xl">
-        <div class="inline-flex items-center gap-2 bg-secondary/20 border border-secondary/30 text-secondary-container px-4 py-2 rounded-full mb-6">
-          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">schedule</span>
-          <span class="font-label-md text-label-md uppercase tracking-widest">Reserve Now</span>
+  <!-- ===== HERO ORBIT CAROUSEL (DISH/JERSEY ORBIT PREORDER SHOWCASE) ===== -->
+  <section class="dsh-root border-b border-neutral-800">
+    <div class="dsh-canvas" id="dsh-container">
+      
+      <!-- SVG Curved Arc Morph Path -->
+      <svg class="dsh-arc" viewBox="0 0 960 520" preserveAspectRatio="none">
+        <path id="dsh-arc-path" fill="#0f172a" opacity="0.4" d=""></path>
+      </svg>
+
+      <!-- Side Dot Pager -->
+      <div class="dsh-pager" id="dsh-pager-dots"></div>
+
+      <!-- Plates / Jerseys Swing Area -->
+      <div class="dsh-plates" id="dsh-plates-wrap"></div>
+
+      <!-- Headings (Two-weight Wipe Transition) -->
+      <div class="dsh-head" id="dsh-head-wrap"></div>
+
+      <!-- Actions -->
+      <div class="dsh-acts">
+        <button type="button" id="dsh-preorder-cta" onclick="triggerActivePreorder()" class="px-6 py-3.5 bg-white hover:bg-neutral-200 text-black font-headline font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-base">bolt</span>
+          <span>PREORDER NOW</span>
+        </button>
+        <button type="button" onclick="stepOrbit(-1)" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95" title="Previous Jersey">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button type="button" onclick="stepOrbit(1)" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95" title="Next Jersey">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Right Card: Rating, Edition, Details & Specs -->
+      <div class="dsh-card">
+        <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
+          <span class="text-[10px] font-mono-ui font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>RESERVE SLOT OPEN</span>
+          </span>
+          <div class="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md font-mono-ui text-xs font-bold text-amber-400">
+            <span class="material-symbols-outlined text-[13px] fill-1">star</span>
+            <span id="dsh-card-rating">4.9</span>
+          </div>
         </div>
-        <h1 class="font-headline-lg text-headline-lg md:text-[48px] md:leading-[56px] mb-4">UPCOMING DROPS<br/><span class="text-secondary-container">& PREORDERS</span></h1>
-        <p class="font-body-lg text-body-lg text-inverse-on-surface/80 max-w-lg mb-8">Secure your favourite jersey before it drops. Limited slots — once they're gone, they're gone. Free delivery on all preorders over ৳ 3,000.</p>
-        <div class="flex flex-wrap gap-6">
-          <div class="flex items-center gap-2 text-inverse-on-surface/70">
-            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">lock</span>
-            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Secure Payment</span>
+
+        <div id="dsh-card-bodies"></div>
+
+        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono-ui">
+          <div>
+            <div class="text-[9px] uppercase tracking-wider text-neutral-400 font-bold">Preorder Price</div>
+            <div id="dsh-card-price" class="text-base font-black text-white">৳8,500</div>
           </div>
-          <div class="flex items-center gap-2 text-inverse-on-surface/70">
-            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">local_shipping</span>
-            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Guaranteed Delivery</span>
-          </div>
-          <div class="flex items-center gap-2 text-inverse-on-surface/70">
-            <span class="material-symbols-outlined text-secondary-container text-xl" style="font-variation-settings:'FILL' 1">refresh</span>
-            <span class="font-label-md text-label-md text-sm uppercase tracking-wider">Full Refund if Cancelled</span>
-          </div>
+          <button type="button" onclick="triggerActivePreorder()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-headline font-black text-[11px] uppercase tracking-wider rounded-lg transition-all shadow-md active:scale-95 cursor-pointer">
+            Reserve Slot
+          </button>
         </div>
       </div>
+
+      <!-- Bottom Thumbnail Carousel Strip -->
+      <div class="dsh-strip">
+        <div class="flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar" id="dsh-thumb-strip"></div>
+      </div>
+
     </div>
   </section>
 
@@ -1013,7 +1307,366 @@ window.submitPreorder = async function() {
   }
 };
 
+// ==========================================
+// 3D ORBIT CAROUSEL (GSAP Physics Showcase)
+// ==========================================
+const ORBIT_JERSEYS = [
+  {
+    id: 'demo-1',
+    title: 'World Cup 2026',
+    subtitle: 'Argentina Gold Edition',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H',
+    eyebrow: '#1 Most Reserved Preorder',
+    rating: 4.98,
+    chef: 'AFA Authentic Kit',
+    kitchen: 'Limited 150 Batches',
+    description: 'Exclusive 2026 World Cup special edition. Light blue & white stripes with golden champion badge and diamond-mesh ventilation.',
+    likes: 482,
+    price: 8500,
+    accent: '#38bdf8',
+    expectedDeliveryDate: '15 November 2026',
+    sizes: ['S','M','L','XL','XXL']
+  },
+  {
+    id: 'demo-2',
+    title: 'Next Gen Match',
+    subtitle: 'Barça Blaugrana 26/27',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P',
+    eyebrow: '#2 High-Demand Drop',
+    rating: 4.94,
+    chef: 'FC Barcelona Pro',
+    kitchen: 'DryTech Pro Fabric',
+    description: 'Next-generation Barcelona match kit. Engineered micro-mesh weave with aerodynamic contoured flat-lock seams.',
+    likes: 389,
+    price: 7200,
+    accent: '#f43f5e',
+    expectedDeliveryDate: '20 September 2026',
+    sizes: ['S','M','L','XL','XXL']
+  },
+  {
+    id: 'demo-3',
+    title: 'National Pride',
+    subtitle: 'Bangladesh Tigers ODI 26',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X',
+    eyebrow: '#3 Limited Edition Batch',
+    rating: 4.97,
+    chef: 'BCB Official Edition',
+    kitchen: 'Tiger Jacquard Weave',
+    description: 'Official Bangladesh Cricket ODI jersey for 2026. Deep emerald green & ruby accents with woven Royal Bengal tiger crest.',
+    likes: 615,
+    price: 3800,
+    accent: '#10b981',
+    expectedDeliveryDate: '5 October 2026',
+    sizes: ['S','M','L','XL','XXL','XXXL']
+  },
+  {
+    id: 'demo-4',
+    title: 'Elite Edition',
+    subtitle: 'AeroKnit Supreme Pro',
+    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80',
+    eyebrow: "#4 Collector's Preorder",
+    rating: 4.90,
+    chef: 'Zenvy Lab Performance',
+    kitchen: 'Titanium Aeroknit',
+    description: 'Engineered ultra-lightweight performance match kit with thermal-regulated active vents and iridescent reflective logos.',
+    likes: 294,
+    price: 4200,
+    accent: '#a855f7',
+    expectedDeliveryDate: '10 November 2026',
+    sizes: ['S','M','L','XL','XXL']
+  }
+];
+
+const ORBIT_X = 299;
+const ORBIT_Y = -450;
+const ORBIT_R = 650;
+const SWING = 48;
+const ARC_REST = [[50, 98], [46, 124], [60, 126], [40, 100]];
+const ARC_SWEEP = [38, 146];
+const HIDE_1 = "inset(0% 0% 0% 100%)";
+const HIDE_2 = "inset(0% 100% 0% 0%)";
+const SHOW = "inset(0% 0% 0% 0%)";
+
+let currentOrbitIndex = 0;
+let orbitTimeline = null;
+let currentArc = { a0: 50, a1: 98 };
+let orbitAutoTimer = null;
+
+function arcPath(a0, a1, cx, cy, r, w, steps = 48) {
+  const outer = [];
+  const inner = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const a = ((a0 + (a1 - a0) * t) * Math.PI) / 180;
+    const h = (w / 2) * Math.pow(Math.sin(Math.PI * t), 0.45);
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    outer.push((cx + c * (r + h)).toFixed(1) + " " + (cy + s * (r + h)).toFixed(1));
+    inner.push((cx + c * (r - h)).toFixed(1) + " " + (cy + s * (r - h)).toFixed(1));
+  }
+  return "M" + outer.join("L") + "L" + inner.reverse().join("L") + "Z";
+}
+
+function drawArc() {
+  const pathEl = document.getElementById('dsh-arc-path');
+  if (pathEl) {
+    pathEl.setAttribute('d', arcPath(currentArc.a0, currentArc.a1, ORBIT_X, ORBIT_Y, ORBIT_R, 110));
+  }
+}
+
+function initOrbitCarousel() {
+  const platesWrap = document.getElementById('dsh-plates-wrap');
+  const headWrap = document.getElementById('dsh-head-wrap');
+  const cardBodies = document.getElementById('dsh-card-bodies');
+  const pagerDots = document.getElementById('dsh-pager-dots');
+  const thumbStrip = document.getElementById('dsh-thumb-strip');
+
+  if (!platesWrap || !headWrap || !cardBodies || !pagerDots || !thumbStrip) return;
+
+  // Ensure items are mapped into _preorderProductsMap
+  ORBIT_JERSEYS.forEach((dish) => {
+    window._preorderProductsMap[dish.id] = {
+      id: dish.id,
+      name: dish.title + ' • ' + dish.subtitle,
+      description: dish.description,
+      basePrice: dish.price,
+      preorderPrice: dish.price,
+      compareAtPrice: Math.round(dish.price * 1.25),
+      images: [dish.image],
+      preorderMaxQty: 150,
+      preorderSold: 45,
+      expectedDeliveryDate: dish.expectedDeliveryDate,
+      sizes: dish.sizes
+    };
+  });
+
+  // Render HTML nodes for each jersey
+  platesWrap.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
+    <div class="dsh-orbit" id="dsh-orbit-${i}" onclick="gotoOrbit(${i})">
+      <img src="${dish.image}" alt="${dish.subtitle}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80'"/>
+    </div>
+  `).join('');
+
+  headWrap.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
+    <div class="dsh-hd" id="dsh-head-${i}">
+      <div class="dsh-eye">${dish.eyebrow}</div>
+      <div class="dsh-t1">${dish.title}</div>
+      <div class="dsh-t2">${dish.subtitle}</div>
+    </div>
+  `).join('');
+
+  cardBodies.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
+    <div class="dsh-card-body" id="dsh-card-body-${i}">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-0.5">${dish.kitchen}</div>
+      <div class="text-sm font-black text-white mb-2">${dish.chef}</div>
+      <p class="text-xs text-neutral-300 leading-relaxed min-h-[44px]">${dish.description}</p>
+      <div class="flex items-center gap-3 mt-3 pt-2.5 border-t border-white/10">
+        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-neutral-400">
+          <span class="material-symbols-outlined text-xs text-rose-500 fill-1">favorite</span>
+          <span>${dish.likes} preorders</span>
+        </span>
+        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-emerald-400">
+          <span class="material-symbols-outlined text-xs">verified</span>
+          <span>Official Drop</span>
+        </span>
+      </div>
+    </div>
+  `).join('');
+
+  pagerDots.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
+    <div class="dsh-dot" id="dsh-dot-${i}" onclick="gotoOrbit(${i})" title="${dish.subtitle}">
+      <i></i>
+    </div>
+  `).join('');
+
+  thumbStrip.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
+    <button type="button" class="dsh-th-btn" id="dsh-th-${i}" onclick="gotoOrbit(${i})">
+      <img src="${dish.image}" alt="${dish.subtitle}" class="w-10 h-10 object-contain drop-shadow" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
+      <div class="text-[9px] font-bold text-neutral-300 line-clamp-1 leading-tight text-center">${dish.subtitle}</div>
+      <div class="text-[8px] font-mono-ui font-black text-emerald-400">৳${dish.price.toLocaleString()}</div>
+    </button>
+  `).join('');
+
+  // Initial display
+  switchOrbitSlide(0, 1, true);
+
+  // Auto slide timer
+  resetOrbitTimer();
+
+  // Pointer swipe support
+  const container = document.getElementById('dsh-container');
+  if (container) {
+    let startX = 0;
+    let startY = 0;
+    container.addEventListener('pointerdown', (e) => {
+      startX = e.clientX;
+      startY = e.clientY;
+    });
+    container.addEventListener('pointerup', (e) => {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        stepOrbit(dx < 0 ? 1 : -1);
+      }
+    });
+    container.addEventListener('mouseenter', () => clearInterval(orbitAutoTimer));
+    container.addEventListener('mouseleave', () => resetOrbitTimer());
+  }
+}
+
+function resetOrbitTimer() {
+  clearInterval(orbitAutoTimer);
+  orbitAutoTimer = setInterval(() => {
+    stepOrbit(1);
+  }, 6500);
+}
+
+function switchOrbitSlide(to, dir = 1, isInitial = false) {
+  const n = ORBIT_JERSEYS.length;
+  to = ((to % n) + n) % n;
+  const from = currentOrbitIndex;
+  currentOrbitIndex = to;
+
+  // Indicators
+  for (let i = 0; i < n; i++) {
+    const dot = document.getElementById(`dsh-dot-${i}`);
+    const th = document.getElementById(`dsh-th-${i}`);
+    if (dot) dot.classList.toggle('active', i === to);
+    if (th) th.classList.toggle('active', i === to);
+  }
+
+  // Right card info
+  const cur = ORBIT_JERSEYS[to];
+  const ratingEl = document.getElementById('dsh-card-rating');
+  const priceEl = document.getElementById('dsh-card-price');
+  if (ratingEl) ratingEl.textContent = cur.rating.toFixed(2);
+  if (priceEl) priceEl.textContent = '৳' + cur.price.toLocaleString();
+
+  const rest = ARC_REST[to % ARC_REST.length];
+  const pathEl = document.getElementById('dsh-arc-path');
+
+  if (isInitial || typeof gsap === 'undefined') {
+    for (let i = 0; i < n; i++) {
+      const orb = document.getElementById(`dsh-orbit-${i}`);
+      const hd = document.getElementById(`dsh-head-${i}`);
+      const bd = document.getElementById(`dsh-card-body-${i}`);
+      if (orb) {
+        orb.style.visibility = i === to ? 'visible' : 'hidden';
+        orb.style.opacity = i === to ? '1' : '0';
+        orb.style.transform = 'none';
+      }
+      if (hd) {
+        hd.style.visibility = i === to ? 'visible' : 'hidden';
+        hd.style.opacity = i === to ? '1' : '0';
+        const t1 = hd.querySelector('.dsh-t1');
+        const t2 = hd.querySelector('.dsh-t2');
+        if (t1) t1.style.clipPath = SHOW;
+        if (t2) t2.style.clipPath = SHOW;
+      }
+      if (bd) {
+        bd.classList.toggle('active', i === to);
+      }
+    }
+    currentArc.a0 = rest[0];
+    currentArc.a1 = rest[1];
+    drawArc();
+    if (pathEl) pathEl.setAttribute('fill', cur.accent);
+    return;
+  }
+
+  if (orbitTimeline) {
+    orbitTimeline.kill();
+  }
+
+  const orbA = document.getElementById(`dsh-orbit-${from}`);
+  const hdA = document.getElementById(`dsh-head-${from}`);
+  const bdA = document.getElementById(`dsh-card-body-${from}`);
+
+  const orbB = document.getElementById(`dsh-orbit-${to}`);
+  const hdB = document.getElementById(`dsh-head-${to}`);
+  const bdB = document.getElementById(`dsh-card-body-${to}`);
+
+  const t1A = hdA?.querySelector('.dsh-t1');
+  const t2A = hdA?.querySelector('.dsh-t2');
+  const eyeA = hdA?.querySelector('.dsh-eye');
+
+  const t1B = hdB?.querySelector('.dsh-t1');
+  const t2B = hdB?.querySelector('.dsh-t2');
+  const eyeB = hdB?.querySelector('.dsh-eye');
+
+  const tl = gsap.timeline({
+    onComplete: () => {
+      orbitTimeline = null;
+    }
+  });
+  orbitTimeline = tl;
+
+  // 1. Jersey Plate orbital swing
+  if (orbA) {
+    tl.to(orbA, { rotation: SWING * dir, duration: 0.6, ease: "power2.in" }, 0)
+      .set(orbA, { autoAlpha: 0, rotation: 0 }, 0.6);
+  }
+  if (orbB) {
+    tl.fromTo(orbB, { autoAlpha: 1, rotation: -SWING * dir }, { rotation: 0, duration: 0.85, ease: "power3.out" }, 0.25);
+  }
+
+  // 2. Titles clip wipe
+  if (t1A) tl.to(t1A, { clipPath: HIDE_1, duration: 0.38, ease: "power2.in" }, 0);
+  if (t2A) tl.to(t2A, { clipPath: HIDE_2, duration: 0.38, ease: "power2.in" }, 0.05);
+  if (eyeA) tl.to(eyeA, { autoAlpha: 0, duration: 0.25 }, 0);
+  if (hdA) tl.set(hdA, { autoAlpha: 0 }, 0.45);
+
+  if (hdB) tl.set(hdB, { autoAlpha: 1 }, 0.45);
+  if (eyeB) tl.fromTo(eyeB, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.5);
+  if (t1B) tl.fromTo(t1B, { clipPath: HIDE_1 }, { clipPath: SHOW, duration: 0.6, ease: "power3.out" }, 0.5);
+  if (t2B) tl.fromTo(t2B, { clipPath: HIDE_2 }, { clipPath: SHOW, duration: 0.6, ease: "power3.out" }, 0.55);
+
+  // 3. Card body crossfade
+  if (bdA) {
+    tl.to(bdA, { autoAlpha: 0, y: -6, duration: 0.28, ease: "power1.in" }, 0.05)
+      .set(bdA, { display: 'none' }, 0.35);
+  }
+  if (bdB) {
+    tl.set(bdB, { display: 'block', autoAlpha: 0, y: 8 }, 0.35)
+      .to(bdB, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.38);
+    if (bdB.children.length > 0) {
+      tl.fromTo(bdB.children, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }, 0.38);
+    }
+  }
+
+  // 4. Arc morph & tint
+  tl.to(currentArc, { a0: ARC_SWEEP[0], a1: ARC_SWEEP[1], duration: 0.55, ease: "power2.inOut", onUpdate: drawArc }, 0)
+    .to(currentArc, { a0: rest[0], a1: rest[1], duration: 0.75, ease: "power3.out", onUpdate: drawArc }, 0.55);
+
+  if (pathEl) {
+    tl.to(pathEl, { fill: cur.accent, duration: 0.9, ease: "power1.inOut" }, 0.1);
+  }
+}
+
+window.gotoOrbit = function(idx) {
+  if (idx === currentOrbitIndex) return;
+  const dir = idx > currentOrbitIndex ? 1 : -1;
+  resetOrbitTimer();
+  switchOrbitSlide(idx, dir);
+};
+
+window.stepOrbit = function(delta) {
+  const n = ORBIT_JERSEYS.length;
+  const next = (currentOrbitIndex + delta + n) % n;
+  resetOrbitTimer();
+  switchOrbitSlide(next, delta >= 0 ? 1 : -1);
+};
+
+window.triggerActivePreorder = function() {
+  const cur = ORBIT_JERSEYS[currentOrbitIndex];
+  const prod = window._preorderProductsMap ? window._preorderProductsMap[cur.id] : null;
+  if (prod) {
+    window.openPreorderModal(prod);
+  }
+};
+
 // Init
+initOrbitCarousel();
 loadPreorders();
 </script>
 </body>

@@ -43,16 +43,17 @@
   .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
-  /* Orbit Carousel Styles */
+  /* Orbit Carousel Styles - Blended Off-White Theme */
   .dsh-root {
     position: relative;
     overflow: hidden;
     width: 100%;
-    background: radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);
-    color: #ffffff;
-    font-family: 'Montserrat', Inter, sans-serif;
+    background-color: #fbf9f8;
+    color: #1a1c1c;
+    font-family: 'DM Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
   .dsh-canvas {
     position: relative;
@@ -91,21 +92,21 @@
     width: 4px;
     height: 4px;
     border-radius: 4px;
-    background: #ffffff;
-    opacity: 0.35;
+    background: #000000;
+    opacity: 0.18;
     transition: height 0.4s ease, opacity 0.3s;
   }
   .dsh-dot.active i {
     height: 22px;
-    opacity: 1;
-    background: #ffffff;
+    opacity: 0.85;
+    background: #000000;
   }
   .dsh-plates {
     position: absolute;
-    left: 60px;
-    top: 70px;
-    width: 280px;
-    height: 280px;
+    left: 55px;
+    top: 60px;
+    width: 290px;
+    height: 290px;
     z-index: 10;
   }
   .dsh-orbit {
@@ -118,61 +119,75 @@
   }
   .dsh-orbit > img {
     display: block;
-    width: 280px;
-    height: 280px;
+    width: 290px;
+    height: 290px;
     object-fit: contain;
-    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.65)) drop-shadow(0 4px 10px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.12));
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .dsh-orbit:hover > img {
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
   .dsh-head {
     position: absolute;
-    left: 370px;
-    top: 80px;
-    width: 380px;
-    height: 150px;
+    left: 360px;
+    top: 60px;
+    width: 320px;
+    height: 165px;
     z-index: 10;
   }
   .dsh-hd {
     position: absolute;
-    inset: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
     visibility: hidden;
   }
   .dsh-eye {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #a1a1aa;
-    margin-bottom: 6px;
-  }
-  .dsh-t1, .dsh-t2 {
-    display: block;
+    color: #047857;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    padding: 3px 12px;
+    border-radius: 9999px;
+    margin-bottom: 10px;
     white-space: nowrap;
-    line-height: 1.05;
-    text-transform: uppercase;
+    width: fit-content;
   }
   .dsh-t1 {
-    font-size: 24px;
-    font-weight: 300;
-    letter-spacing: -0.015em;
-    margin-top: 4px;
-    color: #ffffff;
+    display: block;
+    font-family: 'DM Sans', Inter, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    line-height: 1.2;
   }
   .dsh-t2 {
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    margin-top: 6px;
-    color: #ffffff;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    display: block;
+    font-family: 'Hanken Grotesk', 'Montserrat', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: #09090b;
+    line-height: 1.15;
+    text-shadow: none;
+    max-width: 320px;
   }
   .dsh-acts {
     position: absolute;
-    left: 370px;
-    top: 265px;
+    left: 360px;
+    top: 250px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -181,14 +196,15 @@
   .dsh-card {
     position: absolute;
     right: 20px;
-    top: 70px;
-    width: 275px;
+    top: 60px;
+    width: 285px;
     padding: 22px 20px;
-    border-radius: 22px;
-    background: rgba(24, 24, 27, 0.78);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
     z-index: 10;
   }
   .dsh-card-body {
@@ -199,7 +215,7 @@
   }
   .dsh-strip {
     position: absolute;
-    left: 60px;
+    left: 55px;
     bottom: 20px;
     width: 580px;
     height: 115px;
@@ -208,8 +224,8 @@
     z-index: 20;
   }
   .dsh-th-btn {
-    width: 84px;
-    height: 108px;
+    width: 86px;
+    height: 110px;
     border-radius: 14px;
     display: flex;
     flex-direction: column;
@@ -218,35 +234,39 @@
     gap: 5px;
     padding: 8px 6px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
     transition: all 0.3s ease;
     flex-shrink: 0;
   }
   .dsh-th-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.22);
+    transform: translateY(-2px);
   }
   .dsh-th-btn.active {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: #ffffff;
-    box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
+    background: #ffffff;
+    border-color: #000000;
+    box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.16);
+    transform: translateY(-2px);
   }
   .dsh-th-btn img {
     width: 48px;
     height: 48px;
     object-fit: contain;
+    mix-blend-mode: multiply;
     transition: transform 0.3s ease;
   }
   .dsh-th-btn.active img {
-    transform: scale(1.12);
+    transform: scale(1.1);
   }
 
   /* Responsive Mobile Layout */
   @media (max-width: 820px) {
     .dsh-canvas {
       height: auto;
-      padding: 30px 16px 40px;
+      padding: 24px 16px 36px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -257,13 +277,13 @@
       position: relative;
       left: auto;
       top: auto;
-      width: 240px;
-      height: 240px;
+      width: 220px;
+      height: 220px;
       margin: 0 auto;
     }
     .dsh-orbit > img {
-      width: 240px;
-      height: 240px;
+      width: 220px;
+      height: 220px;
     }
     .dsh-head {
       position: relative;
@@ -272,9 +292,9 @@
       width: 100%;
       height: auto;
       text-align: center;
-      margin-top: 14px;
+      margin-top: 12px;
     }
-    .dsh-t1 { font-size: 18px; }
+    .dsh-t1 { font-size: 13px; }
     .dsh-t2 { font-size: 24px; }
     .dsh-acts {
       position: relative;
@@ -289,15 +309,15 @@
       right: auto;
       top: auto;
       width: 100%;
-      max-width: 420px;
-      margin-top: 24px;
+      max-width: 400px;
+      margin-top: 20px;
     }
     .dsh-strip {
       position: relative;
       left: auto;
       bottom: auto;
       width: 100%;
-      margin-top: 24px;
+      margin-top: 20px;
       justify-content: center;
     }
   }
@@ -356,12 +376,12 @@
 <main class="pt-20">
 
   <!-- ===== HERO ORBIT CAROUSEL (DISH/JERSEY ORBIT PREORDER SHOWCASE) ===== -->
-  <section class="dsh-root border-b border-neutral-800">
+  <section class="dsh-root border-b border-black/[0.05]">
     <div class="dsh-canvas" id="dsh-container">
       
       <!-- SVG Curved Arc Morph Path -->
       <svg class="dsh-arc" viewBox="0 0 960 520" preserveAspectRatio="none">
-        <path id="dsh-arc-path" fill="#0f172a" opacity="0.4" d=""></path>
+        <path id="dsh-arc-path" fill="#bae6fd" opacity="0.65" d=""></path>
       </svg>
 
       <!-- Side Dot Pager -->
@@ -375,39 +395,39 @@
 
       <!-- Actions -->
       <div class="dsh-acts">
-        <button type="button" id="dsh-preorder-cta" onclick="triggerActivePreorder()" class="px-6 py-3.5 bg-white hover:bg-neutral-200 text-black font-headline font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+        <button type="button" id="dsh-preorder-cta" onclick="triggerActivePreorder()" class="px-7 py-3.5 bg-black hover:bg-neutral-800 text-white font-headline font-bold text-xs uppercase tracking-wider rounded-full transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
           <span class="material-symbols-outlined text-base">bolt</span>
           <span>PREORDER NOW</span>
         </button>
-        <button type="button" onclick="stepOrbit(-1)" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95" title="Previous Jersey">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <button type="button" onclick="stepOrbit(-1)" class="w-11 h-11 rounded-full bg-white hover:bg-neutral-50 text-neutral-900 flex items-center justify-center border border-neutral-200/90 shadow-sm transition-all cursor-pointer active:scale-95" title="Previous Jersey">
+          <svg class="w-5 h-5 text-neutral-900" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <button type="button" onclick="stepOrbit(1)" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95" title="Next Jersey">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        <button type="button" onclick="stepOrbit(1)" class="w-11 h-11 rounded-full bg-white hover:bg-neutral-50 text-neutral-900 flex items-center justify-center border border-neutral-200/90 shadow-sm transition-all cursor-pointer active:scale-95" title="Next Jersey">
+          <svg class="w-5 h-5 text-neutral-900" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </button>
       </div>
 
       <!-- Right Card: Rating, Edition, Details & Specs -->
       <div class="dsh-card">
-        <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
-          <span class="text-[10px] font-mono-ui font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="flex items-center justify-between mb-3 border-b border-black/[0.06] pb-2.5">
+          <span class="text-[10px] font-mono-ui font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>RESERVE SLOT OPEN</span>
           </span>
-          <div class="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md font-mono-ui text-xs font-bold text-amber-400">
-            <span class="material-symbols-outlined text-[13px] fill-1">star</span>
+          <div class="flex items-center gap-1 bg-amber-50 border border-amber-200/70 px-2 py-0.5 rounded-md font-mono-ui text-xs font-bold text-amber-800">
+            <span class="material-symbols-outlined text-[13px] fill-1 text-amber-500">star</span>
             <span id="dsh-card-rating">4.9</span>
           </div>
         </div>
 
         <div id="dsh-card-bodies"></div>
 
-        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono-ui">
+        <div class="mt-4 pt-3 border-t border-black/[0.06] flex items-center justify-between text-xs font-mono-ui">
           <div>
-            <div class="text-[9px] uppercase tracking-wider text-neutral-400 font-bold">Preorder Price</div>
-            <div id="dsh-card-price" class="text-base font-black text-white">৳8,500</div>
+            <div class="text-[9px] uppercase tracking-wider text-neutral-500 font-bold">Preorder Price</div>
+            <div id="dsh-card-price" class="text-base font-black text-neutral-900">৳8,500</div>
           </div>
-          <button type="button" onclick="triggerActivePreorder()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-headline font-black text-[11px] uppercase tracking-wider rounded-lg transition-all shadow-md active:scale-95 cursor-pointer">
+          <button type="button" onclick="triggerActivePreorder()" class="px-4 py-2 bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded-lg transition-all shadow-md active:scale-95 cursor-pointer">
             Reserve Slot
           </button>
         </div>
@@ -962,7 +982,7 @@ function getDemoCards() {
       name: 'Argentina 2026 World Cup Special Edition',
       description: 'Exclusive 2026 FIFA World Cup special edition jersey. Light blue and white stripes with golden champion badge.',
       basePrice: 9500, preorderPrice: 8500, compareAtPrice: 11000,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H'],
+      images: ['img/preorders/argentina.png'],
       preorderMaxQty: 150, preorderSold: 38,
       expectedDeliveryDate: '15 November 2026',
       sizes: ['S','M','L','XL','XXL']
@@ -972,7 +992,7 @@ function getDemoCards() {
       name: 'Barcelona x Zenvy Home 2026/27',
       description: "Next-season Barcelona home jersey with innovative DryTech Pro fabric.",
       basePrice: 8200, preorderPrice: 7200, compareAtPrice: 9500,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P'],
+      images: ['img/preorders/barca.png'],
       preorderMaxQty: 100, preorderSold: 61,
       expectedDeliveryDate: '20 September 2026',
       sizes: ['S','M','L','XL','XXL']
@@ -982,7 +1002,11 @@ function getDemoCards() {
       name: 'Bangladesh Cricket ODI Jersey 2026',
       description: 'Official Bangladesh cricket ODI jersey for 2026. Green and red with tiger embroidery.',
       basePrice: 4500, preorderPrice: 3800, compareAtPrice: 5500,
-      images: ['https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X'],
+      images: ['img/preorders/bangladesh.png'],
+      preorderMaxQty: 200, preorderSold: 45,
+      expectedDeliveryDate: '5 October 2026',
+      sizes: ['S','M','L','XL','XXL','XXXL']
+    }
       preorderMaxQty: 200, preorderSold: 45,
       expectedDeliveryDate: '5 October 2026',
       sizes: ['S','M','L','XL','XXL','XXXL']
@@ -1313,65 +1337,65 @@ window.submitPreorder = async function() {
 const ORBIT_JERSEYS = [
   {
     id: 'demo-1',
-    title: 'World Cup 2026',
-    subtitle: 'Argentina Gold Edition',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H',
-    eyebrow: '#1 Most Reserved Preorder',
+    title: 'World Cup 2026 Special Drop',
+    subtitle: 'Argentina 3-Star Champion Kit',
+    image: 'img/preorders/argentina.png',
+    eyebrow: '🔥 #1 Trending Preorder',
     rating: 4.98,
-    chef: 'AFA Authentic Kit',
-    kitchen: 'Limited 150 Batches',
-    description: 'Exclusive 2026 World Cup special edition. Light blue & white stripes with golden champion badge and diamond-mesh ventilation.',
+    chef: 'AFA Official Player Match Spec',
+    kitchen: 'Limited Edition • 150 Slots',
+    description: 'Featuring the official gold 3-star champions badge, aerated micro-mesh cooling channels, and golden Sun of May crest.',
     likes: 482,
     price: 8500,
-    accent: '#38bdf8',
+    accent: '#bae6fd',
     expectedDeliveryDate: '15 November 2026',
     sizes: ['S','M','L','XL','XXL']
   },
   {
     id: 'demo-2',
-    title: 'Next Gen Match',
-    subtitle: 'Barça Blaugrana 26/27',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P',
-    eyebrow: '#2 High-Demand Drop',
+    title: 'Season 2026/27 Drop',
+    subtitle: 'FC Barcelona Camp Nou Return',
+    image: 'img/preorders/barca.png',
+    eyebrow: '⚡ High Demand Drop',
     rating: 4.94,
-    chef: 'FC Barcelona Pro',
-    kitchen: 'DryTech Pro Fabric',
-    description: 'Next-generation Barcelona match kit. Engineered micro-mesh weave with aerodynamic contoured flat-lock seams.',
+    chef: 'Blaugrana Pro Match Kit',
+    kitchen: 'DryTech Pro Jacquard',
+    description: 'Next-season iconic Blaugrana match jersey with moisture-wicking ergonomic cut and breathable side mesh inserts.',
     likes: 389,
     price: 7200,
-    accent: '#f43f5e',
+    accent: '#fecdd3',
     expectedDeliveryDate: '20 September 2026',
     sizes: ['S','M','L','XL','XXL']
   },
   {
     id: 'demo-3',
-    title: 'National Pride',
-    subtitle: 'Bangladesh Tigers ODI 26',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD3t1GmkG4f2Yo2QsqeOCXqOQpgQjsnXWWMaO2sU6VGnjZ32FCDY9d1WnMZaBDJZEkGLx4bWqB3ulfYu68fQ3bqMQMBjRAKD0JX9YLHfw62upw4tr0guup12oGHkfyv6RjbSJleZzbtB_N1JRqnJvfPuka-SFierW0EvYUZpypZS8UOEuq34oRquU9XqMv2t9N2aCdqRCYXyNgPCLUGEjleVG2B_OoRXaUayEhpOygAMti_T1BGlP5X',
-    eyebrow: '#3 Limited Edition Batch',
+    title: 'National Pride Official Kit',
+    subtitle: 'Bangladesh Tigers ODI 2026',
+    image: 'img/preorders/bangladesh.png',
+    eyebrow: '🇧🇩 Official National Edition',
     rating: 4.97,
-    chef: 'BCB Official Edition',
+    chef: 'BCB Official Match Kit',
     kitchen: 'Tiger Jacquard Weave',
-    description: 'Official Bangladesh Cricket ODI jersey for 2026. Deep emerald green & ruby accents with woven Royal Bengal tiger crest.',
+    description: 'Deep emerald green & crimson accents with woven Royal Bengal tiger patterns and golden star embroidery.',
     likes: 615,
     price: 3800,
-    accent: '#10b981',
+    accent: '#a7f3d0',
     expectedDeliveryDate: '5 October 2026',
     sizes: ['S','M','L','XL','XXL','XXXL']
   },
   {
     id: 'demo-4',
-    title: 'Elite Edition',
-    subtitle: 'AeroKnit Supreme Pro',
-    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80',
-    eyebrow: "#4 Collector's Preorder",
+    title: 'Performance Series',
+    subtitle: 'AeroKnit Supreme Pro UCL',
+    image: 'img/preorders/aeroknit.png',
+    eyebrow: '✨ Elite Performance Drop',
     rating: 4.90,
-    chef: 'Zenvy Lab Performance',
-    kitchen: 'Titanium Aeroknit',
-    description: 'Engineered ultra-lightweight performance match kit with thermal-regulated active vents and iridescent reflective logos.',
+    chef: 'Zenvy Elite Athletics',
+    kitchen: 'Titanium AeroKnit Weave',
+    description: 'Ultra-lightweight match kit engineered with thermal-regulated airflow panels and iridescent reflective branding.',
     likes: 294,
     price: 4200,
-    accent: '#a855f7',
+    accent: '#e9d5ff',
     expectedDeliveryDate: '10 November 2026',
     sizes: ['S','M','L','XL','XXL']
   }
@@ -1457,16 +1481,16 @@ function initOrbitCarousel() {
 
   cardBodies.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
     <div class="dsh-card-body" id="dsh-card-body-${i}">
-      <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-0.5">${dish.kitchen}</div>
-      <div class="text-sm font-black text-white mb-2">${dish.chef}</div>
-      <p class="text-xs text-neutral-300 leading-relaxed min-h-[44px]">${dish.description}</p>
-      <div class="flex items-center gap-3 mt-3 pt-2.5 border-t border-white/10">
-        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-neutral-400">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-0.5">${dish.kitchen}</div>
+      <div class="text-sm font-bold text-neutral-900 mb-1.5">${dish.chef}</div>
+      <p class="text-xs text-neutral-600 leading-relaxed min-h-[44px]">${dish.description}</p>
+      <div class="flex items-center gap-3 mt-3 pt-2.5 border-t border-black/[0.06]">
+        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-neutral-500">
           <span class="material-symbols-outlined text-xs text-rose-500 fill-1">favorite</span>
           <span>${dish.likes} preorders</span>
         </span>
-        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-emerald-400">
-          <span class="material-symbols-outlined text-xs">verified</span>
+        <span class="flex items-center gap-1 text-[11px] font-mono-ui text-emerald-700 font-semibold">
+          <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
           <span>Official Drop</span>
         </span>
       </div>
@@ -1482,8 +1506,8 @@ function initOrbitCarousel() {
   thumbStrip.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
     <button type="button" class="dsh-th-btn" id="dsh-th-${i}" onclick="gotoOrbit(${i})">
       <img src="${dish.image}" alt="${dish.subtitle}" class="w-10 h-10 object-contain drop-shadow" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
-      <div class="text-[9px] font-bold text-neutral-300 line-clamp-1 leading-tight text-center">${dish.subtitle}</div>
-      <div class="text-[8px] font-mono-ui font-black text-emerald-400">৳${dish.price.toLocaleString()}</div>
+      <div class="text-[9px] font-bold text-neutral-800 line-clamp-1 leading-tight text-center">${dish.subtitle}</div>
+      <div class="text-[8px] font-mono-ui font-black text-emerald-700">৳${dish.price.toLocaleString()}</div>
     </button>
   `).join('');
 
@@ -1558,10 +1582,7 @@ function switchOrbitSlide(to, dir = 1, isInitial = false) {
       if (hd) {
         hd.style.visibility = i === to ? 'visible' : 'hidden';
         hd.style.opacity = i === to ? '1' : '0';
-        const t1 = hd.querySelector('.dsh-t1');
-        const t2 = hd.querySelector('.dsh-t2');
-        if (t1) t1.style.clipPath = SHOW;
-        if (t2) t2.style.clipPath = SHOW;
+        hd.style.transform = 'none';
       }
       if (bd) {
         bd.classList.toggle('active', i === to);
@@ -1586,14 +1607,6 @@ function switchOrbitSlide(to, dir = 1, isInitial = false) {
   const hdB = document.getElementById(`dsh-head-${to}`);
   const bdB = document.getElementById(`dsh-card-body-${to}`);
 
-  const t1A = hdA?.querySelector('.dsh-t1');
-  const t2A = hdA?.querySelector('.dsh-t2');
-  const eyeA = hdA?.querySelector('.dsh-eye');
-
-  const t1B = hdB?.querySelector('.dsh-t1');
-  const t2B = hdB?.querySelector('.dsh-t2');
-  const eyeB = hdB?.querySelector('.dsh-eye');
-
   const tl = gsap.timeline({
     onComplete: () => {
       orbitTimeline = null;
@@ -1610,16 +1623,13 @@ function switchOrbitSlide(to, dir = 1, isInitial = false) {
     tl.fromTo(orbB, { autoAlpha: 1, rotation: -SWING * dir }, { rotation: 0, duration: 0.85, ease: "power3.out" }, 0.25);
   }
 
-  // 2. Titles clip wipe
-  if (t1A) tl.to(t1A, { clipPath: HIDE_1, duration: 0.38, ease: "power2.in" }, 0);
-  if (t2A) tl.to(t2A, { clipPath: HIDE_2, duration: 0.38, ease: "power2.in" }, 0.05);
-  if (eyeA) tl.to(eyeA, { autoAlpha: 0, duration: 0.25 }, 0);
-  if (hdA) tl.set(hdA, { autoAlpha: 0 }, 0.45);
-
-  if (hdB) tl.set(hdB, { autoAlpha: 1 }, 0.45);
-  if (eyeB) tl.fromTo(eyeB, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.5);
-  if (t1B) tl.fromTo(t1B, { clipPath: HIDE_1 }, { clipPath: SHOW, duration: 0.6, ease: "power3.out" }, 0.5);
-  if (t2B) tl.fromTo(t2B, { clipPath: HIDE_2 }, { clipPath: SHOW, duration: 0.6, ease: "power3.out" }, 0.55);
+  // 2. Titles smooth fade and rise
+  if (hdA) {
+    tl.to(hdA, { autoAlpha: 0, y: -8, duration: 0.32, ease: "power2.in" }, 0);
+  }
+  if (hdB) {
+    tl.fromTo(hdB, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power2.out" }, 0.32);
+  }
 
   // 3. Card body crossfade
   if (bdA) {

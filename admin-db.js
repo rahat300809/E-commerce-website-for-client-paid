@@ -715,9 +715,8 @@ const DB = {
     ],
     all() {
       let items = Store.get('categories');
-      if (!items || !Array.isArray(items) || items.length === 0) {
-        items = this.defaultItems;
-        Store.set('categories', items);
+      if (!items || !Array.isArray(items)) {
+        return [];
       }
       return items.sort((a,b) => (parseInt(a.displayOrder) || 0) - (parseInt(b.displayOrder) || 0));
     },
@@ -737,14 +736,19 @@ const DB = {
       return item;
     },
     update(id, data) {
-      const items = Store.get('categories').map(c => c.id === id ? { ...c, ...data, updatedAt: Store.now() } : c);
-      Store.set('categories', items); DB.log(`Category updated: ${data.name||id}`);
-      return items.find(c => c.id === id);
+      const strId = String(id);
+      const items = Store.get('categories').map(c => (String(c.id) === strId || String(c.slug) === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
+      Store.set('categories', items);
+      DB.log(`Category updated: ${data.name || id}`);
+      return items.find(c => String(c.id) === strId || String(c.slug) === strId);
     },
     delete(id) {
+      const strId = String(id);
       const cat = DB.categories.byId(id);
-      Store.set('categories', Store.get('categories').filter(c => c.id !== id));
-      DB.log(`Category deleted: ${cat?.name}`);
+      const items = Store.get('categories').filter(c => String(c.id) !== strId && String(c.slug) !== strId);
+      Store.set('categories', items);
+      DB.log(`Category deleted: ${cat?.name || id}`);
+      return items;
     },
     toggle(id, field) {
       const cat = DB.categories.byId(id);

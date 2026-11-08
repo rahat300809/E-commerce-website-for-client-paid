@@ -162,6 +162,7 @@ const Uploader = {
         </div>`;
         inner.classList.remove('has-image');
         overlay?.classList.add('hidden');
+        if (input) input.value = '';
         if (opts.onchange) opts.onchange('');
       });
 
@@ -186,10 +187,15 @@ const Uploader = {
         let w = 0;
         const interval = setInterval(() => { w = Math.min(w + 10, 80); if (bar) bar.style.width = w + '%'; }, 50);
         try {
-          const result = await Uploader.processFile(file, { maxSizeMB: opts.maxSizeMB });
+          const result = await Uploader.processFile(file, { 
+            maxSizeMB: opts.maxSizeMB || 5,
+            maxDimension: opts.maxDimension || 900,
+            quality: opts.quality || 0.82
+          });
           clearInterval(interval);
           if (bar) bar.style.width = '100%';
           setTimeout(() => prog?.classList.add('hidden'), 300);
+          if (input) input.value = '';
 
           // Update preview
           inner.innerHTML = `<img src="${result.dataUrl}" class="upload-preview-img" id="${id}-preview" />
@@ -217,6 +223,7 @@ const Uploader = {
               <p class="text-sm text-slate-500 mt-1">${placeholder}</p>
             </div>`;
             inner.classList.remove('has-image');
+            if (input) input.value = '';
             if (opts.onchange) opts.onchange('');
           });
 

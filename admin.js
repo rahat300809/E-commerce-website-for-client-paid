@@ -1825,20 +1825,30 @@ function renderCategories(container) {
             ${cats.length === 0 ? `<tr><td colspan="8">${emptyState('category','No categories yet','Create your first category','Add Category','openCategoryForm()')}</td></tr>` :
               cats.map(c => {
                 const subCount = DB.subcategories.byCategory(c.id).length;
-                const prodCount = DB.products.all().filter(p => p.categoryId === c.id).length;
+                const prodCount = DB.products.all().filter(p => p.categoryId === c.id || p.category === c.name || p.category === c.slug).length;
+                const displayImg = c.imageUrl || c.mobileImgUrl || c.image || '';
                 return `
                   <tr>
-                    <td>${c.imageUrl ? `<img src="${c.imageUrl}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB" alt="${c.name}"/>` : `<div class="prod-thumb-placeholder"><span class="material-symbols-outlined" style="font-size:18px">category</span></div>`}</td>
+                    <td>
+                      ${displayImg ? `
+                        <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;background:#F8FAFC;">
+                          <img src="${displayImg}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+                          <div class="prod-thumb-placeholder" style="display:none;width:100%;height:100%;"><span class="material-symbols-outlined" style="font-size:18px">category</span></div>
+                        </div>
+                      ` : `
+                        <div class="prod-thumb-placeholder" style="width:48px;height:48px;border-radius:8px;"><span class="material-symbols-outlined" style="font-size:18px">category</span></div>
+                      `}
+                    </td>
                     <td style="font-weight:600">${c.name}</td>
                     <td class="font-mono" style="font-size:12px">${c.slug}</td>
                     <td>${subCount}</td>
                     <td>${prodCount}</td>
                     <td><span class="badge ${c.isActive?'badge-green':'badge-gray'}">${c.isActive?'Active':'Inactive'}</span></td>
                     <td>${c.isFeatured?'<span class="badge badge-amber">Featured</span>':'-'}</td>
-                    <td class="actions-cell">
-                      <button class="btn btn-ghost btn-sm" onclick="openCategoryForm('${c.id}')"><span class="material-symbols-outlined">edit</span></button>
-                      <button class="btn btn-ghost btn-sm" onclick="DB.categories.toggle('${c.id}','isActive');renderCategories(document.getElementById('admin-content'));toast('Status updated','success')"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
-                      <button class="btn btn-ghost btn-sm text-red" onclick="deleteCat('${c.id}','${c.name}')"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                    <td class="actions-cell" style="min-width:130px;text-align:right;white-space:nowrap;">
+                      <button class="btn btn-ghost btn-sm" onclick="openCategoryForm('${c.id}')" title="Edit Category"><span class="material-symbols-outlined">edit</span></button>
+                      <button class="btn btn-ghost btn-sm" onclick="DB.categories.toggle('${c.id}','isActive');renderCategories(document.getElementById('admin-content'));toast('Status updated','success')" title="Toggle Active"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
+                      <button class="btn btn-ghost btn-sm text-red" onclick="deleteCat('${c.id}', ${JSON.stringify(c.name)})" title="Delete Category"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                     </td>
                   </tr>
                   ${DB.subcategories.byCategory(c.id).map(s => `
@@ -1848,9 +1858,9 @@ function renderCategories(container) {
                       <td class="font-mono" style="font-size:11px">${s.slug}</td>
                       <td colspan="3"></td>
                       <td></td>
-                      <td class="actions-cell">
-                        <button class="btn btn-ghost btn-sm" onclick="openSubcatForm('${s.id}','${c.id}')"><span class="material-symbols-outlined">edit</span></button>
-                        <button class="btn btn-ghost btn-sm" onclick="DB.subcategories.delete('${s.id}');renderCategories(document.getElementById('admin-content'));toast('Deleted','success')"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                      <td class="actions-cell" style="min-width:130px;text-align:right;white-space:nowrap;">
+                        <button class="btn btn-ghost btn-sm" onclick="openSubcatForm('${s.id}','${c.id}')" title="Edit Subcategory"><span class="material-symbols-outlined">edit</span></button>
+                        <button class="btn btn-ghost btn-sm" onclick="DB.subcategories.delete('${s.id}');renderCategories(document.getElementById('admin-content'));toast('Deleted','success')" title="Delete Subcategory"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                       </td>
                     </tr>
                   `).join('')}
@@ -1864,51 +1874,44 @@ function renderCategories(container) {
 }
 
 function deleteCat(id, name) {
-  showConfirm('Delete Category', `Delete "${name}"? This will not delete products in this category.`, () => {
+  showConfirm('Delete Category', `Are you sure you want to delete category "${name}"? This will not delete products assigned to this category.`, () => {
     DB.categories.delete(id);
-    toast('Category deleted', 'success');
+    toast(`Category "${name}" deleted successfully`, 'success');
     renderCategories(document.getElementById('admin-content'));
   });
 }
 
 function openCategoryForm(id = null) {
   const cat = id ? DB.categories.byId(id) : null;
-  let imgUrl = cat?.imageUrl || '';
-  let mobileUrl = cat?.mobileImgUrl || '';
-  const allCats = DB.categories.all().filter(c => c.id !== id);
+  let imgUrl = cat?.imageUrl || cat?.mobileImgUrl || '';
+  window._catImgUrl = imgUrl;
 
   const html = `
-    <form id="cat-form">
+    <form id="cat-form" onsubmit="event.preventDefault();">
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Category Name<span class="req">*</span></label>
-          <input type="text" name="name" class="form-input" required value="${cat?.name||''}" oninput="autoSlug(this,'cat-slug')"/>
+          <input type="text" name="name" class="form-input" required value="${cat?.name||''}" placeholder="e.g. Club Match Kits, Football" oninput="autoSlug(this,'cat-slug')"/>
         </div>
         <div class="form-group">
           <label class="form-label">Slug<span class="req">*</span></label>
-          <input type="text" name="slug" id="cat-slug" class="form-input" required value="${cat?.slug||''}"/>
+          <input type="text" name="slug" id="cat-slug" class="form-input" required value="${cat?.slug||''}" placeholder="e.g. club-match-kits"/>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea name="description" class="form-textarea">${cat?.description||''}</textarea>
+        <textarea name="description" class="form-textarea" placeholder="Brief description of this collection or category">${cat?.description||''}</textarea>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Category Banner / Image (Desktop)</label>
-          <div id="cat-img-zone"></div>
-          <input type="text" id="cat-img-url" name="imageUrl" class="form-input" style="margin-top:6px;"
-                 placeholder="Or paste direct image URL (https://...)" value="${imgUrl}"
-                 oninput="window._catImgUrl=this.value;"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Category Banner (Mobile)</label>
-          <div id="cat-mobile-zone"></div>
-          <input type="text" id="cat-mobile-url" name="mobileImgUrl" class="form-input" style="margin-top:6px;"
-                 placeholder="Or paste mobile image URL (https://...)" value="${mobileUrl}"
-                 oninput="window._catMobileUrl=this.value;"/>
-        </div>
+
+      <!-- Upload Category Image -->
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Category Image (Upload)<span class="req">*</span></span>
+          <span style="font-size:11px;color:#64748B;font-weight:normal;">Shown on cards, homepage & shop filters</span>
+        </label>
+        <div id="cat-img-zone" style="margin-top:4px;"></div>
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Display Order</label>
@@ -1916,14 +1919,14 @@ function openCategoryForm(id = null) {
         </div>
         <div class="form-group">
           <label class="form-label">SEO Title</label>
-          <input type="text" name="seoTitle" class="form-input" value="${cat?.seoTitle||''}"/>
+          <input type="text" name="seoTitle" class="form-input" value="${cat?.seoTitle||''}" placeholder="Category meta title"/>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">SEO Description</label>
-        <textarea name="seoDesc" class="form-textarea">${cat?.seoDesc||''}</textarea>
+        <textarea name="seoDesc" class="form-textarea" placeholder="Category search engine snippet">${cat?.seoDesc||''}</textarea>
       </div>
-      <div style="display:flex;gap:16px">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
         <label class="checkbox-chip ${cat?.isActive!==false?'selected':''}">
           <input type="checkbox" name="isActive" ${cat?.isActive!==false?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Active
         </label>
@@ -1957,29 +1960,24 @@ function openCategoryForm(id = null) {
   `;
   openModal(cat ? `Edit: ${cat.name}` : 'New Category', html, footer, 'modal-md');
 
-  window._catImgUrl = imgUrl;
-  window._catMobileUrl = mobileUrl;
-
   setTimeout(() => {
     const desktopZone = Uploader.createSingleZone({
-      id:'cat-desktop', value: imgUrl, label:'Desktop Image',
+      id: 'cat-desktop',
+      value: imgUrl,
+      label: 'Category Image',
+      placeholder: 'Click or drop category image file here',
+      maxSizeMB: 5,
+      maxDimension: 800,
       onchange: v => {
-        imgUrl = v; window._catImgUrl = v;
-        const inp = document.getElementById('cat-img-url');
-        if (inp && v.startsWith('http')) inp.value = v;
+        window._catImgUrl = v || '';
       }
     });
-    const mobileZone = Uploader.createSingleZone({
-      id:'cat-mobile', value: mobileUrl, label:'Mobile Image',
-      onchange: v => {
-        mobileUrl = v; window._catMobileUrl = v;
-        const inp = document.getElementById('cat-mobile-url');
-        if (inp && v.startsWith('http')) inp.value = v;
-      }
-    });
-    document.getElementById('cat-img-zone')?.appendChild(desktopZone);
-    document.getElementById('cat-mobile-zone')?.appendChild(mobileZone);
-  }, 100);
+    const zoneEl = document.getElementById('cat-img-zone');
+    if (zoneEl) {
+      zoneEl.innerHTML = '';
+      zoneEl.appendChild(desktopZone);
+    }
+  }, 50);
 }
 
 function addSubcatInline(catId) {
@@ -1999,19 +1997,22 @@ function saveCategoryForm(id) {
   const name = fd.get('name')?.trim();
   const slug = fd.get('slug')?.trim();
   if (!name || !slug) { toast('Name and slug required', 'error'); return; }
-  
-  const directImg = document.getElementById('cat-img-url')?.value?.trim();
-  const directMobile = document.getElementById('cat-mobile-url')?.value?.trim();
+
+  const imageUrl = window._catImgUrl || '';
 
   const data = {
-    name, slug, description: fd.get('description'),
-    imageUrl: directImg || window._catImgUrl || '',
-    mobileImgUrl: directMobile || window._catMobileUrl || '',
+    name,
+    slug,
+    description: fd.get('description')?.trim() || '',
+    imageUrl: imageUrl,
+    mobileImgUrl: imageUrl,
     displayOrder: parseInt(fd.get('displayOrder')) || 0,
-    seoTitle: fd.get('seoTitle'), seoDesc: fd.get('seoDesc'),
+    seoTitle: fd.get('seoTitle')?.trim() || '',
+    seoDesc: fd.get('seoDesc')?.trim() || '',
     isActive: fd.get('isActive') === 'on',
     isFeatured: fd.get('isFeatured') === 'on',
   };
+
   if (id) {
     DB.categories.update(id, data);
     toast('Category updated & synced!', 'success');
@@ -2021,7 +2022,6 @@ function saveCategoryForm(id) {
   }
   closeModal();
   renderCategories(document.getElementById('admin-content'));
-  try { window.dispatchEvent(new Event('storage')); } catch(e){}
   try { window.dispatchEvent(new Event('storage')); } catch(e){}
 }
 
@@ -2285,9 +2285,8 @@ function openPatchForm(id = null) {
       </div>
       
       <div class="form-group">
-        <label class="form-label">Patch Badge Image (Upload or Paste URL)</label>
+        <label class="form-label">Patch Badge Image (Upload Image)</label>
         <div id="patch-img-zone" style="margin-bottom:8px;"></div>
-        <input type="text" name="imageUrl" id="patch-img-url-input" class="form-input" value="${imgUrl}" placeholder="Or paste image URL (https://... or data:image/...)"/>
         <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">
           <span style="font-size:11px;color:#6b7280;">Quick Presets:</span>
           <button type="button" class="btn btn-ghost btn-xs" onclick="window.setPatchPreset('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz48cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPjxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz48cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz48L3N2Zz4=')">UCL Starball</button>
@@ -2311,8 +2310,11 @@ function openPatchForm(id = null) {
   
   window.setPatchPreset = function(dataUrl) {
     window._patchImgUrl = dataUrl;
-    const input = document.getElementById('patch-img-url-input');
-    if (input) input.value = dataUrl;
+    const preview = document.getElementById('patch-img-preview');
+    if (preview) {
+      preview.src = dataUrl;
+      preview.parentElement?.classList.add('has-image');
+    }
     toast('Badge preset applied', 'info');
   };
 
@@ -2322,9 +2324,7 @@ function openPatchForm(id = null) {
       value:imgUrl, 
       placeholder:'Click or drop badge image file (PNG, JPG, SVG)', 
       onchange: v => {
-        window._patchImgUrl = v;
-        const input = document.getElementById('patch-img-url-input');
-        if (input) input.value = v;
+        window._patchImgUrl = v || '';
       }
     });
     document.getElementById('patch-img-zone')?.appendChild(zone);
@@ -2337,8 +2337,7 @@ function savePatch(id) {
   const fd = new FormData(form);
   const name = fd.get('name')?.trim();
   if (!name) { toast('Name required', 'error'); return; }
-  const inputEl = document.getElementById('patch-img-url-input');
-  const imageUrl = (inputEl?.value || window._patchImgUrl || '').trim();
+  const imageUrl = (window._patchImgUrl || '').trim();
   const data = { 
     name, 
     imageUrl, 
@@ -3597,20 +3596,12 @@ function openBannerForm(id=null) {
       
       <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="form-group">
-          <label class="form-label">Desktop Image (1920×600)<span class="req">*</span></label>
-          <div id="banner-desktop-zone" style="margin-bottom:8px;"></div>
-          <input type="text" name="desktopImgUrl" id="ban-desktop-url-input" class="form-input" value="${desktopImg}" placeholder="Or paste direct image URL (https://...)" oninput="window._bannerDesktopImg=this.value; const prev=document.getElementById('ban-desktop-preview'); if(prev){prev.src=this.value; prev.style.display=this.value?'block':'none';}"/>
-          <div style="margin-top:6px;">
-            <img id="ban-desktop-preview" src="${desktopImg}" style="max-height:80px;border-radius:8px;border:1px solid #E2E8F0;object-fit:cover;display:${desktopImg?'block':'none'};" onerror="this.style.display='none'"/>
-          </div>
+          <label class="form-label">Desktop Banner Image (1920×600)<span class="req">*</span></label>
+          <div id="banner-desktop-zone"></div>
         </div>
         <div class="form-group">
-          <label class="form-label">Mobile Image (750×400)</label>
-          <div id="banner-mobile-zone" style="margin-bottom:8px;"></div>
-          <input type="text" name="mobileImgUrl" id="ban-mobile-url-input" class="form-input" value="${mobileImg}" placeholder="Or paste mobile image URL (https://...)" oninput="window._bannerMobileImg=this.value; const prev=document.getElementById('ban-mobile-preview'); if(prev){prev.src=this.value; prev.style.display=this.value?'block':'none';}"/>
-          <div style="margin-top:6px;">
-            <img id="ban-mobile-preview" src="${mobileImg}" style="max-height:80px;border-radius:8px;border:1px solid #E2E8F0;object-fit:cover;display:${mobileImg?'block':'none'};" onerror="this.style.display='none'"/>
-          </div>
+          <label class="form-label">Mobile Banner Image (750×400)</label>
+          <div id="banner-mobile-zone"></div>
         </div>
       </div>
 
@@ -3637,11 +3628,7 @@ function openBannerForm(id=null) {
       value:desktopImg, 
       placeholder:'Upload desktop banner (1920×600 recommended)', 
       onchange: v => { 
-        window._bannerDesktopImg = v; 
-        const inp = document.getElementById('ban-desktop-url-input');
-        if (inp) inp.value = v;
-        const prev = document.getElementById('ban-desktop-preview');
-        if (prev) { prev.src = v; prev.style.display = v ? 'block' : 'none'; }
+        window._bannerDesktopImg = v || ''; 
       } 
     });
     const mZone = Uploader.createSingleZone({ 
@@ -3649,11 +3636,7 @@ function openBannerForm(id=null) {
       value:mobileImg, 
       placeholder:'Upload mobile banner (750×400)', 
       onchange: v => { 
-        window._bannerMobileImg = v; 
-        const inp = document.getElementById('ban-mobile-url-input');
-        if (inp) inp.value = v;
-        const prev = document.getElementById('ban-mobile-preview');
-        if (prev) { prev.src = v; prev.style.display = v ? 'block' : 'none'; }
+        window._bannerMobileImg = v || ''; 
       } 
     });
     document.getElementById('banner-desktop-zone')?.appendChild(dZone);
@@ -3668,8 +3651,8 @@ function saveBanner(id, publish) {
   const title = fd.get('title')?.trim();
   if (!title) { toast('Banner title is required', 'error'); return; }
   
-  const img = fd.get('desktopImgUrl') || window._bannerDesktopImg || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80';
-  const mobileImg = fd.get('mobileImgUrl') || window._bannerMobileImg || img;
+  const img = window._bannerDesktopImg || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80';
+  const mobileImg = window._bannerMobileImg || img;
 
   const data = { 
     title, 
@@ -4251,12 +4234,8 @@ function openModelShowcaseForm(id = null) {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Model Photo (Wearing Jersey/T-shirt)<span class="req">*</span></label>
-        <div id="model-photo-zone" style="margin-bottom:8px;"></div>
-        <input type="text" id="model-photo-url-input" name="src" class="form-input" placeholder="Or paste direct image URL (https://...)" value="${m?.src || ''}" oninput="window._modelPhotoUrl=this.value;const p=document.getElementById('model-preview-img');if(p){p.src=this.value;p.style.display=this.value?'block':'none';}"/>
-        <div style="margin-top:8px;">
-          <img id="model-preview-img" src="${m?.src || ''}" style="max-height:120px;border-radius:10px;object-fit:cover;border:1px solid #E5E7EB;display:${m?.src ? 'block' : 'none'};"/>
-        </div>
+        <label class="form-label">Model Photo (Upload Image)<span class="req">*</span></label>
+        <div id="model-photo-zone"></div>
       </div>
 
       <div style="display:flex;gap:16px;margin-top:12px;">
@@ -4282,11 +4261,7 @@ function openModelShowcaseForm(id = null) {
       value: m?.src || '',
       placeholder: 'Upload high-resolution photo of model wearing jersey',
       onchange: async v => {
-        window._modelPhotoUrl = v;
-        const inp = document.getElementById('model-photo-url-input');
-        if (inp) inp.value = v;
-        const p = document.getElementById('model-preview-img');
-        if (p) { p.src = v; p.style.display = 'block'; }
+        window._modelPhotoUrl = v || '';
       }
     });
     document.getElementById('model-photo-zone')?.appendChild(zone);
@@ -4300,7 +4275,7 @@ function saveModelShowcaseForm(id) {
   const name = fd.get('name')?.trim();
   const designation = fd.get('designation')?.trim();
   const quote = fd.get('quote')?.trim();
-  const src = fd.get('src')?.trim() || window._modelPhotoUrl || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80';
+  const src = window._modelPhotoUrl || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80';
 
   if (!name || !quote) {
     toast('Name and Quote are required.', 'error');

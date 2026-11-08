@@ -252,13 +252,13 @@
           const rawLocal = localStorage.getItem(localKey);
           const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
           if (rawLocal && Array.isArray(payload.data)) {
-            if (payload.data.length === 0 && (cloudUpdatedAt >= rawLocalTime || ['orders','customers','returns','refunds','activityLog','notifLog'].includes(key))) {
-              finalData = [];
+            if (cloudUpdatedAt >= rawLocalTime) {
+              finalData = payload.data;
             } else {
               try {
                 const localParsed = JSON.parse(rawLocal);
                 if (Array.isArray(localParsed)) {
-                  finalData = mergeArraysById(localParsed, payload.data);
+                  finalData = localParsed;
                 }
               } catch(e) {}
             }
@@ -305,13 +305,13 @@
             let finalData = payload.data;
             const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
             if (existingStr && Array.isArray(payload.data)) {
-              if (payload.data.length === 0 && (cloudUpdatedAt >= rawLocalTime || ['orders','customers','returns','refunds','activityLog','notifLog'].includes(key))) {
-                finalData = [];
+              if (cloudUpdatedAt >= rawLocalTime) {
+                finalData = payload.data;
               } else {
                 try {
                   const existingParsed = JSON.parse(existingStr);
                   if (Array.isArray(existingParsed)) {
-                    finalData = mergeArraysById(existingParsed, payload.data);
+                    finalData = existingParsed;
                   }
                 } catch(e) {}
               }

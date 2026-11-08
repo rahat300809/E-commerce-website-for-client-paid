@@ -166,13 +166,23 @@
   } catch(e){}
 
   // ── Intelligent Array Merge for Multi-Admin Concurrency ────────
+  function isDemoItem(item) {
+    if (!item || typeof item !== 'object') return false;
+    const em = (item.email || item.customerEmail || '').toLowerCase();
+    const nm = (item.name || item.customerName || '').toLowerCase();
+    if (em === 'tanvir@example.com' || em === 'rahim@example.com' || em === 'nusrat@example.com') return true;
+    if (nm === 'tanvir ahmed' || nm === 'rahim chowdhury' || nm === 'nusrat jahan') return true;
+    return false;
+  }
+
   function mergeArraysById(localArr, cloudArr) {
-    if (!Array.isArray(localArr)) return Array.isArray(cloudArr) ? cloudArr : [];
-    if (!Array.isArray(cloudArr)) return localArr;
+    if (!Array.isArray(localArr)) return Array.isArray(cloudArr) ? cloudArr.filter(i => !isDemoItem(i)) : [];
+    if (!Array.isArray(cloudArr)) return localArr.filter(i => !isDemoItem(i));
 
     const map = new Map();
-    // 1. Seed with cloud items as baseline
+    // 1. Seed with cloud items as baseline (excluding any demo data)
     cloudArr.forEach(item => {
+      if (isDemoItem(item)) return;
       if (item && typeof item === 'object') {
         const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
         map.set(key ? String(key) : JSON.stringify(item), item);
@@ -183,6 +193,7 @@
 
     // 2. Intelligently merge local items (preserve newer or recently created local drafts)
     localArr.forEach(item => {
+      if (isDemoItem(item)) return;
       if (item && typeof item === 'object') {
         const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
         const mapKey = key ? String(key) : JSON.stringify(item);
@@ -239,13 +250,18 @@
 
           let finalData = payload.data;
           const rawLocal = localStorage.getItem(localKey);
+          const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
           if (rawLocal && Array.isArray(payload.data)) {
-            try {
-              const localParsed = JSON.parse(rawLocal);
-              if (Array.isArray(localParsed)) {
-                finalData = mergeArraysById(localParsed, payload.data);
-              }
-            } catch(e) {}
+            if (payload.data.length === 0 && (cloudUpdatedAt >= rawLocalTime || ['orders','customers','returns','refunds','activityLog','notifLog'].includes(key))) {
+              finalData = [];
+            } else {
+              try {
+                const localParsed = JSON.parse(rawLocal);
+                if (Array.isArray(localParsed)) {
+                  finalData = mergeArraysById(localParsed, payload.data);
+                }
+              } catch(e) {}
+            }
           }
 
           localStorage.setItem(localKey, JSON.stringify(finalData));
@@ -287,13 +303,18 @@
             const existingStr = localStorage.getItem(localKey);
 
             let finalData = payload.data;
+            const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
             if (existingStr && Array.isArray(payload.data)) {
-              try {
-                const existingParsed = JSON.parse(existingStr);
-                if (Array.isArray(existingParsed)) {
-                  finalData = mergeArraysById(existingParsed, payload.data);
-                }
-              } catch(e) {}
+              if (payload.data.length === 0 && (cloudUpdatedAt >= rawLocalTime || ['orders','customers','returns','refunds','activityLog','notifLog'].includes(key))) {
+                finalData = [];
+              } else {
+                try {
+                  const existingParsed = JSON.parse(existingStr);
+                  if (Array.isArray(existingParsed)) {
+                    finalData = mergeArraysById(existingParsed, payload.data);
+                  }
+                } catch(e) {}
+              }
             }
 
             const incomingStr = JSON.stringify(finalData);

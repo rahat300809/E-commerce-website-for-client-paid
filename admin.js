@@ -5660,8 +5660,46 @@ function renderSettingsStore(container) {
         <button class="btn btn-primary" onclick="saveStoreSettings()">Save Store Settings</button>
       </div>
     </div>
+
+    <!-- Client Handover & Launch Reset -->
+    <div class="form-section" style="border: 1px solid #FECACA; background: #FEF2F2; margin-top: 24px; border-radius: 12px; overflow: hidden;">
+      <div class="form-section-header" style="background: #FEE2E2; border-bottom: 1px solid #FECACA;">
+        <span class="material-symbols-outlined" style="color: #DC2626;">restart_alt</span>
+        <span class="form-section-title" style="color: #991B1B; font-weight: 700;">Client Handover & Launch Reset</span>
+      </div>
+      <div class="form-section-body">
+        <div style="font-size: 13px; color: #7F1D1D; line-height: 1.6; margin-bottom: 16px;">
+          <p style="margin: 0 0 8px 0;"><strong>Preparing to hand over the store to your client?</strong></p>
+          <p style="margin: 0 0 8px 0;">Clicking the button below will permanently clear all demo & test orders, dummy customers, order activity logs, and return/refund records — resetting Today, Monthly, and Total Revenue back to <strong>৳0</strong>.</p>
+          <div style="background: #FFFFFF; border: 1px solid #FCA5A5; border-radius: 8px; padding: 10px 14px; color: #15803D; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined" style="color: #16A34A; font-size: 18px;">check_circle</span>
+            All catalog products, jersey categories, collections, banners, coupons, and brand settings will be 100% preserved.
+          </div>
+        </div>
+        <button class="btn btn-danger" style="background: #DC2626; color: #FFFFFF; font-weight: 600; padding: 10px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer;" onclick="resetStoreForHandover()">
+          <span class="material-symbols-outlined" style="font-size: 18px;">delete_sweep</span>
+          Reset Orders, Customers & Revenue for Handover
+        </button>
+      </div>
+    </div>
   `;
 }
+
+window.resetStoreForHandover = function() {
+  showConfirm(
+    'Reset Store for Client Handover?',
+    'This will permanently clear all test orders, test customers, and reset total revenue to ৳0.\n\nAll catalog products, categories, coupons, and brand settings will remain untouched.\n\nAre you sure you want to provide a clean slate for the client?',
+    () => {
+      if (typeof DB !== 'undefined' && DB.clearAllTransactions) {
+        DB.clearAllTransactions();
+        toast('Store data successfully reset! Revenue & orders are now ৳0.', 'success');
+        setTimeout(() => {
+          if (typeof nav === 'function') nav('dashboard');
+        }, 600);
+      }
+    }
+  );
+};
 
 function onCurrencySelectChange(code) {
   const symInput = document.getElementById('store-symbol');

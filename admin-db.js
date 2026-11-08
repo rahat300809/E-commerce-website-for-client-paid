@@ -66,7 +66,7 @@ const Store = {
 // ──────────────────────────────────────────────────────────
 // Seed Default Data (runs once per schema version)
 // ──────────────────────────────────────────────────────────
-const SEED_VERSION = 9; // Reseed with clean studio product cutouts
+const SEED_VERSION = 10; // v10: Client handover fresh start (clear test orders, customers, and revenue)
 let _isSeeding = false;
 function seedDefaultData() {
   if (_isSeeding) return;
@@ -75,16 +75,27 @@ function seedDefaultData() {
   _isSeeding = true;
   try {
     // SAFE: Only clear known schema-managed keys, NOT all localStorage
-    // This preserves orders, customers, and other live data
+    // For v10 handover: reset test orders, demo customers, returns, refunds, and logs so client starts at 0
     const keysToReset = [
       'products', 'categories', 'subcategories', 'collections', 'banners', 'homepage', 'shopBanner',
       'brand', 'coupons', 'flashSales', 'shipping', 'paymentConfig', 'storeSettings',
       'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'colors', 'addons',
-      'printing', 'customization', 'teams', 'seeded', 'seeded_version'
+      'printing', 'customization', 'teams', 'seeded', 'seeded_version',
+      'orders', 'customers', 'returns', 'refunds', 'activityLog', 'notifLog', 'inventoryHistory', 'priceHistory'
     ];
     keysToReset.forEach(k => {
       try { localStorage.removeItem(`${DB_VERSION}_${k}`); } catch(e){}
     });
+    // Explicitly initialize empty transaction lists locally and sync to cloud
+    Store.set('orders', []);
+    Store.set('customers', []);
+    Store.set('returns', []);
+    Store.set('refunds', []);
+    Store.set('activityLog', []);
+    Store.set('notifLog', []);
+    Store.set('inventoryHistory', []);
+    Store.set('priceHistory', []);
+
     Store.setObj('seeded', true);
     Store.setObj('seeded_version', SEED_VERSION);
 
@@ -564,56 +575,8 @@ function seedDefaultData() {
     refundCompleted: { enabled: true, template: 'Your refund of ৳{amount} for order #{orderNumber} has been processed.' },
   });
 
-  // Seed Sample Orders
-  const DEFAULT_SEED_ORDERS = [
-    {
-      customerName: 'Tanvir Ahmed',
-      customerPhone: '+880 1712-345678',
-      customerEmail: 'tanvir@example.com',
-      shippingAddress: 'House 42, Road 11, Banani, Dhaka',
-      items: [
-        { productId: '101', productName: 'Aura Strike Pro Jersey', quantity: 1, unitPrice: 1450, totalPrice: 1450, details: 'Size: L • Home Kit' },
-        { productId: '107', productName: 'TechKnit Pro Shorts', quantity: 1, unitPrice: 1800, totalPrice: 1800, details: 'Size: M • Core Black' }
-      ],
-      totalAmount: 3250,
-      paymentMethod: 'bKash',
-      paymentStatus: 'PAID',
-      status: 'DELIVERED',
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
-    },
-    {
-      customerName: 'Rahim Chowdhury',
-      customerPhone: '+880 1819-876543',
-      customerEmail: 'rahim@example.com',
-      shippingAddress: '78 GEC Circle, Chittagong',
-      items: [
-        { productId: '103', productName: 'AeroWeave Gold Edition', quantity: 1, unitPrice: 4800, totalPrice: 4800, details: 'Size: M • Custom: RAHIM #10' }
-      ],
-      totalAmount: 4800,
-      paymentMethod: 'Cash on Delivery',
-      paymentStatus: 'PAID',
-      status: 'SHIPPED',
-      createdAt: new Date(Date.now() - 86400000).toISOString()
-    },
-    {
-      customerName: 'Nusrat Jahan',
-      customerPhone: '+880 1911-223344',
-      customerEmail: 'nusrat@example.com',
-      shippingAddress: 'Sector 4, Uttara, Dhaka',
-      items: [
-        { productId: '105', productName: 'Velocity Track Top', quantity: 1, unitPrice: 4200, totalPrice: 4200, details: 'Size: S • Full Zip' }
-      ],
-      totalAmount: 4200,
-      paymentMethod: 'Cash on Delivery',
-      paymentStatus: 'PENDING',
-      status: 'PENDING',
-      createdAt: new Date().toISOString()
-    }
-  ];
-
-  if (!Store.get('orders') || Store.get('orders').length === 0) {
-    DEFAULT_SEED_ORDERS.forEach(o => DB.orders.create(o));
-  }
+  // Seed Sample Orders (client handover: keep 100% clean with 0 orders and ৳0 revenue)
+  const DEFAULT_SEED_ORDERS = [];
 
   Store.setObj('seeded', true);
   Store.setObj('seeded_version', SEED_VERSION);
@@ -634,6 +597,19 @@ const DB = {
     Store.setObj('seeded_version', 0);
     seedDefaultData();
     if (typeof window !== 'undefined') window.location.reload();
+  },
+
+  // ── Client Handover & Data Purge (Clears orders, customers, and revenue) ──
+  clearAllTransactions() {
+    const keys = ['orders', 'customers', 'returns', 'refunds', 'activityLog', 'notifLog', 'inventoryHistory', 'priceHistory'];
+    keys.forEach(k => {
+      Store.set(k, []);
+      if (window.ZenvyFirebase && typeof window.ZenvyFirebase.push === 'function') {
+        window.ZenvyFirebase.push(k, []);
+      }
+    });
+    DB.log('Store transactions, orders, customers & revenue reset to 0 for fresh client launch');
+    return true;
   },
 
   // ── Brand Settings (singleton) ──

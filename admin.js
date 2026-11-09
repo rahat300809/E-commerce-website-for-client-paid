@@ -1168,8 +1168,6 @@ window.toggleChipsGroup = function(groupId, selectAll) {
     }
   });
 };
-  });
-};
 
 function openProductForm(id = null) {
   const product = id ? DB.products.byId(id) : null;

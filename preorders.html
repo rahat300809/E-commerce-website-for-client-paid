@@ -114,8 +114,13 @@
     inset: 0;
     transform-origin: 69% -217%;
     visibility: hidden;
+    opacity: 0;
     will-change: transform;
     cursor: pointer;
+  }
+  .dsh-orbit.active {
+    visibility: visible;
+    opacity: 1;
   }
   .dsh-orbit > img {
     display: block;
@@ -142,6 +147,11 @@
     top: 0;
     width: 100%;
     visibility: hidden;
+    opacity: 0;
+  }
+  .dsh-hd.active {
+    visibility: visible;
+    opacity: 1;
   }
   .dsh-eye {
     display: inline-flex;
@@ -1460,15 +1470,15 @@ function initOrbitCarousel() {
     };
   });
 
-  // Render HTML nodes for each jersey
+  // Render HTML nodes for each jersey (index 0 active initially)
   platesWrap.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
-    <div class="dsh-orbit" id="dsh-orbit-${i}" onclick="gotoOrbit(${i})">
+    <div class="dsh-orbit ${i === 0 ? 'active' : ''}" id="dsh-orbit-${i}" onclick="gotoOrbit(${i})" style="${i === 0 ? 'visibility:visible;opacity:1;' : ''}">
       <img src="${dish.image}" alt="${dish.subtitle}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80'"/>
     </div>
   `).join('');
 
   headWrap.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
-    <div class="dsh-hd" id="dsh-head-${i}">
+    <div class="dsh-hd ${i === 0 ? 'active' : ''}" id="dsh-head-${i}" style="${i === 0 ? 'visibility:visible;opacity:1;' : ''}">
       <div class="dsh-eye">${dish.eyebrow}</div>
       <div class="dsh-t1">${dish.title}</div>
       <div class="dsh-t2">${dish.subtitle}</div>
@@ -1476,7 +1486,7 @@ function initOrbitCarousel() {
   `).join('');
 
   cardBodies.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
-    <div class="dsh-card-body" id="dsh-card-body-${i}">
+    <div class="dsh-card-body ${i === 0 ? 'active' : ''}" id="dsh-card-body-${i}">
       <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-0.5">${dish.kitchen}</div>
       <div class="text-sm font-bold text-neutral-900 mb-1.5">${dish.chef}</div>
       <p class="text-xs text-neutral-600 leading-relaxed min-h-[44px]">${dish.description}</p>
@@ -1494,13 +1504,13 @@ function initOrbitCarousel() {
   `).join('');
 
   pagerDots.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
-    <div class="dsh-dot" id="dsh-dot-${i}" onclick="gotoOrbit(${i})" title="${dish.subtitle}">
+    <div class="dsh-dot ${i === 0 ? 'active' : ''}" id="dsh-dot-${i}" onclick="gotoOrbit(${i})" title="${dish.subtitle}">
       <i></i>
     </div>
   `).join('');
 
   thumbStrip.innerHTML = ORBIT_JERSEYS.map((dish, i) => `
-    <button type="button" class="dsh-th-btn" id="dsh-th-${i}" onclick="gotoOrbit(${i})">
+    <button type="button" class="dsh-th-btn ${i === 0 ? 'active' : ''}" id="dsh-th-${i}" onclick="gotoOrbit(${i})">
       <img src="${dish.image}" alt="${dish.subtitle}" class="w-10 h-10 object-contain drop-shadow" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
       <div class="text-[9px] font-bold text-neutral-800 line-clamp-1 leading-tight text-center">${dish.subtitle}</div>
       <div class="text-[8px] font-mono-ui font-black text-emerald-700">৳${dish.price.toLocaleString()}</div>
@@ -1671,9 +1681,16 @@ window.triggerActivePreorder = function() {
   }
 };
 
-// Init
-initOrbitCarousel();
-loadPreorders();
+// Init safely on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initOrbitCarousel();
+    loadPreorders();
+  });
+} else {
+  initOrbitCarousel();
+  loadPreorders();
+}
 </script>
 </body>
 </html>

@@ -1093,7 +1093,8 @@
         if (typeof DB !== 'undefined' && DB.patches) {
           let dbPatches = DB.patches.enabled();
           if (Array.isArray(targetProduct.assignedPatches)) {
-            dbPatches = dbPatches.filter(p => targetProduct.assignedPatches.includes(p.id));
+            const assigned = targetProduct.assignedPatches.map(x => String(x).toLowerCase().trim());
+            dbPatches = dbPatches.filter(p => assigned.includes(String(p.id).toLowerCase().trim()) || assigned.includes(String(p.name||'').toLowerCase().trim()));
           }
           const patchesSection = document.getElementById('patches-section');
           if (dbPatches && dbPatches.length > 0) {
@@ -1111,18 +1112,13 @@
         if (typeof DB !== 'undefined' && DB.sleeves) {
           let dbSleeves = DB.sleeves.enabled();
           if (Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length > 0) {
-            const assigned = targetProduct.assignedSleeves;
+            const assigned = targetProduct.assignedSleeves.map(x => String(x).toLowerCase().trim());
             const filtered = dbSleeves.filter(s => 
-              assigned.includes(s.id) || 
-              assigned.includes(s.name) ||
-              (s.id === 'slv_half' && assigned.includes('short')) ||
-              (s.id === 'slv_full' && assigned.includes('long'))
+              assigned.includes(String(s.id).toLowerCase().trim()) || 
+              assigned.includes(String(s.name||'').toLowerCase().trim()) ||
+              (s.id === 'slv_half' && (assigned.includes('short') || assigned.includes('half'))) ||
+              (s.id === 'slv_full' && (assigned.includes('long') || assigned.includes('full')))
             );
-            // If filtered only includes half sleeve, also ensure full sleeve is present if enabled in DB
-            if (filtered.length === 1 && filtered[0].id === 'slv_half') {
-              const fullOption = dbSleeves.find(s => s.id === 'slv_full' || (s.name && s.name.toLowerCase().includes('full')));
-              if (fullOption) filtered.push(fullOption);
-            }
             if (filtered.length > 0) {
               dbSleeves = filtered;
             }
@@ -1144,7 +1140,8 @@
         if (typeof DB !== 'undefined' && DB.sizes) {
           let dbSizes = DB.sizes.enabled();
           if (Array.isArray(targetProduct.assignedSizes) && targetProduct.assignedSizes.length > 0) {
-            dbSizes = dbSizes.filter(s => targetProduct.assignedSizes.includes(s.id));
+            const assigned = targetProduct.assignedSizes.map(x => String(x).toLowerCase().trim());
+            dbSizes = dbSizes.filter(s => assigned.includes(String(s.id).toLowerCase().trim()) || assigned.includes(String(s.code||'').toLowerCase().trim()) || assigned.includes(String(s.name||'').toLowerCase().trim()));
           }
           renderDynamicSizes(dbSizes);
         }

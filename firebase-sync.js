@@ -75,13 +75,8 @@
         });
       });
 
-      // Automatically activate live sync so updates across phones reflect instantly
-      startLiveSync(() => {
-        try {
-          window.dispatchEvent(new Event('storage'));
-          window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'live' } }));
-        } catch(e){}
-      });
+      // Automatically activate live sync so updates reflect in real-time
+      startLiveSync();
 
       return true;
     } catch (e) {
@@ -285,7 +280,7 @@
 
   // ── Real-time listener — updates local storage & triggers UI ───
   function startLiveSync(onUpdate) {
-    if (typeof onUpdate === 'function') {
+    if (typeof onUpdate === 'function' && !_listeners.includes(onUpdate)) {
       _listeners.push(onUpdate);
     }
     if (!_db) return;

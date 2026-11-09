@@ -707,8 +707,8 @@ const DB = {
     },
     byId(id) {
       if (!id) return null;
-      const strId = String(id).toLowerCase();
-      return Store.get('categories').find(c => String(c.id).toLowerCase() === strId || String(c.slug||'').toLowerCase() === strId || String(c.name||'').toLowerCase() === strId) || null;
+      const strId = String(id).trim().toLowerCase();
+      return Store.get('categories').find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) || null;
     },
     active() {
       return Store.get('categories').filter(c => c.isActive !== false);
@@ -721,17 +721,29 @@ const DB = {
       return item;
     },
     update(id, data) {
-      const strId = String(id);
-      const items = Store.get('categories').map(c => (String(c.id) === strId || String(c.slug) === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
+      const strId = String(id).trim().toLowerCase();
+      const items = Store.get('categories').map(c => (String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
       Store.set('categories', items);
       DB.log(`Category updated: ${data.name || id}`);
-      return items.find(c => String(c.id) === strId || String(c.slug) === strId);
+      return items.find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(data.slug||'').trim().toLowerCase() === String(c.slug||'').trim().toLowerCase());
     },
     delete(id) {
-      const strId = String(id);
+      const strId = String(id).trim().toLowerCase();
       const cat = DB.categories.byId(id);
-      const items = Store.get('categories').filter(c => String(c.id) !== strId && String(c.slug) !== strId);
+      const items = Store.get('categories').filter(c => String(c.id).trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
       Store.set('categories', items);
+      try {
+        const prods = Store.get('products');
+        let updatedProds = false;
+        prods.forEach(p => {
+          if (String(p.categoryId).trim().toLowerCase() === strId || (cat && String(p.categoryName || '').toLowerCase() === String(cat.name || '').toLowerCase())) {
+            p.categoryId = null;
+            p.categoryName = 'Standard Collection';
+            updatedProds = true;
+          }
+        });
+        if (updatedProds) Store.set('products', prods);
+      } catch(e){}
       DB.log(`Category deleted: ${cat?.name || id}`);
       return items;
     },

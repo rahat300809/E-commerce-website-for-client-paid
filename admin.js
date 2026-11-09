@@ -1101,6 +1101,15 @@ window.toggleChip = function(el) {
   if (inp) {
     inp.checked = !inp.checked;
     el.classList.toggle('selected', inp.checked);
+    if (inp.checked) {
+      el.style.background = '#111827';
+      el.style.borderColor = '#111827';
+      el.style.color = '#ffffff';
+    } else {
+      el.style.background = '#ffffff';
+      el.style.borderColor = '#E5E7EB';
+      el.style.color = '#111827';
+    }
     inp.dispatchEvent(new Event('change', { bubbles: true }));
   }
 };
@@ -1110,12 +1119,20 @@ window.toggleCustomRow = function(el) {
   const inp = el.querySelector('input[type="checkbox"]');
   if (inp) {
     inp.checked = !inp.checked;
+    const track = el.querySelector('.toggle-track');
+    const thumb = el.querySelector('.toggle-thumb');
     if (inp.checked) {
       el.style.background = '#F0FDF4';
       el.style.borderColor = '#16A34A';
+      el.classList.add('toggle-active');
+      if (track) track.style.background = '#16A34A';
+      if (thumb) thumb.style.transform = 'translateX(18px)';
     } else {
       el.style.background = '#FAFAFA';
       el.style.borderColor = '#E5E7EB';
+      el.classList.remove('toggle-active');
+      if (track) track.style.background = '#D1D5DB';
+      if (thumb) thumb.style.transform = 'translateX(0px)';
     }
     inp.dispatchEvent(new Event('change', { bubbles: true }));
   }
@@ -1130,6 +1147,15 @@ window.toggleChipsGroup = function(groupId, selectAll) {
     if (input) {
       input.checked = selectAll;
       chip.classList.toggle('selected', selectAll);
+      if (selectAll) {
+        chip.style.background = '#111827';
+        chip.style.borderColor = '#111827';
+        chip.style.color = '#ffffff';
+      } else {
+        chip.style.background = '#ffffff';
+        chip.style.borderColor = '#E5E7EB';
+        chip.style.color = '#111827';
+      }
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
@@ -1427,9 +1453,9 @@ function openProductForm(id = null) {
       <div id="prod-tab-custom" class="prod-tab hidden">
         <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">Choose which customization options, badges, and sleeve styles are available for this product.</p>
         ${[
-          ['customNameNumber','Name + Number Package', `৳${cs.nameNumberPackage?.price||200}`, !product ? true : !!product.customNameNumber],
-          ['customName','Name Printing', `৳${cs.namePrinting?.price||200}`, !product ? true : !!product.customName],
-          ['customNumber','Number Printing', `৳${cs.numberPrinting?.price||150}`, !product ? true : !!product.customNumber],
+          ['customNameNumber','Name + Number Package', `৳${cs.nameNumberPackage?.price||200}`, !product ? true : (product.customNameNumber !== undefined ? !!product.customNameNumber : true)],
+          ['customName','Name Printing', `৳${cs.namePrinting?.price||200}`, !product ? true : (product.customName !== undefined ? !!product.customName : true)],
+          ['customNumber','Number Printing', `৳${cs.numberPrinting?.price||150}`, !product ? true : (product.customNumber !== undefined ? !!product.customNumber : true)],
           ['customLogo','Custom Logo Upload', `৳${cs.customLogo?.price||500}`, !product ? false : !!product.customLogo],
           ['customText','Custom Text', 'Free', !product ? false : !!product.customText],
         ].map(([field,label,price,isChecked]) => `
@@ -1442,8 +1468,8 @@ function openProductForm(id = null) {
             </div>
             <div class="toggle">
               <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} style="pointer-events:none;"/>
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
+              <div class="toggle-track" style="background:${isChecked ? '#16A34A' : '#D1D5DB'};"></div>
+              <div class="toggle-thumb" style="transform:${isChecked ? 'translateX(18px)' : 'translateX(0px)'};"></div>
             </div>
           </div>
         `).join('')}
@@ -1466,8 +1492,8 @@ function openProductForm(id = null) {
           </div>
           <div class="checkbox-group" id="patches-chips">
             ${patches.map(p => {
-              const selected = product ? (Array.isArray(product.assignedPatches) ? product.assignedPatches.includes(p.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+              const selected = product ? (Array.isArray(product.assignedPatches) ? (product.assignedPatches.includes(p.id) || product.assignedPatches.includes(p.name)) : true) : true;
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
                 <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''}/>
                 ${p.name} (+৳${p.price})
               </label>`;
@@ -1485,8 +1511,8 @@ function openProductForm(id = null) {
           </div>
           <div class="checkbox-group" id="sleeves-chips">
             ${sleeves.map(s => {
-              const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? product.assignedSleeves.includes(s.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+              const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? (product.assignedSleeves.includes(s.id) || product.assignedSleeves.includes(s.name)) : true) : true;
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
                 <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''}/>
                 ${s.name} (+৳${s.additionalPrice})
               </label>`;
@@ -1504,8 +1530,8 @@ function openProductForm(id = null) {
           </div>
           <div class="checkbox-group" id="sizes-chips">
             ${sizes.map(s => {
-              const selected = product ? (Array.isArray(product.assignedSizes) && product.assignedSizes.length > 0 ? product.assignedSizes.includes(s.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+              const selected = product ? (Array.isArray(product.assignedSizes) && product.assignedSizes.length > 0 ? (product.assignedSizes.includes(s.id) || product.assignedSizes.includes(s.code)) : true) : true;
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
                 <input type="checkbox" name="size_${s.id}" ${selected?'checked':''}/>
                 ${s.code}
               </label>`;
@@ -1781,7 +1807,14 @@ function inlineAddCategory() {
   const name = prompt('New category name:');
   if (!name?.trim()) return;
   const slug = name.trim().toLowerCase().replace(/\s+/g,'-');
-  const cat = DB.categories.create({ name: name.trim(), slug, isActive: true, displayOrder: 0 });
+  const cat = DB.categories.create({ 
+    name: name.trim(), 
+    slug, 
+    imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+    mobileImgUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+    isActive: true, 
+    displayOrder: 0 
+  });
   toast(`Category "${cat.name}" created`, 'success');
   const select = document.querySelector('[name=categoryId]');
   if (select) { const opt = document.createElement('option'); opt.value = cat.id; opt.textContent = cat.name; opt.selected = true; select.appendChild(opt); }
@@ -2033,8 +2066,46 @@ function deleteCat(id, name) {
     DB.categories.delete(id);
     toast(`Category "${name}" deleted successfully`, 'success');
     renderCategories(document.getElementById('admin-content'));
+    try { window.dispatchEvent(new Event('storage')); } catch(e){}
   });
 }
+
+window.handleCatDirectUrl = function(url) {
+  const clean = (url || '').trim();
+  window._catImgUrl = clean;
+  const inner = document.getElementById('cat-desktop-inner');
+  if (inner) {
+    if (clean) {
+      inner.innerHTML = `<img src="${clean}" class="upload-preview-img" id="cat-desktop-preview" onerror="this.style.display='none'"/>
+        <div class="upload-overlay" id="cat-desktop-overlay" style="display:flex;gap:6px;position:absolute;top:6px;right:6px;">
+          <button type="button" class="btn btn-danger btn-xs" onclick="window.clearCatImage(); event.stopPropagation();">
+            <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+          </button>
+        </div>`;
+      inner.classList.add('has-image');
+    } else {
+      inner.innerHTML = `<div class="upload-placeholder">
+        <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
+        <p class="text-sm text-slate-500 mt-1">Click or drop category image file here</p>
+      </div>`;
+      inner.classList.remove('has-image');
+    }
+  }
+};
+
+window.clearCatImage = function() {
+  window._catImgUrl = '';
+  const urlInp = document.getElementById('cat-direct-url');
+  if (urlInp) urlInp.value = '';
+  const inner = document.getElementById('cat-desktop-inner');
+  if (inner) {
+    inner.innerHTML = `<div class="upload-placeholder">
+      <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
+      <p class="text-sm text-slate-500 mt-1">Click or drop category image file here</p>
+    </div>`;
+    inner.classList.remove('has-image');
+  }
+};
 
 function openCategoryForm(id = null) {
   const cat = id ? DB.categories.byId(id) : null;
@@ -2061,10 +2132,13 @@ function openCategoryForm(id = null) {
       <!-- Upload Category Image -->
       <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>Category Image (Upload)<span class="req">*</span></span>
+          <span>Category Image (Upload or Paste Link)<span class="req">*</span></span>
           <span style="font-size:11px;color:#64748B;font-weight:normal;">Shown on cards, homepage & shop filters</span>
         </label>
         <div id="cat-img-zone" style="margin-top:4px;"></div>
+        <div style="margin-top:8px;">
+          <input type="text" id="cat-direct-url" class="form-input" style="font-size:12px;" value="${imgUrl && !imgUrl.startsWith('data:') ? imgUrl : ''}" placeholder="Or paste image URL directly (e.g. https://...)" oninput="window.handleCatDirectUrl(this.value)"/>
+        </div>
       </div>
 
       <div class="form-row">
@@ -2125,6 +2199,8 @@ function openCategoryForm(id = null) {
       maxDimension: 800,
       onchange: v => {
         window._catImgUrl = v || '';
+        const urlInp = document.getElementById('cat-direct-url');
+        if (urlInp && v && !v.startsWith('data:')) urlInp.value = v;
       }
     });
     const zoneEl = document.getElementById('cat-img-zone');
@@ -2153,7 +2229,8 @@ function saveCategoryForm(id) {
   const slug = fd.get('slug')?.trim();
   if (!name || !slug) { toast('Name and slug required', 'error'); return; }
 
-  const imageUrl = window._catImgUrl || '';
+  const directUrl = document.getElementById('cat-direct-url')?.value?.trim() || '';
+  const imageUrl = window._catImgUrl || directUrl || '';
 
   const data = {
     name,

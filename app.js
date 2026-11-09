@@ -105,10 +105,20 @@ function refreshStorefrontData() {
 }
 
 window.addEventListener('storage', (e) => {
+  if (e && e.key && (e.key.includes('wishlist') || e.key.includes('cart'))) {
+    renderCart();
+    updateWishlistBadges();
+    return;
+  }
   refreshStorefrontData();
 });
 
 window.addEventListener('zenvy-store-updated', (e) => {
+  if (e && e.detail && (e.detail.key === 'wishlist' || e.detail.key === 'cart')) {
+    renderCart();
+    updateWishlistBadges();
+    return;
+  }
   refreshStorefrontData();
 });
 
@@ -174,16 +184,70 @@ function getHeroBanners() {
   return banners;
 }
 
+function updateHeroBannerSlide(targetIndex) {
+  if (!heroBannersList || heroBannersList.length === 0) return;
+  const n = heroBannersList.length;
+  heroBannerActiveIndex = ((targetIndex % n) + n) % n;
+
+  const wrapper = document.getElementById('hero-slides-wrapper');
+  if (wrapper) {
+    const slides = wrapper.querySelectorAll('.hero-slide');
+    slides.forEach((slide, idx) => {
+      const isAct = idx === heroBannerActiveIndex;
+      slide.classList.toggle('opacity-100', isAct);
+      slide.classList.toggle('z-10', isAct);
+      slide.classList.toggle('pointer-events-auto', isAct);
+      slide.classList.toggle('opacity-0', !isAct);
+      slide.classList.toggle('z-0', !isAct);
+      slide.classList.toggle('pointer-events-none', !isAct);
+
+      const bgEl = slide.querySelector('.bg-cover');
+      if (bgEl) {
+        bgEl.classList.toggle('scale-100', isAct);
+        bgEl.classList.toggle('scale-105', !isAct);
+      }
+    });
+  }
+
+  const dotsEl = document.getElementById('hero-banner-dots');
+  if (dotsEl) {
+    const dots = dotsEl.querySelectorAll('button');
+    dots.forEach((dot, idx) => {
+      const isAct = idx === heroBannerActiveIndex;
+      dot.className = `transition-all duration-300 rounded-full cursor-pointer ${isAct ? 'w-5 sm:w-6 h-1.5 sm:h-2 bg-white' : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70'}`;
+    });
+  }
+}
+
 function renderHeroBannerCarousel() {
   const wrapper = document.getElementById('hero-slides-wrapper');
   const dotsEl = document.getElementById('hero-banner-dots');
   if (!wrapper) return;
 
-  heroBannersList = getHeroBanners();
-  if (heroBannersList.length === 0) return;
+  const newBanners = getHeroBanners();
+  if (newBanners.length === 0) return;
+
+  // Check if banners have actually changed to avoid wiping existing DOM and re-decoding images
+  const bannerHash = JSON.stringify(newBanners.map(b => b.id || b.title));
+  if (wrapper.dataset.bannerHash === bannerHash && wrapper.children.length === newBanners.length) {
+    updateHeroBannerSlide(heroBannerActiveIndex);
+    return;
+  }
+
+  heroBannersList = newBanners;
+  wrapper.dataset.bannerHash = bannerHash;
 
   if (heroBannerActiveIndex >= heroBannersList.length) heroBannerActiveIndex = 0;
   if (heroBannerActiveIndex < 0) heroBannerActiveIndex = heroBannersList.length - 1;
+
+  // Preload images into browser memory to eliminate flash
+  heroBannersList.forEach(banner => {
+    const bg = banner.desktopImg || banner.bgImage || banner.image;
+    if (bg) {
+      const img = new Image();
+      img.src = bg;
+    }
+  });
 
   wrapper.innerHTML = heroBannersList.map((banner, index) => {
     const isActive = index === heroBannerActiveIndex;
@@ -245,7 +309,6 @@ function renderHeroBannerCarousel() {
       if (e.changedTouches && e.changedTouches[0]) {
         const diffX = e.changedTouches[0].screenX - startX;
         const diffY = e.changedTouches[0].screenY - startY;
-        // Only trigger slide change if movement was clearly horizontal, NOT vertical scrolling!
         if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
           if (diffX > 45) prevHeroBannerSlide();
           else nextHeroBannerSlide();
@@ -262,6 +325,8 @@ function startHeroBannerAutoScroll() {
   if (heroBannerInterval) clearInterval(heroBannerInterval);
   if (heroBannersList.length > 1) {
     heroBannerInterval = setInterval(() => {
+      const homeView = document.getElementById('view-home');
+      if (homeView && !homeView.classList.contains('active')) return;
       nextHeroBannerSlide(false);
     }, 5500);
   }
@@ -269,21 +334,18 @@ function startHeroBannerAutoScroll() {
 
 window.nextHeroBannerSlide = function(manual = true) {
   if (heroBannersList.length <= 1) return;
-  heroBannerActiveIndex = (heroBannerActiveIndex + 1) % heroBannersList.length;
-  renderHeroBannerCarousel();
+  updateHeroBannerSlide(heroBannerActiveIndex + 1);
   if (manual) startHeroBannerAutoScroll();
 };
 
-window.prevHeroBannerSlide = function() {
+window.prevHeroBannerSlide = function(manual = true) {
   if (heroBannersList.length <= 1) return;
-  heroBannerActiveIndex = (heroBannerActiveIndex - 1 + heroBannersList.length) % heroBannersList.length;
-  renderHeroBannerCarousel();
-  startHeroBannerAutoScroll();
+  updateHeroBannerSlide(heroBannerActiveIndex - 1);
+  if (manual) startHeroBannerAutoScroll();
 };
 
 window.gotoHeroBannerSlide = function(index) {
-  heroBannerActiveIndex = index;
-  renderHeroBannerCarousel();
+  updateHeroBannerSlide(index);
   startHeroBannerAutoScroll();
 };
 
@@ -685,7 +747,7 @@ function renderCheckoutPaymentMethods() {
     { 
       id: 'bkash', 
       name: 'bKash', 
-      logo: 'img/mfs/bkash.png', 
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/BKash_Logo.svg/320px-BKash_Logo.svg.png', 
       brandColor: '#D12053',
       num: bkashNum, 
       type: bkashType, 
@@ -695,7 +757,7 @@ function renderCheckoutPaymentMethods() {
     { 
       id: 'nagad', 
       name: 'Nagad', 
-      logo: 'img/mfs/nagad.png', 
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Nagad_Logo.svg/320px-Nagad_Logo.svg.png', 
       brandColor: '#EA580C',
       num: nagadNum, 
       type: nagadType, 
@@ -705,7 +767,7 @@ function renderCheckoutPaymentMethods() {
     { 
       id: 'rocket', 
       name: 'Rocket', 
-      logo: 'img/mfs/rocket.png', 
+      logo: 'https://seeklogo.com/images/D/dutch-bangla-rocket-logo-B4D1CC458D-seeklogo.com.png', 
       brandColor: '#7C3AED',
       num: rocketNum, 
       type: rocketType, 
@@ -720,7 +782,7 @@ function renderCheckoutPaymentMethods() {
         <label class="relative flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
           <div class="flex items-center justify-between w-full">
             <div class="w-14 h-11 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
-              <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" />
+              <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-weight:900;color:${m.brandColor};font-size:12px;\\'>${m.name}</span>';"/>
             </div>
             <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer" />
           </div>
@@ -846,7 +908,7 @@ function updateCheckoutCalculations() {
   // 6. Active Payment Instructions Card (Dynamic TrxID / Number / COD Info)
   const detailsBox = document.getElementById('checkout-payment-instructions-card');
   if (detailsBox) {
-    if (isCodSelected) {
+    if (isCodSelected || selectedPaymentId === 'cod' || activeSplit === 'cod') {
       detailsBox.innerHTML = `
         <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 shadow-2xs">
           <div class="font-bold flex items-center gap-2 mb-1.5 text-emerald-800 font-mono-ui text-xs tracking-wide">
@@ -855,23 +917,6 @@ function updateCheckoutCalculations() {
           </div>
           <p class="text-[12px] text-emerald-700 leading-relaxed">
             No advance digital payment needed. Pay total cash of <strong>৳${dueAmount.toLocaleString()}</strong> directly to the Steadfast / Pathao courier delivery rider when your package arrives at your doorstep.
-          </p>
-        </div>
-      `;
-    } else {
-      detailsBox.innerHTML = '';
-    }
-  }
-  if (detailsBox) {
-    if (selectedPaymentId === 'cod' || activeSplit === 'cod') {
-      detailsBox.innerHTML = `
-        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 shadow-2xs">
-          <div class="font-bold flex items-center gap-1.5 mb-1 text-emerald-800">
-            <span class="material-symbols-outlined text-base">local_shipping</span>
-            <span>Cash on Delivery (Courier Doorstep Handover)</span>
-          </div>
-          <p class="text-[11px] text-emerald-700 leading-relaxed">
-            No advance digital payment needed. Pay total cash of <strong>৳${dueAmount.toLocaleString()}</strong> to the Steadfast / Pathao courier delivery rider when your package arrives at your doorstep.
           </p>
         </div>
       `;
@@ -1213,7 +1258,7 @@ function renderCart() {
   const shippingCost = subtotal > 0 ? (isDeliveryFree ? 0 : shippingBase) : 0;
 
   if (drawerSubtotal) drawerSubtotal.innerText = formatMoney(subtotal);
-  if (drawerTotal) drawerTotal.innerText = formatMoney(subtotal);
+  if (drawerTotal) drawerTotal.innerText = formatMoney(subtotal > 0 ? subtotal + shippingCost : 0);
   if (checkoutSubtotal) checkoutSubtotal.innerText = formatMoney(subtotal);
   if (checkoutTotal) checkoutTotal.innerText = formatMoney(subtotal > 0 ? subtotal + shippingCost : 0);
 }
@@ -1314,6 +1359,7 @@ function togglePersonalizationInputs() {
   const fields = document.getElementById('personalization-fields');
   const toggle = document.getElementById('personalize-toggle');
   const printOverlay = document.getElementById('jersey-print-overlay');
+  if (!toggle || !fields) return;
 
   if (toggle.checked) {
     fields.classList.remove('hidden');
@@ -2043,6 +2089,8 @@ function shopCarouselGoto(index) {
 }
 
 function shopCarouselNext() {
+  const shopView = document.getElementById('view-shop');
+  if (!shopView || !shopView.classList.contains('active')) return;
   const slides = getShopSlides();
   const total = slides.length || 1;
   shopCarouselGoto((shopCarouselIndex + 1) % total);
@@ -2054,7 +2102,7 @@ function shopCarouselPrev() {
   shopCarouselGoto((shopCarouselIndex - 1 + total) % total);
 }
 
-// Auto-advance shop carousel every 4 seconds
+// Auto-advance shop carousel every 4 seconds (only when shop view is active)
 if (!window._shopCarouselTimer) {
   window._shopCarouselTimer = setInterval(shopCarouselNext, 4000);
 }
@@ -2073,9 +2121,11 @@ function openProduct(product) {
 
 function closeProduct() {
   const modal = document.getElementById('product-modal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-  document.body.style.overflow = '';
+  if (modal && !modal.classList.contains('hidden')) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
 }
 
 function selectPdSize(btn, size) {
@@ -2798,32 +2848,12 @@ function handleCreateProduct(e) {
   }
 }
 
-// Helpers
-function scrollSlider(amount) {
-  const slider = document.getElementById('product-slider');
-  if (slider) {
-    slider.scrollBy({ left: amount, behavior: 'smooth' });
-  }
-}
-
-// ─────────────────────────────────────────
-// Persistent Wishlist System & Drawer
-// ─────────────────────────────────────────
-function getWishlist() {
-  try {
-    return JSON.parse(localStorage.getItem('zenvy_wishlist') || '[]');
-  } catch(e) {
-    return [];
-  }
-}
-
 function saveWishlist(list) {
   try {
     localStorage.setItem('zenvy_wishlist', JSON.stringify(list));
     updateWishlistBadges();
     syncWishlistHeartButtons();
     renderWishlistDrawer();
-    window.dispatchEvent(new Event('storage'));
   } catch(e) {}
 }
 
@@ -3027,7 +3057,7 @@ function addAllWishlistToCart() {
   });
   showToast(`Added all ${list.length} item(s) to Bag!`);
   toggleWishlistModal(false);
-  toggleCart(true);
+  toggleCartDrawer(true);
 }
 
 // Global window bindings
@@ -3042,7 +3072,7 @@ if (typeof window !== 'undefined') {
   window.addAllWishlistToCart = addAllWishlistToCart;
 }
 
-function showToast(message) {
+function showToast(message, duration = 3000) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
@@ -3062,7 +3092,7 @@ function showToast(message) {
   setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-2');
     setTimeout(() => toast.remove(), 300);
-  }, 3000);
+  }, duration);
 }
 
 // Mobile Interactivity Helpers
@@ -3205,7 +3235,11 @@ function syncModelShowcase() {
   }
 
   if (!showcaseInterval) {
-    showcaseInterval = setInterval(() => nextShowcaseModel(false), 5500);
+    showcaseInterval = setInterval(() => {
+      const homeView = document.getElementById('view-home');
+      if (!homeView || !homeView.classList.contains('active')) return;
+      nextShowcaseModel(false);
+    }, 5500);
   }
 }
 

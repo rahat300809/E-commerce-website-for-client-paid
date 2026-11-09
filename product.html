@@ -818,9 +818,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261110_v2"></script>
-  <script src="admin-db.js?v=20261110_v2"></script>
-  <script src="wishlist.js?v=20261110_v2"></script>
+  <script src="firebase-sync.js?v=20261110_v3"></script>
+  <script src="admin-db.js?v=20261110_v3"></script>
+  <script src="wishlist.js?v=20261110_v3"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1058,9 +1058,20 @@
         }
 
         // Determine if customization is enabled on this specific product
-        // If explicitly boolean false, disable it; if true or undefined on a kit, enable it
-        const hasCustomPrinting = targetProduct.customNameNumber !== false && (
-          targetProduct.customNameNumber === true || targetProduct.customName === true || targetProduct.customNumber === true || targetProduct.customText === true || (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined)
+        // If explicitly all false, disable it; if any is true or undefined on a kit, enable it
+        const hasExplicitDisabled = targetProduct.customNameNumber === false && 
+                                    targetProduct.customName === false && 
+                                    targetProduct.customNumber === false && 
+                                    targetProduct.customLogo === false && 
+                                    targetProduct.customText === false;
+
+        const hasCustomPrinting = !hasExplicitDisabled && (
+          targetProduct.customNameNumber === true ||
+          targetProduct.customName === true ||
+          targetProduct.customNumber === true ||
+          targetProduct.customLogo === true ||
+          targetProduct.customText === true ||
+          (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined)
         );
 
         const customSection = document.getElementById('custom-print-section');
@@ -1068,17 +1079,31 @@
           if (hasCustomPrinting) {
             customSection.style.display = 'block';
             let printFee = 200;
-            if (cs?.nameNumberPackage?.price) printFee = parseFloat(cs.nameNumberPackage.price) || 200;
+            if (targetProduct.customName && !targetProduct.customNumber && !targetProduct.customNameNumber) {
+              printFee = parseFloat(cs?.namePrinting?.price) || 200;
+            } else if (targetProduct.customNumber && !targetProduct.customName && !targetProduct.customNameNumber) {
+              printFee = parseFloat(cs?.numberPrinting?.price) || 150;
+            } else {
+              printFee = parseFloat(cs?.nameNumberPackage?.price) || 200;
+            }
             if (targetProduct.customPrintPrice !== undefined && targetProduct.customPrintPrice !== null && targetProduct.customPrintPrice !== '') {
               printFee = parseFloat(targetProduct.customPrintPrice) || printFee;
             }
             productState.personalizeFee = printFee;
             const heading = document.getElementById('custom-section-heading');
+            const customInput = document.getElementById('custom-name-number-input');
+            const onlyName = !!(targetProduct.customName && !targetProduct.customNumber && !targetProduct.customNameNumber);
+            const onlyNumber = !!(targetProduct.customNumber && !targetProduct.customName && !targetProduct.customNameNumber);
             if (heading) {
-              const label = (targetProduct.customName && !targetProduct.customNumber) ? 'Custom Name Printing'
-                          : (targetProduct.customNumber && !targetProduct.customName) ? 'Custom Number Printing'
+              const label = onlyName ? 'Custom Name Printing'
+                          : onlyNumber ? 'Custom Number Printing'
                           : 'Custom Name & Number';
               heading.textContent = `${label} (+৳${printFee})`;
+            }
+            if (customInput) {
+              if (onlyName) customInput.placeholder = 'Enter Name (e.g. RONALDO)';
+              else if (onlyNumber) customInput.placeholder = 'Enter Number (e.g. 7)';
+              else customInput.placeholder = 'Enter Name + Number (e.g. RONALDO 7)';
             }
           } else {
             customSection.style.display = 'none';
@@ -1111,28 +1136,37 @@
         // 3. Read dynamic sleeves from Admin DB (filter by targetProduct.assignedSleeves)
         if (typeof DB !== 'undefined' && DB.sleeves) {
           let dbSleeves = DB.sleeves.enabled();
-          if (Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length > 0) {
-            const assigned = targetProduct.assignedSleeves.map(x => String(x).toLowerCase().trim());
-            const filtered = dbSleeves.filter(s => 
-              assigned.includes(String(s.id).toLowerCase().trim()) || 
-              assigned.includes(String(s.name||'').toLowerCase().trim()) ||
-              (s.id === 'slv_half' && (assigned.includes('short') || assigned.includes('half'))) ||
-              (s.id === 'slv_full' && (assigned.includes('long') || assigned.includes('full')))
-            );
-            if (filtered.length > 0) {
-              dbSleeves = filtered;
-            }
-          }
-          if (!dbSleeves || dbSleeves.length === 0) {
-            dbSleeves = [
-              { id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 },
-              { id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 }
-            ];
-          }
+          const hasExplicitEmptySleeves = Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length === 0 && targetProduct.hasOwnProperty('assignedSleeves');
           const sleeveSection = document.getElementById('sleeve-section');
-          if (sleeveSection) {
-            sleeveSection.style.display = 'block';
-            renderDynamicSleeves(dbSleeves);
+          
+          if (hasExplicitEmptySleeves) {
+            if (sleeveSection) sleeveSection.style.display = 'none';
+            productState.selectedSleeve = '';
+            productState.selectedSleeveName = '';
+            productState.sleevePrice = 0;
+          } else {
+            if (Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length > 0) {
+              const assigned = targetProduct.assignedSleeves.map(x => String(x).toLowerCase().trim());
+              const filtered = dbSleeves.filter(s => 
+                assigned.includes(String(s.id).toLowerCase().trim()) || 
+                assigned.includes(String(s.name||'').toLowerCase().trim()) ||
+                (s.id === 'slv_half' && (assigned.includes('short') || assigned.includes('half'))) ||
+                (s.id === 'slv_full' && (assigned.includes('long') || assigned.includes('full')))
+              );
+              if (filtered.length > 0) {
+                dbSleeves = filtered;
+              }
+            }
+            if (!dbSleeves || dbSleeves.length === 0) {
+              dbSleeves = [
+                { id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 },
+                { id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 }
+              ];
+            }
+            if (sleeveSection) {
+              sleeveSection.style.display = 'block';
+              renderDynamicSleeves(dbSleeves);
+            }
           }
         }
 

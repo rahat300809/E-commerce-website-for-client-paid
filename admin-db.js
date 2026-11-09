@@ -817,6 +817,7 @@ const DB = {
           return tB - tA; // Newest products at the top!
         });
     },
+    list() { return this.published(); },
     lowStock() { return DB.products.all().filter(p => p.stock <= (p.lowStockAlert||5) && p.stock > 0 && !p.isArchived); },
     outOfStock() { return DB.products.all().filter(p => p.stock === 0 && !p.isArchived); },
     preorders() { return DB.products.all().filter(p => p.isPreorder && !p.isArchived); },

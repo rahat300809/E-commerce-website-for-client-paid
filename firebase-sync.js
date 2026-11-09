@@ -68,10 +68,6 @@
         // Automatically hydrate from cloud so other devices immediately get data
         hydrate().then(() => {
           console.log('[ZenvySync] Initial cloud hydration finished ✅');
-          try {
-            window.dispatchEvent(new Event('storage'));
-            window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'all' } }));
-          } catch(e){}
         });
       });
 

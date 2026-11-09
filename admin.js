@@ -1095,18 +1095,22 @@ function removeAllDemoProducts() {
   );
 }
 
-// Helper to toggle a single chip in product form
-window.toggleChip = function(el) {
+// Helper to toggle chips in product form
+window.toggleChip = function(el, evt) {
+  if (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
   const inp = el.querySelector('input[type="checkbox"]');
   if (inp) {
     inp.checked = !inp.checked;
     el.classList.toggle('selected', inp.checked);
     if (inp.checked) {
-      el.style.background = '#111827';
+      el.style.backgroundColor = '#111827';
       el.style.borderColor = '#111827';
       el.style.color = '#ffffff';
     } else {
-      el.style.background = '#ffffff';
+      el.style.backgroundColor = '#ffffff';
       el.style.borderColor = '#E5E7EB';
       el.style.color = '#111827';
     }
@@ -1115,23 +1119,27 @@ window.toggleChip = function(el) {
 };
 
 // Helper to toggle customization rows in product form
-window.toggleCustomRow = function(el) {
+window.toggleCustomRow = function(el, evt) {
+  if (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
   const inp = el.querySelector('input[type="checkbox"]');
   if (inp) {
     inp.checked = !inp.checked;
     const track = el.querySelector('.toggle-track');
     const thumb = el.querySelector('.toggle-thumb');
     if (inp.checked) {
-      el.style.background = '#F0FDF4';
+      el.style.backgroundColor = '#F0FDF4';
       el.style.borderColor = '#16A34A';
       el.classList.add('toggle-active');
-      if (track) track.style.background = '#16A34A';
+      if (track) track.style.backgroundColor = '#16A34A';
       if (thumb) thumb.style.transform = 'translateX(18px)';
     } else {
-      el.style.background = '#FAFAFA';
+      el.style.backgroundColor = '#FAFAFA';
       el.style.borderColor = '#E5E7EB';
       el.classList.remove('toggle-active');
-      if (track) track.style.background = '#D1D5DB';
+      if (track) track.style.backgroundColor = '#D1D5DB';
       if (thumb) thumb.style.transform = 'translateX(0px)';
     }
     inp.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1148,16 +1156,18 @@ window.toggleChipsGroup = function(groupId, selectAll) {
       input.checked = selectAll;
       chip.classList.toggle('selected', selectAll);
       if (selectAll) {
-        chip.style.background = '#111827';
+        chip.style.backgroundColor = '#111827';
         chip.style.borderColor = '#111827';
         chip.style.color = '#ffffff';
       } else {
-        chip.style.background = '#ffffff';
+        chip.style.backgroundColor = '#ffffff';
         chip.style.borderColor = '#E5E7EB';
         chip.style.color = '#111827';
       }
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }
+  });
+};
   });
 };
 
@@ -1460,14 +1470,14 @@ function openProductForm(id = null) {
           ['customText','Custom Text', 'Free', !product ? false : !!product.customText],
         ].map(([field,label,price,isChecked]) => `
           <div class="toggle-row ${isChecked ? 'toggle-active' : ''}" 
-               onclick="toggleCustomRow(this)"
+               onclick="toggleCustomRow(this, event)"
                style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:8px;border:1px solid ${isChecked ? '#16A34A' : '#E5E7EB'};border-radius:10px;cursor:pointer;background:${isChecked ? '#F0FDF4' : '#FAFAFA'};transition:all 0.2s;">
             <div>
               <div class="toggle-label" style="font-weight:700;font-size:13px;color:#111827;">${label}</div>
               <div class="toggle-desc" style="font-size:12px;color:#6B7280;margin-top:2px;">${price}</div>
             </div>
-            <div class="toggle">
-              <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} style="pointer-events:none;"/>
+            <div class="toggle" style="pointer-events:none;">
+              <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} style="display:none;"/>
               <div class="toggle-track" style="background:${isChecked ? '#16A34A' : '#D1D5DB'};"></div>
               <div class="toggle-thumb" style="transform:${isChecked ? 'translateX(18px)' : 'translateX(0px)'};"></div>
             </div>
@@ -1493,10 +1503,10 @@ function openProductForm(id = null) {
           <div class="checkbox-group" id="patches-chips">
             ${patches.map(p => {
               const selected = product ? (Array.isArray(product.assignedPatches) ? (product.assignedPatches.includes(p.id) || product.assignedPatches.includes(p.name)) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
-                <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''}/>
-                ${p.name} (+৳${p.price})
-              </label>`;
+              return `<div role="button" class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this, event)" style="cursor:pointer;${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
+                <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''} style="display:none;"/>
+                <span>${p.name} (+৳${p.price})</span>
+              </div>`;
             }).join('') || '<p style="font-size:13px;color:#9CA3AF">No patches configured. Add patches in Customization → Patches.</p>'}
           </div>
         </div>
@@ -1511,11 +1521,18 @@ function openProductForm(id = null) {
           </div>
           <div class="checkbox-group" id="sleeves-chips">
             ${sleeves.map(s => {
-              const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? (product.assignedSleeves.includes(s.id) || product.assignedSleeves.includes(s.name)) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
-                <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''}/>
-                ${s.name} (+৳${s.additionalPrice})
-              </label>`;
+              const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? (
+                product.assignedSleeves.map(x => String(x).toLowerCase().trim()).some(x => 
+                  x === String(s.id).toLowerCase() || 
+                  x === String(s.name).toLowerCase() || 
+                  (s.id === 'slv_half' && (x === 'half' || x === 'short' || x.includes('half'))) ||
+                  (s.id === 'slv_full' && (x === 'full' || x === 'long' || x.includes('full')))
+                )
+              ) : true) : true;
+              return `<div role="button" class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this, event)" style="cursor:pointer;${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
+                <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''} style="display:none;"/>
+                <span>${s.name} (+৳${s.additionalPrice})</span>
+              </div>`;
             }).join('') || '<p style="font-size:13px;color:#9CA3AF">No sleeves configured.</p>'}
           </div>
         </div>
@@ -1531,10 +1548,10 @@ function openProductForm(id = null) {
           <div class="checkbox-group" id="sizes-chips">
             ${sizes.map(s => {
               const selected = product ? (Array.isArray(product.assignedSizes) && product.assignedSizes.length > 0 ? (product.assignedSizes.includes(s.id) || product.assignedSizes.includes(s.code)) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();" style="${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
-                <input type="checkbox" name="size_${s.id}" ${selected?'checked':''}/>
-                ${s.code}
-              </label>`;
+              return `<div role="button" class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this, event)" style="cursor:pointer;${selected ? 'background:#111827;border-color:#111827;color:#ffffff;' : 'background:#ffffff;border-color:#E5E7EB;color:#111827;'}">
+                <input type="checkbox" name="size_${s.id}" ${selected?'checked':''} style="display:none;"/>
+                <span>${s.code}</span>
+              </div>`;
             }).join('')}
           </div>
         </div>
@@ -1863,7 +1880,7 @@ function saveProduct(e, id, asDraft = false) {
   let assignedSleeves = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="sleeve_"]:checked')).map(i => i.name.replace('sleeve_', ''));
   const assignedSizes = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="size_"]:checked')).map(i => i.name.replace('size_', ''));
 
-  if (assignedSleeves.length === 0 && typeof DB !== 'undefined' && DB.sleeves) {
+  if (assignedSleeves.length === 0 && !id && typeof DB !== 'undefined' && DB.sleeves) {
     assignedSleeves = DB.sleeves.enabled().map(s => s.id);
   }
 
@@ -2070,46 +2087,105 @@ function deleteCat(id, name) {
   });
 }
 
-window.handleCatDirectUrl = function(url) {
-  const clean = (url || '').trim();
-  window._catImgUrl = clean;
-  const inner = document.getElementById('cat-desktop-inner');
-  if (inner) {
-    if (clean) {
-      inner.innerHTML = `<img src="${clean}" class="upload-preview-img" id="cat-desktop-preview" onerror="this.style.display='none'"/>
-        <div class="upload-overlay" id="cat-desktop-overlay" style="display:flex;gap:6px;position:absolute;top:6px;right:6px;">
-          <button type="button" class="btn btn-danger btn-xs" onclick="window.clearCatImage(); event.stopPropagation();">
-            <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+window.renderCatImageZone = function(imgUrl) {
+  const zone = document.getElementById('cat-img-zone');
+  if (!zone) return;
+  window._catImgUrl = imgUrl || '';
+  if (imgUrl) {
+    zone.innerHTML = `
+      <div style="position:relative;width:100%;height:180px;border-radius:12px;overflow:hidden;border:1px solid #E5E7EB;background:#0F172A;display:flex;align-items:center;justify-content:center;">
+        <img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Category Preview" onerror="this.src='';window.renderCatImageZone('')"/>
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);"></div>
+        <div style="position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cat-file-input').click()" style="background:rgba(255,255,255,0.95);color:#0F172A;border:none;box-shadow:0 2px 4px rgba(0,0,0,0.2);display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">photo_camera</span> Change Image
           </button>
-        </div>`;
-      inner.classList.add('has-image');
-    } else {
-      inner.innerHTML = `<div class="upload-placeholder">
-        <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
-        <p class="text-sm text-slate-500 mt-1">Click or drop category image file here</p>
-      </div>`;
-      inner.classList.remove('has-image');
-    }
+          <button type="button" class="btn btn-danger btn-sm" onclick="window.clearCatImage()" style="background:#EF4444;color:#ffffff;border:none;box-shadow:0 2px 4px rgba(0,0,0,0.2);display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Delete Image
+          </button>
+        </div>
+      </div>
+    `;
+  } else {
+    zone.innerHTML = `
+      <div class="upload-zone" onclick="document.getElementById('cat-file-input').click()" style="padding:28px 16px;border:2px dashed #CBD5E1;border-radius:12px;background:#F8FAFC;text-align:center;cursor:pointer;transition:all 0.2s;" ondragover="event.preventDefault();this.style.borderColor='#10B981';this.style.background='#F0FDF4';" ondragleave="this.style.borderColor='#CBD5E1';this.style.background='#F8FAFC';" ondrop="event.preventDefault();this.style.borderColor='#CBD5E1';this.style.background='#F8FAFC';if(event.dataTransfer.files[0])window.processCatImageFile(event.dataTransfer.files[0]);">
+        <span class="material-symbols-outlined" style="font-size:36px;color:#64748B;">cloud_upload</span>
+        <div style="font-weight:700;font-size:13px;color:#1E293B;margin-top:6px;">Click or Drag & Drop Category Image</div>
+        <div style="font-size:11px;color:#64748B;margin-top:2px;">PNG, JPG, WebP up to 5MB (Auto-compressed)</div>
+      </div>
+    `;
+  }
+};
+
+window.processCatImageFile = function(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    toast('Please select a valid image file (PNG, JPG, WebP)', 'error');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image file too large (Max 5MB)', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const rawData = e.target.result;
+    const img = new Image();
+    img.onload = function() {
+      let width = img.width;
+      let height = img.height;
+      const maxDim = 800;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        window._catImgUrl = compressed;
+        window.renderCatImageZone(compressed);
+        toast('Image uploaded & compressed!', 'success');
+      } catch(err) {
+        window._catImgUrl = rawData;
+        window.renderCatImageZone(rawData);
+        toast('Image uploaded!', 'success');
+      }
+    };
+    img.onerror = function() {
+      toast('Failed to load image', 'error');
+    };
+    img.src = rawData;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.handleCatFileUpload = function(input) {
+  if (input && input.files && input.files[0]) {
+    window.processCatImageFile(input.files[0]);
+    input.value = '';
   }
 };
 
 window.clearCatImage = function() {
   window._catImgUrl = '';
-  const urlInp = document.getElementById('cat-direct-url');
-  if (urlInp) urlInp.value = '';
-  const inner = document.getElementById('cat-desktop-inner');
-  if (inner) {
-    inner.innerHTML = `<div class="upload-placeholder">
-      <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
-      <p class="text-sm text-slate-500 mt-1">Click or drop category image file here</p>
-    </div>`;
-    inner.classList.remove('has-image');
-  }
+  const fi = document.getElementById('cat-file-input');
+  if (fi) fi.value = '';
+  window.renderCatImageZone('');
+  toast('Category image removed', 'info');
 };
 
 function openCategoryForm(id = null) {
   const cat = id ? DB.categories.byId(id) : null;
-  let imgUrl = cat?.imageUrl || cat?.mobileImgUrl || '';
+  let imgUrl = cat?.imageUrl || cat?.mobileImgUrl || cat?.image || '';
   window._catImgUrl = imgUrl;
 
   const html = `
@@ -2132,13 +2208,11 @@ function openCategoryForm(id = null) {
       <!-- Upload Category Image -->
       <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>Category Image (Upload or Paste Link)<span class="req">*</span></span>
+          <span>Category Image (Direct File Upload)<span class="req">*</span></span>
           <span style="font-size:11px;color:#64748B;font-weight:normal;">Shown on cards, homepage & shop filters</span>
         </label>
         <div id="cat-img-zone" style="margin-top:4px;"></div>
-        <div style="margin-top:8px;">
-          <input type="text" id="cat-direct-url" class="form-input" style="font-size:12px;" value="${imgUrl && !imgUrl.startsWith('data:') ? imgUrl : ''}" placeholder="Or paste image URL directly (e.g. https://...)" oninput="window.handleCatDirectUrl(this.value)"/>
-        </div>
+        <input type="file" id="cat-file-input" accept="image/*" style="display:none;" onchange="window.handleCatFileUpload(this)"/>
       </div>
 
       <div class="form-row">
@@ -2190,25 +2264,8 @@ function openCategoryForm(id = null) {
   openModal(cat ? `Edit: ${cat.name}` : 'New Category', html, footer, 'modal-md');
 
   setTimeout(() => {
-    const desktopZone = Uploader.createSingleZone({
-      id: 'cat-desktop',
-      value: imgUrl,
-      label: 'Category Image',
-      placeholder: 'Click or drop category image file here',
-      maxSizeMB: 5,
-      maxDimension: 800,
-      onchange: v => {
-        window._catImgUrl = v || '';
-        const urlInp = document.getElementById('cat-direct-url');
-        if (urlInp && v && !v.startsWith('data:')) urlInp.value = v;
-      }
-    });
-    const zoneEl = document.getElementById('cat-img-zone');
-    if (zoneEl) {
-      zoneEl.innerHTML = '';
-      zoneEl.appendChild(desktopZone);
-    }
-  }, 50);
+    window.renderCatImageZone(imgUrl);
+  }, 40);
 }
 
 function addSubcatInline(catId) {
@@ -2229,8 +2286,7 @@ function saveCategoryForm(id) {
   const slug = fd.get('slug')?.trim();
   if (!name || !slug) { toast('Name and slug required', 'error'); return; }
 
-  const directUrl = document.getElementById('cat-direct-url')?.value?.trim() || '';
-  const imageUrl = window._catImgUrl || directUrl || '';
+  const imageUrl = window._catImgUrl || '';
 
   const data = {
     name,
@@ -2238,6 +2294,7 @@ function saveCategoryForm(id) {
     description: fd.get('description')?.trim() || '',
     imageUrl: imageUrl,
     mobileImgUrl: imageUrl,
+    image: imageUrl,
     displayOrder: parseInt(fd.get('displayOrder')) || 0,
     seoTitle: fd.get('seoTitle')?.trim() || '',
     seoDesc: fd.get('seoDesc')?.trim() || '',

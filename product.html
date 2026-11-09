@@ -818,9 +818,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261109_prod_persistence_fix"></script>
-  <script src="admin-db.js?v=20261109_prod_persistence_fix"></script>
-  <script src="wishlist.js?v=20261107_v1"></script>
+  <script src="firebase-sync.js?v=20261110_v2"></script>
+  <script src="admin-db.js?v=20261110_v2"></script>
+  <script src="wishlist.js?v=20261110_v2"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1712,26 +1712,32 @@
         unique.push({ id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 });
       }
 
-      if (unique.length > 0 && !productState.selectedSleeveName) {
+      // Preserve or set active selection
+      const currentSelectedName = (productState.selectedSleeveName || '').toLowerCase();
+      const matching = unique.find(s => s.name.toLowerCase() === currentSelectedName || s.id === productState.selectedSleeve);
+      if (matching) {
+        productState.selectedSleeve = matching.id;
+        productState.selectedSleeveName = matching.name;
+        productState.sleevePrice = parseFloat(matching.additionalPrice) || 0;
+      } else {
         productState.selectedSleeve = unique[0].id;
         productState.selectedSleeveName = unique[0].name;
-        productState.sleevePrice = unique[0].additionalPrice || 0;
+        productState.sleevePrice = parseFloat(unique[0].additionalPrice) || 0;
       }
 
-      container.innerHTML = unique.map((s, idx) => {
-        const isActive = productState.selectedSleeveName 
-          ? (s.name.toLowerCase() === productState.selectedSleeveName.toLowerCase() || s.id === productState.selectedSleeve)
-          : (idx === 0);
+      container.innerHTML = unique.map((s) => {
+        const isActive = (s.id === productState.selectedSleeve || s.name.toLowerCase() === productState.selectedSleeveName.toLowerCase());
         const activeClass = isActive ? 'border-2 border-black bg-black/5 active' : 'border border-gray-200 hover:border-gray-400 bg-white';
         const priceTag = (s.additionalPrice || 0) > 0 ? `+৳${s.additionalPrice}` : 'Included';
         return `
-          <div onclick="selectSleeve('${s.id}', ${s.additionalPrice||0}, '${s.name}', this)" 
+          <div onclick="selectSleeve('${s.id}', ${s.additionalPrice||0}, '${s.name.replace(/'/g, "\\'")}', this)" 
                class="sleeve-card ${activeClass} flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all">
             <span class="text-xs font-bold text-black">${s.name}</span>
             <span class="text-[11px] font-mono-ui font-semibold text-gray-500">${priceTag}</span>
           </div>
         `;
       }).join('');
+      calculateLiveTotal();
     }
 
     function selectSize(size) {

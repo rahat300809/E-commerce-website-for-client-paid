@@ -407,6 +407,12 @@ function syncHomepageContent() {
   const bentoContainer = document.getElementById('collections-bento-grid');
   if (bentoContainer) {
     const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
+    const bentoHash = JSON.stringify(categories.map(c => [c.id, c.name, c.imageUrl || c.image, c.badge]));
+    if (bentoContainer.dataset.bentoHash === bentoHash) {
+      // Content has not changed, do not flash or re-render
+      return;
+    }
+    bentoContainer.dataset.bentoHash = bentoHash;
     const fallbackImages = [
       'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
       'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
@@ -2054,11 +2060,9 @@ function shopCarouselGoto(index) {
   
   const bannerEl = document.getElementById('shop-banner-slide');
   if (bannerEl && slide) {
-    bannerEl.style.opacity = '0.35';
-    setTimeout(() => {
-      bannerEl.style.backgroundImage = `url('${slide.bg}')`;
-      bannerEl.style.opacity = '1';
-    }, 120);
+    bannerEl.style.transition = 'background-image 0.4s ease-in-out';
+    bannerEl.style.backgroundImage = `url('${slide.bg}')`;
+    bannerEl.style.opacity = '1';
   }
   const tagEl = document.getElementById('shop-banner-tag');
   if (tagEl && slide) tagEl.textContent = slide.tag || 'ZENVY Collection';
@@ -3191,30 +3195,51 @@ function syncModelShowcase() {
   const stickUp = Math.round(gap * 0.75);
   const total = models.length;
 
-  container.innerHTML = models.map((m, index) => {
+  const modelsHash = JSON.stringify(models.map(m => m.name + (m.src || '')));
+  if (container.dataset.showcaseHash !== modelsHash) {
+    container.dataset.showcaseHash = modelsHash;
+    const fallbackAthlete = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
+    container.innerHTML = models.map((m, index) => {
+      const imgSrc = (m.src && !m.src.includes('photo-1574629810360-7efbbe195018')) ? m.src : fallbackAthlete;
+      return `
+        <img src="${imgSrc}" alt="${m.name}"
+             onerror="this.onerror=null; this.src='${fallbackAthlete}'"
+             class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+             onclick="gotoShowcaseModel(${index})"
+             style="opacity:0; pointer-events:none; z-index:1; will-change:transform,opacity;"/>
+      `;
+    }).join('');
+  }
+
+  // Non-destructive update: adjust CSS transforms and opacities on existing images
+  const imgEls = container.querySelectorAll('.showcase-img');
+  imgEls.forEach((imgEl, index) => {
     const isActive = index === showcaseActiveIndex;
     const isLeft = (showcaseActiveIndex - 1 + total) % total === index;
     const isRight = (showcaseActiveIndex + 1) % total === index;
 
-    let style = "opacity:0; pointer-events:none; z-index:1;";
     if (isActive) {
-      style = "opacity:1; pointer-events:auto; z-index:3; transform:translateX(0px) translateY(0px) scale(1) rotateY(0deg);";
+      imgEl.style.opacity = '1';
+      imgEl.style.pointerEvents = 'auto';
+      imgEl.style.zIndex = '3';
+      imgEl.style.transform = 'translateX(0px) translateY(0px) scale(1) rotateY(0deg)';
     } else if (isLeft) {
-      style = `opacity:1; pointer-events:auto; z-index:2; transform:translateX(-${gap}px) translateY(-${stickUp}px) scale(0.85) rotateY(15deg);`;
+      imgEl.style.opacity = '1';
+      imgEl.style.pointerEvents = 'auto';
+      imgEl.style.zIndex = '2';
+      imgEl.style.transform = `translateX(-${gap}px) translateY(-${stickUp}px) scale(0.85) rotateY(15deg)`;
     } else if (isRight) {
-      style = `opacity:1; pointer-events:auto; z-index:2; transform:translateX(${gap}px) translateY(-${stickUp}px) scale(0.85) rotateY(-15deg);`;
+      imgEl.style.opacity = '1';
+      imgEl.style.pointerEvents = 'auto';
+      imgEl.style.zIndex = '2';
+      imgEl.style.transform = `translateX(${gap}px) translateY(-${stickUp}px) scale(0.85) rotateY(-15deg)`;
+    } else {
+      imgEl.style.opacity = '0';
+      imgEl.style.pointerEvents = 'none';
+      imgEl.style.zIndex = '1';
+      imgEl.style.transform = 'translateX(0px) translateY(0px) scale(0.7)';
     }
-
-    const fallbackAthlete = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
-    const imgSrc = (m.src && !m.src.includes('photo-1574629810360-7efbbe195018')) ? m.src : fallbackAthlete;
-    return `
-      <img src="${imgSrc}" alt="${m.name}"
-           onerror="this.onerror=null; this.src='${fallbackAthlete}'"
-           class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
-           onclick="gotoShowcaseModel(${index})"
-           style="${style} will-change:transform,opacity;"/>
-    `;
-  }).join('');
+  });
 
   const active = models[showcaseActiveIndex];
   const tagEl = document.getElementById('showcase-jersey-tag');
@@ -3229,9 +3254,16 @@ function syncModelShowcase() {
 
   const dotsEl = document.getElementById('showcase-dots');
   if (dotsEl) {
-    dotsEl.innerHTML = models.map((_, i) => `
-      <button onclick="gotoShowcaseModel(${i})" class="${i === showcaseActiveIndex ? 'w-6 h-2 bg-black rounded-full' : 'w-2 h-2 bg-gray-300 rounded-full hover:bg-gray-400'} transition-all duration-300"></button>
-    `).join('');
+    const dotBtns = dotsEl.querySelectorAll('button');
+    if (dotBtns.length === models.length) {
+      dotBtns.forEach((btn, i) => {
+        btn.className = (i === showcaseActiveIndex ? 'w-6 h-2 bg-black rounded-full' : 'w-2 h-2 bg-gray-300 rounded-full hover:bg-gray-400') + ' transition-all duration-300';
+      });
+    } else {
+      dotsEl.innerHTML = models.map((_, i) => `
+        <button onclick="gotoShowcaseModel(${i})" class="${i === showcaseActiveIndex ? 'w-6 h-2 bg-black rounded-full' : 'w-2 h-2 bg-gray-300 rounded-full hover:bg-gray-400'} transition-all duration-300"></button>
+      `).join('');
+    }
   }
 
   if (!showcaseInterval) {

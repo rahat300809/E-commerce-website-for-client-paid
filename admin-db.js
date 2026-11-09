@@ -929,47 +929,171 @@ const DB = {
   // ── Sizes ──
   sizes: {
     all() {
-      const raw = Store.get('sizes') || [];
-      const seen = new Set();
-      const unique = [];
-      for (const s of raw) {
-        const code = (s.code || s.name || '').toUpperCase().trim();
-        if (code && !seen.has(code)) {
-          seen.add(code);
-          unique.push(s);
-        }
+      let raw = Store.get('sizes');
+      // Only seed initial default standard sizes once if sizes was never initialized (null/undefined)
+      if (raw === null || raw === undefined) {
+        raw = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].map((code, i) => ({
+          id: 'sz_' + code.toLowerCase().replace(/[^a-z0-9]/g, ''),
+          code,
+          name: code,
+          displayOrder: i,
+          isEnabled: true,
+          createdAt: Store.now()
+        }));
+        Store.set('sizes', raw);
+        return raw;
       }
-      if (unique.length === 0) {
-        ['S','M','L','XL','XXL'].forEach((code, i) => {
-          unique.push({ id: 'sz_' + code.toLowerCase(), code, name: code, displayOrder: i, isEnabled: true });
-        });
-      }
-      if (raw.length !== unique.length) {
-        try { Store.set('sizes', unique); } catch(e){}
-      }
-      return unique.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+      if (!Array.isArray(raw)) return [];
+
+      const list = raw.map((s, i) => {
+        if (!s) return null;
+        const code = String(s.code || s.name || '').toUpperCase().trim();
+        const id = s.id ? String(s.id).trim() : ('sz_' + (code ? code.toLowerCase().replace(/[^a-z0-9]/g, '') : Store.genId()));
+        return {
+          id,
+          code: code || 'SZ',
+          name: s.name || code || 'Size',
+          displayOrder: typeof s.displayOrder === 'number' ? s.displayOrder : i,
+          isEnabled: s.isEnabled !== false,
+          createdAt: s.createdAt || Store.now()
+        };
+      }).filter(Boolean);
+
+      return list.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     },
-    enabled() { return DB.sizes.all().filter(s => s.isEnabled); },
-    byId(id) { return DB.sizes.all().find(s => s.id === id); },
+    enabled() { 
+      return DB.sizes.all().filter(s => s.isEnabled); 
+    },
+    byId(id) {
+      if (!id) return null;
+      const target = String(id).trim().toLowerCase();
+      return DB.sizes.all().find(s => 
+        String(s.id).trim().toLowerCase() === target || 
+        String(s.code).trim().toLowerCase() === target
+      );
+    },
     create(data) {
       const items = DB.sizes.all();
-      const item = { id: Store.genId(), ...data, createdAt: Store.now() };
-      items.push(item); Store.set('sizes', items);
-      DB.log(`Size created: ${item.code}`); return item;
+      const code = String(data.code || data.name || '').toUpperCase().trim();
+      const id = data.id ? String(data.id).trim() : ('sz_' + (code ? code.toLowerCase().replace(/[^a-z0-9]/g, '') : '') + '_' + Store.genId());
+
+      // If a size with the same code already exists, update it cleanly
+      const existingIdx = items.findIndex(s => s.code === code);
+      if (existingIdx >= 0) {
+        items[existingIdx] = {
+          ...items[existingIdx],
+          ...data,
+          code,
+          name: data.name?.trim() || code,
+          displayOrder: typeof data.displayOrder === 'number' ? data.displayOrder : items[existingIdx].displayOrder,
+          isEnabled: data.isEnabled !== false,
+          updatedAt: Store.now()
+        };
+        Store.set('sizes', items);
+        DB.log(`Size updated: ${code}`);
+        return items[existingIdx];
+      }
+
+      const item = {
+        id,
+        code,
+        name: data.name?.trim() || code,
+        displayOrder: typeof data.displayOrder === 'number' ? data.displayOrder : items.length,
+        isEnabled: data.isEnabled !== false,
+        createdAt: Store.now()
+      };
+      items.push(item);
+      Store.set('sizes', items);
+      DB.log(`Size created: ${item.code}`);
+      return item;
     },
     update(id, data) {
-      const items = DB.sizes.all().map(s => s.id === id ? { ...s, ...data } : s);
-      Store.set('sizes', items); return items.find(s => s.id === id);
+      if (!id) return null;
+      const target = String(id).trim().toLowerCase();
+      let updatedItem = null;
+      const items = DB.sizes.all().map(s => {
+        if (String(s.id).trim().toLowerCase() === target || String(s.code).trim().toLowerCase() === target) {
+          const upd = { ...s, ...data };
+          if (upd.code) upd.code = String(upd.code).toUpperCase().trim();
+          if (upd.displayOrder !== undefined) upd.displayOrder = parseInt(upd.displayOrder) || 0;
+          upd.updatedAt = Store.now();
+          updatedItem = upd;
+          return upd;
+        }
+        return s;
+      });
+      Store.set('sizes', items);
+      if (updatedItem) DB.log(`Size updated: ${updatedItem.code}`);
+      return updatedItem;
     },
     delete(id) {
-      const s = DB.sizes.byId(id);
-      Store.set('sizes', DB.sizes.all().filter(s => s.id !== id));
-      DB.log(`Size deleted: ${s?.code}`);
+      if (!id) return;
+      const target = String(id).trim().toLowerCase();
+      const s = DB.sizes.byId(target);
+      const items = DB.sizes.all().filter(x => 
+        String(x.id).trim().toLowerCase() !== target && 
+        String(x.code).trim().toLowerCase() !== target
+      );
+      Store.set('sizes', items);
+      DB.log(`Size deleted: ${s?.code || target}`);
+    },
+    resetDefaults() {
+      const defaults = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].map((code, i) => ({
+        id: 'sz_' + code.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        code,
+        name: code,
+        displayOrder: i,
+        isEnabled: true,
+        createdAt: Store.now()
+      }));
+      Store.set('sizes', defaults);
+      DB.log('Sizes reset to default standard set');
+      return defaults;
     },
     reorder(ids) {
       const items = DB.sizes.all();
-      ids.forEach((id, i) => { const s = items.find(x => x.id === id); if (s) s.displayOrder = i; });
+      ids.forEach((id, i) => { 
+        const s = items.find(x => String(x.id).trim() === String(id).trim()); 
+        if (s) s.displayOrder = i; 
+      });
       Store.set('sizes', items);
+    },
+    getSizeChart() {
+      const stored = Store.getObj('sizeChart', null);
+      if (stored && stored.url) return stored.url;
+      const storeCfg = Store.getObj('storeSettings', {});
+      if (storeCfg.defaultSizeChartImage) return storeCfg.defaultSizeChartImage;
+      const brand = Store.getObj('brand', {});
+      if (brand.sizeChartUrl) return brand.sizeChartUrl;
+      return '';
+    },
+    saveSizeChart(url) {
+      const trimmed = (url || '').trim();
+      Store.setObj('sizeChart', { url: trimmed, updatedAt: Store.now() });
+
+      const storeCfg = Store.getObj('storeSettings', {});
+      storeCfg.defaultSizeChartImage = trimmed;
+      Store.set('storeSettings', storeCfg);
+
+      const brand = Store.getObj('brand', {});
+      brand.sizeChartUrl = trimmed;
+      Store.set('brand', brand);
+
+      DB.log('Store size chart image updated');
+      return trimmed;
+    },
+    removeSizeChart() {
+      Store.setObj('sizeChart', { url: '', updatedAt: Store.now() });
+      const storeCfg = Store.getObj('storeSettings', {});
+      storeCfg.defaultSizeChartImage = '';
+      Store.set('storeSettings', storeCfg);
+
+      const brand = Store.getObj('brand', {});
+      brand.sizeChartUrl = '';
+      Store.set('brand', brand);
+
+      DB.log('Store size chart image removed');
+      return true;
     }
   },
 

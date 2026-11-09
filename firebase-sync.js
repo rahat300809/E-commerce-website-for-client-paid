@@ -28,7 +28,7 @@
     'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
     'brand', 'orders', 'customers', 'coupons', 'flashSales',
     'returns', 'refunds', 'shipping', 'paymentConfig', 'storeSettings',
-    'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'colors', 'addons',
+    'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons',
     'printing', 'customization', 'teams', 'reviews', 'preorders',
     'inventoryHistory', 'priceHistory', 'activityLog', 'adminAuth',
     'admin_access', 'seeded_version'

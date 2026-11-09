@@ -821,8 +821,8 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261108_handover"></script>
-  <script src="admin-db.js?v=20261108_handover"></script>
+  <script src="firebase-sync.js?v=20261109_sizes_sizechart_fix"></script>
+  <script src="admin-db.js?v=20261109_sizes_sizechart_fix"></script>
   <script src="wishlist.js?v=20261107_v1"></script>
   <script>
     // ─────────────────────────────────────────
@@ -1264,16 +1264,17 @@
         }
 
         // Size Chart Image View Setup
-        const chartImg = targetProduct.sizeChartImage || '';
+        let chartImg = targetProduct.sizeChartImage || '';
+        if (!chartImg && typeof DB !== 'undefined') {
+          if (DB.sizes && typeof DB.sizes.getSizeChart === 'function') chartImg = DB.sizes.getSizeChart();
+          if (!chartImg && DB.storeSettings) chartImg = DB.storeSettings.get()?.defaultSizeChartImage || '';
+          if (!chartImg && DB.brand) chartImg = DB.brand.get()?.sizeChartUrl || '';
+        }
+        if (!chartImg) chartImg = 'size-chart-default.jpg';
         const toggleCont = document.getElementById('sizechart-view-toggle');
         const imgEl = document.getElementById('modal-sizechart-img');
-        if (chartImg) {
-          if (toggleCont) toggleCont.classList.remove('hidden');
-          if (imgEl) imgEl.src = chartImg;
-        } else {
-          if (toggleCont) toggleCont.classList.add('hidden');
-          // image only modal
-        }
+        if (imgEl) imgEl.src = chartImg;
+        if (toggleCont) toggleCont.classList.remove('hidden');
 
         // Sync initial size selection
         selectSize(productState.selectedSize || 'M');
@@ -1617,7 +1618,12 @@
       const imgEl = document.getElementById('modal-sizechart-img');
       const titleEl = document.getElementById('modal-sizechart-title');
 
-      const storeDefault = (typeof DB !== 'undefined' && DB.storeSettings) ? (DB.storeSettings.get().defaultSizeChartImage || '') : '';
+      let storeDefault = '';
+      if (typeof DB !== 'undefined') {
+        if (DB.sizes && typeof DB.sizes.getSizeChart === 'function') storeDefault = DB.sizes.getSizeChart();
+        if (!storeDefault && DB.storeSettings) storeDefault = DB.storeSettings.get()?.defaultSizeChartImage || '';
+        if (!storeDefault && DB.brand) storeDefault = DB.brand.get()?.sizeChartUrl || '';
+      }
       const chartImg = p.sizeChartImage || storeDefault || 'size-chart-default.jpg';
 
       if (imgEl) imgEl.src = chartImg;

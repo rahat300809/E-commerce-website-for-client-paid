@@ -1500,20 +1500,24 @@ function openProductForm(id = null) {
               </tr>
             </thead>
             <tbody>
-              ${['S','M','L','XL','XXL'].map(s => {
-                const map = product?.sizeMapping?.[s] || (s==='S'?{height:26,width:36}:s==='M'?{height:27,width:38}:s==='L'?{height:28,width:40}:s==='XL'?{height:29,width:42}:{height:30,width:44});
-                return `
-                  <tr style="border-bottom:1px solid #f3f4f6;">
-                    <td style="padding:8px 14px;font-weight:800;color:#111827;">${s}</td>
-                    <td style="padding:8px 14px;">
-                      <input type="number" step="0.5" name="size_height_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.height}"/>
-                    </td>
-                    <td style="padding:8px 14px;">
-                      <input type="number" step="0.5" name="size_width_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.width}"/>
-                    </td>
-                  </tr>
-                `;
-              }).join('')}
+              ${(() => {
+                const avail = DB.sizes.enabled();
+                const codes = avail.length > 0 ? avail.map(s => s.code) : ['S','M','L','XL','XXL'];
+                return codes.map(s => {
+                  const map = product?.sizeMapping?.[s] || (s==='S'?{height:26,width:36}:s==='M'?{height:27,width:38}:s==='L'?{height:28,width:40}:s==='XL'?{height:29,width:42}:s==='XXL'?{height:30,width:44}:{height:31,width:46});
+                  return `
+                    <tr style="border-bottom:1px solid #f3f4f6;">
+                      <td style="padding:8px 14px;font-weight:800;color:#111827;">${s}</td>
+                      <td style="padding:8px 14px;">
+                        <input type="number" step="0.5" name="size_height_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.height}"/>
+                      </td>
+                      <td style="padding:8px 14px;">
+                        <input type="number" step="0.5" name="size_width_${s}" class="form-input" style="padding:6px 10px;font-size:12px;" value="${map.width}"/>
+                      </td>
+                    </tr>
+                  `;
+                }).join('');
+              })()}
             </tbody>
           </table>
           <p style="font-size:11px;color:#9ca3af;margin-top:8px;">These exact values will be displayed to customers when they click "View Size Chart" on this product's page.</p>
@@ -1760,13 +1764,18 @@ function saveProduct(e, id, asDraft = false) {
     deliveryNote: get('deliveryNote') || '',
     sizeChartType: get('sizeChartType') || 'Player Edition',
     sizeChartImage: get('sizeChartImage') || '',
-    sizeMapping: {
-      S: { height: parseFloat(get('size_height_S')) || 26, width: parseFloat(get('size_width_S')) || 36 },
-      M: { height: parseFloat(get('size_height_M')) || 27, width: parseFloat(get('size_width_M')) || 38 },
-      L: { height: parseFloat(get('size_height_L')) || 28, width: parseFloat(get('size_width_L')) || 40 },
-      XL: { height: parseFloat(get('size_height_XL')) || 29, width: parseFloat(get('size_width_XL')) || 42 },
-      XXL: { height: parseFloat(get('size_height_XXL')) || 30, width: parseFloat(get('size_width_XXL')) || 44 }
-    }
+    sizeMapping: (() => {
+      const availSizes = DB.sizes.enabled();
+      const dynamicCodes = availSizes.length > 0 ? availSizes.map(s => s.code) : ['S','M','L','XL','XXL'];
+      const mapping = {};
+      dynamicCodes.forEach(s => {
+        mapping[s] = {
+          height: parseFloat(get(`size_height_${s}`)) || (s==='S'?26:s==='M'?27:s==='L'?28:s==='XL'?29:s==='XXL'?30:31),
+          width: parseFloat(get(`size_width_${s}`)) || (s==='S'?36:s==='M'?38:s==='L'?40:s==='XL'?42:s==='XXL'?44:46)
+        };
+      });
+      return mapping;
+    })()
   };
 
   if (id) {
@@ -2414,60 +2423,307 @@ function saveSleeve(id) {
   closeModal(); renderSleeves(document.getElementById('admin-content'));
 }
 
-// ── SIZES ──
+// ── SIZES & SIZE CHART ──
 function renderSizes(container) {
   const sizes = DB.sizes.all();
+  const currentChartUrl = DB.sizes.getSizeChart();
+
   container.innerHTML = `
-    <div class="page-header">
-      <div class="page-header-left"><div class="page-title">Sizes</div></div>
-      <button class="btn btn-primary" onclick="openSizeForm()"><span class="material-symbols-outlined">add</span> Add Size</button>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div class="page-header-left">
+        <div class="page-title" style="font-size:24px;font-weight:800;color:#111827;display:flex;align-items:center;gap:10px;">
+          <span class="material-symbols-outlined" style="font-size:28px;color:#2563EB;">straighten</span>
+          Sizes & Size Chart Guide
+        </div>
+        <p style="font-size:13px;color:#6B7280;margin-top:2px;">Manage available apparel sizes and store-wide size chart image guide for your customers.</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="resetDefaultSizes()" title="Reset sizes to standard XS-4XL list">
+          <span class="material-symbols-outlined" style="font-size:16px;">restart_alt</span> Reset Standard Sizes
+        </button>
+        <button class="btn btn-primary" onclick="openSizeForm()">
+          <span class="material-symbols-outlined" style="font-size:18px;">add</span> Add New Size
+        </button>
+      </div>
     </div>
-    <div class="card">
+
+    <!-- 1. SIZE CHART IMAGE UPLOAD CARD -->
+    <div class="card" style="margin-bottom:24px;border:1px solid #E5E7EB;border-radius:12px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.05);overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid #F3F4F6;background:#F9FAFB;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="font-size:15px;font-weight:700;color:#111827;display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="color:#059669;font-size:20px;">image</span>
+            Store Size Chart Graphic (Customer Sizing Guide)
+          </h3>
+          <p style="font-size:12px;color:#6B7280;margin-top:2px;">
+            This image is displayed when customers click "Size Guide" or "View Size Chart" on product pages.
+          </p>
+        </div>
+        <div>
+          ${currentChartUrl ? `
+            <span class="badge badge-green" style="display:inline-flex;align-items:center;gap:4px;font-weight:600;padding:4px 10px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> Active Graphic Uploaded
+            </span>
+          ` : `
+            <span class="badge badge-gray" style="display:inline-flex;align-items:center;gap:4px;font-weight:600;padding:4px 10px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">info</span> Using Default Template
+            </span>
+          `}
+        </div>
+      </div>
+
+      <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px;align-items:start;">
+        <!-- Left: Upload Zone -->
+        <div>
+          <label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:8px;">
+            Upload Size Chart Image
+          </label>
+          <div id="sizechart-upload-zone" style="margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveAdminSizeChartManual()">
+              <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save Size Chart
+            </button>
+            ${currentChartUrl ? `
+              <button type="button" class="btn btn-ghost btn-sm" onclick="removeAdminSizeChart()" style="color:#DC2626;">
+                <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Remove Image
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="previewSizeChartModal('${encodeURIComponent(currentChartUrl)}')">
+                <span class="material-symbols-outlined" style="font-size:16px;">visibility</span> Preview Modal
+              </button>
+            ` : ''}
+          </div>
+          <p style="font-size:11px;color:#9CA3AF;margin-top:8px;line-height:1.4;">
+            💡 Recommended size: 1200×800 or 1000×1000 JPG/PNG. Clear chart showing Chest & Length measurements in inches.
+          </p>
+        </div>
+
+        <!-- Right: Live Preview Box -->
+        <div>
+          <label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:8px;">
+            Current Sizing Guide Preview
+          </label>
+          <div style="border:1px solid #E5E7EB;border-radius:10px;padding:12px;background:#F9FAFB;text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            ${currentChartUrl ? `
+              <img src="${currentChartUrl}" alt="Store Size Chart" style="max-height:220px;max-width:100%;object-fit:contain;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.06);background:#fff;" />
+              <div style="margin-top:8px;font-size:11px;color:#059669;font-weight:600;">✓ Visible on customer product pages</div>
+            ` : `
+              <img src="size-chart-default.jpg" alt="Default Size Chart" onerror="this.style.display='none'" style="max-height:140px;max-width:100%;opacity:0.6;border-radius:6px;margin-bottom:8px;" />
+              <p style="font-size:12px;color:#6B7280;font-weight:600;">Default Size Chart Graphic Active</p>
+              <p style="font-size:11px;color:#9CA3AF;margin-top:2px;">Upload a custom image above to replace the default chart.</p>
+            `}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SIZES TABLE CARD -->
+    <div class="card" style="border:1px solid #E5E7EB;border-radius:12px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.05);overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="font-size:15px;font-weight:700;color:#111827;">Catalog Apparel Sizes (${sizes.length})</h3>
+          <p style="font-size:12px;color:#6B7280;margin-top:2px;">Available jersey size options shown in product selector, cart, and customization.</p>
+        </div>
+      </div>
       <div class="table-wrapper">
         <table class="admin-table">
-          <thead><tr><th>Code</th><th>Name</th><th>Order</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th style="width:120px;">Size Code</th>
+              <th>Full Label / Name</th>
+              <th style="width:120px;">Display Order</th>
+              <th style="width:140px;">Status</th>
+              <th style="text-align:right;width:160px;">Actions</th>
+            </tr>
+          </thead>
           <tbody>
             ${sizes.map(s => `
               <tr>
-                <td><span class="badge badge-blue font-mono">${s.code}</span></td>
-                <td>${s.name}</td>
-                <td>${s.displayOrder}</td>
-                <td><span class="badge ${s.isEnabled?'badge-green':'badge-gray'}">${s.isEnabled?'Active':'Disabled'}</span></td>
-                <td class="actions-cell">
-                  <button class="btn btn-ghost btn-sm" onclick="openSizeForm('${s.id}')"><span class="material-symbols-outlined">edit</span></button>
-                  <button class="btn btn-ghost btn-sm" onclick="DB.sizes.update('${s.id}',{isEnabled:${!s.isEnabled}});renderSizes(document.getElementById('admin-content'))"><span class="material-symbols-outlined">${s.isEnabled?'block':'check_circle'}</span></button>
-                  <button class="btn btn-ghost btn-sm" onclick="showConfirm('Delete','Delete size ${s.code}?',()=>{DB.sizes.delete('${s.id}');renderSizes(document.getElementById('admin-content'));toast('Deleted','success')})"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                <td>
+                  <span class="badge font-mono" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px;">
+                    ${s.code}
+                  </span>
+                </td>
+                <td style="font-weight:600;color:#1F2937;">${s.name || s.code}</td>
+                <td style="color:#6B7280;font-family:monospace;font-size:13px;">#${s.displayOrder ?? 0}</td>
+                <td>
+                  <span class="badge ${s.isEnabled ? 'badge-green' : 'badge-gray'}" style="cursor:pointer;" onclick="toggleSizeStatus('${s.id}')" title="Click to toggle status">
+                    ${s.isEnabled ? '● Active' : '○ Disabled'}
+                  </span>
+                </td>
+                <td class="actions-cell" style="text-align:right;white-space:nowrap;">
+                  <button class="btn btn-ghost btn-sm" onclick="openSizeForm('${s.id}')" title="Edit Size">
+                    <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+                  </button>
+                  <button class="btn btn-ghost btn-sm" onclick="toggleSizeStatus('${s.id}')" title="${s.isEnabled ? 'Disable Size' : 'Enable Size'}">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:${s.isEnabled ? '#F59E0B' : '#10B981'}">
+                      ${s.isEnabled ? 'block' : 'check_circle'}
+                    </span>
+                  </button>
+                  <button class="btn btn-ghost btn-sm" onclick="deleteSize('${s.id}', '${s.code}')" title="Delete Size">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#DC2626;">delete</span>
+                  </button>
                 </td>
               </tr>
-            `).join('') || `<tr><td colspan="5">${emptyState('format_size','No sizes','Add sizes')}</td></tr>`}
+            `).join('') || `
+              <tr>
+                <td colspan="5">
+                  <div style="text-align:center;padding:40px 20px;">
+                    <span class="material-symbols-outlined" style="font-size:48px;color:#9CA3AF;margin-bottom:8px;">format_size</span>
+                    <h4 style="font-size:16px;font-weight:700;color:#111827;margin-bottom:4px;">No Sizes Configured</h4>
+                    <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">Add your first size or click below to load standard sizes.</p>
+                    <button class="btn btn-primary btn-sm" onclick="resetDefaultSizes()">Load Standard Sizes (XS - 4XL)</button>
+                  </div>
+                </td>
+              </tr>
+            `}
           </tbody>
         </table>
       </div>
     </div>
   `;
+
+  // Attach single image dropzone
+  setTimeout(() => {
+    const zoneContainer = document.getElementById('sizechart-upload-zone');
+    if (zoneContainer && typeof Uploader !== 'undefined') {
+      window._tempSizeChartImg = currentChartUrl;
+      const zone = Uploader.createSingleZone({
+        id: 'store-sizechart-uploader',
+        value: currentChartUrl,
+        placeholder: 'Drag & drop Size Chart image file, or click to browse',
+        label: 'Size Chart Graphic',
+        maxSizeMB: 10,
+        maxDimension: 2400,
+        onchange: (val) => {
+          window._tempSizeChartImg = val || '';
+          DB.sizes.saveSizeChart(val || '');
+          toast(val ? 'Store Size Chart updated successfully' : 'Store Size Chart removed', 'success');
+          renderSizes(document.getElementById('admin-content'));
+        }
+      });
+      zoneContainer.appendChild(zone);
+    }
+  }, 50);
 }
 
-function openSizeForm(id=null) {
-  const s = id ? DB.sizes.byId(id) : null;
-  const html = `<form id="size-form">
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Code<span class="req">*</span></label><input type="text" name="code" class="form-input" required value="${s?.code||''}" placeholder="XL"/></div>
-      <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-input" value="${s?.name||s?.code||''}" placeholder="Extra Large"/></div>
+function saveAdminSizeChartManual() {
+  const url = window._tempSizeChartImg || DB.sizes.getSizeChart();
+  if (!url) {
+    toast('Please upload an image first', 'warning');
+    return;
+  }
+  DB.sizes.saveSizeChart(url);
+  toast('Store Size Chart saved successfully', 'success');
+  renderSizes(document.getElementById('admin-content'));
+}
+
+function removeAdminSizeChart() {
+  showConfirm('Remove Size Chart', 'Are you sure you want to remove the custom store size chart image? Storefront will revert to standard template.', () => {
+    DB.sizes.removeSizeChart();
+    window._tempSizeChartImg = '';
+    toast('Custom Size Chart removed', 'info');
+    renderSizes(document.getElementById('admin-content'));
+  });
+}
+
+function previewSizeChartModal(imgUrl) {
+  const url = decodeURIComponent(imgUrl);
+  const html = `
+    <div style="text-align:center;padding:10px;">
+      <img src="${url}" alt="Size Chart Preview" style="max-height:70vh;max-width:100%;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);object-fit:contain;" />
     </div>
-    <div class="form-group"><label class="form-label">Display Order</label><input type="number" name="displayOrder" class="form-input" value="${s?.displayOrder||0}"/></div>
-    <label class="checkbox-chip ${s?.isEnabled!==false?'selected':''}"><input type="checkbox" name="isEnabled" ${s?.isEnabled!==false?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/> Enabled</label>
+  `;
+  openModal('Size Chart Customer Preview', html, `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`, 'modal-lg');
+}
+
+function toggleSizeStatus(id) {
+  const s = DB.sizes.byId(id);
+  if (!s) return;
+  DB.sizes.update(id, { isEnabled: !s.isEnabled });
+  toast(`Size "${s.code}" ${!s.isEnabled ? 'activated' : 'disabled'}`, 'info');
+  renderSizes(document.getElementById('admin-content'));
+}
+
+function deleteSize(id, code) {
+  showConfirm('Delete Size', `Are you sure you want to delete size "${code}"? This will remove it from future size selections.`, () => {
+    DB.sizes.delete(id);
+    toast(`Size "${code}" deleted successfully`, 'success');
+    renderSizes(document.getElementById('admin-content'));
+  });
+}
+
+function resetDefaultSizes() {
+  showConfirm('Reset Sizes', 'Are you sure you want to reset sizes to the standard catalog list (XS, S, M, L, XL, XXL, 3XL, 4XL)?', () => {
+    DB.sizes.resetDefaults();
+    toast('Sizes reset to standard default set', 'success');
+    renderSizes(document.getElementById('admin-content'));
+  });
+}
+
+function openSizeForm(id = null) {
+  const s = id ? DB.sizes.byId(id) : null;
+  const currentCount = DB.sizes.all().length;
+  const html = `<form id="size-form" onsubmit="event.preventDefault();saveSize('${id || ''}')">
+    <div class="form-row">
+      <div class="form-group" style="flex:1;">
+        <label class="form-label">Size Code<span class="req">*</span></label>
+        <input type="text" name="code" class="form-input font-mono font-bold" required value="${s?.code || ''}" placeholder="e.g. 3XL, L, XL, M, XXL" autofocus style="text-transform:uppercase;"/>
+        <p style="font-size:11px;color:#9CA3AF;margin-top:4px;">Short abbreviation shown on jersey chips and variant selectors.</p>
+      </div>
+      <div class="form-group" style="flex:1.5;">
+        <label class="form-label">Full Name / Label</label>
+        <input type="text" name="name" class="form-input" value="${s?.name || s?.code || ''}" placeholder="e.g. Extra Large, Triple Extra Large"/>
+        <p style="font-size:11px;color:#9CA3AF;margin-top:4px;">Descriptive label for customer invoices and specs.</p>
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:10px;">
+      <div class="form-group" style="flex:1;">
+        <label class="form-label">Display Order</label>
+        <input type="number" name="displayOrder" class="form-input" value="${s?.displayOrder ?? currentCount}" min="0" step="1"/>
+        <p style="font-size:11px;color:#9CA3AF;margin-top:4px;">Lower numbers appear first (e.g. 0 for XS, 1 for S, 2 for M...).</p>
+      </div>
+      <div class="form-group" style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:14px;">
+        <label class="checkbox-chip ${s?.isEnabled !== false ? 'selected' : ''}" style="margin:0;">
+          <input type="checkbox" name="isEnabled" ${s?.isEnabled !== false ? 'checked' : ''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
+          <span>Active in Store</span>
+        </label>
+      </div>
+    </div>
   </form>`;
-  openModal(s?'Edit Size':'New Size', html, `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveSize('${id||''}')">Save</button>`, 'modal-sm');
+
+  openModal(
+    s ? `Edit Size (${s.code})` : 'Add New Size',
+    html,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveSize('${id || ''}')">${s ? 'Save Changes' : 'Create Size'}</button>`,
+    'modal-sm'
+  );
 }
 
 function saveSize(id) {
-  const fd = new FormData(document.getElementById('size-form'));
-  const code = fd.get('code')?.trim().toUpperCase();
-  if (!code) { toast('Code required', 'error'); return; }
-  const data = { code, name: fd.get('name')||code, displayOrder: parseInt(fd.get('displayOrder'))||0, isEnabled: fd.get('isEnabled')==='on' };
-  if (id) { DB.sizes.update(id, data); toast('Size updated', 'success'); }
-  else { DB.sizes.create(data); toast('Size created', 'success'); }
-  closeModal(); renderSizes(document.getElementById('admin-content'));
+  const form = document.getElementById('size-form');
+  if (!form) return;
+  const fd = new FormData(form);
+  const code = (fd.get('code') || '').trim().toUpperCase();
+  if (!code) {
+    toast('Size code is required (e.g. L, XL, 3XL)', 'error');
+    return;
+  }
+  const name = (fd.get('name') || '').trim() || code;
+  const displayOrder = parseInt(fd.get('displayOrder')) || 0;
+  const isEnabled = fd.get('isEnabled') === 'on';
+
+  const data = { code, name, displayOrder, isEnabled };
+
+  if (id) {
+    DB.sizes.update(id, data);
+    toast(`Size "${code}" updated successfully`, 'success');
+  } else {
+    DB.sizes.create(data);
+    toast(`Size "${code}" created successfully`, 'success');
+  }
+  closeModal();
+  renderSizes(document.getElementById('admin-content'));
 }
 
 // ── COLORS ──

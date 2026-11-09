@@ -229,12 +229,14 @@ function renderHeroBannerCarousel() {
 
   // Check if banners have actually changed to avoid wiping existing DOM and re-decoding images
   const bannerHash = JSON.stringify(newBanners.map(b => b.id || b.title));
-  if (wrapper.dataset.bannerHash === bannerHash && wrapper.children.length === newBanners.length) {
+  heroBannersList = newBanners;
+
+  if (wrapper.dataset.bannerHash === bannerHash || (wrapper.children.length >= 1 && !wrapper.dataset.bannerHash)) {
+    wrapper.dataset.bannerHash = bannerHash;
     updateHeroBannerSlide(heroBannerActiveIndex);
     return;
   }
 
-  heroBannersList = newBanners;
   wrapper.dataset.bannerHash = bannerHash;
 
   if (heroBannerActiveIndex >= heroBannersList.length) heroBannerActiveIndex = 0;
@@ -385,15 +387,21 @@ function syncHomepageContent() {
   ];
   const propsContainer = document.getElementById('store-value-props-container');
   if (propsContainer && props.length > 0) {
-    propsContainer.innerHTML = props.map(p => `
-      <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
-        <span class="material-symbols-outlined text-xl text-black">${p.icon || 'verified'}</span>
-        <div>
-          <div class="text-xs font-bold text-black">${p.title || ''}</div>
-          <div class="text-[11px] text-gray-500">${p.subtitle || ''}</div>
+    const propsHash = JSON.stringify(props.map(p => p.icon || p.title));
+    if (propsContainer.dataset.propsHash === propsHash || (propsContainer.children.length >= 4 && !propsContainer.dataset.propsHash)) {
+      propsContainer.dataset.propsHash = propsHash;
+    } else {
+      propsContainer.dataset.propsHash = propsHash;
+      propsContainer.innerHTML = props.map(p => `
+        <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+          <span class="material-symbols-outlined text-xl text-black">${p.icon || 'verified'}</span>
+          <div>
+            <div class="text-xs font-bold text-black">${p.title || ''}</div>
+            <div class="text-[11px] text-gray-500">${p.subtitle || ''}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
 
   // 4. Featured Collections Bento Grid
@@ -408,8 +416,8 @@ function syncHomepageContent() {
   if (bentoContainer) {
     const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
     const bentoHash = JSON.stringify(categories.map(c => [c.id, c.name, c.imageUrl || c.image, c.badge]));
-    if (bentoContainer.dataset.bentoHash === bentoHash) {
-      // Content has not changed, do not flash or re-render
+    if (bentoContainer.dataset.bentoHash === bentoHash || (bentoContainer.children.length >= 2 && !bentoContainer.dataset.bentoHash)) {
+      bentoContainer.dataset.bentoHash = bentoHash;
       return;
     }
     bentoContainer.dataset.bentoHash = bentoHash;
@@ -1917,6 +1925,12 @@ function renderShopProducts() {
   const pageProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
   const defaultImg = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
 
+  const renderHash = `${shopActiveCategory}_${shopCurrentPage}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [p.id, p.name, p.salePrice || p.basePrice, p.stock]));
+  if (grid.dataset.renderHash === renderHash && grid.children.length > 0) {
+    return;
+  }
+  grid.dataset.renderHash = renderHash;
+
   const fallbackNotice = isCategoryFallback ? `
     <div class="col-span-full mb-3 bg-amber-50/90 border border-amber-200/90 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs">
       <div class="flex items-center gap-2.5">
@@ -3197,18 +3211,23 @@ function syncModelShowcase() {
 
   const modelsHash = JSON.stringify(models.map(m => m.name + (m.src || '')));
   if (container.dataset.showcaseHash !== modelsHash) {
-    container.dataset.showcaseHash = modelsHash;
-    const fallbackAthlete = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
-    container.innerHTML = models.map((m, index) => {
-      const imgSrc = (m.src && !m.src.includes('photo-1574629810360-7efbbe195018')) ? m.src : fallbackAthlete;
-      return `
-        <img src="${imgSrc}" alt="${m.name}"
-             onerror="this.onerror=null; this.src='${fallbackAthlete}'"
-             class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
-             onclick="gotoShowcaseModel(${index})"
-             style="opacity:0; pointer-events:none; z-index:1; will-change:transform,opacity;"/>
-      `;
-    }).join('');
+    if (container.children.length >= 2 && !container.dataset.showcaseHash) {
+      container.dataset.showcaseHash = modelsHash;
+    } else {
+      container.dataset.showcaseHash = modelsHash;
+      const fallbackAthlete = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80';
+      container.innerHTML = models.map((m, index) => {
+        const imgSrc = (m.src && !m.src.includes('photo-1574629810360-7efbbe195018')) ? m.src : fallbackAthlete;
+        const isAct = index === showcaseActiveIndex;
+        return `
+          <img src="${imgSrc}" alt="${m.name}"
+               onerror="this.onerror=null; this.src='${fallbackAthlete}'"
+               class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+               onclick="gotoShowcaseModel(${index})"
+               style="opacity:${isAct ? '1' : '0'}; pointer-events:${isAct ? 'auto' : 'none'}; z-index:${isAct ? '3' : '1'}; will-change:transform,opacity;"/>
+        `;
+      }).join('');
+    }
   }
 
   // Non-destructive update: adjust CSS transforms and opacities on existing images

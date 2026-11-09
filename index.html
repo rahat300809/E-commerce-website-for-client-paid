@@ -15,7 +15,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261107_v1">
+  <link rel="stylesheet" href="styles.css?v=20261110_v3">
+
+  <!-- Preload critical hero & bento assets to eliminate first-paint reload flash -->
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80" fetchpriority="high">
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80">
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80">
 
   <script>
     // Instant 0ms initial view detection before DOM paint (Strict Anti-Flash)
@@ -52,6 +57,12 @@
     })();
   </script>
   <style>
+    /* Instant baseline background to eliminate white/blank flash before CSS parses */
+    html, body {
+      background-color: #f9f9f9 !important;
+      color: #1a1c1c;
+    }
+
     /* Critical utility fallbacks to prevent flash/flicker without overriding responsive variants */
     [hidden] {
       display: none !important;
@@ -309,14 +320,14 @@
 
       <!-- ── Main Hero Banner Carousel (Auto-scrolling, Mobile-Optimized, Multi-Banner Support) ── -->
       <section id="hero-banner-section" class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8 pb-3">
-        <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100/80 h-[280px] xs:h-[320px] sm:h-[400px] md:h-[440px] flex items-center group" style="background: radial-gradient(circle at 75% 30%, #134e2f 0%, #062314 55%, #05140c 100%);">
+        <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100/80 h-[280px] xs:h-[320px] sm:h-[400px] md:h-[440px] flex items-center group" style="background: #090e17;">
           
           <!-- Banner Slides Container (Rendered dynamically from DB.banners.active()) -->
-          <div id="hero-slides-wrapper" class="absolute inset-0 w-full h-full">
-            <!-- Populated via renderHeroBannerCarousel() in app.js -->
-            <div class="hero-slide active absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-100 z-10 flex items-center">
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" 
-                   style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1280&q=75&auto=format')"></div>
+          <div id="hero-slides-wrapper" data-banner-hash='["hero_1","hero_2","hero_3"]' class="absolute inset-0 w-full h-full">
+            <!-- Slide 1 (Active) -->
+            <div class="hero-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out flex items-center opacity-100 z-10 pointer-events-auto" data-index="0">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-100" 
+                   style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80');"></div>
               <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25 sm:to-transparent"></div>
               <div class="relative z-10 max-w-xl p-5 sm:p-10 md:p-12 text-white">
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-xs font-mono-ui font-bold uppercase tracking-widest mb-2 sm:mb-3 border border-white/20">
@@ -340,6 +351,62 @@
                 </div>
               </div>
             </div>
+
+            <!-- Slide 2 -->
+            <div class="hero-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out flex items-center opacity-0 z-0 pointer-events-none" data-index="1">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" 
+                   style="background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1920&q=80');"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25 sm:to-transparent"></div>
+              <div class="relative z-10 max-w-xl p-5 sm:p-10 md:p-12 text-white">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-xs font-mono-ui font-bold uppercase tracking-widest mb-2 sm:mb-3 border border-white/20">
+                  <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 animate-ping"></span>
+                  <span>EXCLUSIVE DROP • LIMITED STOCK</span>
+                </div>
+                <h1 class="font-headline text-xl xs:text-2xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight uppercase mb-2 sm:mb-3 drop-shadow">
+                  AUTHENTIC UCL CLUB EDITIONS
+                </h1>
+                <p class="font-body text-[11px] sm:text-sm text-gray-200 leading-relaxed mb-4 sm:mb-6 max-w-md line-clamp-2">
+                  Official club crests, tournament starball badges, and pro player customization precision.
+                </p>
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                  <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
+                    <span>EXPLORE KITS</span>
+                    <svg class="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </a>
+                  <a href="product.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
+                    <span>CUSTOMIZE</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="hero-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out flex items-center opacity-0 z-0 pointer-events-none" data-index="2">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" 
+                   style="background-image: url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&q=80');"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25 sm:to-transparent"></div>
+              <div class="relative z-10 max-w-xl p-5 sm:p-10 md:p-12 text-white">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-xs font-mono-ui font-bold uppercase tracking-widest mb-2 sm:mb-3 border border-white/20">
+                  <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                  <span>PRO SPECIFICATION</span>
+                </div>
+                <h1 class="font-headline text-xl xs:text-2xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight uppercase mb-2 sm:mb-3 drop-shadow">
+                  AEROKNIT AIRFLOW TECHNOLOGY
+                </h1>
+                <p class="font-body text-[11px] sm:text-sm text-gray-200 leading-relaxed mb-4 sm:mb-6 max-w-md line-clamp-2">
+                  Ultra-breathable micro-mesh engineered for 90 minutes of maximum pitch endurance.
+                </p>
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                  <a href="index.html#shop" onclick="switchView('shop'); return false;" class="bg-white text-black hover:bg-gray-100 font-headline font-bold text-xs sm:text-sm px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 shadow-lg flex items-center gap-1.5 group cursor-pointer active:scale-95">
+                    <span>BUY NOW</span>
+                    <svg class="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </a>
+                  <a href="product.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
+                    <span>DISCOVER</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Carousel Controls (Previous / Next Arrows with SVG to prevent raw text flash) -->
@@ -352,7 +419,9 @@
 
           <!-- Carousel Dots Indicator -->
           <div id="hero-banner-dots" class="absolute bottom-2.5 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 bg-black/40 backdrop-blur-md px-3 py-1 sm:py-1.5 rounded-full border border-white/10">
-            <!-- Dots dynamically populated -->
+            <button type="button" onclick="gotoHeroBannerSlide(0)" class="transition-all duration-300 rounded-full cursor-pointer w-5 sm:w-6 h-1.5 sm:h-2 bg-white" aria-label="Slide 1"></button>
+            <button type="button" onclick="gotoHeroBannerSlide(1)" class="transition-all duration-300 rounded-full cursor-pointer w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70" aria-label="Slide 2"></button>
+            <button type="button" onclick="gotoHeroBannerSlide(2)" class="transition-all duration-300 rounded-full cursor-pointer w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70" aria-label="Slide 3"></button>
           </div>
 
         </div>
@@ -361,7 +430,34 @@
       <!-- ── Value Props / Features Bar ── -->
       <section class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <div id="store-value-props-container" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <!-- Populated dynamically -->
+          <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-xl text-black">local_shipping</span>
+            <div>
+              <div class="text-xs font-bold text-black">Nationwide Delivery</div>
+              <div class="text-[11px] text-gray-500">Inside Dhaka 24–48h • All BD 2–3 Days</div>
+            </div>
+          </div>
+          <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-xl text-black">verified</span>
+            <div>
+              <div class="text-xs font-bold text-black">Authentic Grade</div>
+              <div class="text-[11px] text-gray-500">100% Pro-Athlete Specification</div>
+            </div>
+          </div>
+          <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-xl text-black">3d_rotation</span>
+            <div>
+              <div class="text-xs font-bold text-black">3D Studio Live</div>
+              <div class="text-[11px] text-gray-500">Real-Time Customizer & UCL Patches</div>
+            </div>
+          </div>
+          <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-xl text-black">autorenew</span>
+            <div>
+              <div class="text-xs font-bold text-black">30-Day Guarantee</div>
+              <div class="text-[11px] text-gray-500">Hassle-Free Returns & Exchanges</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -404,7 +500,20 @@
               <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop National Teams</span>
             </div>
           </div>
-          <div onclick="goToShopCategory('Training Gear')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 sm:col-span-2 md:col-span-1">
+          <div onclick="goToShopCategory('Men\'s Football')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">POPULAR • MATCH KITS</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">Men's Football</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">Authentic breathable match jerseys with AeroKnit technology.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Men's Football</span>
+            </div>
+          </div>
+          <div onclick="goToShopCategory('Training Gear')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
             <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
                  style="background-image: url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80')"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
@@ -415,6 +524,32 @@
             </div>
             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
               <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Training Gear</span>
+            </div>
+          </div>
+          <div onclick="goToShopCategory('Outerwear')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">NEW DROP • WINTER</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">Outerwear</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">Technical weather-resistant jackets and performance track tops.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Outerwear</span>
+            </div>
+          </div>
+          <div onclick="goToShopCategory('Kids Collection')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                 style="background-image: url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1200&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-5 w-full">
+              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">ACADEMY • JUNIOR SIZES</span>
+              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">Kids Collection</h3>
+              <p class="text-xs text-gray-200 mt-1 line-clamp-1">Junior sizing and youth football academy kits built for young athletes.</p>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop Kids Collection</span>
             </div>
           </div>
         </div>
@@ -508,11 +643,21 @@
           <!-- 3D Image Perspective Box -->
           <div class="w-full md:w-1/2 h-72 sm:h-80 md:h-96 relative" id="showcase-3d-images-box" style="perspective:1000px;">
             <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80" alt="Rahim Chowdhury"
-                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 onclick="gotoShowcaseModel(0)"
                  style="opacity:1; pointer-events:auto; z-index:3; transform:translateX(0px) translateY(0px) scale(1) rotateY(0deg); will-change:transform,opacity;"/>
             <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80" alt="Tariqul Islam"
-                 class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 onclick="gotoShowcaseModel(1)"
                  style="opacity:1; pointer-events:auto; z-index:2; transform:translateX(80px) translateY(-60px) scale(0.85) rotateY(-15deg); will-change:transform,opacity;"/>
+            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=900&q=80" alt="Mahmudul Hasan"
+                 class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 onclick="gotoShowcaseModel(2)"
+                 style="opacity:0; pointer-events:none; z-index:1; transform:translateX(0px) translateY(0px) scale(0.7); will-change:transform,opacity;"/>
+            <img src="https://images.unsplash.com/photo-1511886929837-354d827aae26?w=900&q=80" alt="Arifur Rahman"
+                 class="showcase-img absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 transition-all duration-700 ease-out cursor-pointer"
+                 onclick="gotoShowcaseModel(3)"
+                 style="opacity:1; pointer-events:auto; z-index:2; transform:translateX(-80px) translateY(-60px) scale(0.85) rotateY(15deg); will-change:transform,opacity;"/>
           </div>
 
           <!-- Testimonial Content & Controls -->
@@ -1585,11 +1730,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261110_v2"></script>
+  <script src="firebase-sync.js?v=20261110_v3"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261110_v2"></script>
+  <script src="admin-db.js?v=20261110_v3"></script>
   <!-- Main Application JavaScript -->
-  <script src="wishlist.js?v=20261110_v2"></script>
-  <script src="app.js?v=20261110_v2"></script>
+  <script src="wishlist.js?v=20261110_v3"></script>
+  <script src="app.js?v=20261110_v3"></script>
 </body>
 </html>

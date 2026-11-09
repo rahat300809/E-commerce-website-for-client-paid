@@ -401,7 +401,7 @@
         </div>
 
         <!-- ── ADD-ONS (PATCHES LIST MATCHING SCREENSHOT 1) ── -->
-        <div class="pt-1">
+        <div id="patches-section" class="pt-1">
           <div class="flex items-center justify-between mb-2">
             <h3 class="text-xs font-headline font-black text-black uppercase tracking-wider">Add-ons</h3>
             <span class="text-[10px] font-mono-ui text-gray-400">Official tournament badges</span>
@@ -412,13 +412,13 @@
           </div>
         </div>
 
-        <!-- ── CUSTOM NAME & NUMBER (+250৳) MATCHING SCREENSHOT 1 ── -->
-        <div class="pt-1">
+        <!-- ── CUSTOM NAME & NUMBER MATCHING ADMIN CONFIG ── -->
+        <div id="custom-print-section" class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
             <h3 id="custom-section-heading" class="text-xs font-headline font-black text-black uppercase tracking-wider">
-              Custom Name & Number (+250৳)
+              Custom Name & Number (+200৳)
             </h3>
-            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED (+৳300)</span>
+            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED (+৳200)</span>
           </div>
           
           <div class="relative">
@@ -1049,42 +1049,92 @@
           };
         }
 
-        // Read dynamic customization settings from Admin DB
-        if (DB.customizationSettings) {
-          const cs = DB.customizationSettings.get();
-          if (cs && cs.nameNumberPackage && cs.nameNumberPackage.price) {
-            productState.personalizeFee = cs.nameNumberPackage.price;
-            const feeTag = document.getElementById('personalize-cost-tag');
-            if (feeTag) feeTag.textContent = `(+${formatCurrency(productState.personalizeFee)})`;
+      if (targetProduct) {
+        productState.product = targetProduct;
+        productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
+
+        // 1. Read dynamic customization settings from Admin DB
+        let cs = {};
+        if (typeof DB !== 'undefined' && DB.customizationSettings) {
+          cs = DB.customizationSettings.get() || {};
+        }
+
+        // Determine if customization is enabled on this specific product
+        // If explicitly boolean false, disable it; if true or undefined on a kit, enable it
+        const hasCustomPrinting = targetProduct.customNameNumber !== false && (
+          targetProduct.customNameNumber === true || targetProduct.customName === true || targetProduct.customNumber === true || targetProduct.customText === true || (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined)
+        );
+
+        const customSection = document.getElementById('custom-print-section');
+        if (customSection) {
+          if (hasCustomPrinting) {
+            customSection.style.display = 'block';
+            let printFee = 200;
+            if (cs?.nameNumberPackage?.price) printFee = parseFloat(cs.nameNumberPackage.price) || 200;
+            if (targetProduct.customPrintPrice !== undefined && targetProduct.customPrintPrice !== null && targetProduct.customPrintPrice !== '') {
+              printFee = parseFloat(targetProduct.customPrintPrice) || printFee;
+            }
+            productState.personalizeFee = printFee;
+            const heading = document.getElementById('custom-section-heading');
+            if (heading) {
+              const label = (targetProduct.customName && !targetProduct.customNumber) ? 'Custom Name Printing'
+                          : (targetProduct.customNumber && !targetProduct.customName) ? 'Custom Number Printing'
+                          : 'Custom Name & Number';
+              heading.textContent = `${label} (+৳${printFee})`;
+            }
+          } else {
+            customSection.style.display = 'none';
+            productState.isPersonalized = false;
+            productState.customName = '';
+            productState.customNumber = '';
+            productState.personalizeFee = 0;
           }
         }
 
-        // Read dynamic patches from Admin DB
-        if (DB.patches) {
-          const dbPatches = DB.patches.enabled();
+        // 2. Read dynamic patches from Admin DB (filter by targetProduct.assignedPatches)
+        if (typeof DB !== 'undefined' && DB.patches) {
+          let dbPatches = DB.patches.enabled();
+          if (Array.isArray(targetProduct.assignedPatches)) {
+            dbPatches = dbPatches.filter(p => targetProduct.assignedPatches.includes(p.id));
+          }
+          const patchesSection = document.getElementById('patches-section');
           if (dbPatches && dbPatches.length > 0) {
+            if (patchesSection) patchesSection.style.display = 'block';
             renderDynamicPatches(dbPatches);
+          } else {
+            if (patchesSection) patchesSection.style.display = 'none';
+            productState.selectedPatches = [];
+            productState.selectedPatchNames = [];
+            productState.patchPrice = 0;
           }
         }
 
-        // Read dynamic sleeves from Admin DB
-        if (DB.sleeves) {
-          const dbSleeves = DB.sleeves.enabled();
+        // 3. Read dynamic sleeves from Admin DB (filter by targetProduct.assignedSleeves)
+        if (typeof DB !== 'undefined' && DB.sleeves) {
+          let dbSleeves = DB.sleeves.enabled();
+          if (Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length > 0) {
+            dbSleeves = dbSleeves.filter(s => targetProduct.assignedSleeves.includes(s.id));
+          }
+          const sleeveSection = document.getElementById('sleeve-section');
           if (dbSleeves && dbSleeves.length > 0) {
+            if (sleeveSection) sleeveSection.style.display = 'block';
             renderDynamicSleeves(dbSleeves);
+          } else if (sleeveSection) {
+            sleeveSection.style.display = 'none';
           }
         }
 
-        // Read dynamic sizes from Admin DB
-        if (DB.sizes) {
-          const dbSizes = DB.sizes.enabled();
-          if (dbSizes && dbSizes.length > 0) {
-            renderDynamicSizes(dbSizes);
+        // 4. Read dynamic sizes from Admin DB (filter by targetProduct.assignedSizes)
+        if (typeof DB !== 'undefined' && DB.sizes) {
+          let dbSizes = DB.sizes.enabled();
+          if (Array.isArray(targetProduct.assignedSizes) && targetProduct.assignedSizes.length > 0) {
+            dbSizes = dbSizes.filter(s => targetProduct.assignedSizes.includes(s.id));
           }
+          renderDynamicSizes(dbSizes);
         }
 
         // WhatsApp direct button visibility
-        if (DB.storeSettings) {
+        if (typeof DB !== 'undefined' && DB.storeSettings) {
           const storeCfg = DB.storeSettings.get();
           const waDesktop = document.getElementById('whatsapp-order-btn');
           const waMobile = document.getElementById('mobile-whatsapp-btn');
@@ -1093,10 +1143,6 @@
           if (waMobile) waMobile.style.display = isWaEnabled ? 'flex' : 'none';
         }
       }
-
-      if (targetProduct) {
-        productState.product = targetProduct;
-        productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
 
         // Clean & shorten browser address bar to shareable link (e.g. /product.html?id=108)
         try {
@@ -1975,7 +2021,10 @@ Please confirm my order details!`;
         if (feeTag) feeTag.classList.add('hidden');
       } else {
         productState.isPersonalized = true;
-        if (feeTag) feeTag.classList.remove('hidden');
+        if (feeTag) {
+          feeTag.textContent = `APPLIED (+৳${productState.personalizeFee || 200})`;
+          feeTag.classList.remove('hidden');
+        }
 
         // Extract trailing digits if present: e.g. "RONALDO 7", "MESSI 10", "BENZEMA #9"
         const match = raw.match(/^(.*?)(?:\s+#?|\s+)(\d{1,2})$/);

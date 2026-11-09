@@ -111,12 +111,18 @@
       <div class="nav-section-label">Customization</div>
 
       <div class="nav-group">
-        <div class="nav-group-header" onclick="toggleNavGroup(this)">
+        <div class="nav-group-header" onclick="handleCustomizationNavHeader(this)">
           <span class="material-symbols-outlined">tune</span>
           <span>Customization</span>
           <span class="material-symbols-outlined nav-chevron">expand_more</span>
         </div>
         <div class="nav-group-children">
+          <a class="nav-item" data-view="customization" onclick="nav('customization')">
+            <span class="material-symbols-outlined">dashboard_customize</span> Overview Hub
+          </a>
+          <a class="nav-item" data-view="printing" onclick="nav('printing')">
+            <span class="material-symbols-outlined">print</span> Name / Number
+          </a>
           <a class="nav-item" data-view="patches" onclick="nav('patches')">
             <span class="material-symbols-outlined">badge</span> Patches
           </a>
@@ -124,16 +130,13 @@
             <span class="material-symbols-outlined">straighten</span> Sleeves
           </a>
           <a class="nav-item" data-view="sizes" onclick="nav('sizes')">
-            <span class="material-symbols-outlined">format_size</span> Sizes
+            <span class="material-symbols-outlined">format_size</span> Sizes & Size Chart
           </a>
           <a class="nav-item" data-view="colors" onclick="nav('colors')">
             <span class="material-symbols-outlined">palette</span> Colors
           </a>
           <a class="nav-item" data-view="addons" onclick="nav('addons')">
             <span class="material-symbols-outlined">add_circle</span> Add-ons
-          </a>
-          <a class="nav-item" data-view="printing" onclick="nav('printing')">
-            <span class="material-symbols-outlined">print</span> Name/Number
           </a>
         </div>
       </div>

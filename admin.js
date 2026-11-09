@@ -346,6 +346,14 @@ function toggleNavGroup(header) {
   header.nextElementSibling.classList.toggle('open');
 }
 
+function handleCustomizationNavHeader(header) {
+  if (!header.classList.contains('open')) {
+    header.classList.add('open');
+    if (header.nextElementSibling) header.nextElementSibling.classList.add('open');
+  }
+  nav('customization');
+}
+
 function toggleSidebar() {
   document.getElementById('admin-sidebar').classList.toggle('open');
 }
@@ -384,7 +392,7 @@ function toggleAdminCurrency() {
 const VIEW_MAP = {
   dashboard: renderDashboard, products: renderProducts,
   categories: renderCategories, collections: renderCollections,
-  inventory: renderInventory, patches: renderPatches,
+  inventory: renderInventory, customization: renderCustomizationHub, patches: renderPatches,
   sleeves: renderSleeves, sizes: renderSizes,
   colors: renderColors, addons: renderAddons,
   printing: renderPrinting, orders: renderOrders,
@@ -1087,14 +1095,27 @@ function removeAllDemoProducts() {
   );
 }
 
+// Helper to batch toggle chips in product form
+window.toggleChipsGroup = function(groupId, selectAll) {
+  const container = document.getElementById(groupId);
+  if (!container) return;
+  container.querySelectorAll('label.checkbox-chip').forEach(chip => {
+    const input = chip.querySelector('input[type="checkbox"]');
+    if (input) {
+      input.checked = selectAll;
+      chip.classList.toggle('selected', selectAll);
+    }
+  });
+};
+
 function openProductForm(id = null) {
   const product = id ? DB.products.byId(id) : null;
   const cats = DB.categories.all();
   const subcats = DB.subcategories.all();
   const collections = DB.collections.all();
-  const patches = DB.patches.enabled();
-  const sleeves = DB.sleeves.enabled();
-  const sizes = DB.sizes.enabled();
+  const patches = DB.patches.all().filter(p => p.isEnabled !== false);
+  const sleeves = DB.sleeves.all().filter(s => s.isEnabled !== false);
+  const sizes = DB.sizes.all().filter(s => s.isEnabled !== false);
   const cs = DB.customizationSettings.get();
   const isEdit = !!product;
 
@@ -1377,28 +1398,55 @@ function openProductForm(id = null) {
 
       <!-- TAB: CUSTOMIZATION -->
       <div id="prod-tab-custom" class="prod-tab hidden">
-        <p style="font-size:13px;color:#6B7280;margin-bottom:16px">Choose which customization options are available for this product.</p>
+        <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">Choose which customization options, badges, and sleeve styles are available for this product.</p>
         ${[
-          ['customName','Name Printing', `৳${cs.namePrinting?.price||200}`],
-          ['customNumber','Number Printing', `৳${cs.numberPrinting?.price||150}`],
-          ['customNameNumber','Name + Number Package', `৳${cs.nameNumberPackage?.price||300}`],
-          ['customLogo','Custom Logo Upload', `৳${cs.customLogo?.price||500}`],
-          ['customText','Custom Text', 'Free'],
-        ].map(([field,label,price]) => `
-          <div class="toggle-row">
-            <div><div class="toggle-label">${label}</div><div class="toggle-desc">${price}</div></div>
-            <label class="toggle">
-              <input type="checkbox" name="${field}" ${product?.[field]?'checked':''}>
-              <div class="toggle-track"></div><div class="toggle-thumb"></div>
-            </label>
-          </div>
+          ['customNameNumber','Name + Number Package', `৳${cs.nameNumberPackage?.price||200}`, !product ? true : !!product.customNameNumber],
+          ['customName','Name Printing', `৳${cs.namePrinting?.price||200}`, !product ? true : !!product.customName],
+          ['customNumber','Number Printing', `৳${cs.numberPrinting?.price||150}`, !product ? true : !!product.customNumber],
+          ['customLogo','Custom Logo Upload', `৳${cs.customLogo?.price||500}`, !product ? false : !!product.customLogo],
+          ['customText','Custom Text', 'Free', !product ? false : !!product.customText],
+        ].map(([field,label,price,isChecked]) => `
+          <label class="toggle-row ${isChecked ? 'toggle-active' : ''}" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:8px;border:1px solid ${isChecked ? '#16A34A' : '#E5E7EB'};border-radius:10px;cursor:pointer;background:${isChecked ? '#F0FDF4' : '#FAFAFA'};transition:all 0.2s;">
+            <div>
+              <div class="toggle-label" style="font-weight:700;font-size:13px;color:#111827;">${label}</div>
+              <div class="toggle-desc" style="font-size:12px;color:#6B7280;margin-top:2px;">${price}</div>
+            </div>
+            <div class="toggle" style="pointer-events:none;">
+              <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} onchange="
+                const row = this.closest('.toggle-row');
+                if (this.checked) {
+                  row.style.background = '#F0FDF4';
+                  row.style.borderColor = '#16A34A';
+                } else {
+                  row.style.background = '#FAFAFA';
+                  row.style.borderColor = '#E5E7EB';
+                }
+              "/>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </div>
+          </label>
         `).join('')}
 
+        <div class="form-group mt-3" style="background:#F9FAFB;padding:12px 14px;border-radius:10px;border:1px dashed #D1D5DB;">
+          <label class="form-label" style="font-size:12px;font-weight:700;margin-bottom:4px;">Custom Print Price Override (Optional)</label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="number" name="customPrintPrice" class="form-input" style="max-width:180px;" value="${product?.customPrintPrice !== undefined && product?.customPrintPrice !== null ? product.customPrintPrice : ''}" placeholder="Default: ৳${cs.nameNumberPackage?.price||200}" min="0"/>
+            <span style="font-size:12px;color:#6B7280;">Leave blank to use global package price (৳${cs.nameNumberPackage?.price||200})</span>
+          </div>
+        </div>
+
         <div class="form-group mt-4">
-          <label class="form-label">Available Patches</label>
-          <div class="checkbox-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label class="form-label" style="margin:0;font-weight:700;">Available Patches</label>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('patches-chips', true)">Select All</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('patches-chips', false)">Clear</button>
+            </div>
+          </div>
+          <div class="checkbox-group" id="patches-chips">
             ${patches.map(p => {
-              const selected = product?.assignedPatches?.includes(p.id);
+              const selected = product ? (Array.isArray(product.assignedPatches) ? product.assignedPatches.includes(p.id) : true) : true;
               return `<label class="checkbox-chip ${selected?'selected':''}">
                 <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
                 ${p.name} (+৳${p.price})
@@ -1407,11 +1455,17 @@ function openProductForm(id = null) {
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Available Sleeves</label>
-          <div class="checkbox-group">
+        <div class="form-group mt-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label class="form-label" style="margin:0;font-weight:700;">Available Sleeves</label>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('sleeves-chips', true)">Select All</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('sleeves-chips', false)">Clear</button>
+            </div>
+          </div>
+          <div class="checkbox-group" id="sleeves-chips">
             ${sleeves.map(s => {
-              const selected = product?.assignedSleeves?.includes(s.id) ?? true;
+              const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? product.assignedSleeves.includes(s.id) : true) : true;
               return `<label class="checkbox-chip ${selected?'selected':''}">
                 <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
                 ${s.name} (+৳${s.additionalPrice})
@@ -1420,11 +1474,17 @@ function openProductForm(id = null) {
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Available Sizes</label>
-          <div class="checkbox-group">
+        <div class="form-group mt-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label class="form-label" style="margin:0;font-weight:700;">Available Sizes</label>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('sizes-chips', true)">Select All</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="toggleChipsGroup('sizes-chips', false)">Clear</button>
+            </div>
+          </div>
+          <div class="checkbox-group" id="sizes-chips">
             ${sizes.map(s => {
-              const selected = product?.assignedSizes?.includes(s.id) ?? true;
+              const selected = product ? (Array.isArray(product.assignedSizes) && product.assignedSizes.length > 0 ? product.assignedSizes.includes(s.id) : true) : true;
               return `<label class="checkbox-chip ${selected?'selected':''}">
                 <input type="checkbox" name="size_${s.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
                 ${s.code}
@@ -1745,10 +1805,17 @@ function saveProduct(e, id, asDraft = false) {
     catId = cat?.id || null;
   }
 
-  // Collect patch assignments
-  const assignedPatches = DB.patches.enabled().filter(p => fd.get(`patch_${p.id}`) === 'on').map(p => p.id);
-  const assignedSleeves = DB.sleeves.enabled().filter(s => fd.get(`sleeve_${s.id}`) === 'on').map(s => s.id);
-  const assignedSizes = DB.sizes.enabled().filter(s => fd.get(`size_${s.id}`) === 'on').map(s => s.id);
+  // Collect patch, sleeve, size assignments directly from DOM inputs
+  const assignedPatches = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="patch_"]:checked')).map(i => i.name.replace('patch_', ''));
+  const assignedSleeves = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="sleeve_"]:checked')).map(i => i.name.replace('sleeve_', ''));
+  const assignedSizes = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="size_"]:checked')).map(i => i.name.replace('size_', ''));
+
+  const customName = !!form.querySelector('input[name="customName"]')?.checked;
+  const customNumber = !!form.querySelector('input[name="customNumber"]')?.checked;
+  const customNameNumber = !!form.querySelector('input[name="customNameNumber"]')?.checked;
+  const customLogo = !!form.querySelector('input[name="customLogo"]')?.checked;
+  const customText = !!form.querySelector('input[name="customText"]')?.checked;
+  const customPrintPrice = get('customPrintPrice') ? parseFloat(get('customPrintPrice')) : null;
 
   // Collect gallery images & direct image URL input
   const directUrl = get('directImageUrl');
@@ -1793,11 +1860,12 @@ function saveProduct(e, id, asDraft = false) {
     isPreorder: fd.get('isPreorder') === 'on',
     customBadge: get('customBadge'),
     isPublished: asDraft ? false : (get('productStatus') ? get('productStatus') === 'published' : true),
-    customName: fd.get('customName') === 'on',
-    customNumber: fd.get('customNumber') === 'on',
-    customNameNumber: fd.get('customNameNumber') === 'on',
-    customLogo: fd.get('customLogo') === 'on',
-    customText: fd.get('customText') === 'on',
+    customName,
+    customNumber,
+    customNameNumber,
+    customLogo,
+    customText,
+    customPrintPrice,
     assignedPatches,
     assignedSleeves,
     assignedSizes,
@@ -2987,6 +3055,192 @@ function savePrintingConfig(type) {
   }
   DB.customizationSettings.save(cs);
   toast('Customization config saved', 'success');
+}
+
+// ── CUSTOMIZATION OVERVIEW HUB ──
+function renderCustomizationHub(container) {
+  const cs = DB.customizationSettings.get() || {};
+  const np = cs.namePrinting || {};
+  const nrp = cs.numberPrinting || {};
+  const pkg = cs.nameNumberPackage || {};
+  const patches = DB.patches.all();
+  const sleeves = DB.sleeves.all();
+  const sizes = DB.sizes.all();
+  const colors = DB.colors ? DB.colors.all() : [];
+  const addons = DB.addons ? DB.addons.all() : [];
+  const sizeChartImg = (DB.sizes && typeof DB.sizes.getSizeChart === 'function') ? DB.sizes.getSizeChart() : '';
+
+  container.innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Customization Management Hub</div>
+        <div class="page-sub">Configure jersey name/number printing, tournament patches, sleeve options, sizes, and store size chart.</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="nav('printing')">
+          <span class="material-symbols-outlined">print</span> Name / Number Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Subtabs -->
+    <div class="admin-tabs mb-4">
+      <div class="admin-tab active" onclick="nav('customization')">Overview Hub</div>
+      <div class="admin-tab" onclick="nav('printing')">Name / Number</div>
+      <div class="admin-tab" onclick="nav('patches')">Patches (${patches.filter(p=>p.isEnabled!==false).length})</div>
+      <div class="admin-tab" onclick="nav('sleeves')">Sleeves (${sleeves.filter(s=>s.isEnabled!==false).length})</div>
+      <div class="admin-tab" onclick="nav('sizes')">Sizes & Chart (${sizes.filter(s=>s.isEnabled!==false).length})</div>
+      <div class="admin-tab" onclick="nav('colors')">Colors (${colors.filter(c=>c.isEnabled!==false).length})</div>
+      <div class="admin-tab" onclick="nav('addons')">Add-ons (${addons.filter(a=>a.isEnabled!==false).length})</div>
+    </div>
+
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;padding:14px 18px;border-radius:12px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+      <span class="material-symbols-outlined" style="color:#2563EB;font-size:24px;">info</span>
+      <div style="font-size:13px;color:#1E40AF;line-height:1.5;">
+        <strong>How Customization Works:</strong> Configure global options and pricing below. When editing or adding any jersey in <strong>Products → Edit → Customization</strong>, you can specifically choose which patches, sleeve types, sizes, and player printing packages are enabled for that product.
+      </div>
+    </div>
+
+    <!-- 6 Core Customization Feature Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
+      
+      <!-- Card 1: Name & Number Printing -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#2563EB;background:#DBEAFE;padding:6px;border-radius:8px;">print</span>
+              <span style="font-weight:700;font-size:15px;">Name & Number Printing</span>
+            </div>
+            <span class="badge" style="background:#DCFCE7;color:#16A34A;font-weight:700;">ACTIVE</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">Official match typography printing on kit back view.</p>
+          <div style="background:#F9FAFB;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;line-height:1.8;">
+            <div>• Package: <strong>৳${pkg.price || 200}</strong> (${pkg.enabled !== false ? 'Enabled' : 'Disabled'})</div>
+            <div>• Name Only: <strong>৳${np.price || 200}</strong> (${np.enabled !== false ? 'Enabled' : 'Disabled'})</div>
+            <div>• Number Only: <strong>৳${nrp.price || 150}</strong> (${nrp.enabled !== false ? 'Enabled' : 'Disabled'})</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="nav('printing')" style="width:100%;justify-content:center;">
+          <span class="material-symbols-outlined">tune</span> Configure Printing Prices
+        </button>
+      </div>
+
+      <!-- Card 2: Tournament Patches -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#D97706;background:#FEF3C7;padding:6px;border-radius:8px;">badge</span>
+              <span style="font-weight:700;font-size:15px;">Tournament Patches</span>
+            </div>
+            <span class="badge" style="background:#FEF3C7;color:#D97706;font-weight:700;">${patches.filter(p=>p.isEnabled!==false).length} Active</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">UCL Starball, La Liga, Premier League, Trophy sleeve badges.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            ${patches.map(p => `
+              <span class="badge" style="background:${p.isEnabled!==false?'#F3F4F6':'#FEE2E2'};color:${p.isEnabled!==false?'#374151':'#991B1B'};font-size:11px;">
+                ${p.name} (+৳${p.price})
+              </span>
+            `).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="nav('patches')" style="flex:1;justify-content:center;">Manage Patches</button>
+          <button class="btn btn-primary btn-sm" onclick="openPatchForm()" style="justify-content:center;">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Card 3: Sleeves -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#7C3AED;background:#EDE9FE;padding:6px;border-radius:8px;">straighten</span>
+              <span style="font-weight:700;font-size:15px;">Sleeve Styles</span>
+            </div>
+            <span class="badge" style="background:#EDE9FE;color:#7C3AED;font-weight:700;">${sleeves.filter(s=>s.isEnabled!==false).length} Active</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">Half Sleeve, Full Sleeve, Sleeveless options and additional prices.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            ${sleeves.map(s => `
+              <span class="badge" style="background:#F3F4F6;color:#374151;font-size:11px;">
+                ${s.name} (+৳${s.additionalPrice || 0})
+              </span>
+            `).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="nav('sleeves')" style="flex:1;justify-content:center;">Manage Sleeves</button>
+          <button class="btn btn-primary btn-sm" onclick="openSleeveForm()" style="justify-content:center;">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Card 4: Sizes & Size Chart -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#059669;background:#D1FAE5;padding:6px;border-radius:8px;">format_size</span>
+              <span style="font-weight:700;font-size:15px;">Sizes & Store Size Chart</span>
+            </div>
+            <span class="badge" style="background:#D1FAE5;color:#059669;font-weight:700;">${sizes.length} Sizes</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">Jersey size codes, chest measurements, and graphic size chart.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;">
+            ${sizes.map(s => `<span class="badge" style="background:#111827;color:#fff;font-weight:700;font-size:11px;">${s.code}</span>`).join('')}
+            ${sizeChartImg ? '<span class="badge" style="background:#DCFCE7;color:#16A34A;font-size:11px;font-weight:700;">Chart Uploaded ✓</span>' : '<span class="badge" style="background:#FEF3C7;color:#D97706;font-size:11px;">No Chart Image</span>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="nav('sizes')" style="flex:1;justify-content:center;">Manage Sizes & Size Chart</button>
+          <button class="btn btn-primary btn-sm" onclick="openSizeForm()" style="justify-content:center;">+ Add Size</button>
+        </div>
+      </div>
+
+      <!-- Card 5: Colors -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#DB2777;background:#FCE7F3;padding:6px;border-radius:8px;">palette</span>
+              <span style="font-weight:700;font-size:15px;">Jersey Colors</span>
+            </div>
+            <span class="badge" style="background:#FCE7F3;color:#DB2777;font-weight:700;">${colors.length} Colors</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">Jersey base and accent color swatches.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            ${colors.map(c => `
+              <span class="badge" style="background:#F3F4F6;color:#374151;font-size:11px;display:flex;align-items:center;gap:4px;">
+                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.hex||'#000'};border:1px solid #ccc;"></span>
+                ${c.name}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="nav('colors')" style="width:100%;justify-content:center;">Manage Colors</button>
+      </div>
+
+      <!-- Card 6: Add-ons -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="material-symbols-outlined" style="color:#0284C7;background:#E0F2FE;padding:6px;border-radius:8px;">add_circle</span>
+              <span style="font-weight:700;font-size:15px;">Custom Add-ons</span>
+            </div>
+            <span class="badge" style="background:#E0F2FE;color:#0284C7;font-weight:700;">${addons.length} Add-ons</span>
+          </div>
+          <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">Gift boxes, stickers, matchday cards, or custom merchandise.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            ${addons.map(a => `<span class="badge" style="background:#F3F4F6;color:#374151;font-size:11px;">${a.name} (+৳${a.price||0})</span>`).join('') || '<span style="font-size:12px;color:#9CA3AF;">No add-ons yet.</span>'}
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="nav('addons')" style="width:100%;justify-content:center;">Manage Add-ons</button>
+      </div>
+
+    </div>
+  `;
 }
 
 // ──────────────────────────────────────────────────────────────

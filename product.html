@@ -271,8 +271,8 @@
 
             <!-- Real-time Customization Overlay for Name & Number (Back View) -->
             <div id="live-custom-text-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden" style="top: -10px;">
-              <span id="live-overlay-name" class="jersey-custom-name text-[11px] sm:text-xs md:text-sm tracking-widest text-black/90 font-black">R. CHANDLER</span>
-              <span id="live-overlay-number" class="jersey-custom-number text-4xl sm:text-5xl md:text-6xl text-black/90 font-black mt-0.5">24</span>
+              <span id="live-overlay-name" class="jersey-custom-name text-[11px] sm:text-xs md:text-sm tracking-widest text-black/90 font-black"></span>
+              <span id="live-overlay-number" class="jersey-custom-number text-4xl sm:text-5xl md:text-6xl text-black/90 font-black mt-0.5"></span>
             </div>
 
             <!-- Sleeve Patch Badge Overlay (if selected) -->
@@ -309,10 +309,10 @@
           
           <!-- Thumbnail 1: Back Name / Number Detail -->
           <div onclick="setAngleView('back')" id="thumb-back" class="bg-[#f6f6f8] rounded-xl p-2.5 sm:p-3.5 flex flex-col items-center justify-center cursor-pointer border border-transparent hover:border-black/30 transition-all text-center">
-            <span class="text-[9px] sm:text-[10px] font-mono-ui font-bold text-gray-400 uppercase tracking-wider mb-0.5">CUSTOM PRINT VIEW</span>
-            <div class="flex items-center justify-center gap-1.5">
-              <span id="thumb-name-preview" class="font-headline font-black text-xs sm:text-sm tracking-wider text-black">R. CHANDLER</span>
-              <span id="thumb-number-preview" class="font-headline font-black text-sm sm:text-lg text-black">24</span>
+            <span class="text-[9px] sm:text-[10px] font-mono-ui font-bold text-gray-400 uppercase tracking-wider mb-0.5">BACK VIEW</span>
+            <div class="flex items-center justify-center gap-1.5" id="thumb-back-text-container">
+              <span id="thumb-name-preview" class="font-headline font-black text-xs sm:text-sm tracking-wider text-black">Plain Kit</span>
+              <span id="thumb-number-preview" class="font-headline font-black text-sm sm:text-lg text-black hidden"></span>
             </div>
             <span class="text-[9px] text-gray-400 mt-0.5">Click to preview jersey back</span>
           </div>
@@ -354,6 +354,8 @@
             <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black">1,350.00৳</span>
             <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">SALE</span>
           </div>
+          <!-- Product Short Description -->
+          <p id="pd-short-desc" class="text-xs text-gray-600 leading-relaxed pt-1.5 hidden"></p>
         </div>
 
         <hr class="border-gray-100 my-0.5"/>
@@ -508,12 +510,7 @@
             <button type="button" onclick="switchProductTab('reviews')" id="tab-btn-reviews" class="py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black">Reviews (0)</button>
           </div>
           <div id="tab-content-desc" class="py-3 text-xs text-gray-600 leading-relaxed space-y-2">
-            <p id="pd-full-description">Men's authentic match-grade jersey with micro-perforated AeroKnit weave. Crafted for pro endurance, optimal moisture-wicking and comfort.</p>
-            <ul class="list-disc pl-4 space-y-1 text-gray-500">
-              <li>100% Breathable AeroKnit performance polyester</li>
-              <li>Reinforced heat-sealed cuffs and neckline</li>
-              <li>Official tournament starball badges & name-number printing</li>
-            </ul>
+            <!-- Dynamically populated from targetProduct.description / shortDesc -->
           </div>
           <div id="tab-content-reviews" class="py-3 text-xs text-gray-500 hidden">
             <p>There are no customer reviews for this kit yet. Be the first to review after ordering!</p>
@@ -594,8 +591,8 @@
              alt="3D Jersey"/>
 
         <div id="modal-3d-custom-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden">
-          <span id="modal-3d-name" class="jersey-custom-name text-xs sm:text-sm text-black font-black">R. CHANDLER</span>
-          <span id="modal-3d-number" class="jersey-custom-number text-4xl sm:text-5xl text-black font-black">24</span>
+          <span id="modal-3d-name" class="jersey-custom-name text-xs sm:text-sm text-black font-black"></span>
+          <span id="modal-3d-number" class="jersey-custom-number text-4xl sm:text-5xl text-black font-black"></span>
         </div>
 
         <!-- 360 Rotation Controls -->
@@ -1265,9 +1262,50 @@
         const metaBrand = document.getElementById('pd-meta-brand');
         if (metaBrand) metaBrand.textContent = targetProduct.brand || 'Adidas';
 
-        if (targetProduct.description) {
-          const descEl = document.getElementById('pd-full-description');
-          if (descEl) descEl.textContent = targetProduct.description;
+        // Short Description (under price)
+        const shortDescEl = document.getElementById('pd-short-desc');
+        if (shortDescEl) {
+          const sText = (targetProduct.shortDesc || '').trim();
+          if (sText) {
+            shortDescEl.textContent = sText;
+            shortDescEl.classList.remove('hidden');
+          } else {
+            shortDescEl.textContent = '';
+            shortDescEl.classList.add('hidden');
+          }
+        }
+
+        // Full Description Tab
+        const descContainer = document.getElementById('tab-content-desc');
+        const fullDesc = (targetProduct.description || '').trim();
+        if (descContainer) {
+          if (fullDesc) {
+            const lines = fullDesc.split('\n').map(l => l.trim()).filter(Boolean);
+            const bullets = [];
+            const paragraphs = [];
+            lines.forEach(l => {
+              if (l.startsWith('- ') || l.startsWith('* ') || l.startsWith('• ')) {
+                bullets.push(l.replace(/^[-*•]\s*/, ''));
+              } else {
+                paragraphs.push(l);
+              }
+            });
+
+            let html = '';
+            if (paragraphs.length > 0) {
+              html += paragraphs.map(p => `<p class="mb-2 leading-relaxed text-gray-700">${escapeHtml(p)}</p>`).join('');
+            }
+            if (bullets.length > 0) {
+              html += `<ul class="list-disc pl-4 space-y-1 text-gray-600 mb-2">` +
+                bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('') +
+                `</ul>`;
+            }
+            descContainer.innerHTML = html || `<p class="leading-relaxed text-gray-700">${escapeHtml(fullDesc)}</p>`;
+          } else if (targetProduct.shortDesc && targetProduct.shortDesc.trim()) {
+            descContainer.innerHTML = `<p class="leading-relaxed text-gray-700">${escapeHtml(targetProduct.shortDesc.trim())}</p>`;
+          } else {
+            descContainer.innerHTML = `<p class="text-gray-400 italic">No description provided for this product.</p>`;
+          }
         }
 
         // Custom Name & Number Section Heading
@@ -1327,6 +1365,16 @@
       }
 
       calculateLiveTotal();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function formatCurrency(val) {
@@ -1467,14 +1515,19 @@
       const overlay = document.getElementById('live-custom-text-overlay');
       const modalOverlay = document.getElementById('modal-3d-custom-overlay');
 
+      const hasCustomText = !!(productState.customName || productState.customNumber);
+
       if (checked) {
         if (fields) fields.classList.remove('hidden');
-        if (productState.currentAngle === 'back' && overlay) {
+        if (productState.currentAngle === 'back' && overlay && hasCustomText) {
           overlay.classList.remove('hidden');
+        } else if (overlay) {
+          overlay.classList.add('hidden');
         }
-        if (modalOverlay) modalOverlay.classList.remove('hidden');
+        if (modalOverlay && hasCustomText) modalOverlay.classList.remove('hidden');
+        else if (modalOverlay) modalOverlay.classList.add('hidden');
         const printEl = document.getElementById('modal-preview-print');
-        if (printEl) printEl.textContent = `${productState.customName} #${productState.customNumber}`;
+        if (printEl) printEl.textContent = hasCustomText ? `${productState.customName || ''} ${productState.customNumber ? '#' + productState.customNumber : ''}`.trim() : 'None';
       } else {
         if (fields) fields.classList.add('hidden');
         if (overlay) overlay.classList.add('hidden');
@@ -1491,25 +1544,51 @@
       const ovName = document.getElementById('live-overlay-name');
       const modName = document.getElementById('modal-3d-name');
       const thName = document.getElementById('thumb-name-preview');
+      const thNum = document.getElementById('thumb-number-preview');
       const prName = document.getElementById('modal-preview-print');
 
-      if (ovName) ovName.textContent = productState.customName;
-      if (modName) modName.textContent = productState.customName;
-      if (thName) thName.textContent = productState.customName || 'NAME';
-      if (prName) prName.textContent = `${productState.customName} #${productState.customNumber}`;
+      if (ovName) ovName.textContent = productState.customName || '';
+      if (modName) modName.textContent = productState.customName || '';
+      if (thName) thName.textContent = productState.customName || (productState.customNumber ? '' : 'Plain Kit');
+      if (thNum) {
+        if (productState.customNumber) {
+          thNum.textContent = productState.customNumber;
+          thNum.classList.remove('hidden');
+        } else {
+          thNum.textContent = '';
+          thNum.classList.add('hidden');
+        }
+      }
+      if (prName) {
+        const hasText = !!(productState.customName || productState.customNumber);
+        prName.textContent = hasText ? `${productState.customName || ''} ${productState.customNumber ? '#' + productState.customNumber : ''}`.trim() : 'None';
+      }
     }
 
     function updateCustomNumber(val) {
       productState.customNumber = val || '';
       const ovNum = document.getElementById('live-overlay-number');
       const modNum = document.getElementById('modal-3d-number');
+      const thName = document.getElementById('thumb-name-preview');
       const thNum = document.getElementById('thumb-number-preview');
       const prNum = document.getElementById('modal-preview-print');
 
-      if (ovNum) ovNum.textContent = productState.customNumber;
-      if (modNum) modNum.textContent = productState.customNumber;
-      if (thNum) thNum.textContent = productState.customNumber || '00';
-      if (prNum) prNum.textContent = `${productState.customName} #${productState.customNumber}`;
+      if (ovNum) ovNum.textContent = productState.customNumber || '';
+      if (modNum) modNum.textContent = productState.customNumber || '';
+      if (thName) thName.textContent = productState.customName || (productState.customNumber ? '' : 'Plain Kit');
+      if (thNum) {
+        if (productState.customNumber) {
+          thNum.textContent = productState.customNumber;
+          thNum.classList.remove('hidden');
+        } else {
+          thNum.textContent = '';
+          thNum.classList.add('hidden');
+        }
+      }
+      if (prNum) {
+        const hasText = !!(productState.customName || productState.customNumber);
+        prNum.textContent = hasText ? `${productState.customName || ''} ${productState.customNumber ? '#' + productState.customNumber : ''}`.trim() : 'None';
+      }
     }
 
     // ─────────────────────────────────────────
@@ -1552,7 +1631,11 @@
 
       if (angle === 'back') {
         if (img) img.src = ANGLE_IMAGES.back;
-        if (textOverlay) textOverlay.classList.remove('hidden');
+        const hasCustom = !!(productState.isPersonalized && (productState.customName || productState.customNumber));
+        if (textOverlay) {
+          if (hasCustom) textOverlay.classList.remove('hidden');
+          else textOverlay.classList.add('hidden');
+        }
         if (patchOverlay) patchOverlay.classList.add('hidden');
       } else if (angle === 'detail') {
         if (img) img.src = ANGLE_IMAGES.detail;
@@ -2047,15 +2130,28 @@ Please confirm my order details!`;
       const thName = document.getElementById('thumb-name-preview');
       const thNum = document.getElementById('thumb-number-preview');
 
-      if (ovName) ovName.textContent = productState.customName || 'NAME';
-      if (ovNum) ovNum.textContent = productState.customNumber || '00';
-      if (thName) thName.textContent = productState.customName || 'NAME';
-      if (thNum) thNum.textContent = productState.customNumber || '00';
+      if (ovName) ovName.textContent = productState.customName || '';
+      if (ovNum) ovNum.textContent = productState.customNumber || '';
+
+      const hasCustom = !!(productState.isPersonalized && (productState.customName || productState.customNumber));
+
+      if (thName) {
+        thName.textContent = productState.customName || (productState.customNumber ? '' : 'Plain Kit');
+      }
+      if (thNum) {
+        if (productState.customNumber) {
+          thNum.textContent = productState.customNumber;
+          thNum.classList.remove('hidden');
+        } else {
+          thNum.textContent = '';
+          thNum.classList.add('hidden');
+        }
+      }
 
       if (textOverlay) {
-        if (productState.isPersonalized && productState.currentAngle === 'back') {
+        if (hasCustom && productState.currentAngle === 'back') {
           textOverlay.classList.remove('hidden');
-        } else if (!productState.isPersonalized) {
+        } else {
           textOverlay.classList.add('hidden');
         }
       }
@@ -2064,10 +2160,10 @@ Please confirm my order details!`;
       const modName = document.getElementById('modal-3d-name');
       const modNum = document.getElementById('modal-3d-number');
       const modOverlay = document.getElementById('modal-3d-custom-overlay');
-      if (modName) modName.textContent = productState.customName || 'NAME';
-      if (modNum) modNum.textContent = productState.customNumber || '00';
+      if (modName) modName.textContent = productState.customName || '';
+      if (modNum) modNum.textContent = productState.customNumber || '';
       if (modOverlay) {
-        if (productState.isPersonalized) modOverlay.classList.remove('hidden');
+        if (hasCustom) modOverlay.classList.remove('hidden');
         else modOverlay.classList.add('hidden');
       }
 
@@ -2114,9 +2210,13 @@ Please confirm my order details!`;
     function rotateModalView(angle) {
       const img = document.getElementById('modal-3d-img');
       const customOverlay = document.getElementById('modal-3d-custom-overlay');
+      const hasCustom = !!(productState.isPersonalized && (productState.customName || productState.customNumber));
       if (angle === 'back') {
         if (img) img.src = ANGLE_IMAGES.back;
-        if (customOverlay) customOverlay.classList.remove('hidden');
+        if (customOverlay) {
+          if (hasCustom) customOverlay.classList.remove('hidden');
+          else customOverlay.classList.add('hidden');
+        }
       } else if (angle === 'side') {
         if (img) img.src = ANGLE_IMAGES.detail;
         if (customOverlay) customOverlay.classList.add('hidden');

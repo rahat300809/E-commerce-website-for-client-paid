@@ -64,37 +64,24 @@ const Store = {
 
 
 // ──────────────────────────────────────────────────────────
-// Seed Default Data (runs once per schema version)
+// Schema & Initial Seed Data Management
 // ──────────────────────────────────────────────────────────
-const SEED_VERSION = 10; // v10: Client handover fresh start (clear test orders, customers, and revenue)
+const SEED_VERSION = 11; // v11: Protect user products from auto-deletion, remove demo products
 let _isSeeding = false;
 function seedDefaultData() {
   if (_isSeeding) return;
-  const seededVersion = Store.getObj('seeded_version', 0);
-  if (seededVersion >= SEED_VERSION) return;
   _isSeeding = true;
   try {
-    // SAFE: Only clear known schema-managed keys, NOT all localStorage
-    // For v10 handover: reset test orders, demo customers, returns, refunds, and logs so client starts at 0
-    const keysToReset = [
-      'products', 'categories', 'subcategories', 'collections', 'banners', 'homepage', 'shopBanner',
-      'brand', 'coupons', 'flashSales', 'shipping', 'paymentConfig', 'storeSettings',
-      'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'colors', 'addons',
-      'printing', 'customization', 'teams', 'seeded', 'seeded_version',
-      'orders', 'customers', 'returns', 'refunds', 'activityLog', 'notifLog', 'inventoryHistory', 'priceHistory'
-    ];
-    keysToReset.forEach(k => {
-      try { localStorage.removeItem(`${DB_VERSION}_${k}`); } catch(e){}
-    });
-    // Explicitly initialize empty transaction lists locally and sync to cloud
-    Store.set('orders', []);
-    Store.set('customers', []);
-    Store.set('returns', []);
-    Store.set('refunds', []);
-    Store.set('activityLog', []);
-    Store.set('notifLog', []);
-    Store.set('inventoryHistory', []);
-    Store.set('priceHistory', []);
+    // Only set default empty lists if key does NOT exist at all (null/undefined)
+    if (Store.get('orders') === null) Store.set('orders', []);
+    if (Store.get('customers') === null) Store.set('customers', []);
+    if (Store.get('returns') === null) Store.set('returns', []);
+    if (Store.get('refunds') === null) Store.set('refunds', []);
+    if (Store.get('activityLog') === null) Store.set('activityLog', []);
+    if (Store.get('notifLog') === null) Store.set('notifLog', []);
+    if (Store.get('inventoryHistory') === null) Store.set('inventoryHistory', []);
+    if (Store.get('priceHistory') === null) Store.set('priceHistory', []);
+    if (Store.get('products') === null) Store.set('products', []);
 
     Store.setObj('seeded', true);
     Store.setObj('seeded_version', SEED_VERSION);
@@ -503,10 +490,8 @@ function seedDefaultData() {
     }
   ];
 
-  // Only seed products if store is empty
-  if (!Store.get('products') || Store.get('products').length === 0) {
-    Store.set('products', [...DEFAULT_SEED_PRODUCTS, ...EXTRA_SEED_PRODUCTS]);
-  }
+  // Sample Demo Catalog Products (Only loaded on explicit manual admin request, never auto-seeded)
+  window._SAMPLE_DEMO_PRODUCTS = [...DEFAULT_SEED_PRODUCTS, ...EXTRA_SEED_PRODUCTS];
   // Homepage Config
   DB.homepage.save({
     announcement: { enabled: true, marqueeText: 'THE NEW SEASON • SHOP OFFICIAL JERSEYS • FREE EXPRESS SHIPPING OVER ৳1500 • INTERACTIVE 3D CUSTOM STUDIO LIVE • PRO-GRADE AEROKNIT WEAVE TECHNOLOGY', badgeText: 'SS/26 DROPS LIVE' },
@@ -800,9 +785,8 @@ const DB = {
   products: {
     all() {
       let items = Store.get('products');
-      if (!items || items.length === 0) {
-        seedDefaultData();
-        items = Store.get('products');
+      if (!items || !Array.isArray(items)) {
+        return [];
       }
       return items;
     },
@@ -843,15 +827,15 @@ const DB = {
       return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
     },
     create(data) {
-      const items = Store.get('products');
+      const items = Store.get('products') || [];
       const isPub = data.isPublished !== undefined ? Boolean(data.isPublished) : (data.status === 'draft' ? false : true);
       const item = {
-        id: Store.genId(),
+        id: data.id || ('prod_' + Store.genId()),
         ...data,
         isPublished: isPub,
         status: isPub ? 'published' : 'draft',
         isArchived: false,
-        createdAt: Store.now(),
+        createdAt: data.createdAt || Store.now(),
         updatedAt: Store.now()
       };
       items.unshift(item); // Latest product placed at the top of the catalog
@@ -870,13 +854,14 @@ const DB = {
       } else if (updates.status !== undefined && updates.isPublished === undefined) {
         updates.isPublished = updates.status !== 'draft';
       }
-      const items = Store.get('products').map(p => p.id === id ? { ...p, ...updates } : p);
+      const strId = String(id).trim().toLowerCase();
+      const items = (Store.get('products') || []).map(p => String(p.id).trim().toLowerCase() === strId ? { ...p, ...updates } : p);
       Store.set('products', items);
       if (data.basePrice !== undefined && old?.basePrice !== data.basePrice && DB.priceHistory && typeof DB.priceHistory.add === 'function') {
         DB.priceHistory.add({ productId: id, productName: old?.name, oldPrice: old?.basePrice, newPrice: data.basePrice, type: 'basePrice' });
       }
       DB.log(`Product updated: ${data.name || old?.name}`);
-      return items.find(p => p.id === id);
+      return items.find(p => String(p.id).trim().toLowerCase() === strId);
     },
     duplicate(id) {
       const src = DB.products.byId(id);
@@ -895,10 +880,12 @@ const DB = {
     },
     delete(id) {
       const p = DB.products.byId(id);
-      const hasOrders = DB.orders.all().some(o => o.items?.some(i => i.productId === id));
-      if (hasOrders) { DB.products.archive(id); return 'archived'; }
-      Store.set('products', Store.get('products').filter(p => p.id !== id));
-      DB.log(`Product deleted: ${p?.name}`); return 'deleted';
+      const strId = String(id).trim().toLowerCase();
+      const all = Store.get('products') || [];
+      const remaining = all.filter(x => String(x.id).trim().toLowerCase() !== strId);
+      Store.set('products', remaining);
+      DB.log(`Product deleted: ${p?.name || id}`);
+      return 'deleted';
     },
     updateStock(id, qty, reason = 'Manual adjustment') {
       const p = DB.products.byId(id);
@@ -2361,8 +2348,10 @@ const DB = {
   }
 };
 
-// ── Init ──
-seedDefaultData();
+// ── Safe Init (NEVER clears or auto-seeds products) ──
+if (Store.get('products') === null) {
+  Store.set('products', []);
+}
 
 // Expose globally on window for all views, modals, and integrations
 if (typeof window !== 'undefined') {

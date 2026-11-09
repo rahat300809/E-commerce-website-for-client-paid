@@ -883,7 +883,17 @@ function renderProducts(container) {
         <div class="page-title">Products</div>
         <div class="page-sub">${total} total products</div>
       </div>
-      <div class="page-actions">
+      <div class="page-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        ${(() => {
+          const allProds = DB.products.all();
+          const demoIds = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'];
+          const hasDemos = allProds.some(p => demoIds.includes(String(p.id)));
+          return hasDemos ? `
+            <button class="btn btn-secondary btn-sm" onclick="removeAllDemoProducts()" style="color:#DC2626;border-color:#FCA5A5;" title="Clear sample demo jerseys from store">
+              <span class="material-symbols-outlined" style="font-size:16px;">delete_sweep</span> Clear Demo Products
+            </button>
+          ` : '';
+        })()}
         <button class="btn btn-secondary btn-sm" onclick="exportProductsCSV()">
           <span class="material-symbols-outlined">download</span> Export
         </button>
@@ -1027,10 +1037,54 @@ function toggleSelectProduct(id, checked) {
 }
 
 function bulkPublish(publish) {
+  const count = selectedProducts.size;
   selectedProducts.forEach(id => DB.products.update(id, { isPublished: publish }));
   selectedProducts.clear();
-  toast(`${publish?'Published':'Unpublished'} ${selectedProducts.size} products`, 'success');
+  toast(`${publish?'Published':'Unpublished'} ${count} products`, 'success');
   renderProducts(document.getElementById('admin-content'));
+}
+
+function bulkDelete() {
+  if (!selectedProducts || selectedProducts.size === 0) return;
+  const count = selectedProducts.size;
+  showConfirm(
+    'Delete Selected Products',
+    `Are you sure you want to delete ${count} selected product(s)? This will permanently remove them from your store.`,
+    () => {
+      const all = Store.get('products') || [];
+      const remaining = all.filter(p => !selectedProducts.has(String(p.id)));
+      Store.set('products', remaining);
+      selectedProducts.clear();
+      toast(`${count} product(s) deleted successfully`, 'success');
+      renderProducts(document.getElementById('admin-content'));
+      try { window.dispatchEvent(new Event('storage')); } catch(e){}
+    },
+    'Delete Selected',
+    true
+  );
+}
+
+function removeAllDemoProducts() {
+  const all = Store.get('products') || [];
+  const demoIds = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'];
+  const demoCount = all.filter(p => demoIds.includes(String(p.id))).length;
+  if (demoCount === 0) {
+    toast('No demo products found in catalog', 'info');
+    return;
+  }
+  showConfirm(
+    'Remove Demo Products',
+    `Are you sure you want to permanently remove all ${demoCount} sample/demo products? Your custom added products will remain intact.`,
+    () => {
+      const remaining = all.filter(p => !demoIds.includes(String(p.id)));
+      Store.set('products', remaining);
+      toast(`${demoCount} demo product(s) removed successfully`, 'success');
+      renderProducts(document.getElementById('admin-content'));
+      try { window.dispatchEvent(new Event('storage')); } catch(e){}
+    },
+    'Remove Demo Products',
+    true
+  );
 }
 
 function openProductForm(id = null) {

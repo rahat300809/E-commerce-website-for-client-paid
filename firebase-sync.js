@@ -340,9 +340,23 @@
   }
 
   // ── Public API ──────────────────────────────────────────────────
+  const ADMIN_MANAGED_KEYS = [
+    'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
+    'brand', 'storeSettings', 'shipping', 'paymentConfig', 'coupons', 'flashSales',
+    'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons', 'printing', 'customization'
+  ];
+
   window.ZenvyFirebase = {
     push(key, value) {
       if (SYNC_KEYS.includes(key)) {
+        if (ADMIN_MANAGED_KEYS.includes(key)) {
+          const isFromAdmin = window.location.pathname.toLowerCase().includes('admin') ||
+                              (typeof DB !== 'undefined' && DB.auth && typeof DB.auth.isLoggedIn === 'function' && DB.auth.isLoggedIn());
+          if (!isFromAdmin) {
+            // Guard: storefront visitors cannot push catalog changes to Firestore
+            return;
+          }
+        }
         pushToFirestore(key, value);
       }
     },

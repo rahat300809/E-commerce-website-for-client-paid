@@ -502,14 +502,14 @@ function seedDefaultData() {
       subtitle: 'The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.', 
       ctaPrimaryText: 'SHOP', 
       ctaPrimaryLink: 'index.html#shop', 
-      ctaSecondaryText: '3D STUDIO', 
-      ctaSecondaryLink: '#customizer', 
+      ctaSecondaryText: 'PRE-ORDERS', 
+      ctaSecondaryLink: 'preorders.html', 
       bgImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80' 
     },
     valueProps: [
       { id: 'prop1', icon: 'local_shipping', title: 'Express Shipping', subtitle: '2-4 Business Days Worldwide' },
       { id: 'prop2', icon: 'verified', title: 'Authentic Grade', subtitle: '100% Pro-Athlete Specification' },
-      { id: 'prop3', icon: '3d_rotation', title: '3D Studio Live', subtitle: 'Real-Time Customizer & UCL Patches' },
+      { id: 'prop3', icon: 'workspace_premium', title: 'Official Kit Badges', subtitle: 'Tournament Patches & Name Printing' },
       { id: 'prop4', icon: 'autorenew', title: '30-Day Guarantee', subtitle: 'Hassle-Free Returns & Exchanges' }
     ],
     collections: {
@@ -906,6 +906,31 @@ const DB = {
       const oldStock = p.stock;
       DB.products.update(id, { stock: qty });
       DB.inventory.addHistory({ productId: id, productName: p.name, previousStock: oldStock, change: qty - oldStock, newStock: qty, reason });
+    },
+    exportCSV() {
+      const prods = DB.products.all().filter(p => !p.isArchived);
+      const rows = [['ID', 'Name', 'SKU', 'Category', 'Price', 'Compare At', 'Stock', 'Status', 'Badges', 'Created Date']];
+      prods.forEach(p => {
+        const badges = [];
+        if (p.isNewArrival) badges.push('NEW');
+        if (p.isBestSeller) badges.push('BEST');
+        if (p.isFeatured) badges.push('FEAT');
+        if (p.isPreorder) badges.push('PRE');
+        if (p.isLimited) badges.push('LTD');
+        rows.push([
+          `"${String(p.id || '').replace(/"/g, '""')}"`,
+          `"${String(p.name || '').replace(/"/g, '""')}"`,
+          `"${String(p.sku || '').replace(/"/g, '""')}"`,
+          `"${String(p.categoryName || p.category || '').replace(/"/g, '""')}"`,
+          p.basePrice || p.price || 0,
+          p.compareAt || p.compareAtPrice || '',
+          p.stock || 0,
+          p.isPublished ? 'PUBLISHED' : 'DRAFT',
+          `"${badges.join(' ')}"`,
+          `"${String(p.createdAt || '').replace(/"/g, '""')}"`
+        ]);
+      });
+      return rows.map(r => r.join(',')).join('\n');
     }
   },
 
@@ -1902,7 +1927,150 @@ const DB = {
   preorders: {
     all() { return Store.get('products').filter(p => p.isPreorder && !p.isArchived); },
     byId(productId) { return Store.get('products').find(p => p.id === productId); },
-    active() { return DB.preorders.all().filter(p => p.preorderStatus === 'OPEN' || p.preorderStatus === 'AVAILABLE'); }
+    active() { return DB.preorders.all().filter(p => p.preorderStatus === 'OPEN' || p.preorderStatus === 'AVAILABLE'); },
+    exportCSV() {
+      const items = DB.preorders.all();
+      const rows = [['Product', 'Preorder Price', 'Regular Price', 'Capacity', 'Sold', 'Remaining', 'Expected Delivery', 'Status']];
+      items.forEach(p => {
+        const cap = p.preorderCapacity || 100;
+        const sold = p.preorderSold || 0;
+        rows.push([
+          `"${String(p.name || '').replace(/"/g, '""')}"`,
+          p.preorderPrice || p.basePrice || 0,
+          p.basePrice || 0,
+          cap,
+          sold,
+          Math.max(0, cap - sold),
+          `"${String(p.expectedDelivery || '').replace(/"/g, '""')}"`,
+          `"${String(p.preorderStatus || 'OPEN').replace(/"/g, '""')}"`
+        ]);
+      });
+      return rows.map(r => r.join(',')).join('\n');
+    }
+  },
+
+  // ── Preorder 3D Orbit Hero Showcase ──
+  preorderHero: {
+    defaultItems: [
+      {
+        id: 'orbit_1',
+        title: 'World Cup 2026 Special Drop',
+        subtitle: 'Argentina 3-Star Champion Kit',
+        image: 'img/preorders/argentina.png',
+        eyebrow: '🔥 #1 Trending Preorder',
+        rating: 4.98,
+        chef: 'AFA Official Player Match Spec',
+        kitchen: 'Limited Edition • 150 Slots',
+        description: 'Featuring the official gold 3-star champions badge, aerated micro-mesh cooling channels, and golden Sun of May crest.',
+        likes: 482,
+        price: 8500,
+        accent: '#bae6fd',
+        expectedDeliveryDate: '15 November 2026',
+        sizes: ['S','M','L','XL','XXL']
+      },
+      {
+        id: 'orbit_2',
+        title: 'Season 2026/27 Drop',
+        subtitle: 'FC Barcelona Camp Nou Return',
+        image: 'img/preorders/barca.png',
+        eyebrow: '⚡ High Demand Drop',
+        rating: 4.94,
+        chef: 'Blaugrana Pro Match Kit',
+        kitchen: 'DryTech Pro Jacquard',
+        description: 'Next-season iconic Blaugrana match jersey with moisture-wicking ergonomic cut and breathable side mesh inserts.',
+        likes: 389,
+        price: 7200,
+        accent: '#fecdd3',
+        expectedDeliveryDate: '20 September 2026',
+        sizes: ['S','M','L','XL','XXL']
+      },
+      {
+        id: 'orbit_3',
+        title: 'National Pride Official Kit',
+        subtitle: 'Bangladesh Tigers ODI 2026',
+        image: 'img/preorders/bangladesh.png',
+        eyebrow: '🇧🇩 Official National Edition',
+        rating: 4.97,
+        chef: 'BCB Official Match Kit',
+        kitchen: 'Tiger Jacquard Weave',
+        description: 'Deep emerald green & crimson accents with woven Royal Bengal tiger patterns and golden star embroidery.',
+        likes: 615,
+        price: 3800,
+        accent: '#a7f3d0',
+        expectedDeliveryDate: '5 October 2026',
+        sizes: ['S','M','L','XL','XXL','XXXL']
+      },
+      {
+        id: 'orbit_4',
+        title: 'Performance Series',
+        subtitle: 'AeroKnit Supreme Pro UCL',
+        image: 'img/preorders/aeroknit.png',
+        eyebrow: '✨ Elite Performance Drop',
+        rating: 4.90,
+        chef: 'Zenvy Elite Athletics',
+        kitchen: 'Titanium AeroKnit Weave',
+        description: 'Ultra-lightweight match kit engineered with thermal-regulated airflow panels and iridescent reflective branding.',
+        likes: 294,
+        price: 4200,
+        accent: '#e9d5ff',
+        expectedDeliveryDate: '10 November 2026',
+        sizes: ['S','M','L','XL','XXL']
+      }
+    ],
+    all() {
+      let items = Store.get('preorderHero');
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = JSON.parse(JSON.stringify(this.defaultItems));
+        Store.set('preorderHero', items);
+      }
+      return items;
+    },
+    byId(id) {
+      return this.all().find(x => String(x.id) === String(id));
+    },
+    save(items) {
+      Store.set('preorderHero', items);
+      DB.log('Preorder 3D hero showcase updated');
+    },
+    create(data) {
+      const items = this.all();
+      const item = {
+        id: data.id || ('orbit_' + Store.genId()),
+        title: data.title || 'New Preorder Drop',
+        subtitle: data.subtitle || 'Exclusive Kit Drop',
+        image: data.image || 'img/preorders/argentina.png',
+        eyebrow: data.eyebrow || '🔥 Exclusive Drop',
+        rating: parseFloat(data.rating) || 4.95,
+        chef: data.chef || 'Official Match Spec',
+        kitchen: data.kitchen || 'Limited Edition',
+        description: data.description || '',
+        likes: parseInt(data.likes) || 120,
+        price: parseFloat(data.price) || 5000,
+        accent: data.accent || '#bae6fd',
+        expectedDeliveryDate: data.expectedDeliveryDate || 'Coming Soon',
+        sizes: Array.isArray(data.sizes) ? data.sizes : ['S','M','L','XL','XXL'],
+        createdAt: Store.now(),
+        updatedAt: Store.now()
+      };
+      items.push(item);
+      this.save(items);
+      return item;
+    },
+    update(id, data) {
+      const items = this.all().map(x => String(x.id) === String(id) ? { ...x, ...data, updatedAt: Store.now() } : x);
+      this.save(items);
+      return items.find(x => String(x.id) === String(id));
+    },
+    delete(id) {
+      const items = this.all().filter(x => String(x.id) !== String(id));
+      this.save(items);
+      return true;
+    },
+    reset() {
+      const defs = JSON.parse(JSON.stringify(this.defaultItems));
+      this.save(defs);
+      return defs;
+    }
   },
 
   // ── Teams / Clubs ──

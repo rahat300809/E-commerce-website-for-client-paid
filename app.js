@@ -152,8 +152,8 @@ function getHeroBanners() {
         mobileImg: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
         ctaPrimaryText: 'SHOP',
         ctaPrimaryLink: 'index.html#shop',
-        ctaSecondaryText: '3D Studio',
-        ctaSecondaryLink: 'customizer.html'
+        ctaSecondaryText: 'Pre-Orders',
+        ctaSecondaryLink: 'preorders.html'
       },
       {
         id: 'hero_2',
@@ -282,8 +282,8 @@ function renderHeroBannerCarousel() {
               <span>${cta1}</span>
               <svg class="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
-            <a href="customizer.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
-              <span>${cta2}</span>
+            <a href="${cta2 === '3D Studio' ? 'preorders.html' : 'preorders.html'}" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer">
+              <span>${cta2 === '3D Studio' ? 'Pre-Orders' : cta2}</span>
             </a>
           </div>
         </div>
@@ -382,7 +382,7 @@ function syncHomepageContent() {
   const props = (homeConfig && homeConfig.valueProps) || [
     { icon: 'local_shipping', title: 'Nationwide Delivery', subtitle: 'Inside Dhaka 24–48h • All BD 2–3 Days' },
     { icon: 'verified', title: 'Authentic Grade', subtitle: '100% Pro-Athlete Specification' },
-    { icon: '3d_rotation', title: '3D Studio Live', subtitle: 'Real-Time Customizer & UCL Patches' },
+    { icon: 'workspace_premium', title: 'Official Kit Badges', subtitle: 'Tournament Patches & Name Printing' },
     { icon: 'autorenew', title: '30-Day Guarantee', subtitle: 'Hassle-Free Returns & Exchanges' }
   ];
   const propsContainer = document.getElementById('store-value-props-container');

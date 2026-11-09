@@ -2509,14 +2509,40 @@ function applyStockAdjust(productId, oldStock) {
   renderInventory(document.getElementById('admin-content'));
 }
 
+function exportProductsCSV() {
+  if (typeof DB !== 'undefined' && DB.products && typeof DB.products.exportCSV === 'function') {
+    const csv = DB.products.exportCSV();
+    DB.export.downloadCSV(csv, `zenvy-products-${new Date().toISOString().slice(0,10)}.csv`);
+    toast('Products exported to CSV successfully', 'success');
+  } else {
+    toast('Export not available', 'error');
+  }
+}
+window.exportProductsCSV = exportProductsCSV;
+
 function exportInventoryCSV() {
   const rows = [['Product','SKU','Stock','Low Alert','Status']];
-  DB.products.all().filter(p=>!p.isArchived).forEach(p =>
-    rows.push([p.name, p.sku||'', p.stock||0, p.lowStockAlert||5, p.stock===0?'Out of Stock':p.stock<=(p.lowStockAlert||5)?'Low Stock':'In Stock'])
-  );
-  DB.export.downloadCSV(rows.map(r=>r.join(',')).join('\n'), 'zenvy-inventory.csv');
-  toast('Inventory exported', 'success');
+  DB.products.all().filter(p=>!p.isArchived).forEach(p => {
+    const name = `"${String(p.name||'').replace(/"/g, '""')}"`;
+    const sku = `"${String(p.sku||'').replace(/"/g, '""')}"`;
+    const status = p.stock===0 ? 'Out of Stock' : (p.stock <= (p.lowStockAlert||5) ? 'Low Stock' : 'In Stock');
+    rows.push([name, sku, p.stock||0, p.lowStockAlert||5, `"${status}"`]);
+  });
+  DB.export.downloadCSV(rows.map(r=>r.join(',')).join('\n'), `zenvy-inventory-${new Date().toISOString().slice(0,10)}.csv`);
+  toast('Inventory exported to CSV successfully', 'success');
 }
+window.exportInventoryCSV = exportInventoryCSV;
+
+function exportPreordersCSV() {
+  if (typeof DB !== 'undefined' && DB.preorders && typeof DB.preorders.exportCSV === 'function') {
+    const csv = DB.preorders.exportCSV();
+    DB.export.downloadCSV(csv, `zenvy-preorders-${new Date().toISOString().slice(0,10)}.csv`);
+    toast('Preorders exported to CSV successfully', 'success');
+  } else {
+    toast('Export not available', 'error');
+  }
+}
+window.exportPreordersCSV = exportPreordersCSV;
 
 // ──────────────────────────────────────────────────────────────
 // ═══ CUSTOMIZATION VIEWS ═══
@@ -4025,11 +4051,99 @@ function saveManualOrder() {
 // ──────────────────────────────────────────────────────────────
 function renderPreorders(container) {
   const preorders = DB.preorders.all();
+  const orbitHeroDrops = (typeof DB !== 'undefined' && DB.preorderHero) ? DB.preorderHero.all() : [];
+
   container.innerHTML = `
     <div class="page-header">
-      <div class="page-header-left"><div class="page-title">Preorders</div><div class="page-sub">${preorders.length} preorder products</div></div>
+      <div class="page-header-left">
+        <div class="page-title">Preorders & 3D Showcase</div>
+        <div class="page-sub">${preorders.length} preorder products • ${orbitHeroDrops.length} interactive 3D hero drops</div>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="exportPreordersCSV()">
+          <span class="material-symbols-outlined">download</span> Export Preorders
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="openOrbitHeroModal()">
+          <span class="material-symbols-outlined">view_carousel</span> Add 3D Hero Drop
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="openProductForm(null, { isPreorder: true })">
+          <span class="material-symbols-outlined">add</span> New Preorder Product
+        </button>
+      </div>
     </div>
+
+    <!-- 🌟 TOP INTERACTIVE 3D ORBIT HERO SHOWCASE MANAGER -->
+    <div class="card mb-6" style="border: 1px solid #E0E7FF; background: linear-gradient(to right, #ffffff, #F8FAFC); margin-bottom: 24px;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:16px 20px;border-bottom:1px solid #EDF2F7;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="color:#4F46E5;font-size:22px;">3d_rotation</span>
+            <span style="font-weight:700;font-size:15px;color:#1E1B4B;">Preorders Page Top 3D Orbit Carousel</span>
+            <span class="badge badge-purple" style="font-size:11px;">Live Storefront</span>
+          </div>
+          <div style="font-size:12px;color:#64748B;margin-top:2px;">
+            Edit the interactive rotating showcase at the top of <code>preorders.html</code>. Changes sync live instantly to Firestore.
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="resetOrbitHeroDrops()" style="font-size:12px;">
+            <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reset Defaults
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openOrbitHeroModal()" style="background:#4F46E5;border-color:#4F46E5;font-size:12px;">
+            <span class="material-symbols-outlined" style="font-size:15px;">add</span> Add Hero Item
+          </button>
+        </div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:16px;">
+          ${orbitHeroDrops.map((drop, idx) => `
+            <div style="background:#ffffff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);display:flex;flex-col;justify-content:space-between;transition:transform 0.2s;" onmouseover="this.style.borderColor='#818CF8'" onmouseout="this.style.borderColor='#E2E8F0'">
+              <div style="height:140px;background:${drop.accent || '#f1f5f9'};position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;">
+                <span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.75);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">
+                  #${idx + 1} Drop
+                </span>
+                <span style="position:absolute;top:8px;right:8px;background:#ffffff;color:#1E293B;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                  ★ ${drop.rating || 4.9}
+                </span>
+                <img src="${drop.image}" alt="${drop.title}" style="max-height:115px;max-width:85%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.15));" onerror="this.src='img/preorders/argentina.png'"/>
+              </div>
+              <div style="padding:12px 14px;flex-grow:1;display:flex;flex-direction:column;justify-content:space-between;">
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:#6366F1;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">
+                    ${drop.eyebrow || 'Special Drop'}
+                  </div>
+                  <div style="font-weight:700;font-size:14px;color:#0F172A;line-height:1.2;margin-bottom:2px;">
+                    ${drop.title}
+                  </div>
+                  <div style="font-size:12px;color:#475569;margin-bottom:8px;">
+                    ${drop.subtitle}
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+                    <span style="font-weight:800;font-size:15px;color:#059669;">৳${(drop.price || 0).toLocaleString()}</span>
+                    <span style="font-size:11px;color:#64748B;">🚚 ${drop.expectedDeliveryDate || 'TBD'}</span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;border-top:1px solid #F1F5F9;padding-top:10px;margin-top:6px;">
+                  <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;font-size:11px;padding:4px 8px;" onclick="openOrbitHeroModal('${drop.id}')">
+                    <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
+                  </button>
+                  <button class="btn btn-secondary btn-sm" style="color:#DC2626;border-color:#FCA5A5;padding:4px 8px;" onclick="deleteOrbitHeroDrop('${drop.id}')" title="Delete Drop">
+                    <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- PREORDER PRODUCTS CATALOG TABLE -->
     <div class="card">
+      <div class="card-header" style="padding:14px 20px;border-bottom:1px solid #EDF2F7;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;font-size:14px;color:#1E293B;">Preorder Products Catalog</span>
+        <span style="font-size:12px;color:#64748B;">Products marked with isPreorder: true</span>
+      </div>
       <div class="table-wrapper">
         <table class="admin-table">
           <thead><tr><th>Product</th><th>Preorder Price</th><th>Capacity</th><th>Sold</th><th>Remaining</th><th>Expected Delivery</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
@@ -4057,6 +4171,172 @@ function renderPreorders(container) {
     </div>
   `;
 }
+
+function openOrbitHeroModal(id = null) {
+  const item = id ? DB.preorderHero.byId(id) : null;
+  const isEdit = !!item;
+
+  const content = `
+    <form id="orbit-hero-form" onsubmit="saveOrbitHeroDrop(event, '${id || ''}')" style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Drop Title *</label>
+          <input type="text" name="title" class="form-input" required value="${item ? (item.title||'').replace(/"/g, '&quot;') : 'World Cup 2026 Special Drop'}" placeholder="e.g. World Cup 2026 Special Drop"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subtitle (Jersey Name) *</label>
+          <input type="text" name="subtitle" class="form-input" required value="${item ? (item.subtitle||'').replace(/"/g, '&quot;') : 'Argentina 3-Star Champion Kit'}" placeholder="e.g. Argentina 3-Star Champion Kit"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Eyebrow Tag</label>
+          <input type="text" name="eyebrow" class="form-input" value="${item ? (item.eyebrow||'').replace(/"/g, '&quot;') : '🔥 #1 Trending Preorder'}" placeholder="e.g. 🔥 #1 Trending Preorder"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preorder Price (৳) *</label>
+          <input type="number" name="price" class="form-input" required min="0" value="${item ? (item.price||0) : 8500}" placeholder="8500"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Transparent Cutout Jersey Image URL *</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="orbit-img-url" name="image" class="form-input" required value="${item ? (item.image||'') : 'img/preorders/argentina.png'}" placeholder="e.g. img/preorders/argentina.png or https://..."/>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('orbit-img-file').click()">
+            <span class="material-symbols-outlined">upload</span>
+          </button>
+          <input type="file" id="orbit-img-file" accept="image/*" style="display:none;" onchange="handleOrbitHeroImageUpload(this)"/>
+        </div>
+        <div style="font-size:11px;color:#64748B;margin-top:4px;">Use transparent PNG cutout images for optimal 3D orbit showcase effect.</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Expected Delivery Date</label>
+          <input type="text" name="expectedDeliveryDate" class="form-input" value="${item ? (item.expectedDeliveryDate||'').replace(/"/g, '&quot;') : '15 November 2026'}" placeholder="e.g. 15 November 2026"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rating (e.g. 4.98)</label>
+          <input type="number" step="0.01" min="1" max="5" name="rating" class="form-input" value="${item ? (item.rating||4.98) : 4.98}"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Spec Subtitle (Chef)</label>
+          <input type="text" name="chef" class="form-input" value="${item ? (item.chef||'').replace(/"/g, '&quot;') : 'AFA Official Player Match Spec'}" placeholder="e.g. Official Player Match Spec"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Batch / Slots Badge (Kitchen)</label>
+          <input type="text" name="kitchen" class="form-input" value="${item ? (item.kitchen||'').replace(/"/g, '&quot;') : 'Limited Edition • 150 Slots'}" placeholder="e.g. Limited Edition • 150 Slots"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Background Accent Color (Hex)</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="color" id="orbit-color-picker" value="${item && item.accent ? item.accent : '#bae6fd'}" onchange="document.getElementById('orbit-color-text').value=this.value" style="width:40px;height:38px;padding:2px;border:1px solid #CBD5E1;border-radius:6px;cursor:pointer;"/>
+            <input type="text" id="orbit-color-text" name="accent" class="form-input" value="${item && item.accent ? item.accent : '#bae6fd'}" onchange="document.getElementById('orbit-color-picker').value=this.value"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sizes (comma separated)</label>
+          <input type="text" name="sizes" class="form-input" value="${item && Array.isArray(item.sizes) ? item.sizes.join(', ') : 'S, M, L, XL, XXL'}" placeholder="S, M, L, XL, XXL"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-input" rows="3" placeholder="Drop description...">${item ? (item.description||'') : 'Featuring the official gold 3-star champions badge, aerated micro-mesh cooling channels, and golden Sun of May crest.'}</textarea>
+      </div>
+
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:#4F46E5;border-color:#4F46E5;">
+          <span class="material-symbols-outlined">save</span> ${isEdit ? 'Save Changes' : 'Create Drop'}
+        </button>
+      </div>
+    </form>
+  `;
+
+  openModal(isEdit ? 'Edit 3D Showcase Drop' : 'Add 3D Orbit Showcase Drop', content);
+}
+window.openOrbitHeroModal = openOrbitHeroModal;
+
+function handleOrbitHeroImageUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const urlInput = document.getElementById('orbit-img-url');
+      if (urlInput) urlInput.value = e.target.result;
+      toast('Showcase image uploaded', 'success');
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+window.handleOrbitHeroImageUpload = handleOrbitHeroImageUpload;
+
+function saveOrbitHeroDrop(e, id) {
+  if (e) e.preventDefault();
+  const form = document.getElementById('orbit-hero-form');
+  if (!form) return;
+
+  const fd = new FormData(form);
+  const title = (fd.get('title') || '').toString().trim();
+  const subtitle = (fd.get('subtitle') || '').toString().trim();
+  const image = (fd.get('image') || '').toString().trim();
+  const price = parseFloat(fd.get('price')) || 0;
+  const eyebrow = (fd.get('eyebrow') || '').toString().trim();
+  const expectedDeliveryDate = (fd.get('expectedDeliveryDate') || '').toString().trim();
+  const chef = (fd.get('chef') || '').toString().trim();
+  const kitchen = (fd.get('kitchen') || '').toString().trim();
+  const rating = parseFloat(fd.get('rating')) || 4.95;
+  const accent = (fd.get('accent') || '').toString().trim() || '#bae6fd';
+  const description = (fd.get('description') || '').toString().trim();
+  const sizesRaw = (fd.get('sizes') || '').toString().trim();
+  const sizes = sizesRaw ? sizesRaw.split(',').map(s => s.trim()).filter(Boolean) : ['S','M','L','XL','XXL'];
+
+  if (!title || !subtitle || !image) {
+    toast('Title, Subtitle, and Image are required', 'error');
+    return;
+  }
+
+  const dropData = {
+    title, subtitle, image, price, eyebrow,
+    expectedDeliveryDate, chef, kitchen, rating, accent, description, sizes
+  };
+
+  if (id) {
+    DB.preorderHero.update(id, dropData);
+    toast('3D Hero Showcase drop updated successfully', 'success');
+  } else {
+    DB.preorderHero.create(dropData);
+    toast('3D Hero Showcase drop added successfully', 'success');
+  }
+
+  closeModal();
+  renderPreorders(document.getElementById('admin-content'));
+}
+window.saveOrbitHeroDrop = saveOrbitHeroDrop;
+
+function deleteOrbitHeroDrop(id) {
+  if (!confirm('Are you sure you want to remove this jersey from the 3D Orbit showcase?')) return;
+  DB.preorderHero.delete(id);
+  toast('Showcase drop deleted', 'success');
+  renderPreorders(document.getElementById('admin-content'));
+}
+window.deleteOrbitHeroDrop = deleteOrbitHeroDrop;
+
+function resetOrbitHeroDrops() {
+  if (!confirm('Reset the 3D Orbit Showcase items back to default collection?')) return;
+  DB.preorderHero.reset();
+  toast('Showcase drops reset to defaults', 'success');
+  renderPreorders(document.getElementById('admin-content'));
+}
+window.resetOrbitHeroDrops = resetOrbitHeroDrops;
 
 // ──────────────────────────────────────────────────────────────
 // ═══ VIEW: CUSTOMERS ═══

@@ -3,7 +3,28 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>ZENVY AeroKnit Pro Jersey | ZENVY Elite Performance</title>
+  <title>ZENVY Performance Jersey | ZENVY Elite Performance</title>
+  
+  <script>
+    // Immediate pre-hydration to eliminate reload flash
+    (function() {
+      try {
+        var p = new URLSearchParams(window.location.search);
+        var pid = (p.get('id') || p.get('slug') || '').trim().toLowerCase();
+        var raw = localStorage.getItem('zenvy_v1_products');
+        if (pid && raw) {
+          var list = JSON.parse(raw);
+          var item = list.find(function(x) {
+            return String(x.id).trim().toLowerCase() === pid || String(x.slug||'').trim().toLowerCase() === pid;
+          });
+          if (item) {
+            window._preloadedProduct = item;
+            document.title = item.name + ' | ZENVY Elite Performance';
+          }
+        }
+      } catch(e){}
+    })();
+  </script>
   
   <!-- Tailwind CSS with Plugins -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -193,9 +214,6 @@
       <nav class="hidden md:flex items-center gap-8 text-sm font-semibold">
         <a href="index.html#home" class="text-gray-600 hover:text-black transition-colors">Home</a>
         <a href="index.html#shop" class="text-gray-600 hover:text-black transition-colors">Shop</a>
-        <a href="index.html#customizer" class="text-gray-600 hover:text-black transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span> Custom Studio
-        </a>
         <a href="preorders.html" class="text-gray-600 hover:text-black transition-colors">Preorders</a>
       </nav>
 
@@ -227,9 +245,6 @@
       </a>
       <a href="index.html#shop" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
         <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop
-      </a>
-      <a href="index.html#customizer" class="text-sm font-bold text-amber-600 py-2 px-3 rounded-lg hover:bg-amber-50/50 flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Studio
       </a>
       <a href="preorders.html" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
         <span class="material-symbols-outlined text-lg">schedule</span> Preorders
@@ -265,8 +280,8 @@
             
             <!-- Cutout Jersey Image -->
             <img id="main-product-img" 
-                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA" 
-                 alt="ZENVY AeroKnit Pro Jersey" 
+                 src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48cmVjdCB3aWR0aD0nMjAwJyBoZWlnaHQ9JzIwMCcgZmlsbD0nI2Y1ZjVmNycvPjwvc3ZnPg==" 
+                 alt="Performance Jersey" 
                  class="max-h-[220px] sm:max-h-[280px] md:max-h-[400px] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300 group-hover:scale-105"/>
 
             <!-- Real-time Customization Overlay for Name & Number (Back View) -->
@@ -281,14 +296,6 @@
             </div>
 
           </div>
-
-          <!-- Bottom Right Pill: "Interactive 3D Preview" -->
-          <button type="button" 
-                  onclick="open3DModal()"
-                  class="preview-pill absolute bottom-3 right-3 sm:bottom-4 sm:right-4 flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold text-gray-800 cursor-pointer shadow-sm">
-            <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span>
-            <span>3D Studio</span>
-          </button>
 
           <!-- Top-Left View Switcher Tags (Front, Back, Fabric) -->
           <div class="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 z-10 bg-white/80 backdrop-blur-md p-1 rounded-full border border-black/5 shadow-xs">
@@ -337,22 +344,21 @@
         <!-- Header Info -->
         <div class="space-y-1">
           <!-- Product Title -->
-          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight">
-            Real Madrid 12/13 Home Full sleeve
+          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight min-h-[32px]">
           </h1>
 
           <!-- Subtitle / Team / Category -->
           <div class="text-xs font-mono-ui font-bold text-blue-900 flex items-center gap-2">
-            <span id="pd-subtitle-tags">Real Madrid, Retro Edition</span>
+            <span id="pd-subtitle-tags"></span>
             <span>•</span>
             <span id="pd-stock-tag" class="text-emerald-700 font-black">IN STOCK</span>
           </div>
 
           <!-- Price Display -->
           <div class="pt-1 flex items-baseline gap-2.5">
-            <span id="pd-original-price" class="font-mono-ui text-base text-gray-400 line-through">1,450.00৳</span>
-            <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black">1,350.00৳</span>
-            <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">SALE</span>
+            <span id="pd-original-price" class="font-mono-ui text-base text-gray-400 line-through hidden"></span>
+            <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black"></span>
+            <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">SALE</span>
           </div>
           <!-- Product Short Description -->
           <p id="pd-short-desc" class="text-xs text-gray-600 leading-relaxed pt-1.5 hidden"></p>
@@ -569,57 +575,6 @@
 
 
   <!-- ═══════════════════════════════════════════
-       INTERACTIVE 3D PREVIEW MODAL
-  ════════════════════════════════════════════ -->
-  <div id="modal-3d" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 relative overflow-hidden shadow-2xl animate-slide-up">
-      
-      <div class="flex justify-between items-center mb-3">
-        <div>
-          <h3 class="font-headline font-bold text-base sm:text-lg text-black">Interactive 3D Customizer</h3>
-          <p class="text-[11px] text-gray-500">Rotate and inspect custom name, sleeve, and badge details.</p>
-        </div>
-        <button onclick="close3DModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">✕</button>
-      </div>
-
-      <!-- 3D Canvas / Rotatable Interactive View -->
-      <div class="bg-[#f5f5f7] rounded-2xl h-64 sm:h-80 flex flex-col items-center justify-center relative select-none" id="rotatable-container">
-        
-        <img id="modal-3d-img" 
-             src="" 
-             class="h-52 sm:h-64 object-contain transition-all duration-300 drop-shadow-xl" 
-             alt="3D Jersey"/>
-
-        <div id="modal-3d-custom-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden">
-          <span id="modal-3d-name" class="jersey-custom-name text-xs sm:text-sm text-black font-black"></span>
-          <span id="modal-3d-number" class="jersey-custom-number text-4xl sm:text-5xl text-black font-black"></span>
-        </div>
-
-        <!-- 360 Rotation Controls -->
-        <div class="absolute bottom-3 flex items-center gap-2 sm:gap-3 bg-white/95 px-3 py-1 rounded-full shadow border border-gray-200 text-xs font-bold">
-          <button onclick="rotateModalView('front')" class="px-2 py-0.5 hover:text-black">Front 0°</button>
-          <span>•</span>
-          <button onclick="rotateModalView('side')" class="px-2 py-0.5 hover:text-black">Side 90°</button>
-          <span>•</span>
-          <button onclick="rotateModalView('back')" class="px-2 py-0.5 hover:text-black font-black">Back 180°</button>
-        </div>
-
-      </div>
-
-      <div class="mt-3 flex justify-between items-center text-xs">
-        <div class="text-[11px] text-gray-500">
-          Size: <strong id="modal-preview-size" class="text-black">M</strong> • 
-          Sleeve: <strong id="modal-preview-sleeve" class="text-black">Half</strong> • 
-          Print: <strong id="modal-preview-print" class="text-black">None</strong>
-        </div>
-        <button onclick="close3DModal()" class="bg-black text-white text-xs font-bold px-4 py-1.5 rounded-full">Done</button>
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- ═══════════════════════════════════════════
        SIZE CHART IMAGE MODAL (ONLY IMAGE POPUP)
   ════════════════════════════════════════════ -->
   <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="if(event.target===this)closeSizeGuideModal()">
@@ -761,7 +716,6 @@
             <h4 class="font-headline font-bold text-[11px] sm:text-xs uppercase tracking-widest text-black mb-2 sm:mb-3">LINKS</h4>
             <ul class="flex flex-col gap-1.5 sm:gap-2 text-xs text-gray-500 font-medium">
               <li><a href="index.html#shop" class="hover:text-black transition-colors">Shop Jerseys</a></li>
-              <li><a href="customizer.html" class="hover:text-black transition-colors">3D Custom Studio</a></li>
               <li><a href="preorders.html" class="hover:text-black transition-colors">Pre-orders</a></li>
               <li><button type="button" onclick="openSizeGuideModal()" class="hover:text-black transition-colors text-left cursor-pointer">Size Guide</button></li>
             </ul>
@@ -1046,10 +1000,22 @@
             stock: 45
           };
         }
+      }
 
       if (targetProduct) {
+        // Compute render hash to prevent redundant re-renders and background reload flashing
+        const currentTitleEl = document.getElementById('pd-title');
+        const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}`;
+        const isSameProduct = (window._activeProductRenderHash === prodDataHash);
+
         productState.product = targetProduct;
         productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
+
+        if (isSameProduct && currentTitleEl && currentTitleEl.textContent.trim()) {
+          calculateLiveTotal();
+          return;
+        }
+        window._activeProductRenderHash = prodDataHash;
 
         // 1. Read dynamic customization settings from Admin DB
         let cs = {};
@@ -1186,7 +1152,6 @@
           if (waDesktop) waDesktop.style.display = isWaEnabled ? 'flex' : 'none';
           if (waMobile) waMobile.style.display = isWaEnabled ? 'flex' : 'none';
         }
-      }
 
         // Clean & shorten browser address bar to shareable link (e.g. /product.html?id=108)
         try {
@@ -1259,14 +1224,10 @@
 
         const mainImg = document.getElementById('main-product-img');
         if (mainImg) {
-          mainImg.src = ANGLE_IMAGES.front;
+          if (!mainImg.src.includes(ANGLE_IMAGES.front)) {
+            mainImg.src = ANGLE_IMAGES.front;
+          }
           mainImg.alt = targetProduct.name;
-        }
-
-        const modal3dImg = document.getElementById('modal-3d-img');
-        if (modal3dImg) {
-          modal3dImg.src = ANGLE_IMAGES.front;
-          modal3dImg.alt = targetProduct.name;
         }
 
         // Render Gallery Thumbnails Strip
@@ -1445,11 +1406,15 @@
       ];
 
       // Add extra images if available
-      images.forEach((url, i) => {
+      (images || []).forEach((url, i) => {
         if (!items.some(it => it.img === url)) {
           items.push({ label: `Angle ${i+1}`, img: url, angle: 'custom', customUrl: url });
         }
       });
+
+      const tHash = JSON.stringify(items.map(it => [it.angle, it.img, it.customUrl]));
+      if (strip.dataset.thumbsHash === tHash && strip.children.length > 0) return;
+      strip.dataset.thumbsHash = tHash;
 
       strip.innerHTML = items.map((it, idx) => `
         <button type="button" 
@@ -1521,6 +1486,10 @@
         );
       }
 
+      const pHash = JSON.stringify(unique.map(p => [p.id, p.name, p.price, productState.selectedPatches.includes(p.id)]));
+      if (container.dataset.patchesHash === pHash && container.children.length > 0) return;
+      container.dataset.patchesHash = pHash;
+
       container.innerHTML = unique.map((p) => {
         const fallbackBadge = getFallbackPatchBadge(p.name);
         const imgSrc = (p.imageUrl && p.imageUrl.trim().length > 5) ? p.imageUrl : fallbackBadge;
@@ -1566,7 +1535,6 @@
       productState.isPersonalized = checked;
       const fields = document.getElementById('personalization-fields');
       const overlay = document.getElementById('live-custom-text-overlay');
-      const modalOverlay = document.getElementById('modal-3d-custom-overlay');
 
       const hasCustomText = !!(productState.customName || productState.customNumber);
 
@@ -1577,16 +1545,9 @@
         } else if (overlay) {
           overlay.classList.add('hidden');
         }
-        if (modalOverlay && hasCustomText) modalOverlay.classList.remove('hidden');
-        else if (modalOverlay) modalOverlay.classList.add('hidden');
-        const printEl = document.getElementById('modal-preview-print');
-        if (printEl) printEl.textContent = hasCustomText ? `${productState.customName || ''} ${productState.customNumber ? '#' + productState.customNumber : ''}`.trim() : 'None';
       } else {
         if (fields) fields.classList.add('hidden');
         if (overlay) overlay.classList.add('hidden');
-        if (modalOverlay) modalOverlay.classList.add('hidden');
-        const printEl = document.getElementById('modal-preview-print');
-        if (printEl) printEl.textContent = 'None';
       }
 
       calculateLiveTotal();
@@ -1595,13 +1556,10 @@
     function updateCustomName(val) {
       productState.customName = (val || '').toUpperCase();
       const ovName = document.getElementById('live-overlay-name');
-      const modName = document.getElementById('modal-3d-name');
       const thName = document.getElementById('thumb-name-preview');
       const thNum = document.getElementById('thumb-number-preview');
-      const prName = document.getElementById('modal-preview-print');
 
       if (ovName) ovName.textContent = productState.customName || '';
-      if (modName) modName.textContent = productState.customName || '';
       if (thName) thName.textContent = productState.customName || (productState.customNumber ? '' : 'Plain Kit');
       if (thNum) {
         if (productState.customNumber) {
@@ -1612,22 +1570,16 @@
           thNum.classList.add('hidden');
         }
       }
-      if (prName) {
-        const hasText = !!(productState.customName || productState.customNumber);
-        prName.textContent = hasText ? `${productState.customName || ''} ${productState.customNumber ? '#' + productState.customNumber : ''}`.trim() : 'None';
-      }
     }
 
     function updateCustomNumber(val) {
       productState.customNumber = val || '';
       const ovNum = document.getElementById('live-overlay-number');
-      const modNum = document.getElementById('modal-3d-number');
       const thName = document.getElementById('thumb-name-preview');
       const thNum = document.getElementById('thumb-number-preview');
-      const prNum = document.getElementById('modal-preview-print');
+      const prNum = document.getElementById('print-summary-num');
 
       if (ovNum) ovNum.textContent = productState.customNumber || '';
-      if (modNum) modNum.textContent = productState.customNumber || '';
       if (thName) thName.textContent = productState.customName || (productState.customNumber ? '' : 'Plain Kit');
       if (thNum) {
         if (productState.customNumber) {
@@ -1723,6 +1675,10 @@
       if (unique.length === 0) unique.push('S', 'M', 'L', 'XL', 'XXL');
       
       const current = productState.selectedSize || 'M';
+      const szHash = `${unique.join(',')}_${current}`;
+      if (select.dataset.sizesHash === szHash && select.children.length > 0) return;
+      select.dataset.sizesHash = szHash;
+
       select.innerHTML = unique.map(code => `
         <option value="${code}" ${code === current ? 'selected' : ''}>${code}</option>
       `).join('');
@@ -1762,6 +1718,10 @@
         productState.selectedSleeveName = unique[0].name;
         productState.sleevePrice = parseFloat(unique[0].additionalPrice) || 0;
       }
+
+      const slvHash = `${unique.map(s => `${s.id}:${s.name}:${s.additionalPrice}`).join(',')}_${productState.selectedSleeve}`;
+      if (container.dataset.sleevesHash === slvHash && container.children.length > 0) return;
+      container.dataset.sleevesHash = slvHash;
 
       container.innerHTML = unique.map((s) => {
         const isActive = (s.id === productState.selectedSleeve || s.name.toLowerCase() === productState.selectedSleeveName.toLowerCase());
@@ -2227,17 +2187,6 @@ Please confirm my order details!`;
         }
       }
 
-      // Update 3D Modal Overlays
-      const modName = document.getElementById('modal-3d-name');
-      const modNum = document.getElementById('modal-3d-number');
-      const modOverlay = document.getElementById('modal-3d-custom-overlay');
-      if (modName) modName.textContent = productState.customName || '';
-      if (modNum) modNum.textContent = productState.customNumber || '';
-      if (modOverlay) {
-        if (hasCustom) modOverlay.classList.remove('hidden');
-        else modOverlay.classList.add('hidden');
-      }
-
       calculateLiveTotal();
     }
 
@@ -2264,39 +2213,8 @@ Please confirm my order details!`;
     }
 
     // ─────────────────────────────────────────
-    // Modals (3D & Size Guide Matching Screenshot 2)
+    // End Product Detail Logic
     // ─────────────────────────────────────────
-    function open3DModal() {
-      const m = document.getElementById('modal-3d');
-      if (m) m.classList.remove('hidden');
-      const img = document.getElementById('modal-3d-img');
-      if (img) img.src = ANGLE_IMAGES.front;
-    }
-
-    function close3DModal() {
-      const m = document.getElementById('modal-3d');
-      if (m) m.classList.add('hidden');
-    }
-
-    function rotateModalView(angle) {
-      const img = document.getElementById('modal-3d-img');
-      const customOverlay = document.getElementById('modal-3d-custom-overlay');
-      const hasCustom = !!(productState.isPersonalized && (productState.customName || productState.customNumber));
-      if (angle === 'back') {
-        if (img) img.src = ANGLE_IMAGES.back;
-        if (customOverlay) {
-          if (hasCustom) customOverlay.classList.remove('hidden');
-          else customOverlay.classList.add('hidden');
-        }
-      } else if (angle === 'side') {
-        if (img) img.src = ANGLE_IMAGES.detail;
-        if (customOverlay) customOverlay.classList.add('hidden');
-      } else {
-        if (img) img.src = ANGLE_IMAGES.front;
-        if (customOverlay) customOverlay.classList.add('hidden');
-      }
-    }
-
   </script>
 </body>
 </html>

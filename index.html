@@ -250,9 +250,6 @@
         <a href="index.html#shop" onclick="switchView('shop'); return false;" id="nav-btn-shop" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60">
           Shop
         </a>
-        <a href="customizer.html" id="nav-btn-customizer" class="nav-tab font-body-md text-sm px-5 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60 flex items-center gap-1">
-          <span class="material-symbols-outlined text-[16px] text-amber-600">3d_rotation</span> Custom Studio
-        </a>
         <a href="preorders.html" id="nav-btn-preorders" class="nav-tab font-body-md text-sm px-4 py-1.5 rounded-full transition-all duration-200 text-secondary hover:text-primary hover:bg-white/60">
           Preorders
         </a>
@@ -292,9 +289,6 @@
       </a>
       <a href="index.html#shop" onclick="switchView('shop'); toggleMobileMenu(true); return false;" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
         <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop Catalog & Kits
-      </a>
-      <a href="customizer.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer">
-        <span class="material-symbols-outlined text-lg text-amber-600">3d_rotation</span> Custom Jersey 3D Studio
       </a>
       <a href="preorders.html" onclick="toggleMobileMenu(true);" class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
         <span class="material-symbols-outlined text-lg">schedule</span> Reserve Preorders
@@ -345,8 +339,8 @@
                     <span>SHOP CATALOG</span>
                     <svg class="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </a>
-                  <a href="customizer.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
-                    <span>3D Studio</span>
+                  <a href="preorders.html" class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/30 font-headline font-bold text-xs sm:text-sm px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-full transition-all duration-200 cursor-pointer active:scale-95">
+                    <span>Pre-Orders</span>
                   </a>
                 </div>
               </div>
@@ -445,10 +439,10 @@
             </div>
           </div>
           <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
-            <span class="material-symbols-outlined text-xl text-black">3d_rotation</span>
+            <span class="material-symbols-outlined text-xl text-black">workspace_premium</span>
             <div>
-              <div class="text-xs font-bold text-black">3D Studio Live</div>
-              <div class="text-[11px] text-gray-500">Real-Time Customizer & UCL Patches</div>
+              <div class="text-xs font-bold text-black">Official Kit Badges</div>
+              <div class="text-[11px] text-gray-500">Tournament Patches & Name Printing</div>
             </div>
           </div>
           <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
@@ -594,7 +588,7 @@
             </h2>
             
             <p class="font-body text-xs sm:text-sm text-gray-600 mb-6 leading-relaxed max-w-md">
-              Design your signature kit. Choose your sleeve style, personalize with your player name & number, add official tournament patches, and inspect in real-time 3D.
+              Design your signature kit. Choose your sleeve style, personalize with your player name & number, add official tournament patches, and order directly.
             </p>
             
             <div class="flex flex-wrap gap-3">
@@ -602,8 +596,8 @@
                 <span>CUSTOMIZE NOW</span>
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
-              <a href="customizer.html" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm cursor-pointer active:scale-95">
-                Open 3D Studio
+              <a href="preorders.html" class="bg-white hover:bg-gray-50 text-black border border-gray-300 font-headline font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full transition-all shadow-sm cursor-pointer active:scale-95">
+                Explore Preorders
               </a>
             </div>
           </div>
@@ -895,12 +889,6 @@
                 <div id="print-name" class="font-headline-lg font-extrabold tracking-widest text-primary uppercase text-2xl drop-shadow-sm">ZANE</div>
                 <div id="print-number" class="font-display-lg font-black text-primary text-6xl tracking-tighter leading-none mt-1">10</div>
               </div>
-
-              <!-- Interactive 3D Preview Trigger Button -->
-              <button onclick="toggle3DModal()" class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-outline-variant/60 rounded-full px-5 py-2.5 flex items-center gap-2 text-primary font-label-caps text-xs hover:bg-black hover:text-white transition-all z-30 shadow-lg">
-                <span class="material-symbols-outlined text-[20px] text-amber-600">3d_rotation</span>
-                Interactive 3D Preview
-              </button>
             </div>
 
             <!-- Thumbnails Grid -->
@@ -1382,7 +1370,6 @@
               <ul class="flex flex-col gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 font-medium">
                 <li><a href="index.html" onclick="switchView('home'); window.scrollTo({top:0,behavior:'smooth'}); return false;" class="hover:text-black transition-colors">Home Storefront</a></li>
                 <li><a href="index.html#shop" onclick="switchView('shop'); window.scrollTo({top:0,behavior:'smooth'}); return false;" class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
-                <li><a href="customizer.html" class="hover:text-black transition-colors">3D Custom Studio</a></li>
                 <li><a href="preorders.html" class="hover:text-black transition-colors">Reserve Preorders</a></li>
                 <li><button type="button" onclick="openOrderTrackingModal()" class="hover:text-black transition-colors text-left cursor-pointer">Track Order</button></li>
                 <li><a href="account.html" class="hover:text-black transition-colors">My Account & Sign In</a></li>

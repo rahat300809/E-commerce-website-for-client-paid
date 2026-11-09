@@ -29,7 +29,7 @@
     'brand', 'orders', 'customers', 'coupons', 'flashSales',
     'returns', 'refunds', 'shipping', 'paymentConfig', 'storeSettings',
     'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons',
-    'printing', 'customization', 'teams', 'reviews', 'preorders',
+    'printing', 'customization', 'teams', 'reviews', 'preorders', 'preorderHero',
     'inventoryHistory', 'priceHistory', 'activityLog', 'adminAuth',
     'admin_access', 'seeded_version'
   ];
@@ -139,7 +139,7 @@
     clearTimeout(_writeTimer);
     if (_db) {
       // Critical catalog and transactional keys flush immediately to prevent navigation race conditions
-      if (key === 'products' || key === 'orders' || key === 'categories' || key === 'sleeves') {
+      if (key === 'products' || key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero') {
         flushWriteQueue();
       } else {
         _writeTimer = setTimeout(flushWriteQueue, 25);

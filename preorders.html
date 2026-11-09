@@ -364,9 +364,9 @@
   <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
     <a data-brand-name class="font-headline-md text-headline-md font-black tracking-tighter text-primary" href="index.html">ZENVY</a>
     <div class="hidden md:flex gap-8 items-center">
+      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="index.html">Home</a>
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="index.html#shop">Shop & Kits</a>
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="preorders.html">Preorders</a>
-      <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-on-surface-variant hover:text-secondary transition-colors duration-300" href="index.html#customizer">Customizer</a>
     </div>
     <div class="flex items-center gap-4 text-primary">
       <a href="index.html#shop" aria-label="Shop" class="hover:text-secondary transition-colors duration-300 hidden md:block">
@@ -803,8 +803,8 @@
     <a data-brand-name class="font-headline-md text-headline-md font-black text-primary" href="index.html">ZENVY</a>
     <p class="font-caption text-caption uppercase tracking-widest text-on-surface-variant">© 2026 <span data-brand-name>ZENVY</span>. ALL RIGHTS RESERVED. BDT (৳)</p>
     <div class="flex gap-6">
-      <a href="shop.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Shop</a>
-      <a href="customizer.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Customizer</a>
+      <a href="index.html#shop" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Shop</a>
+      <a href="index.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Home</a>
       <a href="account.html" class="font-caption text-caption text-on-surface-variant hover:text-secondary">Account</a>
     </div>
   </div>
@@ -850,10 +850,26 @@ function updateCartCount() {
 }
 updateCartCount();
 
-window.addEventListener('storage', () => {
+window.addEventListener('storage', (e) => {
   updateCartCount();
   if (document.getElementById('cart-drawer')?.classList.contains('open')) {
     renderPreordersCart();
+  }
+  if (!e || !e.key || e.key.includes('preorderHero')) {
+    initOrbitCarousel();
+  }
+  if (!e || !e.key || e.key.includes('products') || e.key.includes('preorders')) {
+    loadPreorders();
+  }
+});
+
+window.addEventListener('zenvy-store-updated', (e) => {
+  updateCartCount();
+  if (e && e.detail && (e.detail.key === 'preorderHero' || e.detail.key === 'all')) {
+    initOrbitCarousel();
+  }
+  if (e && e.detail && (e.detail.key === 'products' || e.detail.key === 'preorders' || e.detail.key === 'all')) {
+    loadPreorders();
   }
 });
 
@@ -980,10 +996,19 @@ async function loadPreorders() {
 
   if (!products || products.length === 0) {
     if (empty) empty.classList.remove('hidden');
+    if (grid) grid.classList.add('hidden');
     return;
   }
 
   if (grid) {
+    const renderHash = JSON.stringify(products.map(p => [p.id, p.name, p.preorderPrice || p.basePrice, p.images?.[0] || p.image, p.stock]));
+    if (grid.dataset.renderHash === renderHash && grid.children.length > 0) {
+      if (empty) empty.classList.add('hidden');
+      grid.classList.remove('hidden');
+      return;
+    }
+    grid.dataset.renderHash = renderHash;
+    if (empty) empty.classList.add('hidden');
     grid.classList.remove('hidden');
     grid.innerHTML = products.map(p => renderPreorderCard(p)).join('');
   }
@@ -1344,9 +1369,9 @@ window.submitPreorder = async function() {
 // ==========================================
 // 3D ORBIT CAROUSEL (GSAP Physics Showcase)
 // ==========================================
-const ORBIT_JERSEYS = [
+const DEFAULT_ORBIT_JERSEYS = [
   {
-    id: 'demo-1',
+    id: 'orbit_1',
     title: 'World Cup 2026 Special Drop',
     subtitle: 'Argentina 3-Star Champion Kit',
     image: 'img/preorders/argentina.png',
@@ -1362,7 +1387,7 @@ const ORBIT_JERSEYS = [
     sizes: ['S','M','L','XL','XXL']
   },
   {
-    id: 'demo-2',
+    id: 'orbit_2',
     title: 'Season 2026/27 Drop',
     subtitle: 'FC Barcelona Camp Nou Return',
     image: 'img/preorders/barca.png',
@@ -1378,7 +1403,7 @@ const ORBIT_JERSEYS = [
     sizes: ['S','M','L','XL','XXL']
   },
   {
-    id: 'demo-3',
+    id: 'orbit_3',
     title: 'National Pride Official Kit',
     subtitle: 'Bangladesh Tigers ODI 2026',
     image: 'img/preorders/bangladesh.png',
@@ -1394,7 +1419,7 @@ const ORBIT_JERSEYS = [
     sizes: ['S','M','L','XL','XXL','XXXL']
   },
   {
-    id: 'demo-4',
+    id: 'orbit_4',
     title: 'Performance Series',
     subtitle: 'AeroKnit Supreme Pro UCL',
     image: 'img/preorders/aeroknit.png',
@@ -1410,6 +1435,22 @@ const ORBIT_JERSEYS = [
     sizes: ['S','M','L','XL','XXL']
   }
 ];
+
+function getOrbitJerseys() {
+  if (typeof DB !== 'undefined' && DB.preorderHero && typeof DB.preorderHero.all === 'function') {
+    const list = DB.preorderHero.all();
+    if (Array.isArray(list) && list.length > 0) return list;
+  }
+  try {
+    const local = JSON.parse(localStorage.getItem('zenvy_v1_preorderHero') || '[]');
+    if (Array.isArray(local) && local.length > 0) return local;
+  } catch(e){}
+  return DEFAULT_ORBIT_JERSEYS;
+}
+
+let ORBIT_JERSEYS = getOrbitJerseys();
+window.ORBIT_JERSEYS = ORBIT_JERSEYS;
+window.getOrbitJerseys = getOrbitJerseys;
 
 const ORBIT_X = 299;
 const ORBIT_Y = -450;
@@ -1456,6 +1497,15 @@ function initOrbitCarousel() {
   const thumbStrip = document.getElementById('dsh-thumb-strip');
 
   if (!platesWrap || !headWrap || !cardBodies || !pagerDots || !thumbStrip) return;
+
+  ORBIT_JERSEYS = getOrbitJerseys();
+  window.ORBIT_JERSEYS = ORBIT_JERSEYS;
+
+  const heroHash = JSON.stringify(ORBIT_JERSEYS.map(d => [d.id, d.title, d.subtitle, d.price, d.image, d.eyebrow, d.accent]));
+  if (platesWrap.dataset.heroHash === heroHash && platesWrap.children.length > 0) {
+    return;
+  }
+  platesWrap.dataset.heroHash = heroHash;
 
   // Ensure items are mapped into _preorderProductsMap
   ORBIT_JERSEYS.forEach((dish) => {

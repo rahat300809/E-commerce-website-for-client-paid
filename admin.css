@@ -574,7 +574,7 @@ body.admin-body {
   color: var(--text-primary);
   user-select: none;
 }
-.checkbox-chip input { display: none; }
+.checkbox-chip input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
 .checkbox-chip.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
 
 /* Color Picker Row */

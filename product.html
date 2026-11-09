@@ -843,6 +843,7 @@
       currentAngle: 'front',
       galleryImages: []
     };
+    window.productState = productState;
 
     // Authentic High-Res Default Angles
     const DEFAULT_BACK_IMAGE = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvPSMv4hm-ogvHICrLE75pSyHISjUeRYFACniC-YFTC6395bXDbLCEXnamAC_4lHGSDhOnnbm749_rc59n9IIu1p1gOP6rFKwmskJ7depORghWDz9ApaZcCt2mKRzZH6LnLM15nulbMpzHctlkozD_yUmKpIMektqElyuGrcDtzHydDlXqscB4e-luHSYlE7gFo3zwRlKQ_BojzHVyjjah_G0TAj4P6eVNddadsSpPfs_2fRF4dcc-Xw';
@@ -1110,14 +1111,32 @@
         if (typeof DB !== 'undefined' && DB.sleeves) {
           let dbSleeves = DB.sleeves.enabled();
           if (Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length > 0) {
-            dbSleeves = dbSleeves.filter(s => targetProduct.assignedSleeves.includes(s.id));
+            const assigned = targetProduct.assignedSleeves;
+            const filtered = dbSleeves.filter(s => 
+              assigned.includes(s.id) || 
+              assigned.includes(s.name) ||
+              (s.id === 'slv_half' && assigned.includes('short')) ||
+              (s.id === 'slv_full' && assigned.includes('long'))
+            );
+            // If filtered only includes half sleeve, also ensure full sleeve is present if enabled in DB
+            if (filtered.length === 1 && filtered[0].id === 'slv_half') {
+              const fullOption = dbSleeves.find(s => s.id === 'slv_full' || (s.name && s.name.toLowerCase().includes('full')));
+              if (fullOption) filtered.push(fullOption);
+            }
+            if (filtered.length > 0) {
+              dbSleeves = filtered;
+            }
+          }
+          if (!dbSleeves || dbSleeves.length === 0) {
+            dbSleeves = [
+              { id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 },
+              { id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 }
+            ];
           }
           const sleeveSection = document.getElementById('sleeve-section');
-          if (dbSleeves && dbSleeves.length > 0) {
-            if (sleeveSection) sleeveSection.style.display = 'block';
+          if (sleeveSection) {
+            sleeveSection.style.display = 'block';
             renderDynamicSleeves(dbSleeves);
-          } else if (sleeveSection) {
-            sleeveSection.style.display = 'none';
           }
         }
 
@@ -1696,8 +1715,16 @@
         unique.push({ id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 });
       }
 
+      if (unique.length > 0 && !productState.selectedSleeveName) {
+        productState.selectedSleeve = unique[0].id;
+        productState.selectedSleeveName = unique[0].name;
+        productState.sleevePrice = unique[0].additionalPrice || 0;
+      }
+
       container.innerHTML = unique.map((s, idx) => {
-        const isActive = s.name === productState.selectedSleeveName || idx === 0;
+        const isActive = productState.selectedSleeveName 
+          ? (s.name.toLowerCase() === productState.selectedSleeveName.toLowerCase() || s.id === productState.selectedSleeve)
+          : (idx === 0);
         const activeClass = isActive ? 'border-2 border-black bg-black/5 active' : 'border border-gray-200 hover:border-gray-400 bg-white';
         const priceTag = (s.additionalPrice || 0) > 0 ? `+৳${s.additionalPrice}` : 'Included';
         return `
@@ -1708,12 +1735,6 @@
           </div>
         `;
       }).join('');
-
-      if (unique.length > 0 && !productState.selectedSleeveName) {
-        productState.selectedSleeve = unique[0].id;
-        productState.selectedSleeveName = unique[0].name;
-        productState.sleevePrice = unique[0].additionalPrice || 0;
-      }
     }
 
     function selectSize(size) {
@@ -1735,6 +1756,9 @@
       if (cardEl) {
         cardEl.className = 'sleeve-card flex items-center justify-between p-3 rounded-xl border-2 border-black bg-black/5 active cursor-pointer transition-all';
       }
+
+      const modalSleeve = document.getElementById('modal-preview-sleeve');
+      if (modalSleeve) modalSleeve.textContent = (productState.selectedSleeveName || 'Half').replace(' Sleeve', '');
 
       updateMobileBarSummary();
       calculateLiveTotal();
@@ -1787,13 +1811,19 @@
       productState.patchPrice = patchTotal;
 
       const grandTotal = unitPrice * productState.quantity;
-      const formatted = formatCurrency(grandTotal);
+      const formattedGrand = formatCurrency(grandTotal);
+      const formattedUnit = formatCurrency(unitPrice);
+
+      const basePriceEl = document.getElementById('pd-base-price');
+      if (basePriceEl) {
+        basePriceEl.textContent = (productState.quantity > 1) ? formattedGrand : formattedUnit;
+      }
 
       const finalEl = document.getElementById('pd-final-total');
-      if (finalEl) finalEl.textContent = formatted;
+      if (finalEl) finalEl.textContent = formattedGrand;
 
       const mobileTotal = document.getElementById('mobile-bar-total');
-      if (mobileTotal) mobileTotal.textContent = formatted;
+      if (mobileTotal) mobileTotal.textContent = formattedGrand;
 
       updateMobileBarSummary();
     }

@@ -123,7 +123,7 @@ function seedDefaultData() {
   // Sleeves
   [
     { name: 'Half Sleeve', additionalPrice: 0, description: 'Standard half sleeve', displayOrder: 0 },
-    { name: 'Full Sleeve', additionalPrice: 300, description: 'Full sleeve (+৳300)', displayOrder: 1 },
+    { name: 'Full Sleeve', additionalPrice: 100, description: 'Full sleeve (+৳100)', displayOrder: 1 },
     { name: 'Sleeveless', additionalPrice: 0, description: 'No sleeves', displayOrder: 2 },
   ].forEach(s => DB.sleeves.create({ ...s, isEnabled: true }));
 

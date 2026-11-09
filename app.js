@@ -1353,7 +1353,7 @@ function updateCustomizerTotal() {
     const longRecord = sleevesData.find(s =>
       s.name && (s.name.toLowerCase().includes('full') || s.name.toLowerCase().includes('long'))
     );
-    sleevePrice = longRecord ? (parseFloat(longRecord.additionalPrice) || 0) : 300;
+    sleevePrice = longRecord ? (parseFloat(longRecord.additionalPrice) || 0) : 100;
   }
 
   // Personalization fee from DB
@@ -1362,12 +1362,12 @@ function updateCustomizerTotal() {
   if (personalizeToggle && personalizeToggle.checked) {
     const pkg = customSettings.nameNumberPackage;
     if (pkg && pkg.enabled && pkg.price) {
-      personalizePrice = parseFloat(pkg.price) || 300;
+      personalizePrice = parseFloat(pkg.price) || 200;
     } else {
       // Fall back to name + number individually
       const nameFee = customSettings.namePrinting?.enabled ? parseFloat(customSettings.namePrinting.price) || 0 : 0;
       const numFee = customSettings.numberPrinting?.enabled ? parseFloat(customSettings.numberPrinting.price) || 0 : 0;
-      personalizePrice = nameFee + numFee || 300;
+      personalizePrice = nameFee + numFee || 200;
     }
   }
 

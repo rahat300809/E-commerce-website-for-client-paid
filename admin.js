@@ -1095,15 +1095,42 @@ function removeAllDemoProducts() {
   );
 }
 
+// Helper to toggle a single chip in product form
+window.toggleChip = function(el) {
+  const inp = el.querySelector('input[type="checkbox"]');
+  if (inp) {
+    inp.checked = !inp.checked;
+    el.classList.toggle('selected', inp.checked);
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+};
+
+// Helper to toggle customization rows in product form
+window.toggleCustomRow = function(el) {
+  const inp = el.querySelector('input[type="checkbox"]');
+  if (inp) {
+    inp.checked = !inp.checked;
+    if (inp.checked) {
+      el.style.background = '#F0FDF4';
+      el.style.borderColor = '#16A34A';
+    } else {
+      el.style.background = '#FAFAFA';
+      el.style.borderColor = '#E5E7EB';
+    }
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+};
+
 // Helper to batch toggle chips in product form
 window.toggleChipsGroup = function(groupId, selectAll) {
   const container = document.getElementById(groupId);
   if (!container) return;
-  container.querySelectorAll('label.checkbox-chip').forEach(chip => {
+  container.querySelectorAll('.checkbox-chip').forEach(chip => {
     const input = chip.querySelector('input[type="checkbox"]');
     if (input) {
       input.checked = selectAll;
       chip.classList.toggle('selected', selectAll);
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
 };
@@ -1406,26 +1433,19 @@ function openProductForm(id = null) {
           ['customLogo','Custom Logo Upload', `৳${cs.customLogo?.price||500}`, !product ? false : !!product.customLogo],
           ['customText','Custom Text', 'Free', !product ? false : !!product.customText],
         ].map(([field,label,price,isChecked]) => `
-          <label class="toggle-row ${isChecked ? 'toggle-active' : ''}" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:8px;border:1px solid ${isChecked ? '#16A34A' : '#E5E7EB'};border-radius:10px;cursor:pointer;background:${isChecked ? '#F0FDF4' : '#FAFAFA'};transition:all 0.2s;">
+          <div class="toggle-row ${isChecked ? 'toggle-active' : ''}" 
+               onclick="toggleCustomRow(this)"
+               style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:8px;border:1px solid ${isChecked ? '#16A34A' : '#E5E7EB'};border-radius:10px;cursor:pointer;background:${isChecked ? '#F0FDF4' : '#FAFAFA'};transition:all 0.2s;">
             <div>
               <div class="toggle-label" style="font-weight:700;font-size:13px;color:#111827;">${label}</div>
               <div class="toggle-desc" style="font-size:12px;color:#6B7280;margin-top:2px;">${price}</div>
             </div>
-            <div class="toggle" style="pointer-events:none;">
-              <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} onchange="
-                const row = this.closest('.toggle-row');
-                if (this.checked) {
-                  row.style.background = '#F0FDF4';
-                  row.style.borderColor = '#16A34A';
-                } else {
-                  row.style.background = '#FAFAFA';
-                  row.style.borderColor = '#E5E7EB';
-                }
-              "/>
+            <div class="toggle">
+              <input type="checkbox" name="${field}" ${isChecked ? 'checked' : ''} style="pointer-events:none;"/>
               <div class="toggle-track"></div>
               <div class="toggle-thumb"></div>
             </div>
-          </label>
+          </div>
         `).join('')}
 
         <div class="form-group mt-3" style="background:#F9FAFB;padding:12px 14px;border-radius:10px;border:1px dashed #D1D5DB;">
@@ -1447,8 +1467,8 @@ function openProductForm(id = null) {
           <div class="checkbox-group" id="patches-chips">
             ${patches.map(p => {
               const selected = product ? (Array.isArray(product.assignedPatches) ? product.assignedPatches.includes(p.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}">
-                <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+                <input type="checkbox" name="patch_${p.id}" ${selected?'checked':''}/>
                 ${p.name} (+৳${p.price})
               </label>`;
             }).join('') || '<p style="font-size:13px;color:#9CA3AF">No patches configured. Add patches in Customization → Patches.</p>'}
@@ -1466,8 +1486,8 @@ function openProductForm(id = null) {
           <div class="checkbox-group" id="sleeves-chips">
             ${sleeves.map(s => {
               const selected = product ? (Array.isArray(product.assignedSleeves) && product.assignedSleeves.length > 0 ? product.assignedSleeves.includes(s.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}">
-                <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+                <input type="checkbox" name="sleeve_${s.id}" ${selected?'checked':''}/>
                 ${s.name} (+৳${s.additionalPrice})
               </label>`;
             }).join('') || '<p style="font-size:13px;color:#9CA3AF">No sleeves configured.</p>'}
@@ -1485,8 +1505,8 @@ function openProductForm(id = null) {
           <div class="checkbox-group" id="sizes-chips">
             ${sizes.map(s => {
               const selected = product ? (Array.isArray(product.assignedSizes) && product.assignedSizes.length > 0 ? product.assignedSizes.includes(s.id) : true) : true;
-              return `<label class="checkbox-chip ${selected?'selected':''}">
-                <input type="checkbox" name="size_${s.id}" ${selected?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
+              return `<label class="checkbox-chip ${selected?'selected':''}" onclick="toggleChip(this); event.preventDefault();">
+                <input type="checkbox" name="size_${s.id}" ${selected?'checked':''}/>
                 ${s.code}
               </label>`;
             }).join('')}
@@ -1807,8 +1827,12 @@ function saveProduct(e, id, asDraft = false) {
 
   // Collect patch, sleeve, size assignments directly from DOM inputs
   const assignedPatches = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="patch_"]:checked')).map(i => i.name.replace('patch_', ''));
-  const assignedSleeves = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="sleeve_"]:checked')).map(i => i.name.replace('sleeve_', ''));
+  let assignedSleeves = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="sleeve_"]:checked')).map(i => i.name.replace('sleeve_', ''));
   const assignedSizes = Array.from(form.querySelectorAll('#prod-tab-custom input[name^="size_"]:checked')).map(i => i.name.replace('size_', ''));
+
+  if (assignedSleeves.length === 0 && typeof DB !== 'undefined' && DB.sleeves) {
+    assignedSleeves = DB.sleeves.enabled().map(s => s.id);
+  }
 
   const customName = !!form.querySelector('input[name="customName"]')?.checked;
   const customNumber = !!form.querySelector('input[name="customNumber"]')?.checked;

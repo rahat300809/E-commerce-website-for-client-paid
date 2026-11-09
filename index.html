@@ -790,11 +790,11 @@
                   <p class="font-mono-ui text-[11px] text-gray-400 uppercase tracking-wider font-bold">Max Price</p>
                   <span id="price-val" class="font-headline font-black text-xs text-black bg-gray-100 px-2 py-0.5 rounded">৳10,000</span>
                 </div>
-                <input type="range" id="price-range" min="500" max="10000" step="500" value="10000"
+                <input type="range" id="price-range" min="0" max="10000" step="100" value="10000"
                        oninput="updatePriceFilter(this.value)"
                        class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gray-200 accent-black">
                 <div class="flex justify-between text-[10px] text-gray-400 font-mono-ui mt-1.5">
-                  <span>৳500</span>
+                  <span>৳0</span>
                   <span>৳10,000</span>
                 </div>
               </div>
@@ -1730,11 +1730,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261110_v3"></script>
+  <script src="firebase-sync.js?v=20261110_v4"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261110_v3"></script>
+  <script src="admin-db.js?v=20261110_v4"></script>
   <!-- Main Application JavaScript -->
-  <script src="wishlist.js?v=20261110_v3"></script>
-  <script src="app.js?v=20261110_v3"></script>
+  <script src="wishlist.js?v=20261110_v4"></script>
+  <script src="app.js?v=20261110_v4"></script>
 </body>
 </html>

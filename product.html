@@ -463,23 +463,23 @@
             </button>
           </div>
 
-          <!-- Row 2: Instant Buy Now (High-converting, vibrant amber, full-width) -->
+          <!-- Row 2: Instant Buy (High-converting, vibrant amber, full-width) -->
           <button type="button" 
                   onclick="buyNowDirect()" 
-                  class="w-full h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] text-black font-headline font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                  class="w-full h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] text-black font-headline font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
             <span class="material-symbols-outlined text-[19px]">bolt</span>
-            <span>Instant Buy Now</span>
+            <span>Buy Now</span>
           </button>
 
           <!-- Row 3: Order via WhatsApp (Direct Chat & Custom Order) -->
           <button type="button" 
                   id="whatsapp-order-btn"
                   onclick="orderViaWhatsApp()" 
-                  class="w-full h-12 bg-[#25D366] hover:bg-[#20ba5a] active:scale-[0.98] text-white font-headline font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
-            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  class="w-full h-12 bg-[#25D366] hover:bg-[#20ba5a] active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24">
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
             </svg>
-            <span>Order via WhatsApp / হোয়াটসঅ্যাপে অর্ডার</span>
+            <span class="whitespace-nowrap">Order via WhatsApp</span>
           </button>
 
           <!-- Total price indicator -->
@@ -493,7 +493,7 @@
                   id="btn-view-size-chart" 
                   class="w-full mt-3 py-3 px-4 rounded-xl border border-[#2b6cb0] hover:bg-[#f0f6fc] text-[#1e4e8c] font-headline font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
             <span class="material-symbols-outlined text-base">straighten</span>
-            <span id="btn-size-chart-label">View Retro Size Chart</span>
+            <span id="btn-size-chart-label">View Size Chart</span>
           </button>
         </div>
 
@@ -818,9 +818,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261110_v3"></script>
-  <script src="admin-db.js?v=20261110_v3"></script>
-  <script src="wishlist.js?v=20261110_v3"></script>
+  <script src="firebase-sync.js?v=20261110_v4"></script>
+  <script src="admin-db.js?v=20261110_v4"></script>
+  <script src="wishlist.js?v=20261110_v4"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1058,20 +1058,13 @@
         }
 
         // Determine if customization is enabled on this specific product
-        // If explicitly all false, disable it; if any is true or undefined on a kit, enable it
-        const hasExplicitDisabled = targetProduct.customNameNumber === false && 
-                                    targetProduct.customName === false && 
-                                    targetProduct.customNumber === false && 
-                                    targetProduct.customLogo === false && 
-                                    targetProduct.customText === false;
-
-        const hasCustomPrinting = !hasExplicitDisabled && (
+        const hasCustomPrinting = (
           targetProduct.customNameNumber === true ||
           targetProduct.customName === true ||
           targetProduct.customNumber === true ||
           targetProduct.customLogo === true ||
           targetProduct.customText === true ||
-          (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined)
+          (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined && !targetProduct.hasOwnProperty('customNameNumber'))
         );
 
         const customSection = document.getElementById('custom-print-section');
@@ -1150,13 +1143,17 @@
               const filtered = dbSleeves.filter(s => 
                 assigned.includes(String(s.id).toLowerCase().trim()) || 
                 assigned.includes(String(s.name||'').toLowerCase().trim()) ||
-                (s.id === 'slv_half' && (assigned.includes('short') || assigned.includes('half'))) ||
-                (s.id === 'slv_full' && (assigned.includes('long') || assigned.includes('full')))
+                (s.id === 'slv_half' && (assigned.includes('short') || assigned.includes('half') || assigned.some(a => a.includes('half')))) ||
+                (s.id === 'slv_full' && (assigned.includes('long') || assigned.includes('full') || assigned.some(a => a.includes('full'))))
               );
               if (filtered.length > 0) {
                 dbSleeves = filtered;
+              } else {
+                dbSleeves = dbSleeves.filter(s => s.id === 'slv_half' || s.id === 'slv_full');
               }
             }
+            // Filter out any corrupted or anomalous sleeve
+            dbSleeves = (dbSleeves || []).filter(s => (s.name || '').trim() !== '777');
             if (!dbSleeves || dbSleeves.length === 0) {
               dbSleeves = [
                 { id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 },
@@ -1360,14 +1357,14 @@
 
         // Custom Name & Number Section Heading
         const customHeading = document.getElementById('custom-section-heading');
-        if (customHeading) {
+        if (customHeading && hasCustomPrinting) {
           customHeading.textContent = `Custom Name & Number (+${formatCurrency(productState.personalizeFee)})`;
         }
 
         // Size Chart Edition Button Label & Modal Header
         const chartEdition = targetProduct.sizeChartType || 'Retro Edition';
         const sizeChartBtnLabel = document.getElementById('btn-size-chart-label');
-        if (sizeChartBtnLabel) sizeChartBtnLabel.textContent = `View ${chartEdition} Size Chart`;
+        if (sizeChartBtnLabel) sizeChartBtnLabel.textContent = 'View Size Chart';
 
         const modalEdition = document.getElementById('modal-sizechart-edition');
         if (modalEdition) modalEdition.textContent = chartEdition.toUpperCase();
@@ -1486,12 +1483,19 @@
 
     function getFallbackPatchBadge(name) {
       const n = (name || '').toLowerCase();
-      if (n.includes('champion') || n.includes('ucl') || n.includes('starball')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+';
-      if (n.includes('premier') || n.includes('epl')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPgogIDxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPgogIDxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz4KICA8Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+CiAgPHBhdGggZD0nTTQ3IDcwIFE1MCA3MyA1MyA3MCcgc3Ryb2tlPScjMzgwMDNjJyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KPC9zdmc+';
-      if (n.includes('liga') || n.includes('spain')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzIgMjYgTDQ0IDI2IEw0NCA2NCBMNjYgNjQgTDY2IDc0IEwzMiA3NCBaJyBmaWxsPScjZWE1ODBjJy8+CiAgPHBhdGggZD0nTTQ4IDM2IEw1OCAzNiBMNTggNTQgTDcyIDU0IEw3MiA2MiBMNDggNjIgWicgZmlsbD0nIzExMTgyNycvPgo8L3N2Zz4=';
-      if (n.includes('trophy') || n.includes('9') || n.includes('cup')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8cGF0aCBkPSdNMjYgMTggQzI2IDE4IDIyIDUyIDUwIDY4IEM3OCA1MiA3NCAxOCA3NCAxOCBaJyBmaWxsPScjMGYxNzJhJyBzdHJva2U9JyNjYmQ1ZTEnIHN0cm9rZS13aWR0aD0nMycvPgogIDx0ZXh0IHg9JzUwJyB5PSc0OCcgZm9udC1zaXplPScyOCcgZm9udC1mYW1pbHk9J0FyaWFsLCBzYW5zLXNlcmlmJyBmb250LXdlaWdodD0nOTAwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjZmZmZmZmJz45PC90ZXh0PgogIDxwYXRoIGQ9J00zNCA3MiBMNjYgNzIgTDU4IDg0IEw0MiA4NCBaJyBmaWxsPScjMGYxNzJhJy8+Cjwvc3ZnPg==';
-      if (n.includes('respect')) return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgNTAnPgogIDxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nNTAnIHJ4PScxMCcgZmlsbD0nIzFlM2E4YScgc3Ryb2tlPScjM2I4MmY2JyBzdHJva2Utd2lkdGg9JzInLz4KICA8dGV4dCB4PSc1MCcgeT0nMzInIGZvbnQtc2l6ZT0nMTYnIGZvbnQtZmFtaWx5PSdBcmlhbCwgc2Fucy1zZXJpZicgZm9udC13ZWlnaHQ9JzkwMCcgbGV0dGVyLXNwYWNpbmc9JzInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyNmZmZmZmYnPlJFU1BFQ1Q8L3RleHQ+Cjwvc3ZnPg==';
-      return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+';
+      if (n.includes('champion') || n.includes('ucl') || n.includes('starball')) {
+        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz48cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPjxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz48cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz48L3N2Zz4=';
+      }
+      if (n.includes('premier') || n.includes('epl')) {
+        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz48cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPjxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPjxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz48Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+PC9zdmc+';
+      }
+      if (n.includes('liga') || n.includes('spain')) {
+        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPScyOCcgZmlsbD0nI2VhNTgwYycvPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzE2JyBmaWxsPScjZmZmZmZmJy8+PC9zdmc+';
+      }
+      if (n.includes('trophy') || n.includes('cup') || n.includes('foundation') || n.includes('patch')) {
+        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz48cGF0aCBkPSdNMzAgMjQgaDQwIHYxNiBjMCAxMiAtOCAyMiAtMjAgMjIgcy0yMCAtMTAgLTIwIC0yMiBaJyBmaWxsPScjZWFiMzA4Jy8+PHBhdGggZD0nTTMwIDI4IGMtOCAwIC0xMiA2IC0xMiAxMiBzNiAxMiAxMiAxMiB2LTQgYy00IDAgLTggLTQgLTggLTggczQgLTggOCAtOCBaJyBmaWxsPScjZWFiMzA4Jy8+PHBhdGggZD0nTTcwIDI4IGM4IDAgMTIgNiAxMiAxMiBzLTYgMTIgLTEyIDEyIHYtNCBjNCAwIDggLTQgOCAtOCBzLTQgLTggLTggLTggWicgZmlsbD0nI2VhYjMwOCcvPjxyZWN0IHg9JzQ2JyB5PSc2Micgd2lkdGg9JzgnIGhlaWdodD0nMTInIGZpbGw9JyNlYWIzMDgnLz48cmVjdCB4PSczNicgeT0nNzQnIHdpZHRoPScyOCcgaGVpZ2h0PSc4JyByeD0nMicgZmlsbD0nIzBmMTcyYScvPjwvc3ZnPg==';
+      }
+      return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzFlM2E4YScgc3Ryb2tlPScjM2I4MmY2JyBzdHJva2Utd2lkdGg9JzQnLz48cGF0aCBkPSdNNTAgMjAgTDc1IDMwIEw3NSA1MiBDNzUgNjggNTAgODAgNTAgODAgQzUwIDgwIDI1IDY4IDI1IDUyIEwyNSAzMCBaJyBmaWxsPScjZmZmZmZmJy8+PHBvbHlnb24gcG9pbnRzPSc1MCwzNCA1NCw0NCA2NSw0NCA1Niw1MCA2MCw2MCA1MCw1NCA0MCw2MCA0NCw1MCAzNSw0NCA0Niw0NCcgZmlsbD0nIzFlM2E4YScvPjwvc3ZnPg==';
     }
 
     function renderDynamicPatches(patches) {
@@ -1511,13 +1515,13 @@
 
       if (unique.length === 0) {
         unique.push(
-          { id: 'patch_ucl', name: 'UEFA Champions League', price: 250, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz4KICA8cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+CiAgPHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPgogIDxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz4KPC9zdmc+', isEnabled: true },
-          { id: 'patch_epl', name: 'Premier League', price: 200, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nIzM4MDAzYycgc3Ryb2tlPScjMDBmZjg1JyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzUgMzIgTDQwIDQwIEw1MCAzMCBMNjAgNDAgTDY1IDMyIEw2MiA0OCBMMzggNDggWicgZmlsbD0nIzAwZmY4NScvPgogIDxwYXRoIGQ9J001MCA0NiBDNDAgNDYgMzIgNTQgMzIgNjYgQzMyIDc4IDQwIDg0IDUwIDg0IEM2MCA4NCA2OCA3OCA2OCA2NiBDNjggNTQgNjAgNDYgNTAgNDYgWicgZmlsbD0nI2ZmZmZmZicvPgogIDxjaXJjbGUgY3g9JzQzJyBjeT0nNjInIHI9JzMnIGZpbGw9JyMzODAwM2MnLz4KICA8Y2lyY2xlIGN4PSc1NycgY3k9JzYyJyByPSczJyBmaWxsPScjMzgwMDNjJy8+CiAgPHBhdGggZD0nTTQ3IDcwIFE1MCA3MyA1MyA3MCcgc3Ryb2tlPScjMzgwMDNjJyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KPC9zdmc+', isEnabled: true },
-          { id: 'patch_laliga', name: 'La Liga', price: 200, imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz4KICA8Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjZWE1ODBjJyBzdHJva2Utd2lkdGg9JzQnLz4KICA8cGF0aCBkPSdNMzIgMjYgTDQ0IDI2IEw0NCA2NCBMNjYgNjQgTDY2IDc0IEwzMiA3NCBaJyBmaWxsPScjZWE1ODBjJy8+CiAgPHBhdGggZD0nTTQ4IDM2IEw1OCAzNiBMNTggNTQgTDcyIDU0IEw3MiA2MiBMNDggNjIgWicgZmlsbD0nIzExMTgyNycvPgo8L3N2Zz4=', isEnabled: true }
+          { id: 'patch_ucl', name: 'UEFA Champions League', price: 250, isEnabled: true },
+          { id: 'patch_epl', name: 'Premier League', price: 200, isEnabled: true },
+          { id: 'patch_laliga', name: 'La Liga', price: 200, isEnabled: true }
         );
       }
 
-      container.innerHTML = unique.map((p, idx) => {
+      container.innerHTML = unique.map((p) => {
         const fallbackBadge = getFallbackPatchBadge(p.name);
         const imgSrc = (p.imageUrl && p.imageUrl.trim().length > 5) ? p.imageUrl : fallbackBadge;
         const priceText = p.price > 0 ? `+${p.price}৳` : 'Free';
@@ -1526,8 +1530,7 @@
         return `
           <label class="flex items-center justify-between p-2.5 sm:p-3 bg-white hover:bg-gray-50/70 border border-gray-200 hover:border-gray-400 rounded-xl cursor-pointer transition-all shadow-2xs group active:scale-[0.99]">
             <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <span class="font-headline font-black text-xs text-gray-400 w-4 flex-shrink-0">${idx + 1}.</span>
-              <!-- Delicate small badge image (ekhne jeno chotto kore dkhae) -->
+              <!-- Delicate small badge image -->
               <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-gray-200/90 p-1 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-2xs">
                 <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-contain" onerror="this.src='${fallbackBadge}'"/>
               </div>
@@ -1735,10 +1738,11 @@
       const seen = new Set();
       const unique = [];
       (sleeves || []).forEach(s => {
-        const name = (s.name || '').trim();
+        let name = (s.name || '').trim();
+        if (name === '777') name = 'Half Sleeve';
         if (name && !seen.has(name.toLowerCase())) {
           seen.add(name.toLowerCase());
-          unique.push(s);
+          unique.push({ ...s, name });
         }
       });
       if (unique.length === 0) {

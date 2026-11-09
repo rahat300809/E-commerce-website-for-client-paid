@@ -416,65 +416,63 @@ function syncHomepageContent() {
   if (bentoContainer) {
     const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
     const bentoHash = JSON.stringify(categories.map(c => [c.id, c.name, c.imageUrl || c.image, c.badge]));
-    if (bentoContainer.dataset.bentoHash === bentoHash || (bentoContainer.children.length >= 2 && !bentoContainer.dataset.bentoHash)) {
+    if (bentoContainer.dataset.bentoHash !== bentoHash) {
       bentoContainer.dataset.bentoHash = bentoHash;
-      return;
-    }
-    bentoContainer.dataset.bentoHash = bentoHash;
-    const fallbackImages = [
-      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
-      'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
-      'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80',
-      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'
-    ];
+      const fallbackImages = [
+        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
+        'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
+        'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80',
+        'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'
+      ];
 
-    if (categories && categories.length > 0) {
-      const displayCats = categories.slice(0, 6);
-      bentoContainer.innerHTML = displayCats.map((c, idx) => {
-        const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
-        const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => {
-          const pCat = (p.categoryName || '').toLowerCase();
-          const cName = c.name.toLowerCase();
-          return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id;
-        }).length : 0;
-        const countBadge = prodCount > 0 ? `${prodCount} KITS AVAILABLE` : 'EXPLORE COLLECTION';
-        return `
-          <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                 style="background-image: url('${bgImg}')">
+      if (categories && categories.length > 0) {
+        const displayCats = categories.slice(0, 6);
+        bentoContainer.innerHTML = displayCats.map((c, idx) => {
+          const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
+          const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => {
+            const pCat = (p.categoryName || '').toLowerCase();
+            const cName = c.name.toLowerCase();
+            return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id;
+          }).length : 0;
+          const countBadge = prodCount > 0 ? `${prodCount} KITS AVAILABLE` : 'EXPLORE COLLECTION';
+          return `
+            <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                   style="background-image: url('${bgImg}')">
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+              <div class="absolute bottom-0 left-0 p-5 w-full">
+                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.badge ? `${c.badge} • ` : ''}${countBadge}</span>
+                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
+                <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
+              </div>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${c.name}</span>
+              </div>
             </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 p-5 w-full">
-              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.badge ? `${c.badge} • ` : ''}${countBadge}</span>
-              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
-              <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
+          `;
+        }).join('');
+      } else if (col && col.cards && col.cards.length > 0) {
+        bentoContainer.innerHTML = col.cards.map((c, idx) => {
+          const bgImg = (c.bgImage && !c.bgImage.includes('googleusercontent.com')) ? c.bgImage : (fallbackImages[idx % fallbackImages.length]);
+          return `
+            <div onclick="goToShopCategory('${(c.title || '').replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                   style="background-image: url('${bgImg}')">
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+              <div class="absolute bottom-0 left-0 p-5 w-full">
+                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.tag || 'COLLECTION'}</span>
+                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.title || ''}</h3>
+                ${c.desc ? `<p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.desc}</p>` : ''}
+              </div>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
+                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Explore</span>
+              </div>
             </div>
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
-              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${c.name}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } else if (col && col.cards && col.cards.length > 0) {
-      bentoContainer.innerHTML = col.cards.map((c, idx) => {
-        const bgImg = (c.bgImage && !c.bgImage.includes('googleusercontent.com')) ? c.bgImage : (fallbackImages[idx % fallbackImages.length]);
-        return `
-          <div onclick="goToShopCategory('${(c.title || '').replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 ? 'sm:col-span-2 md:col-span-1' : ''}">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                 style="background-image: url('${bgImg}')">
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 p-5 w-full">
-              <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.tag || 'COLLECTION'}</span>
-              <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.title || ''}</h3>
-              ${c.desc ? `<p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.desc}</p>` : ''}
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
-              <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Explore</span>
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
   }
 
@@ -492,33 +490,37 @@ function syncHomepageContent() {
   const sliderEl = document.getElementById('product-slider');
   if (sliderEl && DB.products) {
     const published = DB.products.published();
-    if (published && published.length > 0) {
-      sliderEl.innerHTML = published.map(p => {
-        const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
-        const priceDisplay = formatMoney(p.salePrice || p.basePrice || 1450);
-        return `
-          <div class="min-w-[240px] sm:min-w-[270px] flex-shrink-0 group">
-            <div class="bg-[#f5f5f7] rounded-2xl p-4 sm:p-5 mb-3 relative h-[260px] sm:h-[300px] flex items-center justify-center overflow-hidden cursor-pointer"
-                 onclick="window.location.href='product.html?id=${p.id}'">
-              ${p.isPreorder ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
-              <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10" aria-label="Wishlist">
-                <span class="material-symbols-outlined text-[16px]">favorite</span>
-              </button>
-              <img src="${imgUrl}" class="max-h-[200px] sm:max-h-[230px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md" alt="${p.name}"/>
-              <div class="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-white/95 to-transparent">
-                <a href="product.html?id=${p.id}" class="block w-full text-center bg-black text-white text-xs font-bold py-2 rounded-full shadow">VIEW & CUSTOMIZE</a>
+    const sliderHash = JSON.stringify(published.map(p => [p.id, p.name, p.salePrice || p.basePrice, p.stock, p.images?.[0]?.url || p.image]));
+    if (sliderEl.dataset.sliderHash !== sliderHash) {
+      sliderEl.dataset.sliderHash = sliderHash;
+      if (published && published.length > 0) {
+        sliderEl.innerHTML = published.map(p => {
+          const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
+          const priceDisplay = formatMoney(p.salePrice || p.basePrice || 1450);
+          return `
+            <div class="min-w-[240px] sm:min-w-[270px] flex-shrink-0 group">
+              <div class="bg-[#f5f5f7] rounded-2xl p-4 sm:p-5 mb-3 relative h-[260px] sm:h-[300px] flex items-center justify-center overflow-hidden cursor-pointer"
+                   onclick="window.location.href='product.html?id=${p.id}'">
+                ${p.isPreorder ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
+                <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10" aria-label="Wishlist">
+                  <span class="material-symbols-outlined text-[16px]">favorite</span>
+                </button>
+                <img src="${imgUrl}" class="max-h-[200px] sm:max-h-[230px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md" alt="${p.name}"/>
+                <div class="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-white/95 to-transparent">
+                  <a href="product.html?id=${p.id}" class="block w-full text-center bg-black text-white text-xs font-bold py-2 rounded-full shadow">VIEW & CUSTOMIZE</a>
+                </div>
+              </div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-headline text-sm font-bold text-black group-hover:underline cursor-pointer" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</h4>
+                  <p class="text-xs text-gray-500">${p.categoryName || 'Performance Edition'}</p>
+                </div>
+                <span class="font-mono-ui text-sm font-bold text-black">${priceDisplay}</span>
               </div>
             </div>
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="font-headline text-sm font-bold text-black group-hover:underline cursor-pointer" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</h4>
-                <p class="text-xs text-gray-500">${p.categoryName || 'Performance Edition'}</p>
-              </div>
-              <span class="font-mono-ui text-sm font-bold text-black">${priceDisplay}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
   }
 

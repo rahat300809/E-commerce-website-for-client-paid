@@ -138,7 +138,12 @@
     _writeQueue[key] = value;
     clearTimeout(_writeTimer);
     if (_db) {
-      _writeTimer = setTimeout(flushWriteQueue, 50);
+      // Critical catalog and transactional keys flush immediately to prevent navigation race conditions
+      if (key === 'products' || key === 'orders' || key === 'categories' || key === 'sleeves') {
+        flushWriteQueue();
+      } else {
+        _writeTimer = setTimeout(flushWriteQueue, 25);
+      }
     }
   }
 
@@ -182,7 +187,7 @@
       }
     });
 
-    // 2. Intelligently merge local items (preserve newer or recently created local drafts)
+    // 2. Intelligently merge local items (preserve all user creations & newer edits)
     localArr.forEach(item => {
       if (isDemoItem(item)) return;
       if (item && typeof item === 'object') {
@@ -192,16 +197,13 @@
           const cloudItem = map.get(mapKey);
           const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
           const cloudTime = new Date(cloudItem.updatedAt || cloudItem.createdAt || 0).getTime();
-          if (localTime > cloudTime) {
+          if (localTime >= cloudTime) {
             map.set(mapKey, item);
           }
         } else {
-          // If local item is recently created offline (within 4 hours), preserve it
-          const localTime = new Date(item.createdAt || 0).getTime();
-          const fourHoursAgo = Date.now() - 4 * 60 * 60 * 1000;
-          if (localTime > fourHoursAgo) {
-            map.set(mapKey, item);
-          }
+          // Local item was created locally and has not yet synced to cloud:
+          // ALWAYS PRESERVE IT! Never drop user-created products or items!
+          map.set(mapKey, item);
         }
       } else {
         if (!map.has(String(item))) {
@@ -241,17 +243,17 @@
 
           let finalData = payload.data;
           const rawLocal = localStorage.getItem(localKey);
-          const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
           if (rawLocal && Array.isArray(payload.data)) {
-            if (cloudUpdatedAt >= rawLocalTime) {
-              finalData = payload.data;
-            } else {
-              try {
-                const localParsed = JSON.parse(rawLocal);
-                if (Array.isArray(localParsed)) {
-                  finalData = localParsed;
+            try {
+              const localParsed = JSON.parse(rawLocal);
+              if (Array.isArray(localParsed)) {
+                finalData = mergeArraysById(localParsed, payload.data);
+                if (finalData.length > payload.data.length && _db) {
+                  pushToFirestore(key, finalData);
                 }
-              } catch(e) {}
+              }
+            } catch(e) {
+              finalData = payload.data;
             }
           }
 
@@ -294,17 +296,17 @@
             const existingStr = localStorage.getItem(localKey);
 
             let finalData = payload.data;
-            const rawLocalTime = parseInt(localStorage.getItem(`${localKey}_updatedAt`) || '0', 10);
             if (existingStr && Array.isArray(payload.data)) {
-              if (cloudUpdatedAt >= rawLocalTime) {
-                finalData = payload.data;
-              } else {
-                try {
-                  const existingParsed = JSON.parse(existingStr);
-                  if (Array.isArray(existingParsed)) {
-                    finalData = existingParsed;
+              try {
+                const existingParsed = JSON.parse(existingStr);
+                if (Array.isArray(existingParsed)) {
+                  finalData = mergeArraysById(existingParsed, payload.data);
+                  if (finalData.length > payload.data.length && _db) {
+                    pushToFirestore(key, finalData);
                   }
-                } catch(e) {}
+                }
+              } catch(e) {
+                finalData = payload.data;
               }
             }
 

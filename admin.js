@@ -858,11 +858,64 @@ function renderOrdersChart(days) {
 let productSearch = '', productCatFilter = '', productStatusFilter = '', productSort = 'newest';
 let productPage = 1;
 let selectedProducts = new Set();
+let _adminProdSearchTimer = null;
+
+function handleAdminProductSearch(val) {
+  productSearch = val;
+  productPage = 1;
+  if (_adminProdSearchTimer) clearTimeout(_adminProdSearchTimer);
+  _adminProdSearchTimer = setTimeout(() => {
+    const activeElId = document.activeElement ? document.activeElement.id : null;
+    const cursorPos = document.activeElement ? document.activeElement.selectionStart : null;
+    renderProducts(document.getElementById('admin-content'));
+    if (activeElId) {
+      const el = document.getElementById(activeElId);
+      if (el) {
+        el.focus();
+        if (cursorPos !== null) {
+          try { el.setSelectionRange(cursorPos, cursorPos); } catch(e){}
+        }
+      }
+    }
+  }, 250);
+}
+window.handleAdminProductSearch = handleAdminProductSearch;
+
+function executeAdminProductSearch(val) {
+  if (_adminProdSearchTimer) clearTimeout(_adminProdSearchTimer);
+  productSearch = (val || '').trim();
+  productPage = 1;
+  renderProducts(document.getElementById('admin-content'));
+  const el = document.getElementById('admin-prod-search-input');
+  if (el) {
+    el.focus();
+    const len = el.value.length;
+    try { el.setSelectionRange(len, len); } catch(e){}
+  }
+}
+window.executeAdminProductSearch = executeAdminProductSearch;
+
+function clearAdminProductSearch() {
+  productSearch = '';
+  productPage = 1;
+  renderProducts(document.getElementById('admin-content'));
+}
+window.clearAdminProductSearch = clearAdminProductSearch;
 
 function renderProducts(container) {
   const cats = DB.categories.all();
   let items = DB.products.all().filter(p => !p.isArchived);
-  if (productSearch) { const q = productSearch.toLowerCase(); items = items.filter(p => p.name?.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q)); }
+  if (productSearch) {
+    const q = productSearch.toLowerCase().trim();
+    items = items.filter(p =>
+      p.name?.toLowerCase().includes(q) ||
+      p.sku?.toLowerCase().includes(q) ||
+      p.id?.toLowerCase().includes(q) ||
+      p.slug?.toLowerCase().includes(q) ||
+      p.categoryName?.toLowerCase().includes(q) ||
+      String(p.salePrice || p.basePrice || '').includes(q)
+    );
+  }
   if (productCatFilter) {
     const selCat = cats.find(c => c.id === productCatFilter);
     items = items.filter(p => p.categoryId === productCatFilter || (selCat && (p.categoryName || '').toLowerCase() === selCat.name.toLowerCase()));
@@ -911,9 +964,15 @@ function renderProducts(container) {
       </div>
     </div>
 
-    <div class="filter-bar">
-      <input type="text" class="form-input" placeholder="Search products, SKU…" value="${productSearch}"
-        oninput="productSearch=this.value;productPage=1;renderProducts(document.getElementById('admin-content'))" style="max-width:260px;"/>
+    <div class="filter-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="text" id="admin-prod-search-input" class="form-input" placeholder="Search products, SKU…" value="${escapeHtml(productSearch)}"
+          oninput="handleAdminProductSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();executeAdminProductSearch(this.value);}" style="max-width:220px;"/>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="executeAdminProductSearch(document.getElementById('admin-prod-search-input').value)" style="display:inline-flex;align-items:center;gap:4px;">
+          <span class="material-symbols-outlined" style="font-size:16px;">search</span> Search
+        </button>
+        ${productSearch ? `<button type="button" class="btn btn-secondary btn-sm" onclick="clearAdminProductSearch()" title="Clear">✕</button>` : ''}
+      </div>
       <select class="form-select" style="width:160px;" onchange="productCatFilter=this.value;productPage=1;renderProducts(document.getElementById('admin-content'))">
         <option value="">All Categories</option>
         ${cats.map(c => `<option value="${c.id}" ${productCatFilter===c.id?'selected':''}>${c.name}</option>`).join('')}

@@ -10,8 +10,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="firebase-sync.js?v=20261110_v2"></script>
-<script src="admin-db.js?v=20261110_v2"></script>
+<script src="firebase-sync.js?v=20261110_v5"></script>
+<script src="admin-db.js?v=20261110_v5"></script>
 <script id="tailwind-config">
   tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-fixed-dim":"#c8c6c5","background":"#fbf9f8","on-error-container":"#93000a","surface-dim":"#dbdad9","surface-variant":"#e4e2e2","inverse-primary":"#c8c6c5","primary-container":"#1c1b1b","on-primary":"#ffffff","inverse-on-surface":"#f2f0f0","on-secondary-fixed":"#001452","surface-container-lowest":"#ffffff","surface-container-highest":"#e4e2e2","error":"#ba1a1a","error-container":"#ffdad6","on-surface":"#1b1c1c","secondary":"#003ec6","surface-container-low":"#f5f3f3","on-surface-variant":"#444748","secondary-container":"#0052fe","on-secondary":"#ffffff","surface":"#fbf9f8","surface-container":"#efeded","outline":"#747878","primary":"#000000","outline-variant":"#c4c7c7","on-background":"#1b1c1c","tertiary":"#000000","on-secondary-container":"#dfe3ff","surface-container-high":"#e9e8e7","on-error":"#ffffff"},spacing:{"margin-desktop":"64px","margin-mobile":"16px","unit":"8px","gutter":"24px","container-max":"1440px"},fontFamily:{"body-lg":["Inter"],"caption":["Inter"],"display-lg":["Montserrat"],"label-md":["Inter"],"headline-md":["Montserrat"],"headline-lg":["Montserrat"],"body-md":["Inter"]},fontSize:{"body-lg":["18px",{lineHeight:"28px",fontWeight:"400"}],"caption":["12px",{lineHeight:"16px",fontWeight:"400"}],"display-lg":["64px",{lineHeight:"72px",letterSpacing:"-0.02em",fontWeight:"800"}],"label-md":["14px",{lineHeight:"20px",letterSpacing:"0.05em",fontWeight:"600"}],"headline-md":["24px",{lineHeight:"32px",fontWeight:"700"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.01em",fontWeight:"700"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}}
 </script>
@@ -369,9 +369,9 @@
       <a class="font-label-md text-label-md uppercase tracking-[0.15em] text-secondary font-bold border-b-2 border-secondary pb-1" href="preorders.html">Preorders</a>
     </div>
     <div class="flex items-center gap-4 text-primary">
-      <a href="index.html#shop" aria-label="Search" class="hover:text-secondary transition-colors duration-300" title="Search Jerseys">
+      <button type="button" onclick="openPreorderSearch()" aria-label="Search" class="hover:text-secondary transition-colors duration-300 cursor-pointer flex items-center p-1" title="Search Jerseys (Ctrl+K)">
         <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">search</span>
-      </a>
+      </button>
       <a href="index.html#shop" aria-label="Shop" class="hover:text-secondary transition-colors duration-300 hidden md:block">
         <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">store</span>
       </a>
@@ -1788,6 +1788,125 @@ window.triggerActivePreorder = function() {
   }
 };
 
+// ── Global Preorders Search Engine ──
+window.openPreorderSearch = function() {
+  const modal = document.getElementById('preorder-search-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const input = document.getElementById('preorder-search-input');
+  if (input) {
+    setTimeout(() => { input.focus(); input.select(); }, 60);
+  }
+  handlePreorderSearch(input ? input.value : '');
+};
+
+window.closePreorderSearch = function() {
+  const modal = document.getElementById('preorder-search-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+};
+
+window.handlePreorderSearch = function(query) {
+  const container = document.getElementById('preorder-search-results');
+  if (!container) return;
+  const all = typeof DB !== 'undefined' && DB.products && typeof DB.products.published === 'function'
+    ? DB.products.published()
+    : [];
+  const q = (query || '').trim().toLowerCase();
+
+  let matches = [];
+  if (!q) {
+    matches = all;
+  } else {
+    const tokens = q.split(/\s+/).filter(Boolean);
+    matches = all.filter(p => {
+      const parts = [
+        p.name || '', p.id || '', p.slug || '', p.sku || '', p.categoryName || '',
+        p.team || '', p.club || '', p.description || '', p.shortDesc || '',
+        p.salePrice || p.basePrice || '', p.isPreorder ? 'preorder' : ''
+      ];
+      const s = parts.join(' ').toLowerCase();
+      return tokens.every(t => s.includes(t));
+    });
+  }
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-10 px-4">
+        <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
+        <p class="font-headline font-bold text-sm text-gray-700">No kits found matching "${query}"</p>
+        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all match jerseys.</p>
+        <button type="button" onclick="handlePreorderSearch('')" class="mt-3 px-4 py-2 text-xs font-bold text-black border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+          View All Products (${all.length})
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const headerHtml = `
+    <div class="px-2 py-1 flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider">
+      <span>${q ? `Found ${matches.length} matching kit${matches.length === 1 ? '' : 's'}` : `All Available Kits & Jerseys (${matches.length})`}</span>
+      ${q ? `<button type="button" onclick="const i=document.getElementById('preorder-search-input');if(i){i.value='';handlePreorderSearch('');i.focus();}" class="text-blue-600 hover:underline capitalize cursor-pointer">Clear</button>` : ''}
+    </div>
+  `;
+
+  const itemsHtml = matches.map(p => {
+    const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+      ? DB.products.getImage(p)
+      : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
+    const price = `৳${p.salePrice || p.basePrice || 0}`;
+
+    return `
+      <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closePreorderSearch(); window.location.href='product.html?id=${encodeURIComponent(p.id)}'">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
+            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"/>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+              ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
+            </div>
+            <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
+              <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
+              ${p.sku ? `<span>• SKU: ${p.sku}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <div class="text-right">
+            <div class="font-headline font-black text-xs sm:text-sm text-black">${price}</div>
+          </div>
+          <button type="button" onclick="event.stopPropagation(); closePreorderSearch(); window.location.href='product.html?id=${encodeURIComponent(p.id)}'" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
+            View
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = headerHtml + itemsHtml;
+};
+
+window.viewAllPreorderSearchResultsInShop = function() {
+  const input = document.getElementById('preorder-search-input');
+  const query = input ? input.value.trim() : '';
+  closePreorderSearch();
+  window.location.href = `index.html?search=${encodeURIComponent(query)}#shop`;
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePreorderSearch();
+  if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+    e.preventDefault();
+    openPreorderSearch();
+  }
+});
+
 // Init safely on DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -1799,5 +1918,33 @@ if (document.readyState === 'loading') {
   loadPreorders();
 }
 </script>
+
+<!-- ==================== PREORDER SEARCH MODAL ==================== -->
+<div id="preorder-search-modal" class="fixed inset-0 z-[100] hidden items-start justify-center pt-16 sm:pt-24 px-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+  <div onclick="closePreorderSearch()" class="fixed inset-0 bg-transparent"></div>
+  <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200/80 overflow-hidden flex flex-col max-h-[80vh]">
+    <!-- Search Input Header -->
+    <div class="flex items-center px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 gap-2 sm:gap-3">
+      <button type="button" onclick="viewAllPreorderSearchResultsInShop()" class="text-gray-400 hover:text-black transition-colors cursor-pointer flex items-center p-1" title="Execute Search">
+        <span class="material-symbols-outlined text-2xl">search</span>
+      </button>
+      <input type="text" id="preorder-search-input" placeholder="Search jerseys by club, country, player, SKU..." oninput="handlePreorderSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();viewAllPreorderSearchResultsInShop();}" class="w-full font-headline text-base sm:text-lg font-bold text-black placeholder:text-gray-400 outline-none bg-transparent">
+      <button type="button" id="preorder-search-submit-btn" onclick="viewAllPreorderSearchResultsInShop()" class="flex items-center gap-1 px-3.5 sm:px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded-xl text-xs font-bold font-headline transition-all cursor-pointer whitespace-nowrap active:scale-95 shadow-xs flex-shrink-0">
+        <span class="material-symbols-outlined text-sm">search</span>
+        <span>Search</span>
+      </button>
+      <button onclick="closePreorderSearch()" class="p-1.5 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer flex-shrink-0" title="Close (Esc)">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+    </div>
+    <!-- Search Results List -->
+    <div id="preorder-search-results" class="flex-1 overflow-y-auto p-4 space-y-2 divide-y divide-gray-50"></div>
+    <!-- Search Footer -->
+    <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-[11px] font-mono-ui text-gray-500">
+      <span>Press <kbd class="px-1.5 py-0.5 bg-white border border-gray-200 rounded text-black font-bold">Esc</kbd> to exit</span>
+      <button onclick="viewAllPreorderSearchResultsInShop()" class="text-black font-bold hover:underline cursor-pointer">View in Shop →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -28,16 +28,26 @@
       try {
         function detectTargetView() {
           var rawHash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+          var hashParts = rawHash.split('?');
+          var hashView = hashParts[0];
           var path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
           var urlParams = new URLSearchParams(window.location.search);
+          if (hashParts[1]) {
+            var extra = new URLSearchParams(hashParts[1]);
+            extra.forEach(function(val, key) {
+              if (!urlParams.has(key)) urlParams.set(key, val);
+            });
+          }
+          var searchParam = urlParams.get('search') || urlParams.get('q');
           var cat = urlParams.get('category') || urlParams.get('cat');
-          var target = urlParams.get('view') || rawHash;
-          if (!target) {
-            if (path === 'shop' || path === 'shop.html' || cat) target = 'shop';
+          var target = urlParams.get('view') || hashView;
+          if (!target || target === '') {
+            if (path === 'shop' || path === 'shop.html' || cat || searchParam) target = 'shop';
             else if (path === 'customizer' || path === 'customizer.html') target = 'customizer';
             else if (path === 'checkout' || path === 'checkout.html') target = 'checkout';
             else target = 'home';
           }
+          if (searchParam && (!target || target === 'home')) target = 'shop';
           if (target === 'studio') target = 'customizer';
           if (target === 'preorder' || target === 'preorders') target = 'shop';
           if (target === 'checkout') {
@@ -257,8 +267,9 @@
 
       <!-- Actions (Search, Profile, Wishlist, Cart, Mobile Menu Toggle) -->
       <div class="flex items-center gap-1 sm:gap-2">
-        <button type="button" onclick="openGlobalSearch()" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 flex items-center justify-center cursor-pointer" title="Search jerseys & kits (Ctrl+K or /)">
-          <span class="material-symbols-outlined text-[20px]">search</span>
+        <button type="button" id="header-search-btn" onclick="openGlobalSearch()" class="hover:scale-105 transition-all duration-200 p-2 sm:py-2 sm:px-3 rounded-full hover:bg-white/90 text-primary border border-gray-200/80 hover:border-black/30 flex items-center gap-1.5 cursor-pointer shadow-2xs group" title="Search jerseys & kits (Ctrl+K or /)">
+          <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">search</span>
+          <span class="hidden lg:inline text-xs font-headline font-semibold text-gray-700">Search</span>
         </button>
 
         <a href="account.html" class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 flex items-center justify-center cursor-pointer" title="My Account & Orders">
@@ -426,6 +437,20 @@
           </div>
 
         </div>
+      </section>
+
+      <!-- ── Homepage Quick Search Bar (Prominent 1-Click Kit & Player Search) ── -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-3 pb-1">
+        <form onsubmit="event.preventDefault(); const q=document.getElementById('home-quick-search-input').value; viewAllSearchResultsInShop(q);" class="bg-white/95 backdrop-blur-md rounded-2xl p-2 sm:p-2.5 shadow-sm hover:shadow-md border border-gray-200/90 flex items-center gap-2 max-w-2xl mx-auto transition-all focus-within:border-black focus-within:ring-2 focus-within:ring-black/10">
+          <div class="flex items-center gap-2.5 pl-3 flex-1 min-w-0">
+            <span class="material-symbols-outlined text-gray-400 text-xl flex-shrink-0">search</span>
+            <input type="text" id="home-quick-search-input" placeholder="Search jerseys by club, player, country or SKU (e.g. Barcelona, Real Madrid, 876)..." class="w-full bg-transparent font-headline text-xs sm:text-sm text-black placeholder:text-gray-400 outline-none truncate">
+          </div>
+          <button type="submit" id="home-quick-search-submit" class="bg-black hover:bg-neutral-800 text-white font-headline text-xs font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap flex-shrink-0">
+            <span class="material-symbols-outlined text-base">search</span>
+            <span>Search</span>
+          </button>
+        </form>
       </section>
 
       <!-- ── Value Props / Features Bar ── -->
@@ -769,14 +794,29 @@
           <!-- ── RIGHT: Products Area ── -->
           <div class="w-full flex-1 min-w-0 max-w-full">
 
-            <!-- Shop Search Bar (Quick In-Shop Product Search) -->
-            <div class="w-full flex items-center justify-between gap-3 mb-3">
-              <div class="relative flex-1 max-w-md">
-                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">search</span>
-                <input type="text" id="shop-search-input" placeholder="Search jerseys, clubs, players, SKU..." oninput="handleShopSearch(this.value)" class="w-full pl-10 pr-9 py-2 rounded-xl bg-white border border-gray-200 focus:border-black focus:ring-1 focus:ring-black text-xs sm:text-sm font-body outline-none transition-all shadow-2xs">
-                <button type="button" id="shop-search-clear" onclick="clearShopSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer" title="Clear Search">
-                  <span class="material-symbols-outlined text-sm">close</span>
+            <!-- Shop Search Bar (Quick In-Shop Product Search with explicit Search Button) -->
+            <div class="w-full mb-3.5">
+              <form onsubmit="event.preventDefault(); handleShopSearch(document.getElementById('shop-search-input').value);" class="flex items-center gap-2 max-w-lg">
+                <div class="relative flex-1">
+                  <button type="button" onclick="handleShopSearch(document.getElementById('shop-search-input').value)" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors cursor-pointer flex items-center" title="Click to Search">
+                    <span class="material-symbols-outlined text-lg">search</span>
+                  </button>
+                  <input type="text" id="shop-search-input" placeholder="Search jerseys, clubs, players, SKU..." oninput="handleShopSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();handleShopSearch(this.value);}" class="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white border border-gray-200 focus:border-black focus:ring-1 focus:ring-black text-xs sm:text-sm font-body outline-none transition-all shadow-2xs">
+                  <button type="button" id="shop-search-clear" onclick="clearShopSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer p-0.5" title="Clear Search">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+                <button type="submit" id="shop-search-submit-btn" class="px-4 sm:px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 text-white font-headline text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95 flex-shrink-0">
+                  <span class="material-symbols-outlined text-base">search</span>
+                  <span>Search</span>
                 </button>
+              </form>
+              <div id="shop-search-active-pill" class="hidden mt-2 flex items-center justify-between text-xs text-neutral-800 bg-neutral-100 border border-neutral-200 rounded-lg px-3 py-1.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-sm text-neutral-500">search</span>
+                  <span>Searching: <strong id="shop-search-query-label" class="font-bold text-black"></strong></span>
+                </div>
+                <button type="button" onclick="clearShopSearch()" class="text-blue-600 hover:underline font-bold text-[11px] cursor-pointer">Clear Search</button>
               </div>
             </div>
 
@@ -1697,10 +1737,16 @@
     <div onclick="closeGlobalSearch()" class="fixed inset-0 bg-transparent"></div>
     <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200/80 overflow-hidden flex flex-col max-h-[80vh]">
       <!-- Search Input Header -->
-      <div class="flex items-center px-4 sm:px-6 py-4 border-b border-gray-100 gap-3">
-        <span class="material-symbols-outlined text-gray-400 text-2xl">search</span>
+      <div class="flex items-center px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 gap-2 sm:gap-3">
+        <button type="button" onclick="viewAllSearchResultsInShop()" class="text-gray-400 hover:text-black transition-colors cursor-pointer flex items-center p-1" title="Execute Search">
+          <span class="material-symbols-outlined text-2xl">search</span>
+        </button>
         <input type="text" id="global-search-input" placeholder="Search jerseys by club, country, player, SKU..." oninput="handleGlobalSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();viewAllSearchResultsInShop();}" class="w-full font-headline text-base sm:text-lg font-bold text-black placeholder:text-gray-400 outline-none bg-transparent">
-        <button onclick="closeGlobalSearch()" class="p-1 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close (Esc)">
+        <button type="button" id="global-search-submit-btn" onclick="viewAllSearchResultsInShop()" class="flex items-center gap-1 px-3.5 sm:px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded-xl text-xs font-bold font-headline transition-all cursor-pointer whitespace-nowrap active:scale-95 shadow-xs flex-shrink-0">
+          <span class="material-symbols-outlined text-sm">search</span>
+          <span>Search</span>
+        </button>
+        <button onclick="closeGlobalSearch()" class="p-1.5 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer flex-shrink-0" title="Close (Esc)">
           <span class="material-symbols-outlined text-xl">close</span>
         </button>
       </div>
@@ -1725,11 +1771,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- Zenvy Firestore Sync Layer -->
-  <script src="firebase-sync.js?v=20261110_v4"></script>
+  <script src="firebase-sync.js?v=20261110_v5"></script>
   <!-- Admin DB & Store State -->
-  <script src="admin-db.js?v=20261110_v4"></script>
+  <script src="admin-db.js?v=20261110_v5"></script>
   <!-- Main Application JavaScript -->
-  <script src="wishlist.js?v=20261110_v4"></script>
-  <script src="app.js?v=20261110_v4"></script>
+  <script src="wishlist.js?v=20261110_v5"></script>
+  <script src="app.js?v=20261110_v5"></script>
 </body>
 </html>

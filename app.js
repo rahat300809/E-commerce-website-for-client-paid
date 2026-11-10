@@ -61,19 +61,36 @@ document.addEventListener('DOMContentLoaded', () => {
   syncModelShowcase();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const catParam = urlParams.get('category') || urlParams.get('cat');
   const rawHash = (window.location.hash || '').replace('#', '').trim();
+  const hashParts = rawHash.split('?');
+  const hashView = hashParts[0];
+  if (hashParts[1]) {
+    const extra = new URLSearchParams(hashParts[1]);
+    extra.forEach((val, key) => {
+      if (!urlParams.has(key)) urlParams.set(key, val);
+    });
+  }
+
+  const catParam = urlParams.get('category') || urlParams.get('cat');
+  const searchParam = urlParams.get('search') || urlParams.get('q');
   const pathName = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
 
-  let targetView = urlParams.get('view') || rawHash;
+  let targetView = urlParams.get('view') || hashView;
   if (!targetView) {
-    if (pathName === 'shop' || pathName === 'shop.html' || catParam) targetView = 'shop';
+    if (pathName === 'shop' || pathName === 'shop.html' || catParam || searchParam) targetView = 'shop';
     else if (pathName === 'customizer' || pathName === 'customizer.html') targetView = 'customizer';
     else if (pathName === 'checkout' || pathName === 'checkout.html') targetView = 'checkout';
     else targetView = 'home';
   }
 
-  if (catParam) {
+  if (searchParam) {
+    switchView('shop', false);
+    setTimeout(() => {
+      handleShopSearch(searchParam);
+      const sInput = document.getElementById('shop-search-input');
+      if (sInput) sInput.value = searchParam;
+    }, 80);
+  } else if (catParam) {
     switchView('shop', false);
     setTimeout(() => selectCategory(catParam), 80);
   } else if (['checkout', 'shop', 'customizer', 'studio', 'order-tracking', 'preorder', 'preorders', 'home'].includes(targetView)) {
@@ -1865,6 +1882,65 @@ function changeShopPage(page) {
   }
 }
 
+// ── Universal Product Search Matcher ──
+function matchProductSearch(p, query) {
+  if (!p) return false;
+  if (!query || !query.trim()) return true;
+
+  const rawQ = query.trim().toLowerCase();
+  const cleanQ = rawQ.replace(/[^a-z0-9\u0980-\u09FF\s]/gi, ' ').trim();
+  const tokens = rawQ.split(/\s+/).filter(Boolean);
+  const cleanTokens = cleanQ.split(/\s+/).filter(Boolean);
+
+  const parts = [
+    p.name || '',
+    p.id || '',
+    p.slug || '',
+    p.sku || '',
+    p.categoryName || '',
+    p.categoryId || '',
+    p.subcategoryId || '',
+    p.team || '',
+    p.club || '',
+    p.sport || '',
+    p.gender || '',
+    p.description || '',
+    p.shortDesc || '',
+    p.seoTitle || '',
+    p.seoDesc || '',
+    p.basePrice !== undefined ? String(p.basePrice) : '',
+    p.salePrice !== undefined ? String(p.salePrice) : '',
+    p.compareAt !== undefined ? String(p.compareAt) : '',
+    p.isPreorder ? 'preorder pre-order' : '',
+    p.stock === 0 ? 'out of stock' : 'in stock',
+    p.isNewArrival ? 'new arrival' : '',
+    p.isBestSeller ? 'best seller bestseller' : '',
+    p.isFeatured ? 'featured' : '',
+    p.isLimited ? 'limited edition' : '',
+    Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || ''),
+    Array.isArray(p.badges) ? p.badges.join(' ') : (p.badges || ''),
+    Array.isArray(p.assignedSizes) ? p.assignedSizes.join(' ') : '',
+    Array.isArray(p.assignedSleeves) ? p.assignedSleeves.join(' ') : '',
+  ];
+
+  const searchable = parts.join(' ').toLowerCase();
+  const cleanSearchable = searchable.replace(/[^a-z0-9\u0980-\u09FF\s]/gi, ' ');
+  const condensedSearchable = cleanSearchable.replace(/\s+/g, '');
+  const condensedQ = cleanQ.replace(/\s+/g, '');
+
+  if (condensedQ && condensedSearchable.includes(condensedQ)) return true;
+  if (tokens.every(t => searchable.includes(t))) return true;
+  if (cleanTokens.length > 0 && cleanTokens.every(t => cleanSearchable.includes(t))) return true;
+
+  const idStr = String(p.id || '').toLowerCase();
+  const skuStr = String(p.sku || '').toLowerCase();
+  const slugStr = String(p.slug || '').toLowerCase();
+  if (tokens.some(t => idStr === t || skuStr === t || slugStr === t)) return true;
+
+  return false;
+}
+window.matchProductSearch = matchProductSearch;
+
 function renderShopProducts() {
   const grid = document.getElementById('shop-product-grid');
   const countEl = document.getElementById('product-count');
@@ -1876,11 +1952,7 @@ function renderShopProducts() {
   let filtered = allProducts.filter(p => {
     // If user has entered a search query, search across ALL products regardless of category filter
     if (shopSearchQuery) {
-      const q = shopSearchQuery.toLowerCase();
-      const tokens = q.split(/\s+/).filter(Boolean);
-      const searchable = `${p.name || ''} ${p.categoryName || ''} ${p.sku || ''} ${p.description || ''} ${p.shortDesc || ''} ${Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')} ${p.salePrice || p.basePrice || ''}`.toLowerCase();
-      const matchSearch = tokens.every(t => searchable.includes(t));
-      if (!matchSearch) return false;
+      if (!matchProductSearch(p, shopSearchQuery)) return false;
     } else if (shopActiveCategory !== 'all') {
       const pCatName = (p.categoryName || '').toLowerCase();
       const pCatId = (p.categoryId || '').toLowerCase();
@@ -1889,9 +1961,9 @@ function renderShopProducts() {
       const match = pCatName === targetCat || pCatId === targetCat || pCatName.includes(targetCat) || pSlug.includes(targetCat);
       if (!match) return false;
     }
-    // Filter by Price
+    // Filter by Price (only when NOT searching or if within price range)
     const price = p.salePrice || p.basePrice || 0;
-    if (price > shopMaxPrice) return false;
+    if (!shopSearchQuery && price > shopMaxPrice) return false;
 
     return true;
   });
@@ -2117,11 +2189,30 @@ window.instantBuy = instantBuy;
 function handleShopSearch(val) {
   shopSearchQuery = (val || '').trim();
   shopCurrentPage = 1;
+
+  // Sync shop input & global modal input if open
+  const sInput = document.getElementById('shop-search-input');
+  if (sInput && sInput.value !== shopSearchQuery) sInput.value = shopSearchQuery;
+  const gInput = document.getElementById('global-search-input');
+  if (gInput && gInput.value !== shopSearchQuery) gInput.value = shopSearchQuery;
+
   const clearBtn = document.getElementById('shop-search-clear');
   if (clearBtn) {
     if (shopSearchQuery) clearBtn.classList.remove('hidden');
     else clearBtn.classList.add('hidden');
   }
+
+  const pill = document.getElementById('shop-search-active-pill');
+  const label = document.getElementById('shop-search-query-label');
+  if (pill && label) {
+    if (shopSearchQuery) {
+      label.textContent = `"${shopSearchQuery}"`;
+      pill.classList.remove('hidden');
+    } else {
+      pill.classList.add('hidden');
+    }
+  }
+
   renderShopProducts();
 }
 window.handleShopSearch = handleShopSearch;
@@ -2129,10 +2220,19 @@ window.handleShopSearch = handleShopSearch;
 function clearShopSearch() {
   shopSearchQuery = '';
   shopCurrentPage = 1;
-  const input = document.getElementById('shop-search-input');
-  if (input) input.value = '';
+  const sInput = document.getElementById('shop-search-input');
+  if (sInput) sInput.value = '';
+  const gInput = document.getElementById('global-search-input');
+  if (gInput) gInput.value = '';
+  const hInput = document.getElementById('home-quick-search-input');
+  if (hInput) hInput.value = '';
+
   const clearBtn = document.getElementById('shop-search-clear');
   if (clearBtn) clearBtn.classList.add('hidden');
+
+  const pill = document.getElementById('shop-search-active-pill');
+  if (pill) pill.classList.add('hidden');
+
   renderShopProducts();
 }
 window.clearShopSearch = clearShopSearch;
@@ -2167,27 +2267,23 @@ function handleGlobalSearch(query) {
   const container = document.getElementById('global-search-results');
   if (!container) return;
   const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
-  const q = (query || '').trim().toLowerCase();
+  const q = (query || '').trim();
 
   // If search query is empty, show all available products immediately!
   let matches = [];
   if (!q) {
     matches = all;
   } else {
-    const tokens = q.split(/\s+/).filter(Boolean);
-    matches = all.filter(p => {
-      const searchable = `${p.name || ''} ${p.categoryName || ''} ${p.sku || ''} ${p.description || ''} ${p.shortDesc || ''} ${Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')} ${p.salePrice || p.basePrice || ''}`.toLowerCase();
-      return tokens.every(t => searchable.includes(t));
-    });
+    matches = all.filter(p => matchProductSearch(p, q));
   }
 
   if (matches.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-10">
+      <div class="text-center py-10 px-4">
         <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
-        <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(query)}"</p>
+        <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(q)}"</p>
         <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all match kits in the catalog.</p>
-        <button type="button" onclick="handleGlobalSearch('')" class="mt-3 px-3 py-1.5 text-xs font-bold text-black border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+        <button type="button" onclick="handleGlobalSearch('')" class="mt-3 px-4 py-2 text-xs font-bold text-black border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
           View All Products (${all.length})
         </button>
       </div>
@@ -2245,9 +2341,14 @@ function handleGlobalSearch(query) {
 }
 window.handleGlobalSearch = handleGlobalSearch;
 
-function viewAllSearchResultsInShop() {
-  const input = document.getElementById('global-search-input');
-  const query = input ? input.value.trim() : '';
+function viewAllSearchResultsInShop(customQuery) {
+  let query = '';
+  if (customQuery !== undefined && customQuery !== null) {
+    query = String(customQuery).trim();
+  } else {
+    const input = document.getElementById('global-search-input') || document.getElementById('home-quick-search-input');
+    query = input ? input.value.trim() : '';
+  }
   closeGlobalSearch();
   if (typeof selectCategory === 'function') {
     selectCategory('all', false);
@@ -2258,6 +2359,7 @@ function viewAllSearchResultsInShop() {
   handleShopSearch(query);
   window.scrollTo({ top: 320, behavior: 'smooth' });
 }
+window.viewAllSearchResultsInShop = viewAllSearchResultsInShop;
 window.viewAllSearchResultsInShop = viewAllSearchResultsInShop;
 
 // Keyboard shortcut listeners for instant search

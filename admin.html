@@ -256,8 +256,8 @@
       </button>
 
       <div class="topbar-search">
-        <span class="material-symbols-outlined">search</span>
-        <input type="text" id="global-search" placeholder="Search products, orders, customers…" oninput="globalSearch(this.value)" autocomplete="off"/>
+        <span class="material-symbols-outlined" style="cursor:pointer;" onclick="globalSearch(document.getElementById('global-search').value)" title="Search">search</span>
+        <input type="text" id="global-search" placeholder="Search products, orders, customers…" oninput="globalSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();globalSearch(this.value);}" autocomplete="off"/>
       </div>
 
       <div id="global-search-results" class="hidden" style="position:fixed;top:62px;left:0;right:0;max-width:420px;margin:0 auto;background:#fff;border:1px solid #E5E7EB;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;max-height:360px;overflow-y:auto;"></div>
@@ -326,9 +326,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <!-- Zenvy Firestore Sync Layer -->
-<script src="firebase-sync.js?v=20261110_v4"></script>
-<script src="admin-db.js?v=20261110_v4"></script>
-<script src="admin-upload.js?v=20261110_v4"></script>
-<script src="admin.js?v=20261110_v4"></script>
+<script src="firebase-sync.js?v=20261110_v5"></script>
+<script src="admin-db.js?v=20261110_v5"></script>
+<script src="admin-upload.js?v=20261110_v5"></script>
+<script src="admin.js?v=20261110_v5"></script>
 </body>
 </html>

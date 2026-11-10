@@ -1872,9 +1872,16 @@ function renderShopProducts() {
 
   let allProducts = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
 
-  // Filter by Category across the FULL catalog
+  // Filter by Category across the FULL catalog (or search across ALL products if query is active)
   let filtered = allProducts.filter(p => {
-    if (shopActiveCategory !== 'all') {
+    // If user has entered a search query, search across ALL products regardless of category filter
+    if (shopSearchQuery) {
+      const q = shopSearchQuery.toLowerCase();
+      const tokens = q.split(/\s+/).filter(Boolean);
+      const searchable = `${p.name || ''} ${p.categoryName || ''} ${p.sku || ''} ${p.description || ''} ${p.shortDesc || ''} ${Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')} ${p.salePrice || p.basePrice || ''}`.toLowerCase();
+      const matchSearch = tokens.every(t => searchable.includes(t));
+      if (!matchSearch) return false;
+    } else if (shopActiveCategory !== 'all') {
       const pCatName = (p.categoryName || '').toLowerCase();
       const pCatId = (p.categoryId || '').toLowerCase();
       const pSlug = (p.slug || '').toLowerCase();
@@ -1885,18 +1892,6 @@ function renderShopProducts() {
     // Filter by Price
     const price = p.salePrice || p.basePrice || 0;
     if (price > shopMaxPrice) return false;
-
-    // Filter by Search Query
-    if (shopSearchQuery) {
-      const q = shopSearchQuery.toLowerCase();
-      const name = (p.name || '').toLowerCase();
-      const cat = (p.categoryName || '').toLowerCase();
-      const sku = (p.sku || '').toLowerCase();
-      const desc = (p.description || p.shortDesc || '').toLowerCase();
-      const tags = Array.isArray(p.tags) ? p.tags.join(' ').toLowerCase() : (p.tags || '').toLowerCase();
-      const matchSearch = name.includes(q) || cat.includes(q) || sku.includes(q) || desc.includes(q) || tags.includes(q);
-      if (!matchSearch) return false;
-    }
 
     return true;
   });
@@ -2089,6 +2084,35 @@ function renderShopProducts() {
   }).join('');
 }
 
+// ── Instant Buy Helper (1-Click Add & Checkout from Cards or Search) ──
+function instantBuy(productId) {
+  const p = (typeof DB !== 'undefined' && DB.products) ? DB.products.byId(productId) : null;
+  if (!p) {
+    window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
+    return;
+  }
+  const defaultSize = (Array.isArray(p.sizes) && p.sizes[0]) ? p.sizes[0] : (p.size || 'M');
+  const defaultSleeve = 'Half Sleeve';
+  const price = p.salePrice || p.basePrice || 1450;
+  const image = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : (p.images?.[0]?.url || p.image || '');
+
+  addToCart({
+    productId: p.id,
+    name: p.name,
+    price: price,
+    size: defaultSize,
+    sleeve: defaultSleeve,
+    image: image,
+    qty: 1,
+    details: `Size: ${defaultSize} • ${defaultSleeve}`
+  });
+
+  closeGlobalSearch();
+  switchView('checkout');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.instantBuy = instantBuy;
+
 // ── Search Handlers (Shop In-Line Search & Global Search Modal) ──
 function handleShopSearch(val) {
   shopSearchQuery = (val || '').trim();
@@ -2121,9 +2145,12 @@ function openGlobalSearch() {
   const input = document.getElementById('global-search-input');
   if (input) {
     input.value = shopSearchQuery || '';
-    setTimeout(() => input.focus(), 50);
-    handleGlobalSearch(input.value);
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 60);
   }
+  handleGlobalSearch(input ? input.value : '');
 }
 window.openGlobalSearch = openGlobalSearch;
 
@@ -2139,66 +2166,82 @@ window.closeGlobalSearch = closeGlobalSearch;
 function handleGlobalSearch(query) {
   const container = document.getElementById('global-search-results');
   if (!container) return;
-  const q = (query || '').trim().toLowerCase();
-  if (q.length < 2) {
-    container.innerHTML = `
-      <div class="text-center py-10 text-gray-400 font-mono-ui text-xs">
-        Type 2 or more characters to search match kits & jerseys...
-      </div>
-    `;
-    return;
-  }
-
   const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
-  const matches = all.filter(p => {
-    const name = (p.name || '').toLowerCase();
-    const cat = (p.categoryName || '').toLowerCase();
-    const sku = (p.sku || '').toLowerCase();
-    const desc = (p.description || p.shortDesc || '').toLowerCase();
-    const tags = Array.isArray(p.tags) ? p.tags.join(' ').toLowerCase() : (p.tags || '').toLowerCase();
-    return name.includes(q) || cat.includes(q) || sku.includes(q) || desc.includes(q) || tags.includes(q);
-  });
+  const q = (query || '').trim().toLowerCase();
+
+  // If search query is empty, show all available products immediately!
+  let matches = [];
+  if (!q) {
+    matches = all;
+  } else {
+    const tokens = q.split(/\s+/).filter(Boolean);
+    matches = all.filter(p => {
+      const searchable = `${p.name || ''} ${p.categoryName || ''} ${p.sku || ''} ${p.description || ''} ${p.shortDesc || ''} ${Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')} ${p.salePrice || p.basePrice || ''}`.toLowerCase();
+      return tokens.every(t => searchable.includes(t));
+    });
+  }
 
   if (matches.length === 0) {
     container.innerHTML = `
       <div class="text-center py-10">
         <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
         <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(query)}"</p>
-        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all jerseys in the shop catalog.</p>
+        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all match kits in the catalog.</p>
+        <button type="button" onclick="handleGlobalSearch('')" class="mt-3 px-3 py-1.5 text-xs font-bold text-black border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+          View All Products (${all.length})
+        </button>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = matches.map(p => {
+  const headerHtml = `
+    <div class="px-2 py-1 flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider">
+      <span>${q ? `Found ${matches.length} matching kit${matches.length === 1 ? '' : 's'}` : `All Available Kits & Jerseys (${matches.length})`}</span>
+      ${q ? `<button type="button" onclick="const i=document.getElementById('global-search-input');if(i){i.value='';handleGlobalSearch('');i.focus();}" class="text-blue-600 hover:underline capitalize">Clear</button>` : ''}
+    </div>
+  `;
+
+  const itemsHtml = matches.map(p => {
     const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
       ? DB.products.getImage(p)
       : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
     const price = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
+    const origPrice = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
+    const isOutOfStock = p.stock === 0;
+
     return `
-      <div class="p-2 sm:p-3 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closeGlobalSearch(); openProduct('${p.id}')">
+      <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closeGlobalSearch(); openProduct('${p.id}')">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
             <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
           </div>
           <div class="min-w-0">
-            <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+            <div class="flex items-center gap-2">
+              <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+              ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
+              ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-600">OUT OF STOCK</span>' : ''}
+            </div>
             <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
-              <span>${p.categoryName || 'Kit'}</span>
+              <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
               ${p.sku ? `<span>• SKU: ${p.sku}</span>` : ''}
-              ${p.stock === 0 ? '<span class="text-red-500 font-bold">• Out of stock</span>' : ''}
             </div>
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
-          <span class="font-headline font-black text-xs sm:text-sm text-black">${price}</span>
-          <button type="button" onclick="event.stopPropagation(); closeGlobalSearch(); instantBuy('${p.id}')" class="px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer">
+          <div class="text-right">
+            <div class="font-headline font-black text-xs sm:text-sm text-black">${price}</div>
+            ${origPrice ? `<div class="font-mono-ui text-[10px] text-gray-400 line-through">${origPrice}</div>` : ''}
+          </div>
+          <button type="button" onclick="event.stopPropagation(); closeGlobalSearch(); instantBuy('${p.id}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
             Buy Now
           </button>
         </div>
       </div>
     `;
   }).join('');
+
+  container.innerHTML = headerHtml + itemsHtml;
 }
 window.handleGlobalSearch = handleGlobalSearch;
 
@@ -2206,10 +2249,14 @@ function viewAllSearchResultsInShop() {
   const input = document.getElementById('global-search-input');
   const query = input ? input.value.trim() : '';
   closeGlobalSearch();
+  if (typeof selectCategory === 'function') {
+    selectCategory('all', false);
+  }
   switchView('shop');
   const shopInput = document.getElementById('shop-search-input');
   if (shopInput) shopInput.value = query;
   handleShopSearch(query);
+  window.scrollTo({ top: 320, behavior: 'smooth' });
 }
 window.viewAllSearchResultsInShop = viewAllSearchResultsInShop;
 

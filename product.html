@@ -219,10 +219,14 @@
 
       <!-- Right Icons -->
       <div class="flex items-center gap-1.5 sm:gap-3">
+        <!-- Search Button -->
+        <button type="button" onclick="openProductSearch()" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Search Jerseys (Ctrl+K or /)">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">search</span>
+        </button>
         <a href="account.html" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Account">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">person</span>
         </a>
-                <button onclick="toggleWishlistModal()" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Wishlist">
+        <button onclick="toggleWishlistModal()" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Wishlist">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">favorite</span>
           <span id="wishlist-badge" class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
         </button>
@@ -240,6 +244,9 @@
 
     <!-- Mobile Navigation Dropdown Menu -->
     <div id="product-mobile-nav" class="hidden md:hidden border-t border-gray-100 bg-white/98 px-4 py-3 shadow-lg flex flex-col gap-2">
+      <button type="button" onclick="openProductSearch(); toggleProductMobileNav(false);" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5 w-full text-left cursor-pointer">
+        <span class="material-symbols-outlined text-lg">search</span> Search Jerseys & Kits...
+      </button>
       <a href="index.html#home" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
         <span class="material-symbols-outlined text-lg">home</span> Home
       </a>
@@ -2286,6 +2293,150 @@ Please confirm my order details!`;
     // ─────────────────────────────────────────
     // End Product Detail Logic
     // ─────────────────────────────────────────
+
+    // ─────────────────────────────────────────
+    // Global Search Modal on Product Page
+    // ─────────────────────────────────────────
+    function openProductSearch() {
+      const modal = document.getElementById('product-search-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      const input = document.getElementById('product-search-input');
+      if (input) {
+        setTimeout(() => { input.focus(); input.select(); }, 60);
+      }
+      handleProductSearch(input ? input.value : '');
+    }
+    window.openProductSearch = openProductSearch;
+
+    function closeProductSearch() {
+      const modal = document.getElementById('product-search-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    window.closeProductSearch = closeProductSearch;
+
+    function handleProductSearch(query) {
+      const container = document.getElementById('product-search-results');
+      if (!container) return;
+      const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
+      const q = (query || '').trim().toLowerCase();
+
+      let matches = [];
+      if (!q) {
+        matches = all;
+      } else {
+        const tokens = q.split(/\s+/).filter(Boolean);
+        matches = all.filter(p => {
+          const searchable = `${p.name || ''} ${p.categoryName || ''} ${p.sku || ''} ${p.description || ''} ${p.shortDesc || ''} ${Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')} ${p.salePrice || p.basePrice || ''}`.toLowerCase();
+          return tokens.every(t => searchable.includes(t));
+        });
+      }
+
+      if (matches.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10">
+            <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
+            <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(query)}"</p>
+            <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all jerseys in the shop catalog.</p>
+            <button type="button" onclick="handleProductSearch('')" class="mt-3 px-3 py-1.5 text-xs font-bold text-black border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+              View All Products (${all.length})
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const headerHtml = `
+        <div class="px-2 py-1 flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider">
+          <span>${q ? `Found ${matches.length} matching kit${matches.length === 1 ? '' : 's'}` : `All Available Kits & Jerseys (${matches.length})`}</span>
+          ${q ? `<button type="button" onclick="const i=document.getElementById('product-search-input');if(i){i.value='';handleProductSearch('');i.focus();}" class="text-blue-600 hover:underline capitalize">Clear</button>` : ''}
+        </div>
+      `;
+
+      const itemsHtml = matches.map(p => {
+        const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+          ? DB.products.getImage(p)
+          : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
+        const price = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
+        const origPrice = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
+        const isOutOfStock = p.stock === 0;
+
+        return `
+          <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closeProductSearch(); window.location.href='product.html?id=${encodeURIComponent(p.id)}'">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
+                <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+                  ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
+                  ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-600">OUT OF STOCK</span>' : ''}
+                </div>
+                <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
+                  <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
+                  ${p.sku ? `<span>• SKU: ${p.sku}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="text-right">
+                <div class="font-headline font-black text-xs sm:text-sm text-black">${price}</div>
+                ${origPrice ? `<div class="font-mono-ui text-[10px] text-gray-400 line-through">${origPrice}</div>` : ''}
+              </div>
+              <button type="button" onclick="event.stopPropagation(); closeProductSearch(); window.location.href='product.html?id=${encodeURIComponent(p.id)}'" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
+                View
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = headerHtml + itemsHtml;
+    }
+    window.handleProductSearch = handleProductSearch;
+
+    function viewAllProductSearchResultsInShop() {
+      const input = document.getElementById('product-search-input');
+      const query = input ? input.value.trim() : '';
+      closeProductSearch();
+      window.location.href = `index.html#shop${query ? '?search=' + encodeURIComponent(query) : ''}`;
+    }
+    window.viewAllProductSearchResultsInShop = viewAllProductSearchResultsInShop;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProductSearch();
+      if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        openProductSearch();
+      }
+    });
   </script>
+
+  <!-- ==================== PRODUCT SEARCH MODAL ==================== -->
+  <div id="product-search-modal" class="fixed inset-0 z-[100] hidden items-start justify-center pt-16 sm:pt-24 px-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+    <div onclick="closeProductSearch()" class="fixed inset-0 bg-transparent"></div>
+    <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200/80 overflow-hidden flex flex-col max-h-[80vh]">
+      <!-- Search Input Header -->
+      <div class="flex items-center px-4 sm:px-6 py-4 border-b border-gray-100 gap-3">
+        <span class="material-symbols-outlined text-gray-400 text-2xl">search</span>
+        <input type="text" id="product-search-input" placeholder="Search jerseys by club, country, player, SKU..." oninput="handleProductSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();viewAllProductSearchResultsInShop();}" class="w-full font-headline text-base sm:text-lg font-bold text-black placeholder:text-gray-400 outline-none bg-transparent">
+        <button onclick="closeProductSearch()" class="p-1 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close (Esc)">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+      <!-- Search Results List -->
+      <div id="product-search-results" class="flex-1 overflow-y-auto p-4 space-y-2 divide-y divide-gray-50"></div>
+      <!-- Search Footer -->
+      <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-[11px] font-mono-ui text-gray-500">
+        <span>Press <kbd class="px-1.5 py-0.5 bg-white border border-gray-200 rounded text-black font-bold">Esc</kbd> to exit</span>
+        <button onclick="viewAllProductSearchResultsInShop()" class="text-black font-bold hover:underline cursor-pointer">View in Shop →</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

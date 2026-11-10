@@ -1699,7 +1699,7 @@
       <!-- Search Input Header -->
       <div class="flex items-center px-4 sm:px-6 py-4 border-b border-gray-100 gap-3">
         <span class="material-symbols-outlined text-gray-400 text-2xl">search</span>
-        <input type="text" id="global-search-input" placeholder="Search jerseys by club, country, player, SKU..." oninput="handleGlobalSearch(this.value)" class="w-full font-headline text-base sm:text-lg font-bold text-black placeholder:text-gray-400 outline-none bg-transparent">
+        <input type="text" id="global-search-input" placeholder="Search jerseys by club, country, player, SKU..." oninput="handleGlobalSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();viewAllSearchResultsInShop();}" class="w-full font-headline text-base sm:text-lg font-bold text-black placeholder:text-gray-400 outline-none bg-transparent">
         <button onclick="closeGlobalSearch()" class="p-1 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer" title="Close (Esc)">
           <span class="material-symbols-outlined text-xl">close</span>
         </button>

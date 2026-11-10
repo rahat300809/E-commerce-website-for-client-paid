@@ -1121,6 +1121,27 @@ function toggleProductPublish(id, isCurrentlyPublished) {
 }
 window.toggleProductPublish = toggleProductPublish;
 
+function duplicateProduct(id) {
+  const p = DB.products.byId(id);
+  if (!p) {
+    toast('Product not found', 'error');
+    return;
+  }
+  const duplicated = DB.products.duplicate(id);
+  if (duplicated) {
+    toast(`Product "${p.name}" duplicated as "${duplicated.name}"`, 'success');
+    renderProducts(document.getElementById('admin-content'));
+    updateNavBadges();
+    try {
+      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+      window.dispatchEvent(new Event('storage'));
+    } catch(e){}
+  } else {
+    toast('Failed to duplicate product', 'error');
+  }
+}
+window.duplicateProduct = duplicateProduct;
+
 function bulkPublish(publish) {
   const count = selectedProducts.size;
   selectedProducts.forEach(id => DB.products.update(id, { 
@@ -1789,6 +1810,11 @@ function openProductForm(id = null) {
 
   const footer = `
     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    ${isEdit ? `
+      <button type="button" class="btn btn-secondary" onclick="closeModal(); duplicateProduct('${id}')" title="Duplicate this product">
+        <span class="material-symbols-outlined">content_copy</span> Duplicate
+      </button>
+    ` : ''}
     <button type="button" class="btn btn-secondary" onclick="saveProduct(null,'${id||''}',true)">
       <span class="material-symbols-outlined">save</span> Save Draft
     </button>

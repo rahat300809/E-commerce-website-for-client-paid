@@ -879,12 +879,32 @@ const DB = {
     duplicate(id) {
       const src = DB.products.byId(id);
       if (!src) return null;
-      const copy = { ...src };
-      delete copy.id; copy.name = src.name + ' (Copy)';
-      copy.sku = src.sku + '-COPY-' + Date.now().toString(36).toUpperCase();
-      copy.slug = src.slug + '-copy-' + Date.now().toString(36);
-      copy.isPublished = false; copy.stock = 0;
-      return DB.products.create(copy);
+      const copy = JSON.parse(JSON.stringify(src));
+      delete copy.id;
+      copy.name = src.name + ' (Copy)';
+      copy.sku = (src.sku ? String(src.sku).replace(/-COPY-[\w\d]+$/i, '') : 'ZNV') + '-COPY-' + Date.now().toString(36).toUpperCase();
+      copy.slug = (src.slug ? String(src.slug).replace(/-copy-[\w\d]+$/i, '') : (src.name || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '-copy-' + Date.now().toString(36);
+      copy.isPublished = src.isPublished !== undefined ? Boolean(src.isPublished) : true;
+      copy.status = copy.isPublished ? 'published' : 'draft';
+      copy.stock = typeof src.stock === 'number' ? src.stock : 10;
+      copy.isArchived = false;
+      copy.createdAt = Store.now();
+      copy.updatedAt = Store.now();
+
+      const created = DB.products.create(copy);
+      if (created && DB.variants && typeof DB.variants.byProduct === 'function') {
+        const vars = DB.variants.byProduct(id);
+        if (Array.isArray(vars) && vars.length > 0) {
+          vars.forEach(v => {
+            const vCopy = JSON.parse(JSON.stringify(v));
+            delete vCopy.id;
+            vCopy.productId = created.id;
+            vCopy.sku = `${created.id}-${v.size || 'M'}-${(v.color || 'S').substr(0, 3).toUpperCase()}`;
+            DB.variants.create(vCopy);
+          });
+        }
+      }
+      return created;
     },
     archive(id) {
       const p = DB.products.byId(id);

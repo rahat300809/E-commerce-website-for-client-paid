@@ -976,7 +976,7 @@ function renderProducts(container) {
                     <span class="badge ${p.stock===0?'badge-red':p.stock<=(p.lowStockAlert||5)?'badge-amber':'badge-green'}">${p.stock||0}</span>
                   </td>
                   <td>
-                    <span class="badge ${p.isPublished?'badge-green':'badge-gray'}">${p.isPublished?'Published':'Draft'}</span>
+                    <span class="badge ${p.isPublished?'badge-green':'badge-gray'} cursor-pointer" onclick="event.stopPropagation();toggleProductPublish('${p.id}',${p.isPublished})" title="Click to ${p.isPublished?'Unpublish':'Publish'}">${p.isPublished?'Published':'Draft'}</span>
                   </td>
                   <td>
                     <div style="display:flex;gap:3px;flex-wrap:wrap;">
@@ -1044,13 +1044,39 @@ function toggleSelectProduct(id, checked) {
   renderProducts(document.getElementById('admin-content'));
 }
 
+function toggleProductPublish(id, isCurrentlyPublished) {
+  const prod = DB.products.byId(id);
+  if (!prod) return;
+  const current = (isCurrentlyPublished === true || isCurrentlyPublished === 'true' || prod.isPublished === true);
+  const next = !current;
+  DB.products.update(id, { 
+    isPublished: next, 
+    status: next ? 'published' : 'draft' 
+  });
+  toast(`Product ${next ? 'Published' : 'Unpublished (Draft)'} successfully`, 'success');
+  renderProducts(document.getElementById('admin-content'));
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
+}
+window.toggleProductPublish = toggleProductPublish;
+
 function bulkPublish(publish) {
   const count = selectedProducts.size;
-  selectedProducts.forEach(id => DB.products.update(id, { isPublished: publish }));
+  selectedProducts.forEach(id => DB.products.update(id, { 
+    isPublished: publish,
+    status: publish ? 'published' : 'draft'
+  }));
   selectedProducts.clear();
   toast(`${publish?'Published':'Unpublished'} ${count} products`, 'success');
   renderProducts(document.getElementById('admin-content'));
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
 }
+window.bulkPublish = bulkPublish;
 
 function bulkDelete() {
   if (!selectedProducts || selectedProducts.size === 0) return;
@@ -1932,6 +1958,7 @@ function saveProduct(e, id, asDraft = false) {
     isPreorder: fd.get('isPreorder') === 'on',
     customBadge: get('customBadge'),
     isPublished: asDraft ? false : (get('productStatus') ? get('productStatus') === 'published' : true),
+    status: (asDraft || get('productStatus') === 'draft') ? 'draft' : 'published',
     customName,
     customNumber,
     customNameNumber,
@@ -2046,11 +2073,11 @@ function renderCategories(container) {
                     <td class="font-mono" style="font-size:12px">${c.slug}</td>
                     <td>${subCount}</td>
                     <td>${prodCount}</td>
-                    <td><span class="badge ${c.isActive?'badge-green':'badge-gray'}">${c.isActive?'Active':'Inactive'}</span></td>
+                    <td><span class="badge ${c.isActive?'badge-green':'badge-gray'} cursor-pointer" onclick="toggleCategory('${c.id}')" title="Click to toggle status">${c.isActive?'Active':'Inactive'}</span></td>
                     <td>${c.isFeatured?'<span class="badge badge-amber">Featured</span>':'-'}</td>
                     <td class="actions-cell" style="min-width:130px;text-align:right;white-space:nowrap;">
                       <button class="btn btn-ghost btn-sm" onclick="openCategoryForm('${c.id}')" title="Edit Category"><span class="material-symbols-outlined">edit</span></button>
-                      <button class="btn btn-ghost btn-sm" onclick="DB.categories.toggle('${c.id}','isActive');renderCategories(document.getElementById('admin-content'));toast('Status updated','success')" title="Toggle Active"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
+                      <button class="btn btn-ghost btn-sm" onclick="toggleCategory('${c.id}')" title="Toggle Active"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
                       <button class="btn btn-ghost btn-sm text-red" onclick="deleteCat('${c.id}', ${JSON.stringify(c.name)})" title="Delete Category"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                     </td>
                   </tr>
@@ -2075,6 +2102,20 @@ function renderCategories(container) {
     </div>
   `;
 }
+
+function toggleCategory(id) {
+  const cat = DB.categories.byId(id);
+  if (!cat) return;
+  const next = cat.isActive === false ? true : false;
+  DB.categories.update(id, { isActive: next });
+  toast(`Category "${cat.name}" ${next ? 'Activated' : 'Deactivated'}`, 'success');
+  renderCategories(document.getElementById('admin-content'));
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'categories' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
+}
+window.toggleCategory = toggleCategory;
 
 function deleteCat(id, name) {
   showConfirm('Delete Category', `Are you sure you want to delete category "${name}"? This will not delete products assigned to this category.`, () => {
@@ -2359,10 +2400,11 @@ function renderCollections(container) {
                   <td style="font-weight:600">${c.name}</td>
                   <td class="font-mono" style="font-size:12px">${c.slug}</td>
                   <td>${pCount}</td>
-                  <td><span class="badge ${c.isActive?'badge-green':'badge-gray'}">${c.isActive?'Active':'Inactive'}</span></td>
+                  <td><span class="badge ${c.isActive?'badge-green':'badge-gray'} cursor-pointer" onclick="toggleCollection('${c.id}')" title="Click to toggle status">${c.isActive?'Active':'Inactive'}</span></td>
                   <td class="actions-cell">
-                    <button class="btn btn-ghost btn-sm" onclick="openCollectionForm('${c.id}')"><span class="material-symbols-outlined">edit</span></button>
-                    <button class="btn btn-ghost btn-sm" onclick="DB.collections.delete('${c.id}');renderCollections(document.getElementById('admin-content'));toast('Deleted','success')"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="openCollectionForm('${c.id}')" title="Edit Collection"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="toggleCollection('${c.id}')" title="Toggle Active"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="DB.collections.delete('${c.id}');renderCollections(document.getElementById('admin-content'));toast('Deleted','success')" title="Delete Collection"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                   </td>
                 </tr>`;
               }).join('')}
@@ -2372,6 +2414,20 @@ function renderCollections(container) {
     </div>
   `;
 }
+
+function toggleCollection(id) {
+  const col = DB.collections.byId(id);
+  if (!col) return;
+  const next = col.isActive === false ? true : false;
+  DB.collections.update(id, { isActive: next });
+  toast(`Collection "${col.name}" ${next ? 'Activated' : 'Deactivated'}`, 'success');
+  renderCollections(document.getElementById('admin-content'));
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'collections' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
+}
+window.toggleCollection = toggleCollection;
 
 function openCollectionForm(id = null) {
   const col = id ? DB.collections.byId(id) : null;
@@ -4566,13 +4622,13 @@ function renderBanners(container) {
                 <td><div style="font-weight:600">${b.title}</div><div style="font-size:11px;color:#9CA3AF">${b.subtitle||''}</div></td>
                 <td style="font-size:12px">${b.ctaText||'-'} → ${b.destination||'-'}</td>
                 <td>${b.displayOrder}</td>
-                <td><span class="badge ${b.isActive?'badge-green':'badge-gray'}">${b.isActive?'Published':'Draft'}</span></td>
+                <td><span class="badge ${b.isActive?'badge-green':'badge-gray'} cursor-pointer" onclick="toggleBanner('${b.id}')" title="Click to ${b.isActive?'Unpublish':'Publish'}">${b.isActive?'Published':'Draft'}</span></td>
                 <td class="actions-cell">
-                  <button class="btn btn-ghost btn-sm" onclick="openBannerForm('${b.id}')"><span class="material-symbols-outlined">edit</span></button>
-                  <button class="btn btn-ghost btn-sm" onclick="DB.banners[${b.isActive?'unpublish':'publish'}]('${b.id}');renderBanners(document.getElementById('admin-content'));toast('${b.isActive?'Unpublished':'Published'}','success')">
-                    <span class="material-symbols-outlined">${b.isActive?'visibility_off':'publish'}</span>
+                  <button class="btn btn-ghost btn-sm" onclick="openBannerForm('${b.id}')" title="Edit Banner"><span class="material-symbols-outlined">edit</span></button>
+                  <button class="btn btn-ghost btn-sm" onclick="toggleBanner('${b.id}')" title="Toggle Active">
+                    <span class="material-symbols-outlined">${b.isActive?'visibility_off':'visibility'}</span>
                   </button>
-                  <button class="btn btn-ghost btn-sm" onclick="showConfirm('Delete Banner','Delete this banner?',()=>{DB.banners.delete('${b.id}');renderBanners(document.getElementById('admin-content'));toast('Deleted','success')})"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                  <button class="btn btn-ghost btn-sm" onclick="showConfirm('Delete Banner','Delete this banner?',()=>{DB.banners.delete('${b.id}');renderBanners(document.getElementById('admin-content'));toast('Deleted','success')})" title="Delete Banner"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                 </td>
               </tr>`).join('')}
           </tbody>
@@ -4581,6 +4637,20 @@ function renderBanners(container) {
     </div>
   `;
 }
+
+function toggleBanner(id) {
+  const b = DB.banners.byId(id);
+  if (!b) return;
+  const next = !b.isActive;
+  DB.banners.update(id, { isActive: next });
+  toast(`Banner ${next ? 'Published' : 'Unpublished (Draft)'}`, 'success');
+  renderBanners(document.getElementById('admin-content'));
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'banners' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
+}
+window.toggleBanner = toggleBanner;
 
 function openBannerForm(id=null) {
   const b = id ? DB.banners.byId(id) : null;

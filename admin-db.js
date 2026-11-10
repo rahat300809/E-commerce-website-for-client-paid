@@ -1194,7 +1194,7 @@ const DB = {
         name: 'UCL Ball patch',
         price: 100,
         description: 'Official UEFA Champions League Starball sleeve badge',
-        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="%23ffffff" stroke="%23111827" stroke-width="6"/><polygon points="50,15 58,35 79,38 64,52 68,73 50,62 32,73 36,52 21,38 42,35" fill="%23111827"/></svg>',
+        imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0NicgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMTExODI3JyBzdHJva2Utd2lkdGg9JzYnLz48cG9seWdvbiBwb2ludHM9JzUwLDE1IDU4LDM1IDc5LDM4IDY0LDUyIDY4LDczIDUwLDYyIDMyLDczIDM2LDUyIDIxLDM4IDQyLDM1JyBmaWxsPScjMTExODI3Jy8+PC9zdmc+',
         isEnabled: true,
         displayOrder: 1
       },
@@ -1203,7 +1203,7 @@ const DB = {
         name: '9 Trophy patch',
         price: 100,
         description: 'UEFA Champions League Badge of Honour Trophy patch',
-        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M26 18 C26 18 22 52 50 68 C78 52 74 18 74 18 Z" fill="%23111827"/><text x="50" y="47" font-size="28" font-family="Arial" font-weight="900" text-anchor="middle" fill="%23ffffff">9</text><path d="M34 72 L66 72 L58 84 L42 84 Z" fill="%23111827"/></svg>',
+        imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cGF0aCBkPSdNMjYgMTggQzI2IDE4IDIyIDUyIDUwIDY4IEM3OCA1MiA3NCAxOCA3NCAxOCBaJyBmaWxsPScjMTExODI3Jy8+PHRleHQgeD0nNTAnIHk9JzQ3JyBmb250LXNpemU9JzI4JyBmb250LWZhbWlseT0nQXJpYWwnIGZvbnQtd2VpZ2h0PSc5MDAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyNmZmZmZmYnPjk8L3RleHQ+PHBhdGggZD0nTTM0IDcyIEw2NiA3MiBMNTggODQgTDQyIDg0IFonIGZpbGw9JyMxMTE4MjcnLz48L3N2Zz4=',
         isEnabled: true,
         displayOrder: 2
       },
@@ -1212,7 +1212,7 @@ const DB = {
         name: 'Respect patch',
         price: 100,
         description: 'Official UEFA Foundation / Respect sleeve patch',
-        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 44"><rect width="100" height="44" rx="8" fill="%231e3a8a"/><text x="50" y="28" font-size="15" font-family="Arial" font-weight="900" letter-spacing="2" text-anchor="middle" fill="%23ffffff">RESPECT</text></svg>',
+        imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgNDQnPjxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nNDQnIHJ4PSc4JyBmaWxsPScjMWUzYThhJy8+PHRleHQgeD0nNTAnIHk9JzI4JyBmb250LXNpemU9JzE1JyBmb250LWZhbWlseT0nQXJpYWwnIGZvbnQtd2VpZ2h0PSc5MDAnIGxldHRlci1zcGFjaW5nPScyJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjZmZmZmZmJz5SRVNQRUNUPC90ZXh0Pjwvc3ZnPg==',
         isEnabled: true,
         displayOrder: 3
       },
@@ -1221,7 +1221,7 @@ const DB = {
         name: 'Premier League patch',
         price: 150,
         description: 'Official Premier League sleeve patch',
-        imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="%2338003c"/><text x="50" y="58" font-size="20" font-family="Arial" font-weight="900" text-anchor="middle" fill="%2300ff85">PL</text></svg>',
+        imageUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0NicgZmlsbD0nIzM4MDAzYycvPjx0ZXh0IHg9JzUwJyB5PSc1OCcgZm9udC1zaXplPScyMCcgZm9udC1mYW1pbHk9J0FyaWFsJyBmb250LXdlaWdodD0nOTAwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjMDBmZjg1Jz5QTDwvdGV4dD48L3N2Zz4=',
         isEnabled: true,
         displayOrder: 4
       }
@@ -1239,6 +1239,13 @@ const DB = {
         const key = (p.name || '').trim().toLowerCase();
         if (key && !seen.has(key)) {
           seen.add(key);
+          // Convert any raw unescaped SVG data URIs into safe base64 to avoid attribute quotes breaking HTML
+          if (p.imageUrl && p.imageUrl.startsWith('data:image/svg+xml;utf8,<svg')) {
+            const rawSvg = p.imageUrl.replace('data:image/svg+xml;utf8,', '');
+            try {
+              p.imageUrl = 'data:image/svg+xml;base64,' + (typeof btoa !== 'undefined' ? btoa(rawSvg) : p.imageUrl);
+            } catch(e){}
+          }
           // Auto fill missing or broken imageUrl with high-res badge
           if (!p.imageUrl || p.imageUrl.trim().length <= 5) {
             if (key.includes('champion') || key.includes('ucl')) p.imageUrl = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0OCcgZmlsbD0nI2ZmZmZmZicgc3Ryb2tlPScjMGYxNzJhJyBzdHJva2Utd2lkdGg9JzQnLz48cG9seWdvbiBwb2ludHM9JzUwLDE0IDUzLDI0IDY0LDI0IDU1LDMwIDU4LDQwIDUwLDM0IDQyLDQwIDQ1LDMwIDM2LDI0IDQ3LDI0JyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPSc3NSwzMiA3OCw0MiA4OSw0MiA4MCw0OCA4Myw1OCA3NSw1MiA2Nyw1OCA3MCw0OCA2MSw0MiA3Miw0MicgZmlsbD0nIzBmMTcyYScvPjxwb2x5Z29uIHBvaW50cz0nNjYsNzAgNjksODAgODAsODAgNzEsODYgNzQsOTYgNjYsOTAgNTgsOTYgNjEsODYgNTIsODAgNjMsODAnIGZpbGw9JyMwZjE3MmEnLz48cG9seWdvbiBwb2ludHM9JzM0LDcwIDM3LDgwIDQ4LDgwIDM5LDg2IDQyLDk2IDM0LDkwIDI2LDk2IDI5LDg2IDIwLDgwIDMxLDgwJyBmaWxsPScjMGYxNzJhJy8+PHBvbHlnb24gcG9pbnRzPScyNSwzMiAyOCw0MiAzOSw0MiAzMCw0OCAzMyw1OCAyNSw1MiAxNyw1OCAyMCw0OCAxMSw0MiAyMiw0MicgZmlsbD0nIzBmMTcyYScvPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzcnIGZpbGw9JyMwZjE3MmEnLz48L3N2Zz4=';
@@ -1498,8 +1505,13 @@ const DB = {
       Store.set('banners', Store.get('banners').filter(b => b.id !== id));
       DB.log(`Banner deleted: ${b?.title}`);
     },
-    publish(id) { DB.banners.update(id, { isActive: true }); DB.log(`Banner published`); },
-    unpublish(id) { DB.banners.update(id, { isActive: false }); DB.log(`Banner unpublished`); }
+    publish(id) { const b = DB.banners.update(id, { isActive: true }); DB.log(`Banner published`); return b; },
+    unpublish(id) { const b = DB.banners.update(id, { isActive: false }); DB.log(`Banner unpublished`); return b; },
+    toggle(id) {
+      const b = DB.banners.byId(id);
+      const next = b ? !b.isActive : true;
+      return DB.banners.update(id, { isActive: next });
+    }
   },
 
   // ── Shop Discount Banner ──

@@ -22,6 +22,7 @@ var shopActiveCategory = 'all';
 var shopMaxPrice = 25000;
 var shopSortOrder = 'default';
 var shopCarouselIndex = 0;
+var shopSearchQuery = '';
 
 function saveCartState() {
   try {
@@ -35,6 +36,16 @@ function formatMoney(amountInBDT) {
     return DB.currency.format(amountInBDT);
   }
   return `৳${Math.round(amountInBDT).toLocaleString()}`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // Initialize Application — Instant Local-First with Background Cloud Sync
@@ -1045,22 +1056,53 @@ function syncFooterSocialLinks() {
     phoneEl.textContent = brand.phone || ('+' + cleanWa);
   }
 
-  // 4. Global Floating WhatsApp Chat Button
-  let floatingWa = document.getElementById('floating-whatsapp-btn');
-  if (!floatingWa) {
-    floatingWa = document.createElement('a');
-    floatingWa.id = 'floating-whatsapp-btn';
-    floatingWa.target = '_blank';
-    floatingWa.rel = 'noopener';
-    floatingWa.className = 'fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group';
-    floatingWa.setAttribute('title', 'Chat on WhatsApp');
-    floatingWa.innerHTML = `
-      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-      <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Chat with us</span>
+  // 4. Global Floating Contact Widget (WhatsApp + Call)
+  let contactWidget = document.getElementById('floating-contact-widget');
+  if (!contactWidget) {
+    contactWidget = document.createElement('div');
+    contactWidget.id = 'floating-contact-widget';
+    contactWidget.className = 'fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col gap-2.5 items-end pointer-events-auto';
+
+    // Direct Call Button
+    const callBtn = document.createElement('a');
+    callBtn.id = 'floating-call-btn';
+    callBtn.className = 'bg-black hover:bg-neutral-800 text-white p-3 sm:p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group border border-white/20';
+    callBtn.setAttribute('title', 'Call Us Now');
+    callBtn.innerHTML = `
+      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">call</span>
+      <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Call Now</span>
     `;
-    document.body.appendChild(floatingWa);
+
+    // WhatsApp Button
+    const waBtn = document.createElement('a');
+    waBtn.id = 'floating-whatsapp-btn';
+    waBtn.target = '_blank';
+    waBtn.rel = 'noopener';
+    waBtn.className = 'bg-[#25D366] hover:bg-[#20ba5a] text-white p-3 sm:p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group';
+    waBtn.setAttribute('title', 'Chat on WhatsApp');
+    waBtn.innerHTML = `
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 fill-current flex-shrink-0" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">WhatsApp</span>
+    `;
+
+    contactWidget.appendChild(callBtn);
+    contactWidget.appendChild(waBtn);
+    document.body.appendChild(contactWidget);
   }
-  floatingWa.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about products and orders.')}`;
+
+  const callBtn = document.getElementById('floating-call-btn');
+  const waBtn = document.getElementById('floating-whatsapp-btn');
+  const rawPhone = (brand.phone || cleanWa || '01700000000').toString();
+  const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+
+  if (callBtn) {
+    callBtn.href = `tel:${cleanPhone}`;
+    callBtn.setAttribute('title', `Call: ${rawPhone}`);
+  }
+  if (waBtn) {
+    waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about products and orders.')}`;
+    waBtn.setAttribute('title', `WhatsApp: ${cleanWa}`);
+  }
 }
 
 // View Switcher Router with Short Shareable URL Sync
@@ -1844,6 +1886,18 @@ function renderShopProducts() {
     const price = p.salePrice || p.basePrice || 0;
     if (price > shopMaxPrice) return false;
 
+    // Filter by Search Query
+    if (shopSearchQuery) {
+      const q = shopSearchQuery.toLowerCase();
+      const name = (p.name || '').toLowerCase();
+      const cat = (p.categoryName || '').toLowerCase();
+      const sku = (p.sku || '').toLowerCase();
+      const desc = (p.description || p.shortDesc || '').toLowerCase();
+      const tags = Array.isArray(p.tags) ? p.tags.join(' ').toLowerCase() : (p.tags || '').toLowerCase();
+      const matchSearch = name.includes(q) || cat.includes(q) || sku.includes(q) || desc.includes(q) || tags.includes(q);
+      if (!matchSearch) return false;
+    }
+
     return true;
   });
 
@@ -1859,9 +1913,9 @@ function renderShopProducts() {
     filtered.sort((a, b) => getTs(b) - getTs(a));
   }
 
-  // Fallback to all products if selected category has no matching items
+  // Fallback to all products if selected category has no matching items (only when not searching)
   let isCategoryFallback = false;
-  if (filtered.length === 0 && shopActiveCategory !== 'all') {
+  if (filtered.length === 0 && shopActiveCategory !== 'all' && !shopSearchQuery) {
     isCategoryFallback = true;
     filtered = allProducts.filter(p => {
       const price = p.salePrice || p.basePrice || 0;
@@ -1874,6 +1928,21 @@ function renderShopProducts() {
     } else {
       filtered.sort((a, b) => getTs(b) - getTs(a));
     }
+  }
+
+  if (filtered.length === 0) {
+    if (countEl) countEl.textContent = '0';
+    grid.innerHTML = `
+      <div class="col-span-full py-14 px-4 text-center bg-white rounded-2xl border border-dashed border-gray-200">
+        <span class="material-symbols-outlined text-4xl text-gray-300 mb-2">search_off</span>
+        <h3 class="font-headline font-bold text-base text-gray-800 mb-1">${shopSearchQuery ? `No kits found matching "${escapeHtml(shopSearchQuery)}"` : 'No products available'}</h3>
+        <p class="font-mono-ui text-xs text-gray-400 mb-4">${shopSearchQuery ? 'Try checking for typos or searching by another club, country, or player.' : 'Check back later or explore other categories.'}</p>
+        ${shopSearchQuery ? `<button type="button" onclick="clearShopSearch()" class="px-4 py-2 bg-black text-white text-xs font-headline font-bold rounded-xl hover:bg-neutral-800 transition-all cursor-pointer">Clear Search</button>` : ''}
+      </div>
+    `;
+    const pagContainer = document.getElementById('shop-pagination-container');
+    if (pagContainer) pagContainer.innerHTML = '';
+    return;
   }
 
   if (countEl) {
@@ -2009,9 +2078,9 @@ function renderShopProducts() {
             <button type="button" 
                     onclick="instantBuy('${p.id}')"
                     class="py-1.5 px-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
-                    title="Instant Buy Now">
+                    title="Buy Now">
               <span class="material-symbols-outlined text-[13px] sm:text-[14px]">bolt</span>
-              <span>Instant Buy</span>
+              <span>Buy Now</span>
             </button>
           </div>
         </div>
@@ -2019,6 +2088,141 @@ function renderShopProducts() {
       </div>    `;
   }).join('');
 }
+
+// ── Search Handlers (Shop In-Line Search & Global Search Modal) ──
+function handleShopSearch(val) {
+  shopSearchQuery = (val || '').trim();
+  shopCurrentPage = 1;
+  const clearBtn = document.getElementById('shop-search-clear');
+  if (clearBtn) {
+    if (shopSearchQuery) clearBtn.classList.remove('hidden');
+    else clearBtn.classList.add('hidden');
+  }
+  renderShopProducts();
+}
+window.handleShopSearch = handleShopSearch;
+
+function clearShopSearch() {
+  shopSearchQuery = '';
+  shopCurrentPage = 1;
+  const input = document.getElementById('shop-search-input');
+  if (input) input.value = '';
+  const clearBtn = document.getElementById('shop-search-clear');
+  if (clearBtn) clearBtn.classList.add('hidden');
+  renderShopProducts();
+}
+window.clearShopSearch = clearShopSearch;
+
+function openGlobalSearch() {
+  const modal = document.getElementById('global-search-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const input = document.getElementById('global-search-input');
+  if (input) {
+    input.value = shopSearchQuery || '';
+    setTimeout(() => input.focus(), 50);
+    handleGlobalSearch(input.value);
+  }
+}
+window.openGlobalSearch = openGlobalSearch;
+
+function closeGlobalSearch() {
+  const modal = document.getElementById('global-search-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+window.closeGlobalSearch = closeGlobalSearch;
+
+function handleGlobalSearch(query) {
+  const container = document.getElementById('global-search-results');
+  if (!container) return;
+  const q = (query || '').trim().toLowerCase();
+  if (q.length < 2) {
+    container.innerHTML = `
+      <div class="text-center py-10 text-gray-400 font-mono-ui text-xs">
+        Type 2 or more characters to search match kits & jerseys...
+      </div>
+    `;
+    return;
+  }
+
+  const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
+  const matches = all.filter(p => {
+    const name = (p.name || '').toLowerCase();
+    const cat = (p.categoryName || '').toLowerCase();
+    const sku = (p.sku || '').toLowerCase();
+    const desc = (p.description || p.shortDesc || '').toLowerCase();
+    const tags = Array.isArray(p.tags) ? p.tags.join(' ').toLowerCase() : (p.tags || '').toLowerCase();
+    return name.includes(q) || cat.includes(q) || sku.includes(q) || desc.includes(q) || tags.includes(q);
+  });
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-10">
+        <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
+        <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(query)}"</p>
+        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all jerseys in the shop catalog.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = matches.map(p => {
+    const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+      ? DB.products.getImage(p)
+      : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
+    const price = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
+    return `
+      <div class="p-2 sm:p-3 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closeGlobalSearch(); openProduct('${p.id}')">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
+            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+            <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
+              <span>${p.categoryName || 'Kit'}</span>
+              ${p.sku ? `<span>• SKU: ${p.sku}</span>` : ''}
+              ${p.stock === 0 ? '<span class="text-red-500 font-bold">• Out of stock</span>' : ''}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="font-headline font-black text-xs sm:text-sm text-black">${price}</span>
+          <button type="button" onclick="event.stopPropagation(); closeGlobalSearch(); instantBuy('${p.id}')" class="px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer">
+            Buy Now
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+window.handleGlobalSearch = handleGlobalSearch;
+
+function viewAllSearchResultsInShop() {
+  const input = document.getElementById('global-search-input');
+  const query = input ? input.value.trim() : '';
+  closeGlobalSearch();
+  switchView('shop');
+  const shopInput = document.getElementById('shop-search-input');
+  if (shopInput) shopInput.value = query;
+  handleShopSearch(query);
+}
+window.viewAllSearchResultsInShop = viewAllSearchResultsInShop;
+
+// Keyboard shortcut listeners for instant search
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeGlobalSearch();
+  }
+  if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+    e.preventDefault();
+    openGlobalSearch();
+  }
+});
 
 // ── Shop Banner Carousel ──
 // shopCarouselIndex declared at top of file

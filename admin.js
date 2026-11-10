@@ -3511,10 +3511,12 @@ function renderOrders(container) {
         <option value="">All Status</option>
         ${statuses.map(s => `<option value="${s}" ${orderStatusFilter===s?'selected':''}>${s}</option>`).join('')}
       </select>
-      <select class="form-select" style="width:140px;" onchange="orderPayFilter=this.value;orderPage=1;renderOrders(document.getElementById('admin-content'))">
+      <select class="form-select" style="width:170px;" onchange="orderPayFilter=this.value;orderPage=1;renderOrders(document.getElementById('admin-content'))">
         <option value="">All Payments</option>
-        <option value="PENDING">Pending</option>
         <option value="PAID">Paid</option>
+        <option value="ADVANCE_DELIVERY_PAID">Advance Paid</option>
+        <option value="AWAITING_ADVANCE_PAYMENT">Awaiting Advance</option>
+        <option value="PENDING">Pending / COD</option>
         <option value="FAILED">Failed</option>
         <option value="REFUNDED">Refunded</option>
       </select>
@@ -3535,24 +3537,47 @@ function renderOrders(container) {
                   </td>
                   <td style="font-size:12px">${(o.items||[]).length} items</td>
                   <td class="font-mono" style="font-weight:700">৳${(o.totalAmount||0).toLocaleString()}</td>
-                  <td onclick="event.stopPropagation();openPaymentRemarkModal('${o.id}')" title="Click to remark / mark as paid">
-                    <span class="badge ${o.paymentStatus==='PAID'?'badge-green':o.paymentStatus==='FAILED'?'badge-red':'badge-amber'}" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px">
-                      ${o.paymentStatus}
-                      <span class="material-symbols-outlined" style="font-size:12px;opacity:0.7">edit</span>
-                    </span>
+                  <td onclick="event.stopPropagation();openPaymentRemarkModal('${o.id}')" title="Click to edit / verify payment">
+                    ${(() => {
+                      const st = o.paymentStatus || 'PENDING';
+                      if (st === 'PAID') {
+                        return `<span class="badge badge-green" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:12px;">check_circle</span> PAID</span>`;
+                      } else if (st === 'ADVANCE_DELIVERY_PAID') {
+                        return `<span class="badge" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-weight:800;"><span class="material-symbols-outlined" style="font-size:12px;">verified</span> Advance ৳${(o.paidAmount||80).toLocaleString()} Paid</span>`;
+                      } else if (st === 'AWAITING_ADVANCE_PAYMENT') {
+                        return `<span class="badge" style="background:#FFFBEB;color:#B45309;border:1px solid #FDE68A;cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-weight:800;"><span class="material-symbols-outlined" style="font-size:12px;">hourglass_top</span> Awaiting Advance</span>`;
+                      } else if (st === 'FAILED') {
+                        return `<span class="badge badge-red" style="cursor:pointer;">FAILED</span>`;
+                      } else {
+                        return `<span class="badge badge-amber" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px;">${st} <span class="material-symbols-outlined" style="font-size:12px;opacity:0.7">edit</span></span>`;
+                      }
+                    })()}
                     <div style="font-weight:800;font-size:11px;color:#0F172A;margin-top:3px;display:flex;align-items:center;gap:4px;">
                       <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${(o.paymentMethod||'').toLowerCase().includes('bkash')?'#D12053':(o.paymentMethod||'').toLowerCase().includes('nagad')?'#EA580C':(o.paymentMethod||'').toLowerCase().includes('rocket')?'#7C3AED':'#16A34A'}"></span>
                       ${o.paymentMethod || 'COD'}
                     </div>
-                    ${(o.paymentTrxId || o.trxId || o.transactionId) ? `
-                      <div style="font-family:monospace;font-size:10px;font-weight:800;color:#0369A1;background:#E0F2FE;border:1px solid #BAE6FD;padding:1px 6px;border-radius:4px;display:inline-block;margin-top:2px;">
-                        Trx: ${o.paymentTrxId || o.trxId || o.transactionId}
-                      </div>
-                    ` : ''}
+                    ${(() => {
+                      const trx = o.paymentTrxId || o.trxId || o.transactionId;
+                      if (!trx) return '';
+                      return `
+                        <div style="margin-top:3px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                          <div style="font-family:monospace;font-size:10px;font-weight:800;color:#0369A1;background:#E0F2FE;border:1px solid #BAE6FD;padding:1px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;">
+                            <span>Trx: <b>${trx}</b></span>
+                            <span class="material-symbols-outlined" style="font-size:12px;cursor:pointer;" onclick="event.stopPropagation();navigator.clipboard.writeText('${trx}');toast('TrxID Copied!','success');" title="Copy TrxID">content_copy</span>
+                          </div>
+                          ${o.paymentSenderPhone ? `<div style="font-size:9.5px;color:#64748B;">Sender: <b>${o.paymentSenderPhone}</b></div>` : ''}
+                        </div>
+                      `;
+                    })()}
                   </td>
                   <td><span class="badge badge-${statusColor(o.status)} status-${o.status}">${o.status}</span></td>
                   <td style="font-size:12px;color:#9CA3AF">${fmtDate(o.createdAt)}</td>
                   <td class="actions-cell" onclick="event.stopPropagation()">
+                    ${(o.paymentTrxId || o.trxId) && o.paymentStatus !== 'PAID' ? `
+                      <button class="btn btn-ghost btn-sm" onclick="quickApprovePayment('${o.id}')" title="Verify TrxID & Mark Full Paid" style="color:#16A34A;">
+                        <span class="material-symbols-outlined">verified</span>
+                      </button>
+                    ` : ''}
                     <button class="btn btn-ghost btn-sm" onclick="openPaymentRemarkModal('${o.id}')" title="Mark Paid / Payment Remark"><span class="material-symbols-outlined" style="color:#16A34A">payments</span></button>
                     <button class="btn btn-ghost btn-sm" onclick="openOrderDetail('${o.id}')" title="Order Details"><span class="material-symbols-outlined">visibility</span></button>
                     <button class="btn btn-ghost btn-sm" onclick="openOrderStatusModal('${o.id}')" title="Update Status"><span class="material-symbols-outlined">sync</span></button>
@@ -3613,17 +3638,32 @@ function openOrderDetail(id) {
           </span>
         </div>
         ${(o.paymentTrxId || o.trxId || o.transactionId) ? `
-          <div style="background:#EFF6FF;border:1px solid #BFDBFE;padding:8px 12px;border-radius:8px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;padding:10px 14px;border-radius:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <div>
-              <div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#1D4ED8;letter-spacing:0.04em;">Transaction ID (TrxID)</div>
-              <div style="font-family:monospace;font-weight:900;font-size:13px;color:#1E40AF;margin-top:1px;">
+              <div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#1D4ED8;letter-spacing:0.04em;">Transaction ID (TrxID) & Verification</div>
+              <div style="font-family:monospace;font-weight:900;font-size:14px;color:#1E40AF;margin-top:2px;">
                 ${o.paymentTrxId || o.trxId || o.transactionId}
               </div>
               ${o.paymentSenderPhone ? `<div style="font-size:11px;color:#1D4ED8;margin-top:2px;">Sender Phone: <b>${o.paymentSenderPhone}</b></div>` : ''}
+              <div style="font-size:11px;color:#15803D;font-weight:700;margin-top:3px;">
+                Advance Received: ৳${(o.paidAmount || (o.paymentStatus === 'PAID' ? o.totalAmount : 0)).toLocaleString()} • Due on Delivery: ৳${(o.dueAmount !== undefined ? o.dueAmount : Math.max(0, (o.totalAmount||0) - (o.paidAmount||0))).toLocaleString()}
+              </div>
             </div>
-            <button type="button" class="btn btn-sm" style="background:#2563EB;color:white;font-size:11px;padding:3px 8px;gap:3px;" onclick="navigator.clipboard.writeText('${o.paymentTrxId || o.trxId || o.transactionId}');toast('TrxID Copied!','success');">
-              <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> Copy
-            </button>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="btn btn-sm" style="background:#2563EB;color:white;font-size:11px;padding:4px 9px;gap:3px;" onclick="navigator.clipboard.writeText('${o.paymentTrxId || o.trxId || o.transactionId}');toast('TrxID Copied!','success');">
+                <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> Copy
+              </button>
+              ${o.paymentStatus !== 'PAID' ? `
+                <button type="button" class="btn btn-sm" style="background:#16A34A;color:white;font-size:11px;padding:4px 10px;gap:3px;" onclick="quickApprovePayment('${o.id}')">
+                  <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> Mark Full Paid
+                </button>
+              ` : ''}
+              ${o.paymentStatus === 'AWAITING_ADVANCE_PAYMENT' ? `
+                <button type="button" class="btn btn-sm" style="background:#0284C7;color:white;font-size:11px;padding:4px 10px;gap:3px;" onclick="quickVerifyAdvancePayment('${o.id}', ${o.paidAmount || 80})">
+                  <span class="material-symbols-outlined" style="font-size:14px;">verified</span> Verify Advance
+                </button>
+              ` : ''}
+            </div>
           </div>
         ` : ''}
         ${o.paymentRemark ? `
@@ -3873,11 +3913,12 @@ function updateOrderStatus(id) {
   if (status) DB.orders.updateStatus(id, status);
   if (tracking !== undefined) DB.orders.update(id, { trackingNumber: tracking });
   if (payStatus) {
+    const existing = DB.orders.byId(id);
     DB.orders.updatePayment(id, {
       paymentStatus: payStatus,
       paidAmount,
       paymentRemark: payRemark,
-      paymentTrxId: payRemark
+      paymentTrxId: existing?.paymentTrxId || existing?.trxId || ''
     });
   }
 
@@ -3890,9 +3931,11 @@ function updateOrderStatus(id) {
 function openPaymentRemarkModal(id) {
   const o = DB.orders.byId(id);
   if (!o) return;
-  const payStatuses = ['PAID','PENDING','PARTIALLY_PAID','FAILED','REFUNDED'];
+  const payStatuses = ['PAID','ADVANCE_DELIVERY_PAID','AWAITING_ADVANCE_PAYMENT','PENDING','PARTIALLY_PAID','FAILED','REFUNDED'];
   const total = o.totalAmount || 0;
   const currentPaid = o.paidAmount !== undefined ? o.paidAmount : (o.paymentStatus === 'PAID' ? total : 0);
+  const currentTrx = o.paymentTrxId || o.trxId || o.transactionId || '';
+  const currentSender = o.paymentSenderPhone || '';
 
   const html = `
     <div style="background:#F8FAFC;padding:14px 16px;border-radius:10px;margin-bottom:16px;border:1px solid #E2E8F0;">
@@ -3910,10 +3953,14 @@ function openPaymentRemarkModal(id) {
     </div>
 
     <!-- Quick 1-Click Buttons -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
       <button type="button" class="btn btn-sm" style="flex:1;background:#DCFCE7;color:#166534;border:1px solid #86EFAC;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;"
         onclick="document.getElementById('modal-pay-status').value='PAID';document.getElementById('modal-pay-amount').value='${total}';">
         <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> 1-Click Mark PAID
+      </button>
+      <button type="button" class="btn btn-sm" style="flex:1;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;"
+        onclick="document.getElementById('modal-pay-status').value='ADVANCE_DELIVERY_PAID';document.getElementById('modal-pay-amount').value='${o.paidAmount || 80}';">
+        <span class="material-symbols-outlined" style="font-size:16px;">verified</span> Verify Advance ৳${(o.paidAmount || 80).toLocaleString()}
       </button>
       <button type="button" class="btn btn-sm btn-secondary" style="font-weight:700;"
         onclick="document.getElementById('modal-pay-status').value='PENDING';document.getElementById('modal-pay-amount').value='0';">
@@ -3923,7 +3970,7 @@ function openPaymentRemarkModal(id) {
 
     <div class="form-group">
       <label class="form-label" style="font-weight:700;">Payment Status<span class="req">*</span></label>
-      <select id="modal-pay-status" class="form-select" onchange="if(this.value==='PAID'){document.getElementById('modal-pay-amount').value='${total}'}">
+      <select id="modal-pay-status" class="form-select" onchange="if(this.value==='PAID'){document.getElementById('modal-pay-amount').value='${total}'}else if(this.value==='ADVANCE_DELIVERY_PAID'){document.getElementById('modal-pay-amount').value='${o.paidAmount||80}'}">
         ${payStatuses.map(s => `<option value="${s}" ${o.paymentStatus === s ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
     </div>
@@ -3934,8 +3981,18 @@ function openPaymentRemarkModal(id) {
     </div>
 
     <div class="form-group">
-      <label class="form-label" style="font-weight:700;">Payment Remark / Trx ID / Notes</label>
-      <textarea id="modal-pay-remark" class="form-textarea" rows="2" placeholder="e.g. bKash TrxID: 9B7X2K4M / Full payment received via COD rider / Advance ৳150 paid">${o.paymentRemark || o.paymentTrxId || ''}</textarea>
+      <label class="form-label" style="font-weight:700;">Transaction ID (TrxID)</label>
+      <input type="text" id="modal-pay-trxid" class="form-input font-mono uppercase" value="${currentTrx}" placeholder="e.g. 9B7X2K4M"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Sender Phone Number (Optional)</label>
+      <input type="text" id="modal-pay-sender" class="form-input font-mono" value="${currentSender}" placeholder="e.g. 017XXXXXXXX"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" style="font-weight:700;">Payment Remark / Notes</label>
+      <textarea id="modal-pay-remark" class="form-textarea" rows="2" placeholder="e.g. Advance verified via bKash statement / COD rider collected">${o.paymentRemark || ''}</textarea>
     </div>
   `;
 
@@ -3948,13 +4005,20 @@ function openPaymentRemarkModal(id) {
 function savePaymentRemark(id) {
   const paymentStatus = document.getElementById('modal-pay-status')?.value || 'PENDING';
   const paidAmount = document.getElementById('modal-pay-amount')?.value;
+  const paymentTrxId = document.getElementById('modal-pay-trxid')?.value?.trim().toUpperCase() || '';
+  const paymentSenderPhone = document.getElementById('modal-pay-sender')?.value?.trim() || '';
   const paymentRemark = document.getElementById('modal-pay-remark')?.value?.trim();
 
   DB.orders.updatePayment(id, {
     paymentStatus,
     paidAmount,
     paymentRemark,
-    paymentTrxId: paymentRemark
+    paymentTrxId
+  });
+  DB.orders.update(id, {
+    paymentSenderPhone,
+    trxId: paymentTrxId,
+    transactionId: paymentTrxId
   });
 
   toast(`Payment updated to ${paymentStatus}`, 'success');
@@ -3962,6 +4026,38 @@ function savePaymentRemark(id) {
   updateNavBadges();
   renderOrders(document.getElementById('admin-content'));
 }
+
+window.quickApprovePayment = function(id) {
+  const o = DB.orders.byId(id);
+  if (!o) return;
+  const total = o.totalAmount || 0;
+  DB.orders.updatePayment(id, {
+    paymentStatus: 'PAID',
+    paidAmount: total,
+    paymentRemark: `TrxID verified and marked Full Paid by Admin on ${new Date().toLocaleDateString('en-GB')}`
+  });
+  toast(`Order #${o.orderNumber || o.id} marked as PAID!`, 'success');
+  if (typeof closeModal === 'function') closeModal();
+  updateNavBadges();
+  renderOrders(document.getElementById('admin-content'));
+};
+
+window.quickVerifyAdvancePayment = function(id, advAmount) {
+  const o = DB.orders.byId(id);
+  if (!o) return;
+  const adv = advAmount || o.paidAmount || 80;
+  const due = Math.max(0, (o.totalAmount || 0) - adv);
+  DB.orders.updatePayment(id, {
+    paymentStatus: 'ADVANCE_DELIVERY_PAID',
+    paidAmount: adv,
+    dueAmount: due,
+    paymentRemark: `Advance ৳${adv} verified by Admin on ${new Date().toLocaleDateString('en-GB')}`
+  });
+  toast(`Order #${o.orderNumber || o.id}: Advance ৳${adv} Verified!`, 'success');
+  if (typeof closeModal === 'function') closeModal();
+  updateNavBadges();
+  renderOrders(document.getElementById('admin-content'));
+};
 
 function printInvoice(id) {
   const o = DB.orders.byId(id);

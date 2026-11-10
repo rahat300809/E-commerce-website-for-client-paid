@@ -1370,13 +1370,16 @@ const DB = {
       const isPaid = paymentStatus === 'PAID';
       const finalPaidAmount = paidAmount !== undefined && paidAmount !== '' ? Number(paidAmount) : (isPaid ? total : (old.paidAmount || 0));
       const due = Math.max(0, total - finalPaidAmount);
+      const finalTrx = paymentTrxId !== undefined ? paymentTrxId : (old.paymentTrxId || old.trxId || '');
 
       const updated = DB.orders.update(id, {
         paymentStatus,
         paidAmount: finalPaidAmount,
         dueAmount: due,
         paymentRemark: paymentRemark !== undefined ? paymentRemark : (old.paymentRemark || ''),
-        paymentTrxId: paymentTrxId !== undefined ? paymentTrxId : (old.paymentTrxId || ''),
+        paymentTrxId: finalTrx,
+        trxId: finalTrx,
+        transactionId: finalTrx,
         paidAt: isPaid ? (old.paidAt || Store.now()) : old.paidAt
       });
       DB.activityLog.add({ action: `Payment ${paymentStatus}`, entity: 'Order', entityId: id, detail: `${old.orderNumber} - ৳${finalPaidAmount} (${paymentRemark || 'No remark'})` });

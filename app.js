@@ -2645,13 +2645,16 @@ function showOrderSuccessCelebration(order) {
   const orderNum = order.orderNumber || order.id || 'ZNV-100001';
   const total = order.totalAmount || order.total || 0;
   const method = order.paymentMethod || 'Cash on Delivery';
+  const trxId = order.paymentTrxId || order.trxId || order.transactionId || '';
+  const paid = order.paidAmount || (order.paymentStatus === 'PAID' ? total : 0);
+  const due = order.dueAmount !== undefined ? order.dueAmount : Math.max(0, total - paid);
 
-  const waMsg = encodeURIComponent(`Hi ZENVY, I have placed order #${orderNum} for ৳${total.toLocaleString()} via ${method}. Please confirm!`);
+  const waMsg = encodeURIComponent(`Hi ZENVY, I have placed order #${orderNum} for ৳${total.toLocaleString()} via ${method}${trxId ? ' (TrxID: ' + trxId + ')' : ''}${paid > 0 ? ' [Paid Advance: ৳' + paid.toLocaleString() + ', Due: ৳' + due.toLocaleString() + ']' : ''}. Please confirm!`);
   const waUrl = `https://wa.me/${phone}?text=${waMsg}`;
 
   const modal = document.createElement('div');
   modal.id = 'order-success-modal';
-  modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+  modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in';
   modal.innerHTML = `
     <div class="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center border border-neutral-200 animate-slide-up">
       <!-- Close Button -->
@@ -2676,7 +2679,7 @@ function showOrderSuccessCelebration(order) {
       </p>
 
       <!-- Order ID and Total Card -->
-      <div class="p-4 bg-neutral-50 rounded-2xl border border-neutral-200 mb-5 text-left font-mono-ui text-xs space-y-1.5">
+      <div class="p-4 bg-neutral-50 rounded-2xl border border-neutral-200 mb-5 text-left font-mono-ui text-xs space-y-2">
         <div class="flex justify-between items-center">
           <span class="text-neutral-500 uppercase font-bold text-[10px]">Order Number</span>
           <span class="font-headline font-black text-sm text-neutral-900">#${orderNum}</span>
@@ -2685,7 +2688,25 @@ function showOrderSuccessCelebration(order) {
           <span class="text-neutral-500 uppercase font-bold text-[10px]">Payment Method</span>
           <span class="font-bold text-neutral-800">${method}</span>
         </div>
-        <div class="flex justify-between items-center pt-1 border-t border-dashed border-neutral-200">
+        ${trxId ? `
+        <div class="flex justify-between items-center bg-blue-50/80 -mx-1 px-2 py-1 rounded-lg border border-blue-100">
+          <span class="text-blue-800 uppercase font-bold text-[10px]">Transaction ID (TrxID)</span>
+          <span class="font-mono font-black text-xs text-blue-900">${trxId}</span>
+        </div>
+        ` : ''}
+        ${paid > 0 ? `
+        <div class="flex justify-between items-center">
+          <span class="text-emerald-700 font-bold text-[10px] uppercase">Advance Paid</span>
+          <span class="font-bold text-xs text-emerald-700 font-mono">৳${paid.toLocaleString()}</span>
+        </div>
+        ` : ''}
+        ${due > 0 ? `
+        <div class="flex justify-between items-center">
+          <span class="text-amber-700 font-bold text-[10px] uppercase">Due on Delivery (COD)</span>
+          <span class="font-bold text-xs text-amber-700 font-mono">৳${due.toLocaleString()}</span>
+        </div>
+        ` : ''}
+        <div class="flex justify-between items-center pt-1.5 border-t border-dashed border-neutral-200">
           <span class="text-neutral-800 font-bold uppercase text-[10px]">Total Order Value</span>
           <span class="font-black text-sm text-neutral-900">৳${total.toLocaleString()}</span>
         </div>
@@ -2825,10 +2846,10 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
 
   const modal = document.createElement('div');
   modal.id = 'bkash-payment-modal';
-  modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md';
+  modal.className = 'fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md transition-opacity duration-200';
   modal.setAttribute('onclick', 'if(event.target===this)this.remove();');
   modal.innerHTML = `
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-gray-100 relative">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in border border-gray-100 relative" onclick="event.stopPropagation()">
       <!-- MFS Header -->
       <div style="background:${providerColor};" class="p-6 text-white text-center relative">
         <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-bold text-base transition-colors cursor-pointer" title="Close / বন্ধ করুন">✕</button>
@@ -2873,7 +2894,9 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
 
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-1">Enter ${providerName} Transaction ID (TrxID)<span class="text-red-500">*</span></label>
-          <input type="text" id="bkash-trx-input" placeholder="e.g. 9B7X2K4M" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white" />
+          <input type="text" id="bkash-trx-input" placeholder="e.g. 9B7X2K4M" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-mono uppercase text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white transition-all"
+            oninput="const e=document.getElementById('mfs-trx-error');if(e)e.classList.add('hidden');this.classList.remove('border-rose-500','ring-2','ring-rose-200');"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}');}" />
         </div>
 
         <div>
@@ -2881,9 +2904,13 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
           <input type="tel" id="bkash-sender-input" placeholder="e.g. 017XXXXXXXX" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:outline-none bg-white" />
         </div>
 
+        <!-- Inline error alert box -->
+        <div id="mfs-trx-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-xs px-3.5 py-2.5 rounded-xl font-medium flex items-center gap-2 animate-fade-in"></div>
+
         <div class="flex gap-2 pt-2">
-          <button onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-base">verified</span> Confirm & Verify TrxID
+          <button id="mfs-confirm-btn" type="button" onclick="submitMfsTrxId('${order.id}', '${providerName}', ${amount}, ${dueOnDelivery}, '${activeSplit}')" style="background:${providerColor};" class="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm hover:opacity-95 shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-base">verified</span>
+            <span id="mfs-confirm-btn-text">Confirm & Verify TrxID</span>
           </button>
           <button type="button" onclick="document.getElementById('bkash-payment-modal').remove();" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 transition-colors cursor-pointer">
             Cancel
@@ -2893,58 +2920,96 @@ function openMfsPaymentModal(order, providerId = 'bkash', payableNow = null, act
     </div>
   `;
   document.body.appendChild(modal);
+  setTimeout(() => {
+    const input = document.getElementById('bkash-trx-input');
+    if (input) input.focus();
+  }, 100);
 }
 
+window.openMfsPaymentModal = openMfsPaymentModal;
 window.openBkashPaymentModal = (order, uddoktaConfig, payableNow, activeSplit, dueOnDelivery) => openMfsPaymentModal(order, 'bkash', payableNow, activeSplit, dueOnDelivery);
 
 function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode) {
   const trxInput = document.getElementById('bkash-trx-input');
+  const errorBox = document.getElementById('mfs-trx-error');
+  const confirmBtn = document.getElementById('mfs-confirm-btn');
+  const confirmBtnText = document.getElementById('mfs-confirm-btn-text');
+
   const trxId = trxInput ? trxInput.value.trim().toUpperCase() : '';
   const senderInput = document.getElementById('bkash-sender-input');
   const senderPhone = senderInput ? senderInput.value.trim() : '';
 
-  if (!trxId || trxId.length < 4) {
+  if (!trxId) {
+    if (trxInput) {
+      trxInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-200');
+      trxInput.focus();
+    }
+    if (errorBox) {
+      errorBox.innerHTML = `<span class="material-symbols-outlined text-base text-rose-600">error</span> <span>অনুগ্রহ করে আপনার ${providerName} Transaction ID (TrxID) লিখুন।</span>`;
+      errorBox.classList.remove('hidden');
+    }
     showToast(`⚠️ Please enter a valid ${providerName} Transaction ID (TrxID)`);
     return;
+  }
+
+  // Visual loading feedback immediately on click
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.85';
+    confirmBtn.style.pointerEvents = 'none';
+  }
+  if (confirmBtnText) {
+    confirmBtnText.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span> Verifying & Saving...';
   }
 
   const isFullPaid = splitMode === 'full' || dueAmount === 0;
   const paymentStatus = isFullPaid ? 'PAID' : 'ADVANCE_DELIVERY_PAID';
   const paymentDetails = `${providerName} TrxID: ${trxId}${senderPhone ? ' (Sender: ' + senderPhone + ')' : ''} • ${isFullPaid ? 'Full Paid' : `Advance ৳${paidAmount} paid, ৳${dueAmount} due`}`;
 
-  if (typeof DB !== 'undefined' && DB.orders) {
-    DB.orders.update(orderId, {
-      paymentMethod: providerName,
-      paymentStatus: paymentStatus,
-      status: 'PROCESSING',
-      paidAmount: paidAmount,
-      dueAmount: dueAmount,
-      trxId: trxId,
-      transactionId: trxId,
-      paymentTrxId: trxId,
-      paymentSenderPhone: senderPhone,
-      paymentRemark: paymentDetails,
-      paymentDetails: paymentDetails
-    });
-
-    const order = DB.orders.byId(orderId);
-    if (order && DB.telegram && DB.telegram.sendOrderNotification) {
-      DB.telegram.sendOrderNotification({
-        ...order,
+  try {
+    if (typeof DB !== 'undefined' && DB.orders) {
+      DB.orders.update(orderId, {
         paymentMethod: providerName,
+        paymentStatus: paymentStatus,
+        status: 'PROCESSING',
+        paidAmount: paidAmount,
+        dueAmount: dueAmount,
+        trxId: trxId,
+        transactionId: trxId,
         paymentTrxId: trxId,
         paymentSenderPhone: senderPhone,
         paymentRemark: paymentDetails,
-        paidAmount,
-        dueAmount,
-        paymentStatus: `${paymentStatus} (TrxID: ${trxId})`,
-        paymentDetails
+        paymentDetails: paymentDetails,
+        updatedAt: new Date().toISOString()
       });
+
+      const order = DB.orders.byId(orderId);
+      if (order && DB.telegram && DB.telegram.sendOrderNotification) {
+        try {
+          DB.telegram.sendOrderNotification({
+            ...order,
+            paymentMethod: providerName,
+            paymentTrxId: trxId,
+            paymentSenderPhone: senderPhone,
+            paymentRemark: paymentDetails,
+            paidAmount,
+            dueAmount,
+            paymentStatus: `${paymentStatus} (TrxID: ${trxId})`,
+            paymentDetails
+          });
+        } catch(e) { console.warn('Telegram notify error:', e); }
+      }
     }
+  } catch(err) {
+    console.error('Error updating order:', err);
   }
 
+  // Smoothly remove payment modal
   const modal = document.getElementById('bkash-payment-modal');
-  if (modal) modal.remove();
+  if (modal) {
+    modal.classList.add('opacity-0');
+    setTimeout(() => { if (modal) modal.remove(); }, 200);
+  }
 
   // Clear cart now that payment is confirmed
   appState.cart = [];
@@ -2956,7 +3021,12 @@ function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode)
     id: orderId,
     orderNumber: orderId,
     totalAmount: paidAmount + dueAmount,
-    paymentMethod: providerName
+    paidAmount: paidAmount,
+    dueAmount: dueAmount,
+    paymentMethod: providerName,
+    paymentTrxId: trxId,
+    trxId: trxId,
+    paymentStatus: paymentStatus
   };
 
   // Redirect directly to shopping page
@@ -2964,9 +3034,13 @@ function submitMfsTrxId(orderId, providerName, paidAmount, dueAmount, splitMode)
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Show celebratory success popup on shop
-  showOrderSuccessCelebration(finalOrder);
-  showToast(`🎉 ${providerName} Payment Verified! TrxID: ${trxId}`, 6000);
+  setTimeout(() => {
+    showOrderSuccessCelebration(finalOrder);
+    showToast(`🎉 ${providerName} TrxID: ${trxId} গৃহীত হয়েছে! অর্ডার কনফার্মড!`, 6000);
+  }, 250);
 }
+
+window.submitMfsTrxId = submitMfsTrxId;
 
 // Admin Management Suite Logic
 function filterAdminTable() {

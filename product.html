@@ -916,9 +916,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v6"></script>
-  <script src="admin-db.js?v=20261111_v6"></script>
-  <script src="wishlist.js?v=20261111_v6"></script>
+  <script src="firebase-sync.js?v=20261111_v7"></script>
+  <script src="admin-db.js?v=20261111_v7"></script>
+  <script src="wishlist.js?v=20261111_v7"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1459,7 +1459,7 @@
         const waText = document.getElementById('whatsapp-order-btn-text');
 
         const isStockOut = (typeof targetProduct.stock === 'number' && targetProduct.stock <= 0);
-        const isPreorder = Boolean(targetProduct.isPreorder);
+        const isPreorder = Boolean(targetProduct.isPreorder && ((typeof targetProduct.preorderPrice === 'number' && targetProduct.preorderPrice > 0) || targetProduct.preorderStatus === 'OPEN' || targetProduct.preorderStatus === 'CLOSING_SOON'));
         const currentStock = typeof targetProduct.stock === 'number' ? targetProduct.stock : 10;
 
         if (stockEl) {
@@ -2699,7 +2699,7 @@ Please confirm my order details!`;
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
                   <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${highlightedName}</h4>
-                  ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
+                  ${(p.isPreorder && ((typeof p.preorderPrice === 'number' && p.preorderPrice > 0) || p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON')) ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
                   ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">STOCK OUT</span>' : ''}
                 </div>
                 <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">

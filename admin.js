@@ -1107,7 +1107,7 @@ function renderProducts(container) {
                       ${p.isNewArrival?'<span class="badge badge-blue" style="font-size:9px">NEW</span>':''}
                       ${p.isBestSeller?'<span class="badge badge-amber" style="font-size:9px">BEST</span>':''}
                       ${p.isFeatured?'<span class="badge badge-purple" style="font-size:9px">FEAT</span>':''}
-                      ${(p.isPreorder === true || p.isPreorder === 'true')?'<span class="badge badge-purple" style="font-size:9px">PRE</span>':''}
+                      ${(p.isPreorder === true && ((typeof p.preorderPrice === 'number' && p.preorderPrice > 0) || p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON'))?'<span class="badge badge-purple" style="font-size:9px">PRE</span>':''}
                       ${p.isLimited?'<span class="badge badge-red" style="font-size:9px">LTD</span>':''}
                     </div>
                   </td>

@@ -241,48 +241,54 @@
     if (!_db) return;
     try {
       const snapshot = await _db.collection(FS_COLLECTION).get();
-      if (snapshot.empty) {
-        console.log('[ZenvySync] Firestore empty on hydration, keeping local data.');
-        return;
-      }
       let count = 0;
-      snapshot.forEach(docSnap => {
-        const key = docSnap.id;
-        const payload = docSnap.data();
-        if (payload && payload.data !== undefined) {
-          const localKey = `${DB_VERSION}_${key}`;
-          const cloudUpdatedAt = payload.updatedAt || 0;
+      if (!snapshot.empty) {
+        snapshot.forEach(docSnap => {
+          const key = docSnap.id;
+          // IMPORTANT: Do NOT hydrate products from the single legacy doc;
+          // products are exclusively hydrated from the scalable /products/ collection below!
+          if (key === 'products') return;
 
-          let finalData = payload.data;
-          const rawLocal = localStorage.getItem(localKey);
-          if (rawLocal && Array.isArray(payload.data)) {
-            try {
-              const localParsed = JSON.parse(rawLocal);
-              if (Array.isArray(localParsed)) {
-                finalData = mergeArraysById(localParsed, payload.data, key);
-                if (finalData.length > payload.data.length && _db && key !== 'products') {
-                  pushToFirestore(key, finalData);
+          const payload = docSnap.data();
+          if (payload && payload.data !== undefined) {
+            const localKey = `${DB_VERSION}_${key}`;
+            const cloudUpdatedAt = payload.updatedAt || 0;
+
+            let finalData = payload.data;
+            const rawLocal = localStorage.getItem(localKey);
+            if (rawLocal && Array.isArray(payload.data)) {
+              try {
+                const localParsed = JSON.parse(rawLocal);
+                if (Array.isArray(localParsed)) {
+                  finalData = mergeArraysById(localParsed, payload.data, key);
+                  if (finalData.length > payload.data.length && _db) {
+                    pushToFirestore(key, finalData);
+                  }
                 }
+              } catch(e) {
+                finalData = payload.data;
               }
-            } catch(e) {
-              finalData = payload.data;
             }
-          }
 
-          localStorage.setItem(localKey, JSON.stringify(finalData));
-          if (cloudUpdatedAt) {
-            localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+            localStorage.setItem(localKey, JSON.stringify(finalData));
+            if (cloudUpdatedAt) {
+              localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+            }
+            count++;
           }
-          count++;
-        }
-      });
-      console.log(`[ZenvySync] Hydrated ${count} keys from Firestore ✅`);
-      if (count > 0) {
-        try {
-          window.dispatchEvent(new Event('storage'));
-          window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'all' } }));
-        } catch(e){}
+        });
       }
+
+      // ── AUTHORITATIVE PRODUCT HYDRATION FROM /products/ COLLECTION ──
+      // Pull all individual product documents so EVERY device gets the exact same live catalog
+      await syncProductsWithCloud();
+      count++;
+
+      console.log(`[ZenvySync] Hydrated ${count} keys & full product catalog from Firestore ✅`);
+      try {
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'all' } }));
+      } catch(e){}
     } catch (e) {
       console.warn('[ZenvySync] Hydration error (using local storage):', e);
     }
@@ -292,76 +298,93 @@
   async function syncProductsWithCloud(isManual = false) {
     if (!_db) return { count: 0, uploaded: 0 };
     try {
-      // 1. Fetch individual products from /products/ collection (no 1MB document ceiling!)
+      // 1. Fetch all individual products from Firestore /products/ collection
       const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
       let cloudList = [];
       pSnap.forEach(doc => {
         const d = doc.data();
         if (d) {
           if (!d.id) d.id = doc.id;
+          // Preorder normalization: only genuine preorders with open status/price are true
+          const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
+          const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';
+          d.isPreorder = Boolean(d.isPreorder && (hasPrePrice || hasOpenStatus));
           cloudList.push(d);
         }
       });
 
-      // 2. Fallback check from legacy zenvy_store/products if /products is empty
-      if (cloudList.length === 0) {
-        try {
-          const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
-          if (legDoc.exists && Array.isArray(legDoc.data()?.data)) {
-            cloudList = legDoc.data().data;
-          }
-        } catch(e){}
+      // 2. Read deleted tracking IDs from storage so deleted products NEVER reappear
+      const deletedKey = `${DB_VERSION}_deleted_product_ids`;
+      let deletedIds = new Set();
+      try {
+        const delRaw = localStorage.getItem(deletedKey);
+        if (delRaw) deletedIds = new Set(JSON.parse(delRaw));
+      } catch(e){}
+
+      // Filter out any known deleted products from cloudList
+      if (deletedIds.size > 0) {
+        cloudList = cloudList.filter(p => !deletedIds.has(String(p.id).trim()));
       }
 
-      // 3. Read local products
+      // 3. Read local products on this device
       const localKey = `${DB_VERSION}_products`;
       let localList = [];
       try {
         const raw = localStorage.getItem(localKey);
         if (raw) localList = JSON.parse(raw);
       } catch(e){}
+      if (deletedIds.size > 0) {
+        localList = localList.filter(p => !deletedIds.has(String(p.id).trim()));
+      }
 
-      // 4. Bidirectionally merge
-      const merged = mergeArraysById(localList, cloudList, 'products');
+      // 4. Merge: cloudList is master truth.
+      // If this device created a brand-new product within the last 5 minutes that hasn't reached cloud yet, preserve it!
+      const cloudMap = new Map();
+      cloudList.forEach(p => cloudMap.set(String(p.id).trim(), p));
 
-      // 5. Update localStorage
+      const now = Date.now();
+      const freshLocalItems = localList.filter(p => {
+        if (!p || !p.id) return false;
+        const pid = String(p.id).trim();
+        if (deletedIds.has(pid)) return false;
+        if (cloudMap.has(pid)) return false;
+        const cTime = new Date(p.createdAt || 0).getTime();
+        const uTime = new Date(p.updatedAt || 0).getTime();
+        // Keep only if created or updated in this local session within the last 5 minutes
+        return (now - cTime < 300000) || (now - uTime < 300000);
+      });
+
+      const merged = [...cloudList];
+      freshLocalItems.forEach(p => merged.unshift(p));
+
+      // Sort newest first
+      merged.sort((a, b) => {
+        const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return tB - tA;
+      });
+
+      // 5. Update local storage with complete synchronized catalog
       localStorage.setItem(localKey, JSON.stringify(merged));
       localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
 
-      // 6. Ensure all products in merged are backed up in /products/{id} in Firestore
-      // (Guarantees local products from ANY admin device are permanently saved to cloud)
-      const existingCloudMap = new Map();
-      cloudList.forEach(p => existingCloudMap.set(p.id, p));
-
-      const toUpload = merged.filter(p => {
-        if (!p || !p.id) return false;
-        if (!existingCloudMap.has(p.id)) return true;
-        const c = existingCloudMap.get(p.id);
-        const lTime = new Date(p.updatedAt || p.createdAt || 0).getTime();
-        const cTime = new Date(c.updatedAt || c.createdAt || 0).getTime();
-        return lTime > cTime;
-      });
-
-      if (toUpload.length > 0) {
-        console.log(`[ZenvySync] Uploading ${toUpload.length} products to cloud /products collection...`);
-        // Batch upload in chunks of 20 to prevent timeout
-        for (let i = 0; i < toUpload.length; i += 20) {
-          const chunk = toUpload.slice(i, i + 20);
-          const batch = _db.batch();
-          chunk.forEach(p => {
-            const docRef = _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id);
-            batch.set(docRef, sanitize(p));
-          });
-          await batch.commit();
+      // 6. Upload any fresh local products to cloud /products/
+      if (freshLocalItems.length > 0) {
+        console.log(`[ZenvySync] Uploading ${freshLocalItems.length} fresh local products to cloud...`);
+        for (const p of freshLocalItems) {
+          try {
+            await _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id).set(sanitize(p));
+          } catch(err) {
+            console.warn('[ZenvySync] Upload error for product:', p.name, err);
+          }
         }
-        console.log(`[ZenvySync] Uploaded ${toUpload.length} products to cloud ✅`);
       }
 
-      // 7. Dispatch events for instant UI reactivity
+      // 7. Dispatch events for instant UI reactivity across storefront and admin
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
 
-      return { count: merged.length, uploaded: toUpload.length };
+      return { count: merged.length, uploaded: freshLocalItems.length };
     } catch(err) {
       console.warn('[ZenvySync] syncProductsWithCloud notice:', err);
       return { count: 0, uploaded: 0, error: err };
@@ -370,24 +393,111 @@
 
   async function saveProductToCloud(p) {
     if (!p || !p.id) return;
-    p.isPreorder = Boolean(p.isPreorder);
+    const pid = String(p.id).trim();
+
+    // Remove from deleted tracker if re-creating
+    const deletedKey = `${DB_VERSION}_deleted_product_ids`;
+    try {
+      const delRaw = localStorage.getItem(deletedKey);
+      if (delRaw) {
+        const delSet = new Set(JSON.parse(delRaw));
+        if (delSet.has(pid)) {
+          delSet.delete(pid);
+          localStorage.setItem(deletedKey, JSON.stringify(Array.from(delSet)));
+        }
+      }
+    } catch(e){}
+
+    const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+    const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+    p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
+
+    // 1. Update local storage immediately
+    const localKey = `${DB_VERSION}_products`;
+    try {
+      let prods = JSON.parse(localStorage.getItem(localKey) || '[]');
+      const idx = prods.findIndex(x => String(x.id).trim() === pid);
+      if (idx >= 0) prods[idx] = p; else prods.unshift(p);
+      localStorage.setItem(localKey, JSON.stringify(prods));
+      localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+    } catch(e){}
+
+    // 2. Upload to Firestore /products/{pid}
     if (_db) {
       try {
-        await _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id).set(sanitize(p));
-        console.log('[ZenvySync] Saved product to cloud /products:', p.name, p.id);
+        await _db.collection(FS_PRODUCTS_COLLECTION).doc(pid).set(sanitize(p));
+        console.log('[ZenvySync] Saved product to cloud /products:', p.name, pid);
       } catch(e) {
         console.warn('[ZenvySync] Cloud product save failed:', e);
       }
+
+      // Keep legacy summary doc in sync (lightweight)
+      try {
+        const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
+        let legList = (legDoc.exists && Array.isArray(legDoc.data()?.data)) ? legDoc.data().data : [];
+        const lIdx = legList.findIndex(x => String(x.id).trim() === pid);
+        const pSummary = { ...p };
+        // Prune heavy image for summary
+        if (typeof pSummary.image === 'string' && pSummary.image.startsWith('data:image') && pSummary.image.length > 500) {
+          pSummary.image = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+        }
+        if (lIdx >= 0) legList[lIdx] = pSummary; else legList.unshift(pSummary);
+        await _db.collection(FS_COLLECTION).doc('products').set({ data: sanitize(legList), updatedAt: Date.now() });
+      } catch(e){}
     }
+
+    // 3. Broadcast to all open views & tabs
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
   }
 
   async function deleteProductFromCloud(id) {
     if (!id) return;
+    const strId = String(id).trim();
+
+    // 1. Add to permanent deleted tracking set
+    const deletedKey = `${DB_VERSION}_deleted_product_ids`;
+    try {
+      let delSet = new Set();
+      const delRaw = localStorage.getItem(deletedKey);
+      if (delRaw) delSet = new Set(JSON.parse(delRaw));
+      delSet.add(strId);
+      localStorage.setItem(deletedKey, JSON.stringify(Array.from(delSet)));
+    } catch(e){}
+
+    // 2. Remove immediately from local products array
+    const localKey = `${DB_VERSION}_products`;
+    try {
+      let prods = JSON.parse(localStorage.getItem(localKey) || '[]');
+      prods = prods.filter(p => String(p.id).trim() !== strId);
+      localStorage.setItem(localKey, JSON.stringify(prods));
+      localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+    } catch(e){}
+
+    // 3. Delete from Firestore /products/{strId}
     if (_db) {
       try {
-        await _db.collection(FS_PRODUCTS_COLLECTION).doc(id).delete();
-        console.log('[ZenvySync] Deleted product from cloud /products:', id);
+        await _db.collection(FS_PRODUCTS_COLLECTION).doc(strId).delete();
+        console.log('[ZenvySync] Deleted product from cloud /products:', strId);
       } catch(e) {
+        console.warn('[ZenvySync] Cloud product delete error:', e);
+      }
+
+      // 4. Delete from legacy zenvy_store/products doc so it NEVER comes back!
+      try {
+        const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
+        if (legDoc.exists && Array.isArray(legDoc.data()?.data)) {
+          const legList = legDoc.data().data.filter(p => String(p.id).trim() !== strId);
+          await _db.collection(FS_COLLECTION).doc('products').set({ data: sanitize(legList), updatedAt: Date.now() });
+          console.log('[ZenvySync] Cleaned legacy products document ✅');
+        }
+      } catch(e){}
+    }
+
+    // 5. Broadcast deletion to all open views & tabs
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+  }
         console.warn('[ZenvySync] Cloud product delete failed:', e);
       }
     }

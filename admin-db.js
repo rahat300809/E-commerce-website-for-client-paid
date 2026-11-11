@@ -2715,10 +2715,28 @@ const DB = {
   }
 };
 
-// ── Safe Init (NEVER clears or auto-seeds products) ──
-if (Store.get('products') === null) {
-  Store.set('products', []);
-}
+// ── Safe Init & Catalog Preorder Sanity Self-Heal ──
+try {
+  let existingProds = Store.get('products');
+  if (existingProds === null) {
+    Store.set('products', []);
+  } else if (Array.isArray(existingProds) && existingProds.length > 0) {
+    let touched = false;
+    existingProds.forEach(p => {
+      if (p && p.isPreorder) {
+        const hasPrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+        const isOpen = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+        if (!hasPrice && !isOpen) {
+          p.isPreorder = false;
+          touched = true;
+        }
+      }
+    });
+    if (touched) {
+      localStorage.setItem(`${DB_VERSION}_products`, JSON.stringify(existingProds));
+    }
+  }
+} catch(e){}
 
 // Expose globally on window for all views, modals, and integrations
 if (typeof window !== 'undefined') {

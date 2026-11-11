@@ -525,11 +525,14 @@ function syncHomepageContent() {
         sliderEl.innerHTML = published.map(p => {
           const imgUrl = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80');
           const priceDisplay = formatMoney(p.salePrice || p.basePrice || 1450);
+          const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+          const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+          const isPreorderItem = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
           return `
             <div class="min-w-[240px] sm:min-w-[270px] flex-shrink-0 group">
               <div class="bg-[#f5f5f7] rounded-2xl p-4 sm:p-5 mb-3 relative h-[260px] sm:h-[300px] flex items-center justify-center overflow-hidden cursor-pointer"
                    onclick="window.location.href='product.html?id=${p.id}'">
-                ${p.isPreorder ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
+                ${isPreorderItem ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
                 <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10" aria-label="Wishlist">
                   <span class="material-symbols-outlined text-[16px]">favorite</span>
                 </button>
@@ -2094,8 +2097,11 @@ function renderShopProducts() {
     const priceFormatted = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origFormatted = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
     const isOutOfStock = (typeof p.stock === 'number' && p.stock <= 0);
-    const badgeText = p.isPreorder ? 'PRE-ORDER' : (isOutOfStock ? 'STOCK OUT' : (p.compareAt ? 'SALE' : ''));
-    const badgeClass = p.isPreorder ? 'bg-purple-600 text-white' : (isOutOfStock ? 'bg-red-600 text-white' : 'bg-red-50 text-red-600 border border-red-200');
+    const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+    const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+    const isPreorderItem = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
+    const badgeText = isPreorderItem ? 'PRE-ORDER' : (isOutOfStock ? 'STOCK OUT' : (p.compareAt ? 'SALE' : ''));
+    const badgeClass = isPreorderItem ? 'bg-purple-600 text-white' : (isOutOfStock ? 'bg-red-600 text-white' : 'bg-red-50 text-red-600 border border-red-200');
 
     return `
       <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-150 sm:border-gray-100 shadow-2xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between w-full max-w-full"
@@ -2327,7 +2333,7 @@ function renderProductSearchList(matches, q) {
           <div class="min-w-0">
             <div class="flex items-center gap-2">
               <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${highlightedName}</h4>
-              ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
+              ${(p.isPreorder && ((p.preorderPrice && p.preorderPrice > 0) || p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON')) ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
               ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">STOCK OUT</span>' : ''}
             </div>
             <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">

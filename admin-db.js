@@ -856,9 +856,11 @@ const DB = {
     create(data) {
       const items = Store.get('products') || [];
       const isPub = data.isPublished !== undefined ? Boolean(data.isPublished) : (data.status === 'draft' ? false : true);
+      const isPre = data.isPreorder !== undefined ? Boolean(data.isPreorder) : false;
       const item = {
         id: data.id || ('prod_' + Store.genId()),
         ...data,
+        isPreorder: isPre,
         isPublished: isPub,
         status: isPub ? 'published' : 'draft',
         isArchived: false,
@@ -874,6 +876,9 @@ const DB = {
       }
       items.unshift(item); // Latest product placed at the top of the catalog
       Store.set('products', items);
+      if (window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
+        window.ZenvyFirebase.saveProduct(item);
+      }
       DB.log(`Product created: ${item.name}`);
       if (DB.inventory && typeof DB.inventory.addHistory === 'function') {
         DB.inventory.addHistory({ productId: item.id, productName: item.name, change: item.stock || 0, newStock: item.stock || 0, reason: 'Initial stock', admin: 'Admin' });
@@ -883,6 +888,9 @@ const DB = {
     update(id, data) {
       const old = DB.products.byId(id);
       const updates = { ...data, updatedAt: Store.now() };
+      if (updates.isPreorder !== undefined) {
+        updates.isPreorder = Boolean(updates.isPreorder);
+      }
       if (updates.isPublished !== undefined && updates.status === undefined) {
         updates.status = updates.isPublished ? 'published' : 'draft';
       } else if (updates.status !== undefined && updates.isPublished === undefined) {
@@ -909,11 +917,15 @@ const DB = {
         return p;
       });
       Store.set('products', items);
+      const resItem = updatedItem || items.find(p => String(p.id).trim().toLowerCase() === targetId);
+      if (resItem && window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
+        window.ZenvyFirebase.saveProduct(resItem);
+      }
       if (data.basePrice !== undefined && old?.basePrice !== data.basePrice && DB.priceHistory && typeof DB.priceHistory.add === 'function') {
         DB.priceHistory.add({ productId: id, productName: old?.name, oldPrice: old?.basePrice, newPrice: data.basePrice, type: 'basePrice' });
       }
       DB.log(`Product updated: ${data.name || old?.name}`);
-      return updatedItem || items.find(p => String(p.id).trim().toLowerCase() === targetId);
+      return resItem;
     },
     duplicate(id) {
       const src = DB.products.byId(id);
@@ -927,6 +939,7 @@ const DB = {
       copy.status = copy.isPublished ? 'published' : 'draft';
       copy.stock = typeof src.stock === 'number' ? src.stock : 10;
       copy.isArchived = false;
+      copy.isPreorder = false; // Duplicated products are NEVER preorders by default
       copy.createdAt = Store.now();
       copy.updatedAt = Store.now();
 
@@ -956,6 +969,9 @@ const DB = {
       const all = Store.get('products') || [];
       const remaining = all.filter(x => String(x.id).trim().toLowerCase() !== strId);
       Store.set('products', remaining);
+      if (window.ZenvyFirebase && typeof window.ZenvyFirebase.deleteProduct === 'function') {
+        window.ZenvyFirebase.deleteProduct(id);
+      }
       DB.log(`Product deleted: ${p?.name || id}`);
       return 'deleted';
     },
@@ -1014,9 +1030,11 @@ const DB = {
   sizes: {
     all() {
       let raw = Store.get('sizes');
-      // Only seed initial default standard sizes once if sizes was never initialized (null/undefined)
-      if (raw === null || raw === undefined) {
-        raw = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].map((code, i) => ({
+      const stdCodes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
+
+      // Only seed initial default standard sizes once if sizes was never initialized
+      if (raw === null || raw === undefined || (Array.isArray(raw) && raw.length === 0)) {
+        raw = stdCodes.map((code, i) => ({
           id: 'sz_' + code.toLowerCase().replace(/[^a-z0-9]/g, ''),
           code,
           name: code,
@@ -1029,21 +1047,41 @@ const DB = {
       }
       if (!Array.isArray(raw)) return [];
 
-      const list = raw.map((s, i) => {
-        if (!s) return null;
+      // STRICT DEDUPLICATION BY UPPERCASE CODE (Fixes L L, M M duplicates permanently)
+      const seen = new Map();
+      let hasDuplicates = false;
+
+      raw.forEach((s, idx) => {
+        if (!s) return;
         const code = String(s.code || s.name || '').toUpperCase().trim();
-        const id = s.id ? String(s.id).trim() : ('sz_' + (code ? code.toLowerCase().replace(/[^a-z0-9]/g, '') : Store.genId()));
-        return {
-          id,
-          code: code || 'SZ',
-          name: s.name || code || 'Size',
-          displayOrder: typeof s.displayOrder === 'number' ? s.displayOrder : i,
+        if (!code) return;
+        if (seen.has(code)) {
+          hasDuplicates = true;
+          // Prune duplicate: preserve enabled if any entry is enabled
+          const existing = seen.get(code);
+          if (s.isEnabled && !existing.isEnabled) existing.isEnabled = true;
+          return;
+        }
+        const canonicalId = 'sz_' + code.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const stdIdx = stdCodes.indexOf(code);
+        seen.set(code, {
+          id: canonicalId,
+          code,
+          name: s.name || code,
+          displayOrder: stdIdx >= 0 ? stdIdx : (typeof s.displayOrder === 'number' ? s.displayOrder : idx),
           isEnabled: s.isEnabled !== false,
           createdAt: s.createdAt || Store.now()
-        };
-      }).filter(Boolean);
+        });
+      });
 
-      return list.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+      const list = Array.from(seen.values()).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+      // Self-heal storage if duplicates or non-canonical IDs were detected
+      if (hasDuplicates || list.length !== raw.length) {
+        Store.set('sizes', list);
+      }
+
+      return list;
     },
     enabled() { 
       return DB.sizes.all().filter(s => s.isEnabled); 
@@ -1059,7 +1097,7 @@ const DB = {
     create(data) {
       const items = DB.sizes.all();
       const code = String(data.code || data.name || '').toUpperCase().trim();
-      const id = data.id ? String(data.id).trim() : ('sz_' + (code ? code.toLowerCase().replace(/[^a-z0-9]/g, '') : '') + '_' + Store.genId());
+      const id = 'sz_' + code.toLowerCase().replace(/[^a-z0-9]/g, '');
 
       // If a size with the same code already exists, update it cleanly
       const existingIdx = items.findIndex(s => s.code === code);
@@ -1067,6 +1105,7 @@ const DB = {
         items[existingIdx] = {
           ...items[existingIdx],
           ...data,
+          id,
           code,
           name: data.name?.trim() || code,
           displayOrder: typeof data.displayOrder === 'number' ? data.displayOrder : items[existingIdx].displayOrder,

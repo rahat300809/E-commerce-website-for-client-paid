@@ -23,6 +23,7 @@
 
   const DB_VERSION   = 'zenvy_v1';
   const FS_COLLECTION = 'zenvy_store';
+  const FS_PRODUCTS_COLLECTION = 'products';
 
   const SYNC_KEYS = [
     'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
@@ -36,6 +37,7 @@
 
   let _db = null;
   let _unsubscribe = null;
+  let _productsUnsubscribe = null;
   let _writeQueue = {};
   let _writeTimer = null;
   let _listeners = [];
@@ -68,6 +70,10 @@
         // Automatically hydrate from cloud so other devices immediately get data
         hydrate().then(() => {
           console.log('[ZenvySync] Initial cloud hydration finished ✅');
+          // Automatically sync products from dedicated /products/ collection
+          syncProductsWithCloud().then(() => {
+            console.log('[ZenvySync] Cloud product catalog ready ✅');
+          });
         });
       });
 
@@ -171,50 +177,56 @@
     return false;
   }
 
-  function mergeArraysById(localArr, cloudArr) {
+  function mergeArraysById(localArr, cloudArr, keyName = '') {
     if (!Array.isArray(localArr)) return Array.isArray(cloudArr) ? cloudArr.filter(i => !isDemoItem(i)) : [];
     if (!Array.isArray(cloudArr)) return localArr.filter(i => !isDemoItem(i));
 
     const map = new Map();
+
+    const getItemKey = (item) => {
+      if (!item || typeof item !== 'object') return String(item);
+      if (keyName === 'sizes') {
+        const c = String(item.code || item.name || '').toUpperCase().trim();
+        if (c) return `sz_${c}`;
+      }
+      return item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null) || JSON.stringify(item);
+    };
+
     // 1. Seed with cloud items as baseline (excluding any demo data)
     cloudArr.forEach(item => {
       if (isDemoItem(item)) return;
-      if (item && typeof item === 'object') {
-        const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
-        map.set(key ? String(key) : JSON.stringify(item), item);
-      } else {
-        map.set(String(item), item);
-      }
+      const mapKey = getItemKey(item);
+      map.set(mapKey, item);
     });
 
     // 2. Intelligently merge local items (preserve all user creations & newer edits)
     localArr.forEach(item => {
       if (isDemoItem(item)) return;
-      if (item && typeof item === 'object') {
-        const key = item.id || item.email || item.code || (item.orderNumber ? `ord_${item.orderNumber}` : null);
-        const mapKey = key ? String(key) : JSON.stringify(item);
-        if (map.has(mapKey)) {
-          const cloudItem = map.get(mapKey);
-          const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
-          const cloudTime = new Date(cloudItem.updatedAt || cloudItem.createdAt || 0).getTime();
-          if (localTime >= cloudTime) {
-            map.set(mapKey, item);
-          }
-        } else {
-          // Local item was created locally and has not yet synced to cloud:
-          // ALWAYS PRESERVE IT! Never drop user-created products or items!
+      const mapKey = getItemKey(item);
+      if (map.has(mapKey)) {
+        const cloudItem = map.get(mapKey);
+        const localTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+        const cloudTime = new Date(cloudItem.updatedAt || cloudItem.createdAt || 0).getTime();
+        if (localTime >= cloudTime) {
           map.set(mapKey, item);
         }
       } else {
-        if (!map.has(String(item))) {
-          map.set(String(item), item);
-        }
+        // Local item was created locally and has not yet synced to cloud:
+        // ALWAYS PRESERVE IT! Never drop user-created products or items!
+        map.set(mapKey, item);
       }
     });
 
     const res = Array.from(map.values());
-    // Auto-sort items with createdAt newest first
-    if (res.length > 0 && res[0] && typeof res[0] === 'object' && ('createdAt' in res[0])) {
+    if (keyName === 'sizes') {
+      const stdOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
+      res.sort((a, b) => {
+        const iA = stdOrder.indexOf((a.code || '').toUpperCase());
+        const iB = stdOrder.indexOf((b.code || '').toUpperCase());
+        if (iA >= 0 && iB >= 0) return iA - iB;
+        return (a.displayOrder || 0) - (b.displayOrder || 0);
+      });
+    } else if (res.length > 0 && res[0] && typeof res[0] === 'object' && ('createdAt' in res[0])) {
       res.sort((a, b) => {
         const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -247,8 +259,8 @@
             try {
               const localParsed = JSON.parse(rawLocal);
               if (Array.isArray(localParsed)) {
-                finalData = mergeArraysById(localParsed, payload.data);
-                if (finalData.length > payload.data.length && _db) {
+                finalData = mergeArraysById(localParsed, payload.data, key);
+                if (finalData.length > payload.data.length && _db && key !== 'products') {
                   pushToFirestore(key, finalData);
                 }
               }
@@ -276,58 +288,220 @@
     }
   }
 
+  // ── Dedicated Real-time Cloud Sync for Products Collection ─────
+  async function syncProductsWithCloud(isManual = false) {
+    if (!_db) return { count: 0, uploaded: 0 };
+    try {
+      // 1. Fetch individual products from /products/ collection (no 1MB document ceiling!)
+      const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
+      let cloudList = [];
+      pSnap.forEach(doc => {
+        const d = doc.data();
+        if (d) {
+          if (!d.id) d.id = doc.id;
+          cloudList.push(d);
+        }
+      });
+
+      // 2. Fallback check from legacy zenvy_store/products if /products is empty
+      if (cloudList.length === 0) {
+        try {
+          const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
+          if (legDoc.exists && Array.isArray(legDoc.data()?.data)) {
+            cloudList = legDoc.data().data;
+          }
+        } catch(e){}
+      }
+
+      // 3. Read local products
+      const localKey = `${DB_VERSION}_products`;
+      let localList = [];
+      try {
+        const raw = localStorage.getItem(localKey);
+        if (raw) localList = JSON.parse(raw);
+      } catch(e){}
+
+      // 4. Bidirectionally merge
+      const merged = mergeArraysById(localList, cloudList, 'products');
+
+      // 5. Update localStorage
+      localStorage.setItem(localKey, JSON.stringify(merged));
+      localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+
+      // 6. Ensure all products in merged are backed up in /products/{id} in Firestore
+      // (Guarantees local products from ANY admin device are permanently saved to cloud)
+      const existingCloudMap = new Map();
+      cloudList.forEach(p => existingCloudMap.set(p.id, p));
+
+      const toUpload = merged.filter(p => {
+        if (!p || !p.id) return false;
+        if (!existingCloudMap.has(p.id)) return true;
+        const c = existingCloudMap.get(p.id);
+        const lTime = new Date(p.updatedAt || p.createdAt || 0).getTime();
+        const cTime = new Date(c.updatedAt || c.createdAt || 0).getTime();
+        return lTime > cTime;
+      });
+
+      if (toUpload.length > 0) {
+        console.log(`[ZenvySync] Uploading ${toUpload.length} products to cloud /products collection...`);
+        // Batch upload in chunks of 20 to prevent timeout
+        for (let i = 0; i < toUpload.length; i += 20) {
+          const chunk = toUpload.slice(i, i + 20);
+          const batch = _db.batch();
+          chunk.forEach(p => {
+            const docRef = _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id);
+            batch.set(docRef, sanitize(p));
+          });
+          await batch.commit();
+        }
+        console.log(`[ZenvySync] Uploaded ${toUpload.length} products to cloud ✅`);
+      }
+
+      // 7. Dispatch events for instant UI reactivity
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+
+      return { count: merged.length, uploaded: toUpload.length };
+    } catch(err) {
+      console.warn('[ZenvySync] syncProductsWithCloud notice:', err);
+      return { count: 0, uploaded: 0, error: err };
+    }
+  }
+
+  async function saveProductToCloud(p) {
+    if (!p || !p.id) return;
+    p.isPreorder = Boolean(p.isPreorder);
+    if (_db) {
+      try {
+        await _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id).set(sanitize(p));
+        console.log('[ZenvySync] Saved product to cloud /products:', p.name, p.id);
+      } catch(e) {
+        console.warn('[ZenvySync] Cloud product save failed:', e);
+      }
+    }
+  }
+
+  async function deleteProductFromCloud(id) {
+    if (!id) return;
+    if (_db) {
+      try {
+        await _db.collection(FS_PRODUCTS_COLLECTION).doc(id).delete();
+        console.log('[ZenvySync] Deleted product from cloud /products:', id);
+      } catch(e) {
+        console.warn('[ZenvySync] Cloud product delete failed:', e);
+      }
+    }
+  }
+
   // ── Real-time listener — updates local storage & triggers UI ───
   function startLiveSync(onUpdate) {
     if (typeof onUpdate === 'function' && !_listeners.includes(onUpdate)) {
       _listeners.push(onUpdate);
     }
     if (!_db) return;
-    if (_unsubscribe) return; // Already listening
 
-    _unsubscribe = _db.collection(FS_COLLECTION).onSnapshot(snapshot => {
-      let changed = false;
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added' || change.type === 'modified') {
-          const key = change.doc.id;
-          const payload = change.doc.data();
-          if (payload && payload.data !== undefined) {
-            const localKey = `${DB_VERSION}_${key}`;
-            const cloudUpdatedAt = payload.updatedAt || 0;
-            const existingStr = localStorage.getItem(localKey);
+    // 1. General store settings listener
+    if (!_unsubscribe) {
+      _unsubscribe = _db.collection(FS_COLLECTION).onSnapshot(snapshot => {
+        let changed = false;
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added' || change.type === 'modified') {
+            const key = change.doc.id;
+            if (key === 'products') return; // Handled by dedicated products collection listener
+            const payload = change.doc.data();
+            if (payload && payload.data !== undefined) {
+              const localKey = `${DB_VERSION}_${key}`;
+              const cloudUpdatedAt = payload.updatedAt || 0;
+              const existingStr = localStorage.getItem(localKey);
 
-            let finalData = payload.data;
-            if (existingStr && Array.isArray(payload.data)) {
-              try {
-                const existingParsed = JSON.parse(existingStr);
-                if (Array.isArray(existingParsed)) {
-                  finalData = mergeArraysById(existingParsed, payload.data);
-                  if (finalData.length > payload.data.length && _db) {
-                    pushToFirestore(key, finalData);
+              let finalData = payload.data;
+              if (existingStr && Array.isArray(payload.data)) {
+                try {
+                  const existingParsed = JSON.parse(existingStr);
+                  if (Array.isArray(existingParsed)) {
+                    finalData = mergeArraysById(existingParsed, payload.data, key);
+                    if (finalData.length > payload.data.length && _db) {
+                      pushToFirestore(key, finalData);
+                    }
                   }
+                } catch(e) {
+                  finalData = payload.data;
                 }
-              } catch(e) {
-                finalData = payload.data;
+              }
+
+              const incomingStr = JSON.stringify(finalData);
+              if (existingStr !== incomingStr) {
+                localStorage.setItem(localKey, incomingStr);
+                if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                changed = true;
               }
             }
+          }
+        });
+        if (changed) {
+          console.log('[ZenvySync] Live change received from cloud 🔄');
+          _listeners.forEach(cb => {
+            try { cb(); } catch(err){ console.error(err); }
+          });
+        }
+      }, err => {
+        console.warn('[ZenvySync] Live sync listener warning:', err);
+      });
+    }
 
-            const incomingStr = JSON.stringify(finalData);
-            if (existingStr !== incomingStr) {
-              localStorage.setItem(localKey, incomingStr);
-              if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
-              changed = true;
+    // 2. Dedicated Real-Time Products Listener across all devices
+    if (!_productsUnsubscribe) {
+      _productsUnsubscribe = _db.collection(FS_PRODUCTS_COLLECTION).onSnapshot(snapshot => {
+        let changed = false;
+        const localKey = `${DB_VERSION}_products`;
+        let prods = [];
+        try { prods = JSON.parse(localStorage.getItem(localKey) || '[]'); } catch(e){}
+
+        snapshot.docChanges().forEach(change => {
+          const d = change.doc.data();
+          const id = change.doc.id;
+          if (change.type === 'removed') {
+            const prevLen = prods.length;
+            prods = prods.filter(p => p.id !== id);
+            if (prods.length !== prevLen) changed = true;
+          } else if (change.type === 'added' || change.type === 'modified') {
+            if (d) {
+              if (!d.id) d.id = id;
+              d.isPreorder = Boolean(d.isPreorder);
+              const idx = prods.findIndex(p => p.id === id);
+              if (idx >= 0) {
+                const prev = JSON.stringify(prods[idx]);
+                const next = JSON.stringify(d);
+                if (prev !== next) {
+                  prods[idx] = d;
+                  changed = true;
+                }
+              } else {
+                prods.unshift(d);
+                changed = true;
+              }
             }
           }
-        }
-      });
-      if (changed) {
-        console.log('[ZenvySync] Live change received from cloud 🔄');
-        _listeners.forEach(cb => {
-          try { cb(); } catch(err){ console.error(err); }
         });
-      }
-    }, err => {
-      console.warn('[ZenvySync] Live sync listener warning:', err);
-    });
+
+        if (changed) {
+          // Sort newest first
+          prods.sort((a, b) => {
+            const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return tB - tA;
+          });
+          localStorage.setItem(localKey, JSON.stringify(prods));
+          localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+          console.log('[ZenvySync] Live product update received from server 🔄');
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+          _listeners.forEach(cb => { try { cb(); } catch(e){} });
+        }
+      }, err => {
+        console.warn('[ZenvySync] Products collection listener warning:', err);
+      });
+    }
 
     console.log('[ZenvySync] Live sync active 🔄');
   }
@@ -355,11 +529,15 @@
         pushToFirestore(key, value);
       }
     },
+    saveProduct: saveProductToCloud,
+    deleteProduct: deleteProductFromCloud,
+    syncProductsWithCloud,
     hydrate,
     startLiveSync,
     isReady() { return !!_db; },
     async forceSync() {
       await hydrate();
+      await syncProductsWithCloud(true);
       console.log('[ZenvySync] Force sync complete ✅');
     }
   };

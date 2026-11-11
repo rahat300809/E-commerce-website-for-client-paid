@@ -27,7 +27,7 @@ const Uploader = {
   },
 
   // Compress image before base64 encoding to stay well within storage quotas
-  compressImage(file, maxDimension = 1400, quality = 0.82) {
+  compressImage(file, maxDimension = 960, quality = 0.78) {
     return new Promise((resolve) => {
       if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml') {
         const reader = new FileReader();

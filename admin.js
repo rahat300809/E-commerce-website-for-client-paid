@@ -921,6 +921,44 @@ function clearAdminProductSearch() {
 }
 window.clearAdminProductSearch = clearAdminProductSearch;
 
+async function manualCloudSyncProducts() {
+  toast('🔄 Syncing products with cloud server across all devices...', 'info');
+  try {
+    if (window.ZenvyFirebase && typeof window.ZenvyFirebase.syncProductsWithCloud === 'function') {
+      const res = await window.ZenvyFirebase.syncProductsWithCloud(true);
+      const content = document.getElementById('admin-content');
+      if (content && typeof currentView !== 'undefined' && currentView === 'products') {
+        renderProducts(content);
+      }
+      toast(`✅ Cloud sync complete! ${res?.count || DB.products.all().length} products live.`, 'success');
+    } else {
+      toast('✅ Catalog refreshed.', 'success');
+    }
+  } catch(err) {
+    toast('❌ Sync notice: ' + (err.message || 'Check connection'), 'warning');
+  }
+}
+window.manualCloudSyncProducts = manualCloudSyncProducts;
+
+// Instant Live Concurrency: Re-render products when another admin saves or updates on any device
+window.addEventListener('zenvy-store-updated', (e) => {
+  if (e.detail && (e.detail.key === 'products' || e.detail.key === 'all')) {
+    if (typeof currentView !== 'undefined' && currentView === 'products') {
+      const isModalOpen = !document.getElementById('generic-modal')?.classList.contains('hidden') ||
+                          !document.getElementById('confirm-modal')?.classList.contains('hidden');
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+      if (!isModalOpen && !isTyping) {
+        const content = document.getElementById('admin-content');
+        if (content) {
+          renderProducts(content);
+          showLiveSyncPill('🔄 Products synced from server');
+        }
+      }
+    }
+  }
+});
+
 function renderProducts(container) {
   const cats = DB.categories.all();
   let items = DB.products.all().filter(p => !p.isArchived);
@@ -974,6 +1012,9 @@ function renderProducts(container) {
             </button>
           ` : '';
         })()}
+        <button class="btn btn-secondary btn-sm" onclick="manualCloudSyncProducts()" title="Resync and merge all products across devices from cloud server" style="display:inline-flex;align-items:center;gap:4px;">
+          <span class="material-symbols-outlined" style="font-size:16px;">cloud_sync</span> Server Cloud Sync
+        </button>
         <button class="btn btn-secondary btn-sm" onclick="exportProductsCSV()">
           <span class="material-symbols-outlined">download</span> Export
         </button>
@@ -1066,7 +1107,7 @@ function renderProducts(container) {
                       ${p.isNewArrival?'<span class="badge badge-blue" style="font-size:9px">NEW</span>':''}
                       ${p.isBestSeller?'<span class="badge badge-amber" style="font-size:9px">BEST</span>':''}
                       ${p.isFeatured?'<span class="badge badge-purple" style="font-size:9px">FEAT</span>':''}
-                      ${p.isPreorder?'<span class="badge badge-purple" style="font-size:9px">PRE</span>':''}
+                      ${(p.isPreorder === true || p.isPreorder === 'true')?'<span class="badge badge-purple" style="font-size:9px">PRE</span>':''}
                       ${p.isLimited?'<span class="badge badge-red" style="font-size:9px">LTD</span>':''}
                     </div>
                   </td>
@@ -1318,7 +1359,14 @@ function openProductForm(id = null) {
   const collections = DB.collections.all();
   const patches = DB.patches.all().filter(p => p.isEnabled !== false);
   const sleeves = DB.sleeves.all().filter(s => s.isEnabled !== false);
-  const sizes = DB.sizes.all().filter(s => s.isEnabled !== false);
+  // Defensive deduplication of sizes by uppercase code
+  const rawSizes = DB.sizes.all().filter(s => s.isEnabled !== false);
+  const sizeMap = new Map();
+  rawSizes.forEach(s => {
+    const c = String(s.code || s.name || '').toUpperCase().trim();
+    if (c && !sizeMap.has(c)) sizeMap.set(c, s);
+  });
+  const sizes = Array.from(sizeMap.values());
   const cs = DB.customizationSettings.get();
   const isEdit = !!product;
 
@@ -1411,7 +1459,7 @@ function openProductForm(id = null) {
         <div class="form-group">
           <label class="form-label">Badges</label>
           <div class="checkbox-group">
-            ${[['isNewArrival','NEW'],['isBestSeller','BEST SELLER'],['isFeatured','FEATURED'],['isLimited','LIMITED'],['isPreorder','PREORDER']].map(([field,label]) => `
+            ${[['isNewArrival','NEW'],['isBestSeller','BEST SELLER'],['isFeatured','FEATURED'],['isLimited','LIMITED']].map(([field,label]) => `
               <label class="checkbox-chip ${product?.[field]?'selected':''}">
                 <input type="checkbox" name="${field}" ${product?.[field]?'checked':''} onchange="this.closest('.checkbox-chip').classList.toggle('selected',this.checked)"/>
                 ${label}
@@ -1819,7 +1867,7 @@ function openProductForm(id = null) {
             <tbody>
               ${(() => {
                 const avail = DB.sizes.enabled();
-                const codes = avail.length > 0 ? avail.map(s => s.code) : ['S','M','L','XL','XXL'];
+                const codes = Array.from(new Set((avail.length > 0 ? avail.map(s => s.code) : ['S','M','L','XL','XXL']).map(c => String(c).toUpperCase().trim())));
                 return codes.map(s => {
                   const map = product?.sizeMapping?.[s] || (s==='S'?{height:26,width:36}:s==='M'?{height:27,width:38}:s==='L'?{height:28,width:40}:s==='XL'?{height:29,width:42}:s==='XXL'?{height:30,width:44}:{height:31,width:46});
                   return `
@@ -2076,7 +2124,7 @@ function saveProduct(e, id, asDraft = false) {
     isBestSeller: fd.get('isBestSeller') === 'on',
     isFeatured: fd.get('isFeatured') === 'on',
     isLimited: fd.get('isLimited') === 'on',
-    isPreorder: fd.get('isPreorder') === 'on',
+    isPreorder: Boolean(document.getElementById('preorder-toggle')?.checked),
     customBadge: get('customBadge'),
     isPublished: asDraft ? false : (get('productStatus') ? get('productStatus') === 'published' : true),
     status: (asDraft || get('productStatus') === 'draft') ? 'draft' : 'published',
@@ -2091,13 +2139,13 @@ function saveProduct(e, id, asDraft = false) {
     assignedSizes,
     images,
     image: (images && images[0]?.url) ? images[0].url : (typeof images[0] === 'string' ? images[0] : ''),
-    preorderPrice: parseFloat(get('preorderPrice')) || null,
-    preorderCapacity: parseInt(get('preorderCapacity')) || 100,
+    preorderPrice: (document.getElementById('preorder-toggle')?.checked) ? (parseFloat(get('preorderPrice')) || null) : null,
+    preorderCapacity: (document.getElementById('preorder-toggle')?.checked) ? (parseInt(get('preorderCapacity')) || 100) : 100,
     preorderSold: id ? DB.products.byId(id)?.preorderSold || 0 : 0,
-    expectedArrival: get('expectedArrival') || null,
-    expectedDelivery: get('expectedDelivery') || null,
-    preorderCloseDate: get('preorderCloseDate') || null,
-    preorderStatus: get('preorderStatus') || 'OPEN',
+    expectedArrival: (document.getElementById('preorder-toggle')?.checked) ? (get('expectedArrival') || null) : null,
+    expectedDelivery: (document.getElementById('preorder-toggle')?.checked) ? (get('expectedDelivery') || null) : null,
+    preorderCloseDate: (document.getElementById('preorder-toggle')?.checked) ? (get('preorderCloseDate') || null) : null,
+    preorderStatus: (document.getElementById('preorder-toggle')?.checked) ? (get('preorderStatus') || 'OPEN') : 'OPEN',
     preorderDesc: get('preorderDesc'),
     advancePaymentMode: get('advancePaymentMode') || 'default',
     hasCustomDelivery: fd.get('hasCustomDelivery') === 'on',
@@ -3086,7 +3134,13 @@ function saveSleeve(id) {
 
 // ── SIZES & SIZE CHART ──
 function renderSizes(container) {
-  const sizes = DB.sizes.all();
+  const rawSizes = DB.sizes.all();
+  const sizeMap = new Map();
+  rawSizes.forEach(s => {
+    const c = String(s.code || s.name || '').toUpperCase().trim();
+    if (c && !sizeMap.has(c)) sizeMap.set(c, s);
+  });
+  const sizes = Array.from(sizeMap.values());
   const currentChartUrl = DB.sizes.getSizeChart();
 
   container.innerHTML = `
@@ -7801,6 +7855,7 @@ Object.assign(window, {
   exportInventoryCSV,
   exportPreordersCSV,
   exportProductsCSV,
+  manualCloudSyncProducts,
   handleLogout,
   handleRemoveAdmin,
   inlineAddCategory,

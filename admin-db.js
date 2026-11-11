@@ -8,6 +8,20 @@
 
 const DB_VERSION = 'zenvy_v1';
 
+// Global Universal HTML Escaper (Prevents ReferenceError across all views)
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+if (typeof window !== 'undefined') {
+  window.escapeHtml = escapeHtml;
+}
+
 // ──────────────────────────────────────────────────────────
 // Core Storage Engine
 // ──────────────────────────────────────────────────────────

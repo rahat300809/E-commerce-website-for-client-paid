@@ -4,6 +4,17 @@
 
 'use strict';
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+if (typeof window !== 'undefined') window.escapeHtml = escapeHtml;
+
 // ──────────────────────────────────────────────────────────────
 // App State
 // ──────────────────────────────────────────────────────────────
@@ -935,7 +946,7 @@ function renderProducts(container) {
 
   const total = items.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const page = Math.min(productPage, totalPages || 1);
+  const page = Math.max(1, Math.min(productPage || 1, totalPages || 1));
   const paged = items.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
 
   container.innerHTML = `
@@ -966,7 +977,7 @@ function renderProducts(container) {
 
     <div class="filter-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       <div style="display:flex;align-items:center;gap:6px;">
-        <input type="text" id="admin-prod-search-input" class="form-input" placeholder="Search products, SKU…" value="${escapeHtml(productSearch)}"
+        <input type="text" id="admin-prod-search-input" class="form-input" placeholder="Search products, SKU…" value="${(typeof escapeHtml === 'function' ? escapeHtml(productSearch) : (productSearch || '')).replace(/"/g, '&quot;')}"
           oninput="handleAdminProductSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();executeAdminProductSearch(this.value);}" style="max-width:220px;"/>
         <button type="button" class="btn btn-secondary btn-sm" onclick="executeAdminProductSearch(document.getElementById('admin-prod-search-input').value)" style="display:inline-flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">search</span> Search
@@ -1019,9 +1030,14 @@ function renderProducts(container) {
                   <td><input type="checkbox" ${selectedProducts.has(p.id)?'checked':''} onchange="toggleSelectProduct('${p.id}',this.checked)"/></td>
                   <td>
                     <div style="display:flex;align-items:center;gap:10px;">
-                      ${p.images?.[0]?.url
-                        ? `<img src="${p.images[0].url}" class="prod-thumb" alt="${p.name}"/>`
-                        : `<div class="prod-thumb-placeholder"><span class="material-symbols-outlined" style="font-size:18px">image</span></div>`}
+                      ${(() => {
+                        const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+                          ? DB.products.getImage(p)
+                          : (p.images?.[0]?.url || p.images?.[0] || p.image || '');
+                        return img
+                          ? `<img src="${img}" class="prod-thumb" alt="${p.name}" onerror="this.style.display='none'"/>`
+                          : `<div class="prod-thumb-placeholder"><span class="material-symbols-outlined" style="font-size:18px">image</span></div>`;
+                      })()}
                       <div><div style="font-weight:600;font-size:13px">${p.name}</div><div style="font-size:11px;color:#9CA3AF">${p.slug||''}</div></div>
                     </div>
                   </td>

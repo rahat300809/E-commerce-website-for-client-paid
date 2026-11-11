@@ -917,9 +917,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v15"></script>
-  <script src="admin-db.js?v=20261111_v15"></script>
-  <script src="wishlist.js?v=20261111_v15"></script>
+  <script src="firebase-sync.js?v=20261111_v17"></script>
+  <script src="admin-db.js?v=20261111_v17"></script>
+  <script src="wishlist.js?v=20261111_v17"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1368,20 +1368,20 @@
       } catch (e) {}
 
       // 3. Dynamic customization settings from Admin DB
+      const hasCustomPrinting = (
+        targetProduct.customNameNumber === true ||
+        targetProduct.customName === true ||
+        targetProduct.customNumber === true ||
+        targetProduct.customLogo === true ||
+        targetProduct.customText === true ||
+        (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined && !targetProduct.hasOwnProperty('customNameNumber'))
+      );
+
       try {
         let cs = {};
         if (typeof DB !== 'undefined' && DB.customizationSettings) {
           cs = DB.customizationSettings.get() || {};
         }
-
-        const hasCustomPrinting = (
-          targetProduct.customNameNumber === true ||
-          targetProduct.customName === true ||
-          targetProduct.customNumber === true ||
-          targetProduct.customLogo === true ||
-          targetProduct.customText === true ||
-          (targetProduct.customNameNumber === undefined && targetProduct.customName === undefined && !targetProduct.hasOwnProperty('customNameNumber'))
-        );
 
         const customSection = document.getElementById('custom-print-section');
         if (customSection) {
@@ -1521,24 +1521,20 @@
         console.warn('WhatsApp button setup error:', e);
       }
 
-      // Stock status, Stock count & Stock Out handling
+      // Stock status & Stock Out handling
       const stockEl = document.getElementById('pd-stock-tag');
       const isStockOut = (typeof targetProduct.stock === 'number' && targetProduct.stock <= 0);
       const isPreorder = Boolean(targetProduct.isPreorder && ((typeof targetProduct.preorderPrice === 'number' && targetProduct.preorderPrice > 0) || targetProduct.preorderStatus === 'OPEN' || targetProduct.preorderStatus === 'CLOSING_SOON'));
-      const currentStock = typeof targetProduct.stock === 'number' ? targetProduct.stock : 10;
 
       if (stockEl) {
         if (isStockOut) {
-          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>STOCK OUT (Out of Stock)</span>`;
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>STOCK OUT</span>`;
           stockEl.className = 'font-bold';
         } else if (isPreorder) {
           stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span>PRE-ORDER</span>`;
           stockEl.className = 'font-bold';
-        } else if (currentStock <= 5) {
-          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>LOW STOCK • Only ${currentStock} left in stock!</span>`;
-          stockEl.className = 'font-bold';
         } else {
-          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IN STOCK (${currentStock} available)</span>`;
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IN STOCK</span>`;
           stockEl.className = 'font-bold';
         }
       }
@@ -2111,24 +2107,17 @@
       select.innerHTML = unique.map(code => {
         const hasStock = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, code) : (curSizeStocks && curSizeStocks[code] !== undefined);
         const qty = hasStock ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, code, productState.product?.stock) : parseInt(curSizeStocks[code])) : null;
-        let suffix = '';
-        if (qty === 0) {
-          suffix = ' — ⚠️ Stock Out (0 left)';
-        } else if (qty !== null && qty <= 3) {
-          suffix = ` — Only ${qty} left!`;
-        } else if (qty !== null) {
-          suffix = ` (${qty} pcs)`;
-        }
-        return `<option value="${code}" ${code === current ? 'selected' : ''} ${qty === 0 ? 'data-out="1"' : ''}>${code}${suffix}</option>`;
+        const isOut = (qty === 0);
+        return `<option value="${code}" ${code === current ? 'selected' : ''} ${isOut ? 'data-out="1"' : ''}>${code}</option>`;
       }).join('');
 
       select.value = current;
-      checkSelectedSizeStockState();
+      checkSelectedSizeStockState(false);
     }
 
-    function checkSelectedSizeStockState() {
+    function checkSelectedSizeStockState(triggerPopup = false) {
       const p = productState.product;
-      if (!p) return;
+      if (!p) return false;
       const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
       const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : null;
       
@@ -2173,7 +2162,7 @@
           notifyAdminBtn.classList.remove('hidden');
           notifyAdminBtn.classList.add('flex');
           const span = notifyAdminBtn.querySelector('span:last-child');
-          if (span) span.textContent = `Request Restock for Size ${selSize} (স্টক রিকোয়েস্ট)`;
+          if (span) span.textContent = `Notify Admin / Request Restock (স্টক রিকোয়েস্ট)`;
         }
         if (mobileAddCartBtn) mobileAddCartBtn.style.display = 'none';
         if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = 'none';
@@ -2181,15 +2170,15 @@
           mobileNotifyAdminBtn.classList.remove('hidden');
           mobileNotifyAdminBtn.classList.add('flex');
         }
+
+        if (triggerPopup) {
+          openRestockModal();
+        }
+        return true;
       } else {
         if (stockTag) {
-          if (sizeQty <= 3) {
-            stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-100 text-amber-800';
-            stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">schedule</span> Size ${selSize}: Only ${sizeQty} left!`;
-          } else {
-            stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-green-100 text-green-700';
-            stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Size ${selSize}: In Stock (${sizeQty} pcs)`;
-          }
+          stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-green-100 text-green-700';
+          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Size ${selSize}: In Stock`;
         }
         if (stockoutBanner) stockoutBanner.classList.add('hidden');
         if (qtyContainer) qtyContainer.classList.remove('opacity-40', 'pointer-events-none');
@@ -2211,6 +2200,7 @@
           mobileNotifyAdminBtn.classList.add('hidden');
           mobileNotifyAdminBtn.classList.remove('flex');
         }
+        return false;
       }
     }
 
@@ -2218,7 +2208,7 @@
       productState.selectedSize = size;
       const select = document.getElementById('pd-size-select');
       if (select && select.value !== size) select.value = size;
-      checkSelectedSizeStockState();
+      checkSelectedSizeStockState(true);
       updateMobileBarSummary();
       calculateLiveTotal();
     }
@@ -3099,11 +3089,16 @@ Please confirm my order details!`;
 
       // Populate size options
       if (sizeSelect) {
+        const curSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
         if (Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0) {
-          sizeSelect.innerHTML = p.assignedSizes.map(s => `<option value="${s}" ${s === productState.selectedSize ? 'selected' : ''}>${s}</option>`).join('');
+          sizeSelect.innerHTML = p.assignedSizes.map(s => {
+            const sc = (typeof resolveSizeCode === 'function') ? resolveSizeCode(s) : s;
+            return `<option value="${sc}" ${sc === curSize ? 'selected' : ''}>${sc}</option>`;
+          }).join('');
         } else {
-          sizeSelect.innerHTML = ['S', 'M', 'L', 'XL', 'XXL'].map(s => `<option value="${s}" ${s === productState.selectedSize ? 'selected' : ''}>${s}</option>`).join('');
+          sizeSelect.innerHTML = ['S', 'M', 'L', 'XL', 'XXL'].map(s => `<option value="${s}" ${s === curSize ? 'selected' : ''}>${s}</option>`).join('');
         }
+        sizeSelect.value = curSize;
       }
 
       if (sleeveSelect && productState.selectedSleeveName) {

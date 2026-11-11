@@ -52,7 +52,32 @@
   }
 
   // ── Init Firebase & Firestore ─────────────────────────────────
+  let _initPromise = null;
+  function ensureDb() {
+    if (_db) return Promise.resolve(_db);
+    if (!_initPromise) {
+      _initPromise = new Promise((resolve) => {
+        let attempts = 0;
+        function check() {
+          attempts++;
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            initFirebase();
+            resolve(_db);
+          } else if (attempts < 100) {
+            setTimeout(check, 30);
+          } else {
+            console.warn('[ZenvySync] Firebase SDK connection timeout');
+            resolve(null);
+          }
+        }
+        check();
+      });
+    }
+    return _initPromise;
+  }
+
   function initFirebase() {
+    if (_db) return _db;
     try {
       if (!firebase.apps || firebase.apps.length === 0) {
         firebase.initializeApp(FIREBASE_CONFIG);
@@ -65,55 +90,16 @@
         flushWriteQueue();
       }
 
-      // Check if Firestore needs initial seeding from localStorage
-      checkInitialCloudSeed().then(() => {
-        // Automatically hydrate from cloud so other devices immediately get data
-        hydrate().then(() => {
-          console.log('[ZenvySync] Initial cloud hydration finished ✅');
-          // Automatically sync products from dedicated /products/ collection
-          syncProductsWithCloud().then(() => {
-            console.log('[ZenvySync] Cloud product catalog ready ✅');
-          });
-        });
-      });
-
-      // Automatically activate live sync so updates reflect in real-time
+      // Immediately activate live real-time listeners across all devices
       startLiveSync();
 
-      return true;
+      // Automatically hydrate and sync full product catalog immediately
+      hydrate().catch(e => console.warn('[ZenvySync] Auto-hydrate notice:', e));
+
+      return _db;
     } catch (e) {
       console.error('[ZenvySync] Firebase init failed:', e);
-      return false;
-    }
-  }
-
-  // If cloud Firestore has 0 documents, upload the current local seed
-  async function checkInitialCloudSeed() {
-    if (!_db) return;
-    try {
-      const snap = await _db.collection(FS_COLLECTION).limit(1).get();
-      if (snap.empty) {
-        console.log('[ZenvySync] Cloud database is empty. Uploading initial catalog to Firestore...');
-        const batch = _db.batch();
-        let uploaded = 0;
-        SYNC_KEYS.forEach(key => {
-          const raw = localStorage.getItem(`${DB_VERSION}_${key}`);
-          if (raw) {
-            try {
-              const val = JSON.parse(raw);
-              const docRef = _db.collection(FS_COLLECTION).doc(key);
-              batch.set(docRef, { data: sanitize(val), updatedAt: Date.now() });
-              uploaded++;
-            } catch {}
-          }
-        });
-        if (uploaded > 0) {
-          await batch.commit();
-          console.log(`[ZenvySync] Uploaded ${uploaded} initial documents to Firestore cloud ✅`);
-        }
-      }
-    } catch (e) {
-      console.warn('[ZenvySync] Initial cloud seed check:', e);
+      return null;
     }
   }
 
@@ -121,7 +107,9 @@
   function flushWriteQueue() {
     if (!_db) return;
     const keysToWrite = { ..._writeQueue };
+    delete keysToWrite.products; // NEVER write products to single document
     _writeQueue = {};
+    if (Object.keys(keysToWrite).length === 0) return;
 
     const batch = _db.batch();
     Object.entries(keysToWrite).forEach(([k, v]) => {
@@ -134,23 +122,24 @@
         console.log('[ZenvySync] Saved to Firestore:', Object.keys(keysToWrite).join(', '));
       })
       .catch(e => {
-        console.warn('[ZenvySync] Firestore write error (re-queuing):', e);
-        // Re-queue on failure
-        Object.assign(_writeQueue, keysToWrite);
+        console.warn('[ZenvySync] Firestore write error:', e);
       });
   }
 
   function pushToFirestore(key, value) {
+    if (key === 'products') return; // NEVER push products array to zenvy_store
     _writeQueue[key] = value;
     clearTimeout(_writeTimer);
-    if (_db) {
-      // Critical catalog and transactional keys flush immediately to prevent navigation race conditions
-      if (key === 'products' || key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests') {
-        flushWriteQueue();
-      } else {
-        _writeTimer = setTimeout(flushWriteQueue, 25);
+    ensureDb().then(db => {
+      if (db) {
+        // Critical catalog and transactional keys flush immediately to prevent navigation race conditions
+        if (key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests') {
+          flushWriteQueue();
+        } else {
+          _writeTimer = setTimeout(flushWriteQueue, 25);
+        }
       }
-    }
+    });
   }
 
   // Ensure pending writes are immediately saved if tab is hidden or closed
@@ -238,6 +227,7 @@
 
   // ── Pull data from Firestore into localStorage ─────────────────
   async function hydrate() {
+    await ensureDb();
     if (!_db) return;
     try {
       const snapshot = await _db.collection(FS_COLLECTION).get();
@@ -247,7 +237,7 @@
           const key = docSnap.id;
           // IMPORTANT: Do NOT hydrate products from the single legacy doc;
           // products are exclusively hydrated from the scalable /products/ collection below!
-          if (key === 'products') return;
+          if (key === 'products' || key === 'deleted_products') return;
 
           const payload = docSnap.data();
           if (payload && payload.data !== undefined) {
@@ -296,6 +286,7 @@
 
   // ── Dedicated Real-time Cloud Sync for Products Collection ─────
   async function syncProductsWithCloud(isManual = false) {
+    await ensureDb();
     if (!_db) return { count: 0, uploaded: 0 };
     try {
       // 1. Fetch deleted tracking IDs from Firestore cloud doc so ALL devices honor deletions
@@ -417,6 +408,7 @@
 
   async function saveProductToCloud(p) {
     if (!p || !p.id) return;
+    await ensureDb();
     const pid = String(p.id).trim();
 
     // Remove from deleted tracker if re-creating
@@ -446,7 +438,7 @@
       localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
     } catch(e){}
 
-    // 2. Upload to Firestore /products/{pid}
+    // 2. Upload directly to Firestore /products/{pid}
     if (_db) {
       try {
         await _db.collection(FS_PRODUCTS_COLLECTION).doc(pid).set(sanitize(p));
@@ -454,20 +446,6 @@
       } catch(e) {
         console.warn('[ZenvySync] Cloud product save failed:', e);
       }
-
-      // Keep legacy summary doc in sync (lightweight)
-      try {
-        const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
-        let legList = (legDoc.exists && Array.isArray(legDoc.data()?.data)) ? legDoc.data().data : [];
-        const lIdx = legList.findIndex(x => String(x.id).trim() === pid);
-        const pSummary = { ...p };
-        // Prune heavy image for summary
-        if (typeof pSummary.image === 'string' && pSummary.image.startsWith('data:image') && pSummary.image.length > 500) {
-          pSummary.image = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
-        }
-        if (lIdx >= 0) legList[lIdx] = pSummary; else legList.unshift(pSummary);
-        await _db.collection(FS_COLLECTION).doc('products').set({ data: sanitize(legList), updatedAt: Date.now() });
-      } catch(e){}
     }
 
     // 3. Broadcast to all open views & tabs
@@ -477,6 +455,7 @@
 
   async function deleteProductFromCloud(id) {
     if (!id) return;
+    await ensureDb();
     const strId = String(id).trim();
 
     // 1. Add to permanent deleted tracking set
@@ -520,27 +499,19 @@
           await delDocRef.set({ ids: curIds, updatedAt: Date.now() });
         }
       } catch(e){}
-
-      // 5. Delete from legacy zenvy_store/products doc
-      try {
-        const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
-        if (legDoc.exists && Array.isArray(legDoc.data()?.data)) {
-          const legList = legDoc.data().data.filter(p => String(p.id).trim() !== strId);
-          await _db.collection(FS_COLLECTION).doc('products').set({ data: sanitize(legList), updatedAt: Date.now() });
-        }
-      } catch(e){}
     }
 
-    // 6. Broadcast deletion to all open views & tabs
+    // 5. Broadcast deletion to all open views & tabs
     window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
   }
 
   // ── Real-time listener — updates local storage & triggers UI ───
-  function startLiveSync(onUpdate) {
+  async function startLiveSync(onUpdate) {
     if (typeof onUpdate === 'function' && !_listeners.includes(onUpdate)) {
       _listeners.push(onUpdate);
     }
+    await ensureDb();
     if (!_db) return;
 
     // 1. General store settings listener
@@ -658,6 +629,7 @@
 
   window.ZenvyFirebase = {
     push(key, value) {
+      if (key === 'products') return; // Products are saved via saveProduct to /products/{id}
       if (SYNC_KEYS.includes(key)) {
         if (ADMIN_MANAGED_KEYS.includes(key)) {
           const isFromAdmin = window.location.pathname.toLowerCase().includes('admin') ||
@@ -678,10 +650,13 @@
     hydrate,
     startLiveSync,
     isReady() { return !!_db; },
+    ensureDb,
     async forceSync() {
+      await ensureDb();
       await hydrate();
-      await syncProductsWithCloud(true);
+      const res = await syncProductsWithCloud(true);
       console.log('[ZenvySync] Force sync complete ✅');
+      return res;
     }
   };
 
@@ -690,14 +665,11 @@
     if (typeof firebase !== 'undefined' && firebase.firestore) {
       initFirebase();
     } else {
-      setTimeout(tryInit, 50);
+      setTimeout(tryInit, 25);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
-  } else {
-    tryInit();
-  }
+  // Execute immediately so Firestore connects without waiting for DOMContentLoaded
+  tryInit();
 
 })();

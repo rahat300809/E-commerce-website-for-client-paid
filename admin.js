@@ -1213,24 +1213,41 @@ function toggleProductPublish(id, isCurrentlyPublished) {
 window.toggleProductPublish = toggleProductPublish;
 
 function duplicateProduct(id) {
-  const p = DB.products.byId(id);
-  if (!p) {
-    toast('Product not found', 'error');
-    return;
-  }
-  const duplicated = DB.products.duplicate(id);
-  if (duplicated) {
-    toast(`Product "${p.name}" duplicated as "${duplicated.name}"`, 'success');
-    productPage = 1;
-    productStatusFilter = ''; // Ensure newly duplicated product is visible immediately
-    renderProducts(document.getElementById('admin-content'));
-    updateNavBadges();
-    try {
-      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
-      window.dispatchEvent(new Event('storage'));
-    } catch(e){}
-  } else {
-    toast('Failed to duplicate product', 'error');
+  try {
+    const p = DB.products.byId(id);
+    if (!p) {
+      toast('Product not found for duplication', 'error');
+      return;
+    }
+    const duplicated = DB.products.duplicate(id);
+    if (duplicated) {
+      toast(`✅ Product "${p.name}" duplicated as "${duplicated.name}"`, 'success');
+      productPage = 1;
+      productSearch = ''; // Reset search so new duplicate is immediately visible
+      productCatFilter = '';
+      productStatusFilter = '';
+      productSort = 'newest'; // Show at the very top
+      const sInp = document.getElementById('admin-prod-search-input');
+      if (sInp) sInp.value = '';
+
+      // Close open action menus
+      document.querySelectorAll('.action-menu-dropdown.show').forEach(d => d.classList.remove('show'));
+
+      const content = document.getElementById('admin-content');
+      if (content) {
+        renderProducts(content);
+      }
+      updateNavBadges();
+      try {
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch(e){}
+    } else {
+      toast('Failed to duplicate product', 'error');
+    }
+  } catch(err) {
+    console.error('duplicateProduct error:', err);
+    toast('Error duplicating product: ' + (err.message || 'Check console'), 'error');
   }
 }
 window.duplicateProduct = duplicateProduct;

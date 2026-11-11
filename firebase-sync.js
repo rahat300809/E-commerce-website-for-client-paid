@@ -230,6 +230,21 @@
     await ensureDb();
     if (!_db) return;
     try {
+      // 1. Fetch deleted restock IDs so deletions are strictly honored across all devices
+      const deletedRestockKey = `${DB_VERSION}_deleted_restock_ids`;
+      let deletedRestockIds = new Set();
+      try {
+        const raw = localStorage.getItem(deletedRestockKey);
+        if (raw) deletedRestockIds = new Set(JSON.parse(raw));
+      } catch(e){}
+      try {
+        const delRestockDoc = await _db.collection(FS_COLLECTION).doc('deleted_restocks').get();
+        if (delRestockDoc.exists && Array.isArray(delRestockDoc.data()?.ids)) {
+          delRestockDoc.data().ids.forEach(id => deletedRestockIds.add(String(id).trim()));
+          localStorage.setItem(deletedRestockKey, JSON.stringify(Array.from(deletedRestockIds)));
+        }
+      } catch(e){}
+
       const snapshot = await _db.collection(FS_COLLECTION).get();
       let count = 0;
       if (!snapshot.empty) {
@@ -237,12 +252,24 @@
           const key = docSnap.id;
           // IMPORTANT: Do NOT hydrate products from the single legacy doc;
           // products are exclusively hydrated from the scalable /products/ collection below!
-          if (key === 'products' || key === 'deleted_products') return;
+          if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks') return;
 
           const payload = docSnap.data();
           if (payload && payload.data !== undefined) {
             const localKey = `${DB_VERSION}_${key}`;
             const cloudUpdatedAt = payload.updatedAt || 0;
+
+            // Restock requests: cloud array is authoritative, filtered against deletedRestockIds
+            if (key === 'restockRequests') {
+              let list = Array.isArray(payload.data) ? payload.data : [];
+              list = list.filter(r => r && r.id && !deletedRestockIds.has(String(r.id).trim()));
+              localStorage.setItem(localKey, JSON.stringify(list));
+              if (cloudUpdatedAt) {
+                localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+              }
+              count++;
+              return;
+            }
 
             let finalData = payload.data;
             const rawLocal = localStorage.getItem(localKey);
@@ -312,10 +339,8 @@
         if (!p) return true;
         const name = String(p.name || '').toLowerCase();
         const id = String(p.id || '').toLowerCase();
-        const sku = String(p.sku || '').toLowerCase();
-        if (name.includes('[test sync]') || name.includes('test sync')) return true;
+        if (name.includes('[test sync]')) return true;
         if (id === 'prod_876_user' || id === '876') return true;
-        if (name.includes('876') && (sku.includes('o887') || name.includes('copy'))) return true;
         return false;
       }
 
@@ -428,10 +453,6 @@
 
   async function saveProductToCloud(p) {
     if (!p || !p.id) return;
-    const pName = String(p.name || '').toLowerCase();
-    if (pName.includes('[test sync]') || pName.includes('test sync') || p.id === 'prod_876_user' || (pName.includes('876') && pName.includes('copy'))) {
-      return;
-    }
     await ensureDb();
     const pid = String(p.id).trim();
 
@@ -530,6 +551,65 @@
     window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
   }
 
+  async function deleteRestockRequest(id) {
+    if (!id) return;
+    await ensureDb();
+    const strId = String(id).trim();
+
+    // 1. Record in local deleted tracker
+    const deletedKey = `${DB_VERSION}_deleted_restock_ids`;
+    let delSet = new Set();
+    try {
+      const delRaw = localStorage.getItem(deletedKey);
+      if (delRaw) delSet = new Set(JSON.parse(delRaw));
+      delSet.add(strId);
+      localStorage.setItem(deletedKey, JSON.stringify(Array.from(delSet)));
+    } catch(e){}
+
+    // 2. Remove immediately from local restockRequests array
+    const localKey = `${DB_VERSION}_restockRequests`;
+    try {
+      let items = JSON.parse(localStorage.getItem(localKey) || '[]');
+      items = items.filter(r => String(r.id).trim() !== strId);
+      localStorage.setItem(localKey, JSON.stringify(items));
+      localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+    } catch(e){}
+
+    // 3. Save to cloud deleted_restocks document so other devices never resurrect it
+    if (_db) {
+      try {
+        const delDocRef = _db.collection(FS_COLLECTION).doc('deleted_restocks');
+        const delDocSnap = await delDocRef.get();
+        let curIds = [];
+        if (delDocSnap.exists && Array.isArray(delDocSnap.data()?.ids)) {
+          curIds = delDocSnap.data().ids;
+        }
+        if (!curIds.includes(strId)) {
+          curIds.push(strId);
+          await delDocRef.set({ ids: curIds, updatedAt: Date.now() });
+        }
+      } catch(e){
+        console.warn('[ZenvySync] Cloud deleted_restocks save error:', e);
+      }
+
+      // 4. Update Firestore restockRequests doc directly
+      try {
+        const reqDocRef = _db.collection(FS_COLLECTION).doc('restockRequests');
+        const reqDocSnap = await reqDocRef.get();
+        if (reqDocSnap.exists && Array.isArray(reqDocSnap.data()?.data)) {
+          const remaining = reqDocSnap.data().data.filter(r => String(r.id).trim() !== strId);
+          await reqDocRef.set({ data: remaining, updatedAt: Date.now() });
+        }
+      } catch(e){
+        console.warn('[ZenvySync] Cloud restockRequests update error:', e);
+      }
+    }
+
+    // 5. Broadcast to all open views & tabs
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'restockRequests' } }));
+  }
+
   // ── Real-time listener — updates local storage & triggers UI ───
   async function startLiveSync(onUpdate) {
     if (typeof onUpdate === 'function' && !_listeners.includes(onUpdate)) {
@@ -545,12 +625,31 @@
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added' || change.type === 'modified') {
             const key = change.doc.id;
-            if (key === 'products') return; // Handled by dedicated products collection listener
+            if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks') return; // Handled separately
             const payload = change.doc.data();
             if (payload && payload.data !== undefined) {
               const localKey = `${DB_VERSION}_${key}`;
               const cloudUpdatedAt = payload.updatedAt || 0;
               const existingStr = localStorage.getItem(localKey);
+
+              // Restock requests: cloud array is authoritative, filtered against deletedRestockIds (NEVER resurrect deleted items)
+              if (key === 'restockRequests') {
+                const deletedRestockKey = `${DB_VERSION}_deleted_restock_ids`;
+                let deletedRestockIds = new Set();
+                try {
+                  const raw = localStorage.getItem(deletedRestockKey);
+                  if (raw) deletedRestockIds = new Set(JSON.parse(raw));
+                } catch(e){}
+                let list = Array.isArray(payload.data) ? payload.data : [];
+                list = list.filter(r => r && r.id && !deletedRestockIds.has(String(r.id).trim()));
+                const incomingStr = JSON.stringify(list);
+                if (existingStr !== incomingStr) {
+                  localStorage.setItem(localKey, incomingStr);
+                  if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                  changed = true;
+                }
+                return;
+              }
 
               let finalData = payload.data;
               if (existingStr && Array.isArray(payload.data)) {
@@ -670,6 +769,7 @@
     },
     saveProduct: saveProductToCloud,
     deleteProduct: deleteProductFromCloud,
+    deleteRestockRequest: deleteRestockRequest,
     syncProductsWithCloud,
     hydrate,
     startLiveSync,

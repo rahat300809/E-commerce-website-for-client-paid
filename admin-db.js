@@ -2025,8 +2025,18 @@ const DB = {
   // ── Restock Requests (Customer Stock Notifications) ──
   restockRequests: {
     all() {
+      const deletedKey = `${DB_VERSION}_deleted_restock_ids`;
+      let deletedIds = new Set();
+      try {
+        const raw = localStorage.getItem(deletedKey);
+        if (raw) deletedIds = new Set(JSON.parse(raw));
+      } catch(e){}
       let items = Store.get('restockRequests');
-      return Array.isArray(items) ? items : [];
+      if (!Array.isArray(items)) items = [];
+      if (deletedIds.size > 0) {
+        items = items.filter(r => !deletedIds.has(String(r.id).trim()));
+      }
+      return items.filter(r => !r.isDeleted);
     },
     pending() {
       return this.all().filter(r => r.status === 'PENDING' || !r.status);
@@ -2069,8 +2079,22 @@ const DB = {
       return items.find(r => r.id === id);
     },
     delete(id) {
-      const items = this.all().filter(r => r.id !== id);
+      const strId = String(id).trim();
+      const deletedKey = `${DB_VERSION}_deleted_restock_ids`;
+      let deletedIds = new Set();
+      try {
+        const raw = localStorage.getItem(deletedKey);
+        if (raw) deletedIds = new Set(JSON.parse(raw));
+      } catch(e){}
+      deletedIds.add(strId);
+      localStorage.setItem(deletedKey, JSON.stringify(Array.from(deletedIds)));
+
+      const items = this.all().filter(r => String(r.id).trim() !== strId);
       Store.set('restockRequests', items);
+
+      if (window.ZenvyFirebase && typeof window.ZenvyFirebase.deleteRestockRequest === 'function') {
+        window.ZenvyFirebase.deleteRestockRequest(strId);
+      }
     }
   },
 

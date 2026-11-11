@@ -1063,23 +1063,33 @@ function renderProducts(container) {
                     </div>
                   </td>
                   <td class="actions-cell">
-                    <div class="action-menu">
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();toggleActionMenu('prod-menu-${p.id}')">
-                        Actions <span class="material-symbols-outlined" style="font-size:13px">expand_more</span>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openProductForm('${p.id}')" title="Edit Product" style="padding:5px 8px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
+                        <span class="material-symbols-outlined" style="font-size:14px">edit</span>
+                        <span style="font-size:11px;font-weight:600;">Edit</span>
                       </button>
-                      <div class="action-menu-dropdown" id="prod-menu-${p.id}">
-                        <div class="action-menu-item" onclick="openProductForm('${p.id}')">
-                          <span class="material-symbols-outlined">edit</span> Edit
-                        </div>
-                        <div class="action-menu-item" onclick="duplicateProduct('${p.id}')">
-                          <span class="material-symbols-outlined">content_copy</span> Duplicate
-                        </div>
-                        <div class="action-menu-item" onclick="toggleProductPublish('${p.id}','${p.isPublished}')">
-                          <span class="material-symbols-outlined">${p.isPublished?'visibility_off':'visibility'}</span>
-                          ${p.isPublished?'Unpublish':'Publish'}
-                        </div>
-                        <div class="action-menu-item danger" onclick="deleteProduct('${p.id}')">
-                          <span class="material-symbols-outlined">delete</span> Delete/Archive
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();duplicateProduct('${p.id}')" title="Duplicate this Product" style="padding:5px 8px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
+                        <span class="material-symbols-outlined" style="font-size:14px">content_copy</span>
+                        <span style="font-size:11px;font-weight:600;">Duplicate</span>
+                      </button>
+                      <div class="action-menu">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();toggleActionMenu('prod-menu-${p.id}')" title="More Actions" style="padding:5px 8px;cursor:pointer;">
+                          <span class="material-symbols-outlined" style="font-size:14px">more_vert</span>
+                        </button>
+                        <div class="action-menu-dropdown" id="prod-menu-${p.id}">
+                          <div class="action-menu-item" onclick="openProductForm('${p.id}')">
+                            <span class="material-symbols-outlined">edit</span> Edit Product
+                          </div>
+                          <div class="action-menu-item" onclick="duplicateProduct('${p.id}')">
+                            <span class="material-symbols-outlined">content_copy</span> Duplicate Product
+                          </div>
+                          <div class="action-menu-item" onclick="toggleProductPublish('${p.id}','${p.isPublished}')">
+                            <span class="material-symbols-outlined">${p.isPublished?'visibility_off':'visibility'}</span>
+                            ${p.isPublished?'Unpublish':'Publish'}
+                          </div>
+                          <div class="action-menu-item danger" onclick="deleteProduct('${p.id}')">
+                            <span class="material-symbols-outlined">delete</span> Delete/Archive
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1146,6 +1156,8 @@ function duplicateProduct(id) {
   const duplicated = DB.products.duplicate(id);
   if (duplicated) {
     toast(`Product "${p.name}" duplicated as "${duplicated.name}"`, 'success');
+    productPage = 1;
+    productStatusFilter = ''; // Ensure newly duplicated product is visible immediately
     renderProducts(document.getElementById('admin-content'));
     updateNavBadges();
     try {
@@ -1827,7 +1839,7 @@ function openProductForm(id = null) {
   const footer = `
     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
     ${isEdit ? `
-      <button type="button" class="btn btn-secondary" onclick="closeModal(); duplicateProduct('${id}')" title="Duplicate this product">
+      <button type="button" class="btn btn-secondary" onclick="closeModal(true); duplicateProduct('${id}')" title="Duplicate this product">
         <span class="material-symbols-outlined">content_copy</span> Duplicate
       </button>
     ` : ''}
@@ -2070,6 +2082,7 @@ function saveProduct(e, id, asDraft = false) {
     assignedSleeves,
     assignedSizes,
     images,
+    image: (images && images[0]?.url) ? images[0].url : (typeof images[0] === 'string' ? images[0] : ''),
     preorderPrice: parseFloat(get('preorderPrice')) || null,
     preorderCapacity: parseInt(get('preorderCapacity')) || 100,
     preorderSold: id ? DB.products.byId(id)?.preorderSold || 0 : 0,
@@ -2116,12 +2129,18 @@ function saveProduct(e, id, asDraft = false) {
   window._lastFormImages = null;
 
   // Trigger cross-tab/storefront storage sync
-  try { window.dispatchEvent(new Event('storage')); } catch(e){}
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
 
-  closeModal();
+  _isSavingModalForm = true;
+  closeModal(true);
+  productPage = 1;
   updateNavBadges();
   renderProducts(document.getElementById('admin-content'));
 }
+window.saveProduct = saveProduct;
 
 function saveVariants(productId, form) {
   const rows = form.querySelectorAll('.variant-row');
@@ -7577,3 +7596,110 @@ window.applySizePreset = function(presetName) {
   const typeSelect = document.getElementById('prod-sizechart-type');
   if (typeSelect) typeSelect.value = presetName;
 };
+
+// ── Explicit window bindings for reliable inline HTML onclick handlers ──
+Object.assign(window, {
+  addShopBannerSlide,
+  addSubcatInline,
+  addVariantRow,
+  applyShopDiscountPresetToCurrent,
+  applyStockAdjust,
+  autoDetectTelegramChatId,
+  bulkDelete,
+  bulkPublish,
+  changeAdminPassword,
+  clearAdminProductSearch,
+  closeModal,
+  deleteCat,
+  deleteModelShowcaseItem,
+  deleteOrbitHeroDrop,
+  deleteProduct,
+  deleteSize,
+  duplicateProduct,
+  executeAdminProductSearch,
+  exportInventoryCSV,
+  exportPreordersCSV,
+  exportProductsCSV,
+  handleLogout,
+  handleRemoveAdmin,
+  inlineAddCategory,
+  nav,
+  openAddonForm,
+  openBannerForm,
+  openCategoryForm,
+  openCollectionForm,
+  openColorForm,
+  openCouponForm,
+  openCreateOrderModal,
+  openFlashSaleForm,
+  openModelShowcaseForm,
+  openOrbitHeroModal,
+  openOrderDetail,
+  openOrderStatusModal,
+  openPatchForm,
+  openPaymentRemarkModal,
+  openProductForm,
+  openRefundForm,
+  openShippingForm,
+  openSizeForm,
+  openSleeveForm,
+  openStockAdjust,
+  openSubcatForm,
+  openTeamForm,
+  previewSizeChartModal,
+  printInvoice,
+  quickMarkOrderPaid,
+  removeAdminSizeChart,
+  removeAllDemoProducts,
+  removeShopBannerSlide,
+  removeVariantRow,
+  resetDefaultSizes,
+  resetOrbitHeroDrops,
+  resetShopBannerDefaults,
+  saveAddon,
+  saveAdminSizeChartManual,
+  saveAnnouncementConfig,
+  saveBanner,
+  saveBrandContact,
+  saveBrandSettings,
+  saveCategoryForm,
+  saveCollection,
+  saveCollectionsConfig,
+  saveColor,
+  saveCoupon,
+  saveFlashSale,
+  saveHomepageHero,
+  saveJustDroppedConfig,
+  saveManualOrder,
+  saveModelShowcaseForm,
+  saveNotificationConfig,
+  saveOrderDetailPaymentAndStatus,
+  savePatch,
+  savePaymentConfig,
+  savePaymentRemark,
+  savePrintingConfig,
+  saveProduct,
+  saveRefund,
+  saveShipping,
+  saveShopBannersConfig,
+  saveShopDiscountBanner,
+  saveSize,
+  saveSleeve,
+  saveSocialSettings,
+  saveStoreSettings,
+  saveSubcat,
+  saveTeam,
+  saveTelegramBotConfig,
+  saveValuePropsConfig,
+  setShopPreviewSlide,
+  showConfirm,
+  switchProdTab,
+  testTelegramNotification,
+  toggleBanner,
+  toggleCategory,
+  toggleCollection,
+  toggleProductPublish,
+  toggleSizeStatus,
+  updateOrderStatus,
+  viewCustomer
+});

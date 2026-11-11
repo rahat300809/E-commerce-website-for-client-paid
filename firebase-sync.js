@@ -344,6 +344,8 @@
       if (SYNC_KEYS.includes(key)) {
         if (ADMIN_MANAGED_KEYS.includes(key)) {
           const isFromAdmin = window.location.pathname.toLowerCase().includes('admin') ||
+                              window.location.href.toLowerCase().includes('admin') ||
+                              (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('zenvy_admin_session') === '1') ||
                               (typeof DB !== 'undefined' && DB.auth && typeof DB.auth.isLoggedIn === 'function' && DB.auth.isLoggedIn());
           if (!isFromAdmin) {
             // Guard: storefront visitors cannot push catalog changes to Firestore

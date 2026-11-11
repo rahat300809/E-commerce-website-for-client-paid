@@ -865,6 +865,13 @@ const DB = {
         createdAt: data.createdAt || Store.now(),
         updatedAt: Store.now()
       };
+      if (Array.isArray(item.images) && item.images.length > 0 && !item.image) {
+        const f = item.images[0];
+        item.image = (f && typeof f === 'object' && f.url) ? f.url : (typeof f === 'string' ? f : '');
+      }
+      if (item.image && !item.imageUrl) {
+        item.imageUrl = item.image;
+      }
       items.unshift(item); // Latest product placed at the top of the catalog
       Store.set('products', items);
       DB.log(`Product created: ${item.name}`);
@@ -881,14 +888,32 @@ const DB = {
       } else if (updates.status !== undefined && updates.isPublished === undefined) {
         updates.isPublished = updates.status !== 'draft';
       }
+      if (Array.isArray(updates.images) && updates.images.length > 0 && !updates.image) {
+        const f = updates.images[0];
+        updates.image = (f && typeof f === 'object' && f.url) ? f.url : (typeof f === 'string' ? f : '');
+      }
+      if (updates.image && !updates.imageUrl) {
+        updates.imageUrl = updates.image;
+      }
       const strId = String(id).trim().toLowerCase();
-      const items = (Store.get('products') || []).map(p => String(p.id).trim().toLowerCase() === strId ? { ...p, ...updates } : p);
+      const targetId = old ? String(old.id).trim().toLowerCase() : strId;
+      const targetSlug = old?.slug ? String(old.slug).trim().toLowerCase() : null;
+      let updatedItem = null;
+      const items = (Store.get('products') || []).map(p => {
+        const pId = String(p.id || '').trim().toLowerCase();
+        const pSlug = String(p.slug || '').trim().toLowerCase();
+        if (pId === targetId || pId === strId || (targetSlug && pSlug === targetSlug) || (pSlug && pSlug === strId)) {
+          updatedItem = { ...p, ...updates };
+          return updatedItem;
+        }
+        return p;
+      });
       Store.set('products', items);
       if (data.basePrice !== undefined && old?.basePrice !== data.basePrice && DB.priceHistory && typeof DB.priceHistory.add === 'function') {
         DB.priceHistory.add({ productId: id, productName: old?.name, oldPrice: old?.basePrice, newPrice: data.basePrice, type: 'basePrice' });
       }
       DB.log(`Product updated: ${data.name || old?.name}`);
-      return items.find(p => String(p.id).trim().toLowerCase() === strId);
+      return updatedItem || items.find(p => String(p.id).trim().toLowerCase() === targetId);
     },
     duplicate(id) {
       const src = DB.products.byId(id);

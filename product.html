@@ -355,7 +355,7 @@
           </h1>
 
           <!-- Subtitle / Team / Category -->
-          <div class="text-xs font-mono-ui font-bold text-blue-900 flex items-center gap-2">
+          <div class="text-xs font-mono-ui font-bold text-blue-900 flex items-center gap-2 flex-wrap">
             <span id="pd-subtitle-tags"></span>
             <span>•</span>
             <span id="pd-stock-tag" class="text-emerald-700 font-black">IN STOCK</span>
@@ -369,6 +369,15 @@
           </div>
           <!-- Product Short Description -->
           <p id="pd-short-desc" class="text-xs text-gray-600 leading-relaxed pt-1.5 hidden"></p>
+
+          <!-- Product Stock Out Banner (Shown dynamically when stock === 0) -->
+          <div id="pd-stockout-banner" class="hidden bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2.5 mt-2 shadow-2xs">
+            <span class="material-symbols-outlined text-red-600 text-xl flex-shrink-0 mt-0.5">sentiment_dissatisfied</span>
+            <div class="text-xs">
+              <div class="font-bold text-red-800">বর্তমানে এই পণ্যটির স্টক শেষ (Currently Out of Stock)</div>
+              <div class="text-[11px] text-red-600 mt-0.5">আপনি নিচের <span class="font-bold underline">"Notify Admin / Request Restock"</span> বাটনে ক্লিক করে রিকোয়েস্ট পাঠাতে পারেন। স্টক আসার সাথে সাথে আপনাকে জানানো হবে।</div>
+            </div>
+          </div>
         </div>
 
         <hr class="border-gray-100 my-0.5"/>
@@ -451,10 +460,10 @@
           <!-- Row 1: Quantity Counter + Add to Cart + Wishlist -->
           <div class="flex items-center gap-2 sm:gap-2.5">
             <!-- Qty Counter -->
-            <div class="flex items-center border border-gray-300 rounded-xl bg-gray-50/80 overflow-hidden h-12 w-24 sm:w-26 flex-shrink-0 shadow-2xs">
-              <button type="button" onclick="changeQty(-1)" class="w-7 sm:w-8 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-base sm:text-lg transition-colors cursor-pointer active:scale-95" aria-label="Decrease quantity">−</button>
+            <div id="pd-qty-container" class="flex items-center border border-gray-300 rounded-xl bg-gray-50/80 overflow-hidden h-12 w-24 sm:w-26 flex-shrink-0 shadow-2xs">
+              <button type="button" id="pd-qty-minus" onclick="changeQty(-1)" class="w-7 sm:w-8 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-base sm:text-lg transition-colors cursor-pointer active:scale-95" aria-label="Decrease quantity">−</button>
               <span id="pd-qty-display" class="flex-1 text-center font-mono-ui font-black text-sm text-black">1</span>
-              <button type="button" onclick="changeQty(1)" class="w-7 sm:w-8 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-base sm:text-lg transition-colors cursor-pointer active:scale-95" aria-label="Increase quantity">+</button>
+              <button type="button" id="pd-qty-plus" onclick="changeQty(1)" class="w-7 sm:w-8 h-full flex items-center justify-center text-gray-700 hover:bg-gray-200 font-bold text-base sm:text-lg transition-colors cursor-pointer active:scale-95" aria-label="Increase quantity">+</button>
             </div>
 
             <!-- Add to Cart Button (Spacious horizontal layout, single line text, never overflows) -->
@@ -462,8 +471,8 @@
                     id="add-to-cart-btn"
                     onclick="handleAddToCart()" 
                     class="flex-1 min-w-0 h-12 px-3 sm:px-4 bg-[#121c33] hover:bg-black active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px] sm:text-[20px] flex-shrink-0">shopping_bag</span>
-              <span class="whitespace-nowrap font-bold">Add to Cart</span>
+              <span id="add-to-cart-icon" class="material-symbols-outlined text-[18px] sm:text-[20px] flex-shrink-0">shopping_bag</span>
+              <span id="add-to-cart-text" class="whitespace-nowrap font-bold">Add to Cart</span>
             </button>
 
             <!-- Wishlist Heart Button -->
@@ -478,10 +487,20 @@
 
           <!-- Row 2: Instant Buy (High-converting, vibrant amber, full-width) -->
           <button type="button" 
+                  id="buy-now-btn"
                   onclick="buyNowDirect()" 
                   class="w-full h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] text-black font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
             <span class="material-symbols-outlined text-[19px] flex-shrink-0">bolt</span>
             <span class="font-bold">Buy Now</span>
+          </button>
+
+          <!-- Row 2B: Notify Admin / Request Restock Button (Displayed when Stock === 0) -->
+          <button type="button" 
+                  id="pd-notify-admin-btn"
+                  onclick="openRestockModal()" 
+                  class="hidden w-full h-12 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[20px] flex-shrink-0">notifications_active</span>
+            <span class="font-bold">Notify Admin / Request Restock (স্টক রিকোয়েস্ট)</span>
           </button>
 
           <!-- Row 3: Order via WhatsApp (Direct Chat & Custom Order) -->
@@ -492,7 +511,7 @@
             <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24">
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
             </svg>
-            <span class="whitespace-nowrap font-bold">Order via WhatsApp</span>
+            <span id="whatsapp-order-btn-text" class="whitespace-nowrap font-bold">Order via WhatsApp</span>
           </button>
 
           <!-- Total price indicator -->
@@ -568,15 +587,133 @@
                 id="mobile-add-cart-btn"
                 class="bg-black text-white hover:bg-neutral-800 active:scale-95 text-xs font-bold px-3.5 py-2.5 rounded-full flex items-center gap-1.5 shadow-sm transition-all">
           <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
-          <span>Add</span>
+          <span id="mobile-add-cart-text">Add</span>
         </button>
         <button type="button" 
                 onclick="buyNowDirect()" 
+                id="mobile-buy-now-btn"
                 class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-headline font-black text-xs px-3.5 py-2.5 rounded-full flex items-center gap-1 shadow-sm transition-all whitespace-nowrap">
           <span class="material-symbols-outlined text-[16px]">bolt</span>
           <span>Buy Now</span>
         </button>
+        <!-- Mobile Notify Admin Button (when Stock === 0) -->
+        <button type="button" 
+                onclick="openRestockModal()" 
+                id="mobile-notify-admin-btn"
+                class="hidden bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 text-white text-xs font-bold px-4 py-2.5 rounded-full items-center gap-1.5 shadow-sm whitespace-nowrap active:scale-95">
+          <span class="material-symbols-outlined text-[16px]">notifications_active</span>
+          <span>Notify Admin</span>
+        </button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       RESTOCK REQUEST / NOTIFY ADMIN MODAL
+  ════════════════════════════════════════════ -->
+  <div id="modal-restock-request" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="if(event.target===this)closeRestockModal()">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-gray-100 flex flex-col animate-slide-up">
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-400 text-xl">notifications_active</span>
+          <div>
+            <h3 class="font-headline font-black text-sm uppercase tracking-wider">Request Restock / স্টক রিকোয়েস্ট</h3>
+            <p class="text-[10px] text-gray-300 font-mono-ui">Notify admin when this jersey is back in stock</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeRestockModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="Close modal">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form id="restock-request-form" onsubmit="submitRestockRequest(event)" class="p-5 space-y-4">
+        <!-- Product Preview Card -->
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+          <img id="restock-product-img" src="" alt="Jersey" class="w-14 h-14 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0"/>
+          <div class="min-w-0 flex-1">
+            <h4 id="restock-product-name" class="font-headline font-bold text-xs text-black truncate"></h4>
+            <div class="text-[11px] font-mono-ui text-gray-500 mt-0.5">
+              <span id="restock-product-sku"></span> • <span class="text-red-600 font-bold">STOCK OUT</span>
+            </div>
+            <div id="restock-product-price" class="font-headline font-black text-xs text-black mt-0.5"></div>
+          </div>
+        </div>
+
+        <!-- Phone Number (Required) -->
+        <div>
+          <label class="block text-xs font-headline font-bold text-black uppercase tracking-wider mb-1.5">
+            Your Phone / WhatsApp Number <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono-ui font-bold text-xs text-gray-500">+880</span>
+            <input type="tel" 
+                   id="restock-customer-phone" 
+                   required 
+                   placeholder="1XXXXXXXXX" 
+                   pattern="[0-9]{10,11}"
+                   class="w-full bg-white border border-gray-300 rounded-xl pl-16 pr-4 py-2.5 text-xs sm:text-sm font-mono-ui font-bold text-black focus:outline-none focus:border-black shadow-2xs"/>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-1">স্টক এলেই এই নম্বরে এসএমএস বা হোয়াটসঅ্যাপে জানানো হবে।</p>
+        </div>
+
+        <!-- Customer Name (Optional) -->
+        <div>
+          <label class="block text-xs font-headline font-bold text-black uppercase tracking-wider mb-1.5">
+            Your Name (আপনার নাম - Optional)
+          </label>
+          <input type="text" 
+                 id="restock-customer-name" 
+                 placeholder="e.g. Tanvir Ahmed" 
+                 class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-black focus:outline-none focus:border-black placeholder:text-gray-400 shadow-2xs"/>
+        </div>
+
+        <!-- Size & Sleeve Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-headline font-bold text-black uppercase tracking-wider mb-1.5">
+              Desired Size (সাইজ)
+            </label>
+            <select id="restock-desired-size" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-black shadow-2xs">
+              <option value="S">S (Small)</option>
+              <option value="M" selected>M (Medium)</option>
+              <option value="L">L (Large)</option>
+              <option value="XL">XL (Extra Large)</option>
+              <option value="XXL">XXL (Double XL)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-headline font-bold text-black uppercase tracking-wider mb-1.5">
+              Sleeve Style (হাতা)
+            </label>
+            <select id="restock-desired-sleeve" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-black shadow-2xs">
+              <option value="Half Sleeve" selected>Half Sleeve</option>
+              <option value="Full Sleeve">Full Sleeve</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Note (Optional) -->
+        <div>
+          <label class="block text-xs font-headline font-bold text-black uppercase tracking-wider mb-1.5">
+            Special Note / মেসেজ (Optional)
+          </label>
+          <input type="text" 
+                 id="restock-customer-note" 
+                 placeholder="e.g. জরুরি দরকার, কবে আসতে পারে?" 
+                 class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2 text-xs font-medium text-black focus:outline-none focus:border-black placeholder:text-gray-400 shadow-2xs"/>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                id="restock-submit-btn"
+                class="w-full py-3 bg-[#0284c7] hover:bg-[#0369a1] text-white font-headline font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+          <span class="material-symbols-outlined text-base">send</span>
+          <span>Send Restock Request to Admin</span>
+        </button>
+      </form>
     </div>
   </div>
 
@@ -779,9 +916,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v4"></script>
-  <script src="admin-db.js?v=20261111_v4"></script>
-  <script src="wishlist.js?v=20261111_v4"></script>
+  <script src="firebase-sync.js?v=20261111_v5"></script>
+  <script src="admin-db.js?v=20261111_v5"></script>
+  <script src="wishlist.js?v=20261111_v5"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1014,7 +1151,7 @@
     // ─────────────────────────────────────────
     function loadDataFromAdminDB() {
       const urlParams = new URLSearchParams(window.location.search);
-      const prodId = _initialRequestedId || urlParams.get('id');
+      const prodId = urlParams.get('id') || urlParams.get('slug') || _initialRequestedId;
       const prodSlug = urlParams.get('slug');
       const paramName = urlParams.get('name');
       const paramPrice = urlParams.get('price');
@@ -1305,19 +1442,106 @@
         // Render Gallery Thumbnails Strip
         renderGalleryThumbnails(imagesList);
 
-        // Stock status
+        // Stock status, Stock count & Stock Out handling
         const stockEl = document.getElementById('pd-stock-tag');
+        const stockoutBanner = document.getElementById('pd-stockout-banner');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const addToCartIcon = document.getElementById('add-to-cart-icon');
+        const addToCartText = document.getElementById('add-to-cart-text');
+        const buyNowBtn = document.getElementById('buy-now-btn');
+        const notifyAdminBtn = document.getElementById('pd-notify-admin-btn');
+        const qtyContainer = document.getElementById('pd-qty-container');
+        const qtyDisplay = document.getElementById('pd-qty-display');
+        const mobileAddCartBtn = document.getElementById('mobile-add-cart-btn');
+        const mobileBuyNowBtn = document.getElementById('mobile-buy-now-btn');
+        const mobileNotifyAdminBtn = document.getElementById('mobile-notify-admin-btn');
+        const mobileSummary = document.getElementById('mobile-bar-summary');
+        const waText = document.getElementById('whatsapp-order-btn-text');
+
+        const isStockOut = (typeof targetProduct.stock === 'number' && targetProduct.stock <= 0);
+        const isPreorder = Boolean(targetProduct.isPreorder);
+        const currentStock = typeof targetProduct.stock === 'number' ? targetProduct.stock : 10;
+
         if (stockEl) {
-          if (targetProduct.stock === 0) {
-            stockEl.textContent = 'OUT OF STOCK';
-            stockEl.className = 'text-red-600 font-bold';
-          } else if (targetProduct.isPreorder) {
-            stockEl.textContent = 'PRE-ORDER';
-            stockEl.className = 'text-purple-600 font-bold';
+          if (isStockOut) {
+            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>STOCK OUT (Out of Stock)</span>`;
+            stockEl.className = 'font-bold';
+          } else if (isPreorder) {
+            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span>PRE-ORDER</span>`;
+            stockEl.className = 'font-bold';
+          } else if (currentStock <= 5) {
+            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>LOW STOCK • Only ${currentStock} left in stock!</span>`;
+            stockEl.className = 'font-bold';
           } else {
-            stockEl.textContent = 'IN STOCK';
-            stockEl.className = 'text-emerald-700 font-bold';
+            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IN STOCK (${currentStock} available)</span>`;
+            stockEl.className = 'font-bold';
           }
+        }
+
+        // Toggle Stock Out Alert Banner
+        if (stockoutBanner) {
+          stockoutBanner.classList.toggle('hidden', !isStockOut);
+          stockoutBanner.classList.toggle('flex', isStockOut);
+        }
+
+        // Update Action Buttons & Controls when Stock Out
+        if (isStockOut) {
+          if (qtyContainer) {
+            qtyContainer.classList.add('opacity-40', 'pointer-events-none');
+          }
+          if (qtyDisplay) qtyDisplay.textContent = '0';
+          
+          if (addToCartBtn) {
+            addToCartBtn.classList.remove('bg-[#121c33]', 'hover:bg-black', 'text-white');
+            addToCartBtn.classList.add('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
+            addToCartBtn.title = 'Product is Out of Stock';
+          }
+          if (addToCartIcon) addToCartIcon.textContent = 'remove_shopping_cart';
+          if (addToCartText) addToCartText.textContent = 'Stock Out';
+
+          if (buyNowBtn) buyNowBtn.style.display = 'none';
+          if (notifyAdminBtn) {
+            notifyAdminBtn.classList.remove('hidden');
+            notifyAdminBtn.classList.add('flex');
+          }
+
+          if (mobileAddCartBtn) mobileAddCartBtn.style.display = 'none';
+          if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = 'none';
+          if (mobileNotifyAdminBtn) {
+            mobileNotifyAdminBtn.classList.remove('hidden');
+            mobileNotifyAdminBtn.classList.add('flex');
+          }
+          if (mobileSummary) mobileSummary.textContent = 'STOCK OUT';
+
+          if (waText) waText.textContent = 'Ask Restock on WhatsApp';
+        } else {
+          if (qtyContainer) {
+            qtyContainer.classList.remove('opacity-40', 'pointer-events-none');
+          }
+          if (qtyDisplay && productState.quantity) qtyDisplay.textContent = productState.quantity;
+
+          if (addToCartBtn) {
+            addToCartBtn.classList.add('bg-[#121c33]', 'hover:bg-black', 'text-white');
+            addToCartBtn.classList.remove('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
+            addToCartBtn.title = 'Add to Cart';
+          }
+          if (addToCartIcon) addToCartIcon.textContent = 'shopping_bag';
+          if (addToCartText) addToCartText.textContent = 'Add to Cart';
+
+          if (buyNowBtn) buyNowBtn.style.display = '';
+          if (notifyAdminBtn) {
+            notifyAdminBtn.classList.add('hidden');
+            notifyAdminBtn.classList.remove('flex');
+          }
+
+          if (mobileAddCartBtn) mobileAddCartBtn.style.display = '';
+          if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = '';
+          if (mobileNotifyAdminBtn) {
+            mobileNotifyAdminBtn.classList.add('hidden');
+            mobileNotifyAdminBtn.classList.remove('flex');
+          }
+
+          if (waText) waText.textContent = 'Order via WhatsApp';
         }
 
         // Breadcrumbs matching Screenshot 1
@@ -1919,6 +2143,11 @@
     // Cart Handling & 1-Click Buy Now
     // ─────────────────────────────────────────
     function handleAddToCart(openDrawer = true) {
+      if (productState.product && typeof productState.product.stock === 'number' && productState.product.stock <= 0) {
+        showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ! অ্যাডমিনকে জানাতে Request Restock বাটনে ক্লিক করুন।');
+        openRestockModal();
+        return;
+      }
       const titleEl = document.getElementById('pd-title');
       const itemTitle = (titleEl ? titleEl.textContent : (productState.product?.name || 'ZENVY AeroKnit Jersey')).trim();
       const unitPrice = productState.basePrice + productState.sleevePrice + (productState.isPersonalized ? productState.personalizeFee : 0) + productState.patchPrice;
@@ -2012,6 +2241,11 @@
     }
 
     function buyNowDirect() {
+      if (productState.product && typeof productState.product.stock === 'number' && productState.product.stock <= 0) {
+        showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ! অ্যাডমিনকে জানাতে Request Restock বাটনে ক্লিক করুন।');
+        openRestockModal();
+        return;
+      }
       // Add quietly to cart without triggering drawer
       handleAddToCart(false);
       try { toggleCartDrawer(false); } catch(e){}
@@ -2036,6 +2270,19 @@
       const title = (document.getElementById('pd-title')?.textContent || p.name || `${brandName} Match Kit Jersey`).trim();
       const size = productState.selectedSize || 'M';
       const sleeve = productState.selectedSleeveName || (productState.selectedSleeve === 'long' ? 'Full Sleeve' : 'Half Sleeve');
+      
+      // If product is out of stock, send Restock Inquiry via WhatsApp
+      if (typeof p.stock === 'number' && p.stock <= 0) {
+        const restockMsg = `Salam ${brandName}! I want to know when this out-of-stock jersey will be available:\n\n` +
+          `📦 *Product:* ${title}\n` +
+          `📏 *Desired Size:* ${size}\n` +
+          `👕 *Sleeve:* ${sleeve}\n` +
+          (p.sku ? `🏷️ *SKU:* ${p.sku}\n` : '') +
+          `🔗 *Link:* ${window.location.href}\n\n` +
+          `Please notify me when restocked. Thank you!`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(restockMsg)}`, '_blank');
+        return;
+      }
       
       const patchNames = (productState.selectedPatchNames && productState.selectedPatchNames.length > 0)
         ? productState.selectedPatchNames.join(', ')
@@ -2408,6 +2655,10 @@ Please confirm my order details!`;
         window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
         return;
       }
+      if (typeof p.stock === 'number' && p.stock <= 0) {
+        window.location.href = `product.html?id=${encodeURIComponent(p.id)}`;
+        return;
+      }
       const defaultSize = (Array.isArray(p.sizes) && p.sizes[0]) ? p.sizes[0] : (p.size || 'M');
       const price = p.salePrice || p.basePrice || 1450;
       const image = (typeof DB.products.getImage === 'function') ? DB.products.getImage(p) : (p.images?.[0]?.url || p.image || '');
@@ -2449,7 +2700,7 @@ Please confirm my order details!`;
                 <div class="flex items-center gap-2">
                   <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${highlightedName}</h4>
                   ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
-                  ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-600">OUT OF STOCK</span>' : ''}
+                  ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">STOCK OUT</span>' : ''}
                 </div>
                 <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
                   <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
@@ -2462,9 +2713,15 @@ Please confirm my order details!`;
                 <div class="font-headline font-black text-xs sm:text-sm text-black">${price}</div>
                 ${origPrice ? `<div class="font-mono-ui text-[10px] text-gray-400 line-through">${origPrice}</div>` : ''}
               </div>
-              <button type="button" onclick="event.stopPropagation(); closeProductSearch(); instantBuyFromSearch('${p.id}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
-                Buy Now
-              </button>
+              ${isOutOfStock ? `
+                <button type="button" onclick="event.stopPropagation(); closeProductSearch(); window.location.href='product.html?id=${encodeURIComponent(p.id)}'" class="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
+                  Stock Out
+                </button>
+              ` : `
+                <button type="button" onclick="event.stopPropagation(); closeProductSearch(); instantBuyFromSearch('${p.id}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
+                  Buy Now
+                </button>
+              `}
             </div>
           </div>
         `;
@@ -2617,6 +2874,114 @@ Please confirm my order details!`;
       window.location.href = `index.html?search=${encodeURIComponent(query)}#shop`;
     }
     window.viewAllProductSearchResultsInShop = viewAllProductSearchResultsInShop;
+
+    // ─────────────────────────────────────────
+    // Restock Request / Notify Admin Handlers
+    // ─────────────────────────────────────────
+    function openRestockModal() {
+      const p = productState.product;
+      if (!p) return;
+      const modal = document.getElementById('modal-restock-request');
+      if (!modal) return;
+
+      const imgEl = document.getElementById('restock-product-img');
+      const nameEl = document.getElementById('restock-product-name');
+      const skuEl = document.getElementById('restock-product-sku');
+      const priceEl = document.getElementById('restock-product-price');
+      const sizeSelect = document.getElementById('restock-desired-size');
+      const sleeveSelect = document.getElementById('restock-desired-sleeve');
+
+      const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+        ? DB.products.getImage(p) : (p.images?.[0]?.url || p.image || '');
+      if (imgEl) imgEl.src = img;
+      if (nameEl) nameEl.textContent = p.name || 'Jersey';
+      if (skuEl) skuEl.textContent = p.sku ? `SKU: ${p.sku}` : '';
+      if (priceEl) priceEl.textContent = formatCurrency(p.salePrice || p.basePrice || 1450);
+
+      // Populate size options
+      if (sizeSelect) {
+        if (Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0) {
+          sizeSelect.innerHTML = p.assignedSizes.map(s => `<option value="${s}" ${s === productState.selectedSize ? 'selected' : ''}>${s}</option>`).join('');
+        } else {
+          sizeSelect.innerHTML = ['S', 'M', 'L', 'XL', 'XXL'].map(s => `<option value="${s}" ${s === productState.selectedSize ? 'selected' : ''}>${s}</option>`).join('');
+        }
+      }
+
+      if (sleeveSelect && productState.selectedSleeveName) {
+        sleeveSelect.value = productState.selectedSleeveName;
+      }
+
+      modal.classList.remove('hidden');
+    }
+    window.openRestockModal = openRestockModal;
+
+    function closeRestockModal() {
+      const modal = document.getElementById('modal-restock-request');
+      if (modal) modal.classList.add('hidden');
+    }
+    window.closeRestockModal = closeRestockModal;
+
+    async function submitRestockRequest(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const p = productState.product;
+      if (!p) return;
+
+      let phone = document.getElementById('restock-customer-phone')?.value.trim();
+      const name = document.getElementById('restock-customer-name')?.value.trim();
+      const size = document.getElementById('restock-desired-size')?.value || 'M';
+      const sleeve = document.getElementById('restock-desired-sleeve')?.value || 'Half Sleeve';
+      const note = document.getElementById('restock-customer-note')?.value.trim();
+      const submitBtn = document.getElementById('restock-submit-btn');
+
+      if (!phone) {
+        showToast('⚠️ অনুগ্রহ করে আপনার ফোন নম্বর লিখুন');
+        return;
+      }
+
+      // Format Bangladesh phone number
+      phone = phone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('880')) phone = phone.slice(2);
+      if (!phone.startsWith('01') && phone.length === 10) phone = '0' + phone;
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> <span>অ্যাডমিনকে জানানো হচ্ছে...</span>';
+      }
+
+      try {
+        if (typeof DB !== 'undefined' && DB.restockRequests) {
+          DB.restockRequests.create({
+            productId: p.id,
+            productName: p.name,
+            productSku: p.sku || '',
+            customerName: name || 'Valued Customer',
+            customerPhone: phone,
+            size: size,
+            sleeve: sleeve,
+            note: note
+          });
+        }
+
+        closeRestockModal();
+        showToast('✅ আপনার স্টক রিকোয়েস্ট অ্যাডমিনকে পাঠানো হয়েছে! স্টক এলেই যোগাযোগ করা হবে।');
+
+        // Reset form
+        const form = document.getElementById('restock-request-form');
+        if (form) form.reset();
+
+        // Broadcast storage event
+        try { window.dispatchEvent(new Event('storage')); } catch(e){}
+      } catch(err) {
+        console.error('Restock request error:', err);
+        showToast('❌ দুঃখিত, রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-base">send</span> <span>Send Restock Request to Admin</span>';
+        }
+      }
+    }
+    window.submitRestockRequest = submitRestockRequest;
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeProductSearch();

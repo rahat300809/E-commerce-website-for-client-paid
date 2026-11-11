@@ -1343,11 +1343,15 @@ function addToCart(product, quantity = 1, openDrawer = true) {
   const prodId = String(product.id || Date.now());
   const prodName = product.name || 'ZENVY Jersey';
 
-  // SECURITY: Always re-validate price from DB — never trust client-provided price
+  // SECURITY: Always re-validate price and stock from DB
   let prodPrice = parseFloat(product.price) || 1450;
   if (typeof DB !== 'undefined' && DB.products && prodId) {
     const dbProduct = DB.products.byId(prodId);
     if (dbProduct) {
+      if (typeof dbProduct.stock === 'number' && dbProduct.stock <= 0) {
+        showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ!');
+        return;
+      }
       const dbBasePrice = dbProduct.salePrice && dbProduct.salePrice > 0 ? dbProduct.salePrice : dbProduct.basePrice;
       if (dbBasePrice && dbBasePrice > 0) {
         prodPrice = dbBasePrice;
@@ -2089,8 +2093,9 @@ function renderShopProducts() {
       : ((p.images && p.images[0] && p.images[0].url) ? p.images[0].url : (p.image || defaultImg));
     const priceFormatted = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origFormatted = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
-    const badgeText = p.isPreorder ? 'PRE-ORDER' : (p.stock === 0 ? 'OUT OF STOCK' : (p.compareAt ? 'SALE' : ''));
-    const badgeClass = p.isPreorder ? 'bg-purple-600 text-white' : (p.stock === 0 ? 'bg-neutral-800 text-white' : 'bg-red-50 text-red-600 border border-red-200');
+    const isOutOfStock = (typeof p.stock === 'number' && p.stock <= 0);
+    const badgeText = p.isPreorder ? 'PRE-ORDER' : (isOutOfStock ? 'STOCK OUT' : (p.compareAt ? 'SALE' : ''));
+    const badgeClass = p.isPreorder ? 'bg-purple-600 text-white' : (isOutOfStock ? 'bg-red-600 text-white' : 'bg-red-50 text-red-600 border border-red-200');
 
     return `
       <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-150 sm:border-gray-100 shadow-2xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between w-full max-w-full"
@@ -2142,13 +2147,23 @@ function renderShopProducts() {
                     title="View Product Details">
               View
             </button>
-            <button type="button" 
-                    onclick="instantBuy('${p.id}')"
-                    class="py-1.5 px-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
-                    title="Buy Now">
-              <span class="material-symbols-outlined text-[13px] sm:text-[14px]">bolt</span>
-              <span>Buy Now</span>
-            </button>
+            ${isOutOfStock ? `
+              <button type="button" 
+                      onclick="openProduct('${p.id}')"
+                      class="py-1.5 px-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-headline font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+                      title="Stock Out - View Product">
+                <span class="material-symbols-outlined text-[13px] sm:text-[14px]">notifications</span>
+                <span>Stock Out</span>
+              </button>
+            ` : `
+              <button type="button" 
+                      onclick="instantBuy('${p.id}')"
+                      class="py-1.5 px-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-headline font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
+                      title="Buy Now">
+                <span class="material-symbols-outlined text-[13px] sm:text-[14px]">bolt</span>
+                <span>Buy Now</span>
+              </button>
+            `}
           </div>
         </div>
 
@@ -2160,6 +2175,10 @@ function renderShopProducts() {
 function instantBuy(productId) {
   const p = (typeof DB !== 'undefined' && DB.products) ? DB.products.byId(productId) : null;
   if (!p) {
+    window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
+    return;
+  }
+  if (typeof p.stock === 'number' && p.stock <= 0) {
     window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
     return;
   }
@@ -2309,7 +2328,7 @@ function renderProductSearchList(matches, q) {
             <div class="flex items-center gap-2">
               <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${highlightedName}</h4>
               ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
-              ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-600">OUT OF STOCK</span>' : ''}
+              ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">STOCK OUT</span>' : ''}
             </div>
             <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
               <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
@@ -2322,8 +2341,15 @@ function renderProductSearchList(matches, q) {
             <div class="font-headline font-black text-xs sm:text-sm text-black">${price}</div>
             ${origPrice ? `<div class="font-mono-ui text-[10px] text-gray-400 line-through">${origPrice}</div>` : ''}
           </div>
-          <button type="button" onclick="event.stopPropagation(); closeGlobalSearch(); instantBuy('${p.id}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
-            Buy Now
+          ${isOutOfStock ? `
+            <span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold font-headline whitespace-nowrap">
+              Stock Out
+            </span>
+          ` : `
+            <button type="button" onclick="event.stopPropagation(); closeGlobalSearch(); instantBuy('${p.id}')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-bold font-headline transition-all cursor-pointer active:scale-95 shadow-xs whitespace-nowrap">
+              Buy Now
+            </button>
+          `}
           </button>
         </div>
       </div>

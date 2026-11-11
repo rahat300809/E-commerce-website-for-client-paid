@@ -1955,6 +1955,79 @@ const DB = {
         `🚀 <i>ZENVY Elite Sportswear Order Engine</i>`;
 
       return await this.sendTelegramMessage(msg);
+    },
+    async sendRestockNotification(req) {
+      const config = this.get();
+      if (!config.enabled) return { success: false, reason: 'disabled' };
+      const safe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      const msg = `🔔 <b>CUSTOMER STOCK OUT ALERT / RESTOCK REQUEST</b> 🔔\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📦 <b>Product:</b> <b>${safe(req.productName)}</b>\n` +
+        (req.productSku ? `🏷️ <b>SKU:</b> <code>${safe(req.productSku)}</code>\n` : '') +
+        (req.size ? `📏 <b>Requested Size:</b> <b>${safe(req.size)}</b>\n` : '') +
+        (req.sleeve ? `👕 <b>Sleeve:</b> <b>${safe(req.sleeve)}</b>\n` : '') +
+        `👤 <b>Customer:</b> ${safe(req.customerName || 'Valued Customer')}\n` +
+        `📞 <b>Phone / WhatsApp:</b> <code>${safe(req.customerPhone)}</code>\n` +
+        (req.note ? `📝 <b>Customer Note:</b> ${safe(req.note)}\n` : '') +
+        `⚠️ <b>Current Stock:</b> <code>0 (OUT OF STOCK)</code>\n` +
+        `🕒 <b>Time:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })} (BST)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `👉 <i>Open Admin Panel → Inventory to view all requests and restock.</i>`;
+
+      return await this.sendTelegramMessage(msg);
+    }
+  },
+
+  // ── Restock Requests (Customer Stock Notifications) ──
+  restockRequests: {
+    all() {
+      let items = Store.get('restockRequests');
+      return Array.isArray(items) ? items : [];
+    },
+    pending() {
+      return this.all().filter(r => r.status === 'PENDING' || !r.status);
+    },
+    byId(id) {
+      return this.all().find(r => r.id === id);
+    },
+    create(data) {
+      const items = this.all();
+      const item = {
+        id: 'rst_' + Store.genId(),
+        productId: data.productId || '',
+        productName: data.productName || 'Jersey',
+        productSku: data.productSku || '',
+        customerName: data.customerName || 'Valued Customer',
+        customerPhone: data.customerPhone || data.phone || '',
+        size: data.size || 'M',
+        sleeve: data.sleeve || 'Half Sleeve',
+        note: data.note || '',
+        status: 'PENDING', // PENDING, CONTACTED, RESTOCKED
+        createdAt: Store.now(),
+        updatedAt: Store.now()
+      };
+      items.unshift(item);
+      Store.set('restockRequests', items);
+      DB.log(`Restock request received for ${item.productName} (${item.customerPhone})`);
+      
+      try {
+        if (DB.telegram && typeof DB.telegram.sendRestockNotification === 'function') {
+          DB.telegram.sendRestockNotification(item).catch(err => console.warn('[Telegram] Restock notify error:', err));
+        }
+      } catch(e) {
+        console.warn('[Telegram] Restock notify dispatch error:', e);
+      }
+      return item;
+    },
+    update(id, data) {
+      const items = this.all().map(r => r.id === id ? { ...r, ...data, updatedAt: Store.now() } : r);
+      Store.set('restockRequests', items);
+      return items.find(r => r.id === id);
+    },
+    delete(id) {
+      const items = this.all().filter(r => r.id !== id);
+      Store.set('restockRequests', items);
     }
   },
 

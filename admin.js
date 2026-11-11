@@ -376,6 +376,14 @@ function updateNavBadges() {
   const notifEl = document.getElementById('topbar-notif-count');
   if (notifEl) { notifEl.textContent = pending; notifEl.style.display = pending > 0 ? 'flex' : 'none'; }
 
+  // Update Restock Requests badge on Inventory
+  const pendingRestock = (typeof DB !== 'undefined' && DB.restockRequests) ? DB.restockRequests.pending().length : 0;
+  const restockBadge = document.getElementById('nav-restock-count');
+  if (restockBadge) {
+    restockBadge.textContent = pendingRestock;
+    restockBadge.style.display = pendingRestock > 0 ? 'inline-flex' : 'none';
+  }
+
   // Update topbar currency badge
   const cur = DB.currency ? DB.currency.get() : { code: 'BDT', symbol: '৳' };
   const curLabel = document.getElementById('admin-topbar-currency-label');
@@ -2594,27 +2602,169 @@ function saveCollection(id) {
 // ──────────────────────────────────────────────────────────────
 function renderInventory(container) {
   const products = DB.products.all().filter(p=>!p.isArchived);
+  const totalStockUnits = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+  const outOfStockProducts = products.filter(p => p.stock === 0);
+  const lowStockProducts = products.filter(p => p.stock > 0 && p.stock <= (p.lowStockAlert || 5));
+  const restockRequests = (typeof DB !== 'undefined' && DB.restockRequests) ? DB.restockRequests.all() : [];
+  const pendingRestock = restockRequests.filter(r => r.status === 'PENDING' || !r.status);
+
   container.innerHTML = `
     <div class="page-header">
-      <div class="page-header-left"><div class="page-title">Inventory</div><div class="page-sub">Manage stock levels</div></div>
-      <button class="btn btn-secondary" onclick="exportInventoryCSV()"><span class="material-symbols-outlined">download</span> Export</button>
+      <div class="page-header-left">
+        <div class="page-title">Inventory & Stock Out Alerts</div>
+        <div class="page-sub">Manage stock counts, monitor stockouts, and respond to customer restock notifications</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="exportInventoryCSV()"><span class="material-symbols-outlined">download</span> Export Inventory CSV</button>
+      </div>
     </div>
-    <div class="card">
+
+    <!-- Inventory KPIs -->
+    <div class="dashboard-grid mb-4" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:16px;">
+      <div class="card" style="padding:14px;">
+        <div style="font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;">Total Products</div>
+        <div style="font-size:24px;font-weight:900;color:#0F172A;margin-top:4px;">${products.length}</div>
+        <div style="font-size:11px;color:#059669;margin-top:2px;">${totalStockUnits} units in stock</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:4px solid #DC2626;">
+        <div style="font-size:12px;color:#DC2626;font-weight:700;text-transform:uppercase;">Stock Out (Out of Stock)</div>
+        <div style="font-size:24px;font-weight:900;color:#DC2626;margin-top:4px;">${outOfStockProducts.length}</div>
+        <div style="font-size:11px;color:#64748B;margin-top:2px;">Requires immediate restock</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:4px solid #D97706;">
+        <div style="font-size:12px;color:#D97706;font-weight:700;text-transform:uppercase;">Low Stock Alerts</div>
+        <div style="font-size:24px;font-weight:900;color:#D97706;margin-top:4px;">${lowStockProducts.length}</div>
+        <div style="font-size:11px;color:#64748B;margin-top:2px;">Stock &le; 5 units</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:4px solid #0284C7;background:${pendingRestock.length > 0 ? '#F0F9FF' : '#ffffff'};">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:12px;color:#0284C7;font-weight:700;text-transform:uppercase;">Restock Requests</div>
+          ${pendingRestock.length > 0 ? `<span class="badge badge-red font-bold" style="font-size:11px;padding:2px 8px;">${pendingRestock.length} PENDING</span>` : ''}
+        </div>
+        <div style="font-size:24px;font-weight:900;color:#0284C7;margin-top:4px;">${restockRequests.length}</div>
+        <div style="font-size:11px;color:#64748B;margin-top:2px;">Customer stock notifications</div>
+      </div>
+    </div>
+
+    <!-- Customer Restock Requests Section -->
+    <div class="card mb-4" style="margin-bottom:16px;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-outlined text-blue-600" style="font-size:20px;">notifications_active</span>
+          <div class="card-title" style="font-size:15px;font-weight:700;">Customer Restock Requests (গ্রাহকদের স্টক রিকোয়েস্ট)</div>
+          <span class="badge badge-blue font-bold">${restockRequests.length} Total</span>
+        </div>
+        <div style="font-size:12px;color:#64748B;">Auto-notified via Telegram Bot</div>
+      </div>
       <div class="table-wrapper">
         <table class="admin-table">
-          <thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Low Alert</th><th>Status</th><th style="text-align:right">Adjust</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Phone / WhatsApp</th>
+              <th>Product Requested</th>
+              <th>Size / Sleeve</th>
+              <th>Note</th>
+              <th>Status</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${restockRequests.length === 0 ? `
+              <tr>
+                <td colspan="8">
+                  <div class="empty-state" style="padding:28px 16px;">
+                    <span class="material-symbols-outlined empty-state-icon" style="color:#94A3B8;">notifications_off</span>
+                    <div class="empty-state-title" style="font-size:14px;font-weight:700;">No customer restock requests yet</div>
+                    <div class="empty-state-sub" style="font-size:12px;">When a customer clicks "Notify Admin / Request Restock" on any out-of-stock jersey, it appears here and pings your Telegram immediately.</div>
+                  </div>
+                </td>
+              </tr>
+            ` : restockRequests.map(r => `
+              <tr style="${(r.status === 'PENDING' || !r.status) ? 'background:#F8FAFC;' : ''}">
+                <td style="font-size:12px;color:#64748B;white-space:nowrap;">${fmtDate(r.createdAt)}</td>
+                <td style="font-weight:700;font-size:13px;color:#0F172A;">${r.customerName || 'Valued Customer'}</td>
+                <td class="font-mono" style="font-weight:700;color:#0284C7;font-size:13px;">
+                  <a href="tel:${r.customerPhone}" style="color:#0284C7;text-decoration:none;">${r.customerPhone}</a>
+                </td>
+                <td>
+                  <div style="font-weight:700;font-size:13px;color:#0F172A;">${r.productName || 'Jersey'}</div>
+                  ${r.productSku ? `<div class="font-mono" style="font-size:11px;color:#64748B;">SKU: ${r.productSku}</div>` : ''}
+                </td>
+                <td>
+                  <span class="badge badge-gray font-mono font-bold">${r.size || 'M'}</span>
+                  ${r.sleeve ? `<span class="badge badge-gray" style="font-size:11px;margin-left:4px;">${r.sleeve}</span>` : ''}
+                </td>
+                <td style="font-size:12px;max-width:180px;color:#475569;" title="${r.note || ''}">${r.note || '-'}</td>
+                <td>
+                  ${(r.status === 'PENDING' || !r.status) ? `<span class="badge badge-red font-bold">Pending</span>` : 
+                    r.status === 'RESTOCKED' ? `<span class="badge badge-green font-bold">Restocked</span>` : 
+                    `<span class="badge badge-blue font-bold">Contacted</span>`}
+                </td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;">
+                    <!-- WhatsApp customer directly -->
+                    <button type="button" class="btn btn-sm" style="background:#25D366;color:#ffffff;padding:4px 8px;font-size:11px;gap:3px;" onclick="openWhatsAppForRestock('${r.customerPhone}','${(r.customerName||'').replace(/'/g,"\\'")}','${(r.productName||'').replace(/'/g,"\\'")}','${r.size||''}')" title="Send WhatsApp Message">
+                      <span class="material-symbols-outlined" style="font-size:13px;">chat</span> WhatsApp
+                    </button>
+                    <!-- Quick Stock Adjust for product -->
+                    ${r.productId ? `
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:11px;" onclick="openStockAdjust('${r.productId}','${(r.productName||'').replace(/'/g,"\\'")}',0)" title="Adjust Product Stock">
+                        <span class="material-symbols-outlined" style="font-size:13px;">tune</span> Restock
+                      </button>
+                    ` : ''}
+                    <!-- Mark Status Toggle -->
+                    ${(r.status === 'PENDING' || !r.status) ? `
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding:4px 6px;" onclick="updateRestockRequestStatus('${r.id}','CONTACTED')" title="Mark as Contacted">
+                        <span class="material-symbols-outlined" style="font-size:14px;color:#0284C7;">done</span>
+                      </button>
+                    ` : (r.status === 'CONTACTED') ? `
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding:4px 6px;" onclick="updateRestockRequestStatus('${r.id}','RESTOCKED')" title="Mark as Restocked">
+                        <span class="material-symbols-outlined" style="font-size:14px;color:#16A34A;">check_circle</span>
+                      </button>
+                    ` : ''}
+                    <button type="button" class="btn btn-ghost btn-sm" style="color:#DC2626;padding:4px 6px;" onclick="deleteRestockRequest('${r.id}')" title="Delete request">
+                      <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Product Stock Levels Table -->
+    <div class="card">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="card-title" style="font-size:15px;font-weight:700;">Product Stock Count & Status</div>
+        <div style="font-size:12px;color:#64748B;">Click "Adjust" to update inventory quantity</div>
+      </div>
+      <div class="table-wrapper">
+        <table class="admin-table">
+          <thead><tr><th>Product</th><th>SKU</th><th>Stock Count</th><th>Low Alert Level</th><th>Stock Status</th><th style="text-align:right">Stock Adjustment</th></tr></thead>
           <tbody>
             ${products.length === 0 ? `<tr><td colspan="6"><div class="empty-state"><p>No products yet</p></div></td></tr>` :
               products.map(p => `
                 <tr>
-                  <td style="font-weight:600">${p.name}</td>
-                  <td class="font-mono" style="font-size:12px">${p.sku||'-'}</td>
-                  <td><span class="badge ${p.stock===0?'badge-red':p.stock<=(p.lowStockAlert||5)?'badge-amber':'badge-green'} font-mono" style="font-size:14px">${p.stock||0}</span></td>
+                  <td style="font-weight:700;color:#0F172A;">${p.name}</td>
+                  <td class="font-mono" style="font-size:12px;color:#64748B;">${p.sku||'-'}</td>
+                  <td>
+                    <span class="badge ${p.stock===0?'badge-red':p.stock<=(p.lowStockAlert||5)?'badge-amber':'badge-green'} font-mono" style="font-size:14px;font-weight:800;padding:4px 10px;">
+                      ${p.stock||0} units
+                    </span>
+                  </td>
                   <td style="color:#9CA3AF">${p.lowStockAlert||5}</td>
-                  <td>${p.stock===0?'<span class="badge badge-red">Out of Stock</span>':p.stock<=(p.lowStockAlert||5)?'<span class="badge badge-amber">Low Stock</span>':'<span class="badge badge-green">In Stock</span>'}</td>
+                  <td>
+                    ${p.stock===0 ? '<span class="badge badge-red font-bold">⚠️ Stock Out (Out of Stock)</span>' : 
+                      p.stock<=(p.lowStockAlert||5) ? `<span class="badge badge-amber font-bold">⚠️ Low Stock (${p.stock} left)</span>` : 
+                      '<span class="badge badge-green font-bold">✓ In Stock</span>'}
+                  </td>
                   <td class="actions-cell">
-                    <button class="btn btn-secondary btn-sm" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})">
-                      <span class="material-symbols-outlined">tune</span> Adjust
+                    <button class="btn btn-secondary btn-sm" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="display:inline-flex;align-items:center;gap:4px;">
+                      <span class="material-symbols-outlined" style="font-size:15px;">tune</span> Adjust Stock
                     </button>
                   </td>
                 </tr>
@@ -2624,8 +2774,9 @@ function renderInventory(container) {
       </div>
     </div>
 
+    <!-- Inventory History -->
     <div class="card" style="margin-top:16px">
-      <div class="card-header"><div class="card-title">Inventory History</div></div>
+      <div class="card-header"><div class="card-title">Inventory Adjustment History</div></div>
       <div class="table-wrapper">
         <table class="admin-table">
           <thead><tr><th>Date</th><th>Product</th><th>Prev</th><th>Change</th><th>New Stock</th><th>Reason</th><th>Admin</th></tr></thead>
@@ -2647,6 +2798,36 @@ function renderInventory(container) {
     </div>
   `;
 }
+
+function updateRestockRequestStatus(id, newStatus) {
+  if (typeof DB !== 'undefined' && DB.restockRequests) {
+    DB.restockRequests.update(id, { status: newStatus });
+    toast(`Request marked as ${newStatus}`, 'success');
+    updateNavBadges();
+    renderInventory(document.getElementById('admin-content'));
+  }
+}
+window.updateRestockRequestStatus = updateRestockRequestStatus;
+
+function deleteRestockRequest(id) {
+  if (!confirm('Are you sure you want to delete this restock request?')) return;
+  if (typeof DB !== 'undefined' && DB.restockRequests) {
+    DB.restockRequests.delete(id);
+    toast('Restock request deleted', 'success');
+    updateNavBadges();
+    renderInventory(document.getElementById('admin-content'));
+  }
+}
+window.deleteRestockRequest = deleteRestockRequest;
+
+function openWhatsAppForRestock(phone, customerName, productName, size) {
+  if (!phone) return;
+  let cleanPhone = phone.replace(/[^0-9]/g, '');
+  if (cleanPhone.startsWith('01')) cleanPhone = '88' + cleanPhone;
+  const msg = `Salam ${customerName || 'Customer'}! Regarding your restock request for "${productName}" (${size || 'Standard'}): It is now available in our store! You can place your order now at ZENVY.`;
+  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+window.openWhatsAppForRestock = openWhatsAppForRestock;
 
 function openStockAdjust(productId, productName, currentStock) {
   const reasons = ['Restock', 'Manual adjustment', 'Damaged', 'Returned', 'Correction'];
@@ -7701,5 +7882,8 @@ Object.assign(window, {
   toggleProductPublish,
   toggleSizeStatus,
   updateOrderStatus,
+  updateRestockRequestStatus,
+  deleteRestockRequest,
+  openWhatsAppForRestock,
   viewCustomer
 });

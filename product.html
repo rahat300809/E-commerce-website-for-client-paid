@@ -916,9 +916,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v9"></script>
-  <script src="admin-db.js?v=20261111_v9"></script>
-  <script src="wishlist.js?v=20261111_v9"></script>
+  <script src="firebase-sync.js?v=20261111_v10"></script>
+  <script src="admin-db.js?v=20261111_v10"></script>
+  <script src="wishlist.js?v=20261111_v10"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1976,74 +1976,125 @@
       });
       if (unique.length === 0) unique.push('S', 'M', 'L', 'XL', 'XXL');
       
-      const current = productState.selectedSize || 'M';
-      const szHash = `${unique.join(',')}_${current}`;
-      if (select.dataset.sizesHash === szHash && select.children.length > 0) return;
-      select.dataset.sizesHash = szHash;
+      const curSizeStocks = (productState.product?.sizeStocks && typeof productState.product.sizeStocks === 'object')
+        ? productState.product.sizeStocks 
+        : null;
 
-      select.innerHTML = unique.map(code => `
-        <option value="${code}" ${code === current ? 'selected' : ''}>${code}</option>
-      `).join('');
-
-      if (!unique.includes(productState.selectedSize)) {
-        productState.selectedSize = unique.includes('M') ? 'M' : unique[0];
+      // Select in-stock size initially if current is 0
+      let current = productState.selectedSize || 'M';
+      if (curSizeStocks && curSizeStocks[current] === 0) {
+        const firstInStock = unique.find(sz => curSizeStocks[sz] === undefined || curSizeStocks[sz] > 0);
+        if (firstInStock) current = firstInStock;
       }
+      productState.selectedSize = current;
+
+      select.innerHTML = unique.map(code => {
+        const hasStock = curSizeStocks && curSizeStocks[code] !== undefined;
+        const qty = hasStock ? parseInt(curSizeStocks[code]) : null;
+        let suffix = '';
+        if (qty === 0) {
+          suffix = ' — ⚠️ Stock Out (0 left)';
+        } else if (qty !== null && qty <= 3) {
+          suffix = ` — Only ${qty} left!`;
+        }
+        return `<option value="${code}" ${code === current ? 'selected' : ''} ${qty === 0 ? 'data-out="1"' : ''}>${code}${suffix}</option>`;
+      }).join('');
+
+      select.value = current;
+      checkSelectedSizeStockState();
     }
 
-    function renderDynamicSleeves(sleeves) {
-      const container = document.getElementById('sleeve-options-container');
-      if (!container) return;
-      const seen = new Set();
-      const unique = [];
-      (sleeves || []).forEach(s => {
-        let name = (s.name || '').trim();
-        if (name === '777') name = 'Half Sleeve';
-        if (name && !seen.has(name.toLowerCase())) {
-          seen.add(name.toLowerCase());
-          unique.push({ ...s, name });
+    function checkSelectedSizeStockState() {
+      const p = productState.product;
+      if (!p) return;
+      const selSize = productState.selectedSize || 'M';
+      const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : null;
+      
+      const hasStockKey = curSizeStocks && curSizeStocks[selSize] !== undefined;
+      const sizeQty = hasStockKey ? parseInt(curSizeStocks[selSize]) : (p.stock !== undefined ? parseInt(p.stock) : 10);
+      const isSizeStockOut = (sizeQty === 0) || (p.stock === 0);
+
+      const addToCartBtn = document.getElementById('add-to-cart-btn');
+      const addToCartText = document.getElementById('add-to-cart-text');
+      const addToCartIcon = document.getElementById('add-to-cart-icon');
+      const buyNowBtn = document.getElementById('buy-now-btn');
+      const notifyAdminBtn = document.getElementById('pd-notify-admin-btn');
+      const stockTag = document.getElementById('pd-stock-tag');
+      const stockoutBanner = document.getElementById('pd-stockout-banner');
+      const qtyContainer = document.getElementById('pd-qty-container');
+      const mobileAddCartBtn = document.getElementById('mobile-add-cart-btn');
+      const mobileBuyNowBtn = document.getElementById('mobile-buy-now-btn');
+      const mobileNotifyAdminBtn = document.getElementById('mobile-notify-admin-btn');
+
+      if (isSizeStockOut) {
+        if (stockTag) {
+          stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-red-100 text-red-700';
+          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">cancel</span> Size ${selSize}: Stock Out`;
         }
-      });
-      if (unique.length === 0) {
-        unique.push({ id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 });
-        unique.push({ id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 });
-      }
-
-      // Preserve or set active selection
-      const currentSelectedName = (productState.selectedSleeveName || '').toLowerCase();
-      const matching = unique.find(s => s.name.toLowerCase() === currentSelectedName || s.id === productState.selectedSleeve);
-      if (matching) {
-        productState.selectedSleeve = matching.id;
-        productState.selectedSleeveName = matching.name;
-        productState.sleevePrice = parseFloat(matching.additionalPrice) || 0;
+        if (stockoutBanner) {
+          stockoutBanner.classList.remove('hidden');
+          const span = stockoutBanner.querySelector('span:last-child');
+          if (span) span.textContent = `Size ${selSize} is currently out of stock. Click below to request restock.`;
+        }
+        if (qtyContainer) qtyContainer.classList.add('opacity-40', 'pointer-events-none');
+        if (addToCartBtn) {
+          addToCartBtn.classList.remove('bg-[#121c33]', 'hover:bg-black', 'text-white');
+          addToCartBtn.classList.add('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
+          addToCartBtn.title = `Size ${selSize} is Out of Stock`;
+        }
+        if (addToCartIcon) addToCartIcon.textContent = 'block';
+        if (addToCartText) addToCartText.textContent = `Size ${selSize} Sold Out`;
+        if (buyNowBtn) buyNowBtn.style.display = 'none';
+        if (notifyAdminBtn) {
+          notifyAdminBtn.classList.remove('hidden');
+          notifyAdminBtn.classList.add('flex');
+          const span = notifyAdminBtn.querySelector('span:last-child');
+          if (span) span.textContent = `Request Restock for Size ${selSize} (স্টক রিকোয়েস্ট)`;
+        }
+        if (mobileAddCartBtn) mobileAddCartBtn.style.display = 'none';
+        if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = 'none';
+        if (mobileNotifyAdminBtn) {
+          mobileNotifyAdminBtn.classList.remove('hidden');
+          mobileNotifyAdminBtn.classList.add('flex');
+        }
       } else {
-        productState.selectedSleeve = unique[0].id;
-        productState.selectedSleeveName = unique[0].name;
-        productState.sleevePrice = parseFloat(unique[0].additionalPrice) || 0;
+        if (stockTag) {
+          if (sizeQty <= 3) {
+            stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-100 text-amber-800';
+            stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">schedule</span> Size ${selSize}: Only ${sizeQty} left!`;
+          } else {
+            stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-green-100 text-green-700';
+            stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Size ${selSize}: In Stock (${sizeQty} pcs)`;
+          }
+        }
+        if (stockoutBanner) stockoutBanner.classList.add('hidden');
+        if (qtyContainer) qtyContainer.classList.remove('opacity-40', 'pointer-events-none');
+        if (addToCartBtn) {
+          addToCartBtn.classList.add('bg-[#121c33]', 'hover:bg-black', 'text-white');
+          addToCartBtn.classList.remove('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
+          addToCartBtn.title = 'Add to Cart';
+        }
+        if (addToCartIcon) addToCartIcon.textContent = 'shopping_bag';
+        if (addToCartText) addToCartText.textContent = 'Add to Cart';
+        if (buyNowBtn) buyNowBtn.style.display = '';
+        if (notifyAdminBtn) {
+          notifyAdminBtn.classList.add('hidden');
+          notifyAdminBtn.classList.remove('flex');
+        }
+        if (mobileAddCartBtn) mobileAddCartBtn.style.display = '';
+        if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = '';
+        if (mobileNotifyAdminBtn) {
+          mobileNotifyAdminBtn.classList.add('hidden');
+          mobileNotifyAdminBtn.classList.remove('flex');
+        }
       }
-
-      const slvHash = `${unique.map(s => `${s.id}:${s.name}:${s.additionalPrice}`).join(',')}_${productState.selectedSleeve}`;
-      if (container.dataset.sleevesHash === slvHash && container.children.length > 0) return;
-      container.dataset.sleevesHash = slvHash;
-
-      container.innerHTML = unique.map((s) => {
-        const isActive = (s.id === productState.selectedSleeve || s.name.toLowerCase() === productState.selectedSleeveName.toLowerCase());
-        const activeClass = isActive ? 'border-2 border-black bg-black/5 active' : 'border border-gray-200 hover:border-gray-400 bg-white';
-        const priceTag = (s.additionalPrice || 0) > 0 ? `+৳${s.additionalPrice}` : 'Included';
-        return `
-          <div onclick="selectSleeve('${s.id}', ${s.additionalPrice||0}, '${s.name.replace(/'/g, "\\'")}', this)" 
-               class="sleeve-card ${activeClass} flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all">
-            <span class="text-xs font-bold text-black">${s.name}</span>
-            <span class="text-[11px] font-mono-ui font-semibold text-gray-500">${priceTag}</span>
-          </div>
-        `;
-      }).join('');
-      calculateLiveTotal();
     }
 
     function selectSize(size) {
       productState.selectedSize = size;
       const select = document.getElementById('pd-size-select');
       if (select && select.value !== size) select.value = size;
+      checkSelectedSizeStockState();
       updateMobileBarSummary();
       calculateLiveTotal();
     }
@@ -2148,6 +2199,13 @@
         openRestockModal();
         return;
       }
+      const selSize = productState.selectedSize || 'M';
+      const curSizeStocks = (productState.product?.sizeStocks && typeof productState.product.sizeStocks === 'object') ? productState.product.sizeStocks : null;
+      if (curSizeStocks && curSizeStocks[selSize] !== undefined && curSizeStocks[selSize] <= 0) {
+        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
+        openRestockModal();
+        return;
+      }
       const titleEl = document.getElementById('pd-title');
       const itemTitle = (titleEl ? titleEl.textContent : (productState.product?.name || 'ZENVY AeroKnit Jersey')).trim();
       const unitPrice = productState.basePrice + productState.sleevePrice + (productState.isPersonalized ? productState.personalizeFee : 0) + productState.patchPrice;
@@ -2243,6 +2301,13 @@
     function buyNowDirect() {
       if (productState.product && typeof productState.product.stock === 'number' && productState.product.stock <= 0) {
         showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ! অ্যাডমিনকে জানাতে Request Restock বাটনে ক্লিক করুন।');
+        openRestockModal();
+        return;
+      }
+      const selSize = productState.selectedSize || 'M';
+      const curSizeStocks = (productState.product?.sizeStocks && typeof productState.product.sizeStocks === 'object') ? productState.product.sizeStocks : null;
+      if (curSizeStocks && curSizeStocks[selSize] !== undefined && curSizeStocks[selSize] <= 0) {
+        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
         openRestockModal();
         return;
       }

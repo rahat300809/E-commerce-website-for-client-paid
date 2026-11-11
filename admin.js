@@ -2812,12 +2812,53 @@ function renderInventory(container) {
       </div>
       <div class="table-wrapper">
         <table class="admin-table">
-          <thead><tr><th>Product</th><th>SKU</th><th>Stock Count</th><th>Low Alert Level</th><th>Stock Status</th><th style="text-align:right">Stock Adjustment</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Product & Sizes</th>
+              <th>SKU</th>
+              <th>Total Stock</th>
+              <th>Alert Level</th>
+              <th>Status</th>
+              <th style="text-align:right">Stock Adjustment</th>
+            </tr>
+          </thead>
           <tbody>
             ${products.length === 0 ? `<tr><td colspan="6"><div class="empty-state"><p>No products yet</p></div></td></tr>` :
-              products.map(p => `
+              products.map(p => {
+                const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : {};
+                const stdSizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
+                const availSizes = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
+                  ? p.assignedSizes.map(s => (typeof s === 'string' ? s : (s.code || s.name || '')).toUpperCase().trim())
+                  : stdSizes;
+                
+                const uniqueSizes = [];
+                availSizes.forEach(s => { if (s && !uniqueSizes.includes(s)) uniqueSizes.push(s); });
+                if (uniqueSizes.length === 0) uniqueSizes.push('S','M','L','XL','XXL');
+
+                const sizePills = uniqueSizes.map(sz => {
+                  const hasStockVal = curSizeStocks[sz] !== undefined;
+                  const qty = hasStockVal ? parseInt(curSizeStocks[sz]) : null;
+                  if (qty === null) {
+                    return `<span class="badge badge-gray font-mono cursor-pointer" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="font-size:11px;padding:2px 7px;" title="Size ${sz}: Click to set stock">${sz}: -</span>`;
+                  } else if (qty === 0) {
+                    return `<span class="badge badge-red font-mono font-bold cursor-pointer" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="font-size:11px;padding:2px 7px;" title="Size ${sz}: Stock Out! Click to restock">${sz}: 0</span>`;
+                  } else if (qty <= 3) {
+                    return `<span class="badge badge-amber font-mono font-bold cursor-pointer" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="font-size:11px;padding:2px 7px;" title="Size ${sz}: Low stock (${qty} left)">${sz}: ${qty}</span>`;
+                  } else {
+                    return `<span class="badge badge-green font-mono font-bold cursor-pointer" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="font-size:11px;padding:2px 7px;" title="Size ${sz}: In stock (${qty} pcs)">${sz}: ${qty}</span>`;
+                  }
+                }).join(' ');
+
+                const hasOutOfStockSize = Object.values(curSizeStocks).some(v => v === 0);
+
+                return `
                 <tr>
-                  <td style="font-weight:700;color:#0F172A;">${p.name}</td>
+                  <td>
+                    <div style="font-weight:700;color:#0F172A;font-size:13px;">${p.name}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;align-items:center;">
+                      ${sizePills}
+                    </div>
+                  </td>
                   <td class="font-mono" style="font-size:12px;color:#64748B;">${p.sku||'-'}</td>
                   <td>
                     <span class="badge ${p.stock===0?'badge-red':p.stock<=(p.lowStockAlert||5)?'badge-amber':'badge-green'} font-mono" style="font-size:14px;font-weight:800;padding:4px 10px;">
@@ -2826,17 +2867,19 @@ function renderInventory(container) {
                   </td>
                   <td style="color:#9CA3AF">${p.lowStockAlert||5}</td>
                   <td>
-                    ${p.stock===0 ? '<span class="badge badge-red font-bold">⚠️ Stock Out (Out of Stock)</span>' : 
+                    ${p.stock===0 ? '<span class="badge badge-red font-bold">⚠️ Stock Out (All sizes)</span>' : 
+                      hasOutOfStockSize ? `<span class="badge badge-amber font-bold">⚠️ Partial Stock Out (${p.stock} total)</span>` :
                       p.stock<=(p.lowStockAlert||5) ? `<span class="badge badge-amber font-bold">⚠️ Low Stock (${p.stock} left)</span>` : 
                       '<span class="badge badge-green font-bold">✓ In Stock</span>'}
                   </td>
                   <td class="actions-cell">
-                    <button class="btn btn-secondary btn-sm" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="display:inline-flex;align-items:center;gap:4px;">
-                      <span class="material-symbols-outlined" style="font-size:15px;">tune</span> Adjust Stock
+                    <button class="btn btn-secondary btn-sm" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;font-weight:600;">
+                      <span class="material-symbols-outlined" style="font-size:15px;">tune</span> Adjust Per-Size Stock
                     </button>
                   </td>
                 </tr>
-              `).join('')}
+              `;
+              }).join('')}
           </tbody>
         </table>
       </div>
@@ -2898,41 +2941,169 @@ function openWhatsAppForRestock(phone, customerName, productName, size) {
 window.openWhatsAppForRestock = openWhatsAppForRestock;
 
 function openStockAdjust(productId, productName, currentStock) {
-  const reasons = ['Restock', 'Manual adjustment', 'Damaged', 'Returned', 'Correction'];
+  const p = DB.products.byId(productId) || { id: productId, name: productName, stock: currentStock };
+  
+  const stdSizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
+  const sizesToDisplay = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
+    ? p.assignedSizes.map(s => (typeof s === 'string' ? s : (s.code || s.name || '')).toUpperCase().trim())
+    : stdSizes;
+  
+  const uniqueSizes = [];
+  sizesToDisplay.forEach(s => { if (s && !uniqueSizes.includes(s)) uniqueSizes.push(s); });
+  if (uniqueSizes.length === 0) uniqueSizes.push('S','M','L','XL','XXL');
+
+  const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : {};
+  const reasons = ['Restock', 'Manual adjustment', 'Size inventory recount', 'Damaged', 'Returned', 'Correction'];
+
   const html = `
-    <p style="font-size:14px;margin-bottom:16px">Current stock: <strong class="font-mono">${currentStock}</strong></p>
-    <div class="form-group">
-      <label class="form-label">New Stock Quantity<span class="req">*</span></label>
-      <input type="number" id="adj-qty" class="form-input" value="${currentStock}" min="0"/>
+    <div style="margin-bottom:14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Current Total Stock</div>
+          <div style="font-size:18px;font-weight:900;color:#0F172A;margin-top:2px;">
+            <span id="adj-live-total" class="font-mono">${p.stock || 0}</span> <span style="font-size:13px;font-weight:600;color:#64748B;">pieces (units)</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#64748B;font-weight:600;">SKU: <span class="font-mono" style="color:#0F172A;">${p.sku || '-'}</span></div>
+          <div style="font-size:11px;color:${(p.stock||0)===0?'#DC2626':(p.stock||0)<=5?'#D97706':'#16A34A'};font-weight:700;margin-top:2px;">
+            ${(p.stock||0)===0?'⚠️ Stock Out':(p.stock||0)<=5?'⚠️ Low Stock':'✓ In Stock'}
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Reason<span class="req">*</span></label>
-      <select id="adj-reason" class="form-select">
-        ${reasons.map(r => `<option>${r}</option>`).join('')}
-      </select>
+
+    <!-- Per-Size Stock Entry Grid -->
+    <div class="form-group mb-4">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label class="form-label" style="font-size:13px;font-weight:800;color:#0F172A;margin:0;">
+          Per-Size Stock Breakdown (সাইজ অনুযায়ী পিস সংখ্যা)
+        </label>
+        <span style="font-size:11px;color:#64748B;">Enter 0 for Stock Out sizes</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
+        ${uniqueSizes.map(sz => {
+          const szQty = curSizeStocks[sz] !== undefined ? parseInt(curSizeStocks[sz]) : (uniqueSizes.length > 0 && (p.stock || 0) > 0 ? Math.floor((p.stock||0) / uniqueSizes.length) : 0);
+          return `
+            <div style="background:#ffffff;border:1.5px solid #E2E8F0;border-radius:10px;padding:8px 10px;box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span class="badge font-mono font-bold" style="background:#0F172A;color:#fff;font-size:11px;padding:2px 6px;">Size ${sz}</span>
+                <button type="button" class="btn btn-ghost btn-xs text-red-600" style="padding:1px 5px;font-size:10px;font-weight:700;" onclick="quickSetSizeZero('${sz}')" title="Set to 0 (Stock Out)">0 (Out)</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input type="number" 
+                       id="adj-sz-${sz}" 
+                       data-size="${sz}" 
+                       class="form-input font-mono size-stock-qty" 
+                       value="${szQty}" 
+                       min="0" 
+                       step="1"
+                       style="font-weight:800;font-size:15px;text-align:center;padding:5px 6px;border-radius:6px;"
+                       oninput="recalcModalStockTotal()"/>
+                <span style="font-size:11px;color:#64748B;font-weight:600;">pcs</span>
+              </div>
+              <div id="adj-sz-status-${sz}" style="font-size:10px;font-weight:700;margin-top:3px;color:${szQty===0?'#DC2626':szQty<=3?'#D97706':'#16A34A'};">
+                ${szQty===0?'⚠️ Stock Out':szQty<=3?`Low (${szQty})`:`In Stock (${szQty})`}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <input type="text" id="adj-notes" class="form-input" placeholder="Optional notes"/>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Adjustment Reason<span class="req">*</span></label>
+        <select id="adj-reason" class="form-select">
+          ${reasons.map(r => `<option>${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes / Reference</label>
+        <input type="text" id="adj-notes" class="form-input" placeholder="e.g. Supplier delivery, damage, recount"/>
+      </div>
     </div>
   `;
+
   const footer = `
     <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary" onclick="applyStockAdjust('${productId}',${currentStock})">Apply Adjustment</button>
+    <button class="btn btn-primary" onclick="applyStockAdjust('${productId}', ${p.stock || 0})" style="background:#0F172A;display:inline-flex;align-items:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save Stock Adjustments
+    </button>
   `;
-  openModal(`Adjust Stock: ${productName}`, html, footer, 'modal-sm');
+
+  openModal(`Adjust Stock: ${productName}`, html, footer, 'modal-md');
+  recalcModalStockTotal();
 }
+window.openStockAdjust = openStockAdjust;
+
+function quickSetSizeZero(sz) {
+  const inp = document.getElementById(`adj-sz-${sz}`);
+  if (inp) {
+    inp.value = 0;
+    recalcModalStockTotal();
+  }
+}
+window.quickSetSizeZero = quickSetSizeZero;
+
+function recalcModalStockTotal() {
+  const inputs = document.querySelectorAll('.size-stock-qty');
+  let sum = 0;
+  inputs.forEach(inp => {
+    const v = parseInt(inp.value) || 0;
+    sum += v;
+    const sz = inp.dataset.size;
+    const statusEl = document.getElementById(`adj-sz-status-${sz}`);
+    if (statusEl) {
+      statusEl.style.color = v === 0 ? '#DC2626' : v <= 3 ? '#D97706' : '#16A34A';
+      statusEl.textContent = v === 0 ? '⚠️ Stock Out' : v <= 3 ? `Low (${v})` : `In Stock (${v})`;
+    }
+  });
+  const totalEl = document.getElementById('adj-live-total');
+  if (totalEl) totalEl.textContent = sum;
+}
+window.recalcModalStockTotal = recalcModalStockTotal;
 
 function applyStockAdjust(productId, oldStock) {
-  const qty = parseInt(document.getElementById('adj-qty')?.value);
-  const reason = document.getElementById('adj-reason')?.value;
-  const notes = document.getElementById('adj-notes')?.value;
-  if (isNaN(qty) || qty < 0) { toast('Invalid quantity', 'error'); return; }
-  DB.products.updateStock(productId, qty, reason + (notes ? ` — ${notes}` : ''));
-  toast(`Stock updated to ${qty}`, 'success');
+  const p = DB.products.byId(productId);
+  if (!p) { toast('Product not found', 'error'); return; }
+
+  const inputs = document.querySelectorAll('.size-stock-qty');
+  const sizeStocks = {};
+  let totalQty = 0;
+  const breakdownParts = [];
+
+  inputs.forEach(inp => {
+    const sz = inp.dataset.size;
+    const qty = Math.max(0, parseInt(inp.value) || 0);
+    sizeStocks[sz] = qty;
+    totalQty += qty;
+    breakdownParts.push(`${sz}: ${qty}`);
+  });
+
+  const reason = document.getElementById('adj-reason')?.value || 'Manual recount';
+  const notes = document.getElementById('adj-notes')?.value?.trim();
+  const fullReason = `${reason} — ${breakdownParts.join(', ')} (Total: ${totalQty} pcs)${notes ? ` [${notes}]` : ''}`;
+
+  DB.products.updateStock(productId, totalQty, fullReason, sizeStocks);
+
+  // If Firebase connected, save product to cloud immediately
+  const updatedP = DB.products.byId(productId);
+  if (window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
+    window.ZenvyFirebase.saveProduct(updatedP);
+  }
+
+  toast(`Stock updated: ${totalQty} total units (${breakdownParts.slice(0, 4).join(', ')}${breakdownParts.length > 4 ? '...' : ''})`, 'success');
   closeModal();
-  renderInventory(document.getElementById('admin-content'));
+
+  const content = document.getElementById('admin-content');
+  if (content) {
+    if (currentView === 'inventory') renderInventory(content);
+    else if (currentView === 'products') renderProducts(content);
+  }
 }
+window.applyStockAdjust = applyStockAdjust;
 
 function exportProductsCSV() {
   if (typeof DB !== 'undefined' && DB.products && typeof DB.products.exportCSV === 'function') {

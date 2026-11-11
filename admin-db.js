@@ -975,11 +975,15 @@ const DB = {
       DB.log(`Product deleted: ${p?.name || id}`);
       return 'deleted';
     },
-    updateStock(id, qty, reason = 'Manual adjustment') {
+    updateStock(id, qty, reason = 'Manual adjustment', sizeStocks = null) {
       const p = DB.products.byId(id);
       if (!p) return;
       const oldStock = p.stock;
-      DB.products.update(id, { stock: qty });
+      const updates = { stock: qty };
+      if (sizeStocks && typeof sizeStocks === 'object') {
+        updates.sizeStocks = sizeStocks;
+      }
+      DB.products.update(id, updates);
       DB.inventory.addHistory({ productId: id, productName: p.name, previousStock: oldStock, change: qty - oldStock, newStock: qty, reason });
     },
     exportCSV() {

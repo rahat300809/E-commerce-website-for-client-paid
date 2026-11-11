@@ -42,6 +42,14 @@
   let _writeTimer = null;
   let _listeners = [];
 
+  // Initialize in-memory products cache from localStorage if available
+  try {
+    const rawProds = localStorage.getItem(`${DB_VERSION}_products`);
+    if (rawProds) {
+      window._ZENVY_PRODUCTS_CACHE = JSON.parse(rawProds);
+    }
+  } catch(e){}
+
   // Helper to ensure clean JSON for Firestore (strips undefined, functions, circular refs)
   function sanitize(obj) {
     try {
@@ -381,39 +389,30 @@
         return true;
       });
 
-      // 4. Merge: Local vs Cloud
-      // Any product present locally that is missing in cloud (e.g. added on another laptop/device)
-      // MUST be preserved and uploaded to cloud so all devices stay 100% in sync!
+      // 4. Authoritative Cloud Catalog Sync
+      // Cloud Firestore /products/ collection is the master source of truth across all devices.
       const cloudMap = new Map();
       cloudList.forEach(p => cloudMap.set(String(p.id).trim(), p));
 
       const toUpload = [];
-      localList.forEach(p => {
-        if (!p || !p.id) return;
-        const pid = String(p.id).trim();
-        if (deletedIds.has(pid)) return; // Never resurrect deleted items
-        if (isTestOrJunkProduct(p)) return; // Never upload test junk
+      if (isManual) {
+        // Only during explicit manual admin sync: upload any newly drafted local-only products
+        localList.forEach(p => {
+          if (!p || !p.id) return;
+          const pid = String(p.id).trim();
+          if (deletedIds.has(pid)) return;
+          if (isTestOrJunkProduct(p)) return;
 
-        const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
-        const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
-        p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
+          const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+          const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+          p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
 
-        if (!cloudMap.has(pid)) {
-          // This product exists on this device but NOT yet in Firestore /products/!
-          // Add to cloud catalog and schedule upload
-          toUpload.push(p);
-          cloudMap.set(pid, p);
-        } else {
-          // Check if local has newer updates (e.g. offline edits)
-          const cloudP = cloudMap.get(pid);
-          const localTime = new Date(p.updatedAt || p.createdAt || 0).getTime();
-          const cloudTime = new Date(cloudP.updatedAt || cloudP.createdAt || 0).getTime();
-          if (localTime > cloudTime + 1000) {
+          if (!cloudMap.has(pid)) {
             toUpload.push(p);
             cloudMap.set(pid, p);
           }
-        }
-      });
+        });
+      }
 
       const merged = Array.from(cloudMap.values());
       // Sort newest first
@@ -423,11 +422,30 @@
         return tB - tA;
       });
 
-      // 5. Update local storage with complete synchronized catalog
-      localStorage.setItem(localKey, JSON.stringify(merged));
-      localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+      // 5. Update in-memory cache IMMEDIATELY so all views have instant 0ms access
+      window._ZENVY_PRODUCTS_CACHE = merged;
 
-      // 6. Upload any missing/newer local products to Firestore /products/
+      // 6. Safely update localStorage with QuotaExceededError protection
+      try {
+        localStorage.setItem(localKey, JSON.stringify(merged));
+        localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+      } catch (quotaErr) {
+        console.warn('[ZenvySync] localStorage quota warning, storing slimmed catalog:', quotaErr);
+        try {
+          const slimmed = merged.map(p => {
+            const cp = { ...p };
+            if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+            if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
+            return cp;
+          });
+          localStorage.setItem(localKey, JSON.stringify(slimmed));
+          localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+        } catch(e2) {
+          console.warn('[ZenvySync] localStorage fallback write notice:', e2);
+        }
+      }
+
+      // 7. Upload any manual local additions to Firestore /products/
       if (toUpload.length > 0) {
         console.log(`[ZenvySync] Uploading ${toUpload.length} local products to Firestore cloud /products/...`);
         for (const p of toUpload) {
@@ -440,7 +458,7 @@
         }
       }
 
-      // 7. Dispatch events for instant UI reactivity across storefront and admin
+      // 8. Dispatch events for instant UI reactivity across storefront and admin
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
 
@@ -455,6 +473,14 @@
     if (!p || !p.id) return;
     await ensureDb();
     const pid = String(p.id).trim();
+
+    // Optimize payload before pushing to Firestore
+    if (p.sizeChartImage && p.sizeChartImage.length > 50000) {
+      p.sizeChartImage = '';
+    }
+    if (p.imageUrl && p.image && p.imageUrl === p.image) {
+      p.imageUrl = '';
+    }
 
     // Remove from deleted tracker if re-creating
     const deletedKey = `${DB_VERSION}_deleted_product_ids`;
@@ -473,7 +499,16 @@
     const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
     p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
 
-    // 1. Update local storage immediately
+    // Update in-memory cache immediately
+    if (Array.isArray(window._ZENVY_PRODUCTS_CACHE)) {
+      const idx = window._ZENVY_PRODUCTS_CACHE.findIndex(x => String(x.id).trim() === pid);
+      if (idx >= 0) window._ZENVY_PRODUCTS_CACHE[idx] = p;
+      else window._ZENVY_PRODUCTS_CACHE.unshift(p);
+    } else {
+      window._ZENVY_PRODUCTS_CACHE = [p];
+    }
+
+    // 1. Update local storage immediately with quota safety
     const localKey = `${DB_VERSION}_products`;
     try {
       let prods = JSON.parse(localStorage.getItem(localKey) || '[]');
@@ -481,7 +516,19 @@
       if (idx >= 0) prods[idx] = p; else prods.unshift(p);
       localStorage.setItem(localKey, JSON.stringify(prods));
       localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
-    } catch(e){}
+    } catch(e) {
+      try {
+        let prods = window._ZENVY_PRODUCTS_CACHE || [];
+        const slimmed = prods.map(item => {
+          const cp = { ...item };
+          if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+          if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
+          return cp;
+        });
+        localStorage.setItem(localKey, JSON.stringify(slimmed));
+        localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+      } catch(e2){}
+    }
 
     // 2. Upload directly to Firestore /products/{pid}
     if (_db) {
@@ -502,6 +549,10 @@
     if (!id) return;
     await ensureDb();
     const strId = String(id).trim();
+
+    if (Array.isArray(window._ZENVY_PRODUCTS_CACHE)) {
+      window._ZENVY_PRODUCTS_CACHE = window._ZENVY_PRODUCTS_CACHE.filter(p => String(p.id).trim() !== strId);
+    }
 
     // 1. Add to permanent deleted tracking set
     const deletedKey = `${DB_VERSION}_deleted_product_ids`;
@@ -728,8 +779,22 @@
             const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
             return tB - tA;
           });
-          localStorage.setItem(localKey, JSON.stringify(prods));
-          localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+          window._ZENVY_PRODUCTS_CACHE = prods;
+          try {
+            localStorage.setItem(localKey, JSON.stringify(prods));
+            localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+          } catch(e) {
+            try {
+              const slimmed = prods.map(p => {
+                const cp = { ...p };
+                if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+                if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
+                return cp;
+              });
+              localStorage.setItem(localKey, JSON.stringify(slimmed));
+              localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
+            } catch(e2){}
+          }
           console.log('[ZenvySync] Live product update received from server 🔄');
           window.dispatchEvent(new Event('storage'));
           window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
@@ -777,8 +842,8 @@
     ensureDb,
     async forceSync() {
       await ensureDb();
-      await hydrate();
       const res = await syncProductsWithCloud(true);
+      await hydrate();
       console.log('[ZenvySync] Force sync complete ✅');
       return res;
     }

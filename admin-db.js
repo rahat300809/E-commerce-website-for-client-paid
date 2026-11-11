@@ -27,7 +27,16 @@ if (typeof window !== 'undefined') {
 // ──────────────────────────────────────────────────────────
 const Store = {
   get(key) {
-    try { return JSON.parse(localStorage.getItem(`${DB_VERSION}_${key}`) || '[]'); }
+    if (key === 'products' && Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
+      return window._ZENVY_PRODUCTS_CACHE;
+    }
+    try { 
+      const res = JSON.parse(localStorage.getItem(`${DB_VERSION}_${key}`) || '[]');
+      if (key === 'products' && Array.isArray(res) && res.length > 0) {
+        window._ZENVY_PRODUCTS_CACHE = res;
+      }
+      return res;
+    }
     catch { return []; }
   },
   getObj(key, def = {}) {
@@ -36,11 +45,26 @@ const Store = {
   },
   set(key, value) {
     const now = Date.now();
+    if (key === 'products' && Array.isArray(value)) {
+      window._ZENVY_PRODUCTS_CACHE = value;
+    }
     try {
       localStorage.setItem(`${DB_VERSION}_${key}`, JSON.stringify(value));
       localStorage.setItem(`${DB_VERSION}_${key}_updatedAt`, now.toString());
     } catch(err) {
       console.warn(`[Store] Failed to write key "${key}":`, err);
+      if (key === 'products' && Array.isArray(value)) {
+        try {
+          const slimmed = value.map(p => {
+            const cp = { ...p };
+            if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+            if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
+            return cp;
+          });
+          localStorage.setItem(`${DB_VERSION}_${key}`, JSON.stringify(slimmed));
+          localStorage.setItem(`${DB_VERSION}_${key}_updatedAt`, now.toString());
+        } catch(e2){}
+      }
     }
     // Mirror write to Firestore for cross-origin sync
     if (window.ZenvyFirebase && typeof window.ZenvyFirebase.push === 'function') {
@@ -810,10 +834,14 @@ const DB = {
   // ── Products ──
   products: {
     all() {
+      if (Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
+        return window._ZENVY_PRODUCTS_CACHE;
+      }
       let items = Store.get('products');
       if (!items || !Array.isArray(items)) {
         return [];
       }
+      window._ZENVY_PRODUCTS_CACHE = items;
       return items;
     },
     byId(id) {
@@ -844,13 +872,13 @@ const DB = {
     },
     getImage(p) {
       if (!p) return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+      if (typeof p.image === 'string' && p.image.trim()) return p.image.trim();
+      if (typeof p.imageUrl === 'string' && p.imageUrl.trim()) return p.imageUrl.trim();
       if (Array.isArray(p.images) && p.images.length > 0) {
         const first = p.images[0];
         if (typeof first === 'string' && first.trim()) return first.trim();
         if (first && typeof first === 'object' && first.url) return first.url;
       }
-      if (typeof p.imageUrl === 'string' && p.imageUrl.trim()) return p.imageUrl.trim();
-      if (typeof p.image === 'string' && p.image.trim()) return p.image.trim();
       return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
     },
     create(data) {

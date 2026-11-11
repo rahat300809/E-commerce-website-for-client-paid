@@ -288,7 +288,7 @@
             
             <!-- Cutout Jersey Image -->
             <img id="main-product-img" 
-                 src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48cmVjdCB3aWR0aD0nMjAwJyBoZWlnaHQ9JzIwMCcgZmlsbD0nI2Y1ZjVmNycvPjwvc3ZnPg==" 
+                 src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80" 
                  alt="Performance Jersey" 
                  class="max-h-[220px] sm:max-h-[280px] md:max-h-[400px] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300 group-hover:scale-105"/>
 
@@ -917,9 +917,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v13"></script>
-  <script src="admin-db.js?v=20261111_v13"></script>
-  <script src="wishlist.js?v=20261111_v13"></script>
+  <script src="firebase-sync.js?v=20261111_v15"></script>
+  <script src="admin-db.js?v=20261111_v15"></script>
+  <script src="wishlist.js?v=20261111_v15"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -945,12 +945,13 @@
     window.productState = productState;
 
     // Authentic High-Res Default Angles
-    const DEFAULT_BACK_IMAGE = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvPSMv4hm-ogvHICrLE75pSyHISjUeRYFACniC-YFTC6395bXDbLCEXnamAC_4lHGSDhOnnbm749_rc59n9IIu1p1gOP6rFKwmskJ7depORghWDz9ApaZcCt2mKRzZH6LnLM15nulbMpzHctlkozD_yUmKpIMektqElyuGrcDtzHydDlXqscB4e-luHSYlE7gFo3zwRlKQ_BojzHVyjjah_G0TAj4P6eVNddadsSpPfs_2fRF4dcc-Xw';
-    const DEFAULT_DETAIL_IMAGE = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    const DEFAULT_FRONT_IMAGE = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    const DEFAULT_BACK_IMAGE = 'https://images.unsplash.com/photo-1580087256394-dc596e1c8f4f?w=800&q=80';
+    const DEFAULT_DETAIL_IMAGE = 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80';
 
     // Images for different angles
     const ANGLE_IMAGES = {
-      front: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA',
+      front: DEFAULT_FRONT_IMAGE,
       back: DEFAULT_BACK_IMAGE,
       detail: DEFAULT_DETAIL_IMAGE
     };
@@ -1004,7 +1005,7 @@
 
     // Initialization
     // ─────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
+    function initProductPage() {
       loadDataFromAdminDB();
       syncProductWishlistButton();
       calculateLiveTotal();
@@ -1029,7 +1030,13 @@
           syncBrandAndSocialSettings();
         });
       }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProductPage);
+    } else {
+      initProductPage();
+    }
 
     window.addEventListener('storage', () => {
       loadDataFromAdminDB();
@@ -1148,8 +1155,41 @@
     })();
 
     // ─────────────────────────────────────────
-    // Load Product & Config from admin-db.js
+    // Load Product & Config from admin-db.js / Firestore
     // ─────────────────────────────────────────
+    let _fetchingProdDirect = false;
+    async function fetchProductDirectFromCloud(idOrSlug) {
+      if (!idOrSlug || _fetchingProdDirect) return;
+      _fetchingProdDirect = true;
+      try {
+        if (window.ZenvyFirebase && typeof window.ZenvyFirebase.ensureDb === 'function') {
+          const db = await window.ZenvyFirebase.ensureDb();
+          if (db) {
+            let docSnap = await db.collection('products').doc(idOrSlug).get();
+            if (!docSnap.exists) {
+              const qSnap = await db.collection('products').where('slug', '==', idOrSlug).limit(1).get();
+              if (!qSnap.empty) docSnap = qSnap.docs[0];
+            }
+            if (docSnap && docSnap.exists) {
+              const pData = docSnap.data();
+              if (!pData.id) pData.id = docSnap.id;
+              if (Array.isArray(window._ZENVY_PRODUCTS_CACHE)) {
+                const idx = window._ZENVY_PRODUCTS_CACHE.findIndex(x => x.id === pData.id);
+                if (idx >= 0) window._ZENVY_PRODUCTS_CACHE[idx] = pData;
+                else window._ZENVY_PRODUCTS_CACHE.unshift(pData);
+              }
+              renderTargetProduct(pData);
+              _fetchingProdDirect = false;
+              return;
+            }
+          }
+        }
+      } catch(e) {
+        console.warn('[ProductPage] Direct Firestore fetch notice:', e);
+      }
+      _fetchingProdDirect = false;
+    }
+
     function loadDataFromAdminDB() {
       const urlParams = new URLSearchParams(window.location.search);
       const prodId = urlParams.get('id') || urlParams.get('slug') || _initialRequestedId;
@@ -1167,7 +1207,7 @@
         if (prodId) {
           targetProduct = DB.products.byId(prodId);
           if (!targetProduct) {
-            targetProduct = allProducts.find(p => String(p.id).trim() === String(prodId).trim() || String(p.slug) === String(prodId));
+            targetProduct = allProducts.find(p => String(p.id).trim().toLowerCase() === String(prodId).trim().toLowerCase() || String(p.slug||'').toLowerCase() === String(prodId).toLowerCase());
           }
         }
         if (!targetProduct && prodSlug) {
@@ -1192,7 +1232,13 @@
           };
         }
 
-        // Default fallback if no specific product requested
+        // If product was explicitly requested by ID/slug in URL, do NOT fallback to dummy product! Fetch direct from cloud
+        if (!targetProduct && (prodId || prodSlug)) {
+          fetchProductDirectFromCloud(prodId || prodSlug);
+          return;
+        }
+
+        // Default fallback ONLY if NO specific product was requested in URL
         if (!targetProduct) {
           targetProduct = allProducts[0] || {
             id: '101',
@@ -1207,27 +1253,127 @@
       }
 
       if (targetProduct) {
-        // Compute render hash to prevent redundant re-renders and background reload flashing
-        const currentTitleEl = document.getElementById('pd-title');
-        const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}`;
-        const isSameProduct = (window._activeProductRenderHash === prodDataHash);
+        renderTargetProduct(targetProduct);
+      }
+    }
 
-        productState.product = targetProduct;
-        productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
+    function renderTargetProduct(targetProduct) {
+      if (!targetProduct) return;
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramImage = urlParams.get('image');
 
-        if (isSameProduct && currentTitleEl && currentTitleEl.textContent.trim()) {
-          calculateLiveTotal();
-          return;
+      // Compute render hash to prevent redundant re-renders and background reload flashing
+      const currentTitleEl = document.getElementById('pd-title');
+      const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}_${JSON.stringify(targetProduct.sizeStocks||{})}`;
+      const isSameProduct = (window._activeProductRenderHash === prodDataHash);
+
+      productState.product = targetProduct;
+      productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
+
+      if (isSameProduct && currentTitleEl && currentTitleEl.textContent.trim()) {
+        calculateLiveTotal();
+        return;
+      }
+      window._activeProductRenderHash = prodDataHash;
+
+      // 1. Basic Product Info & Title (Immediate render)
+      document.title = `${targetProduct.name} | ZENVY Elite Performance`;
+      const titleEl = document.getElementById('pd-title');
+      if (titleEl) titleEl.textContent = targetProduct.name;
+      
+      const catEl = document.getElementById('pd-category-tag');
+      if (catEl) catEl.textContent = (targetProduct.categoryName || 'MEN\'S FOOTBALL').toUpperCase();
+      
+      const priceEl = document.getElementById('pd-base-price');
+      if (priceEl) priceEl.textContent = formatCurrency(productState.basePrice);
+
+      const origEl = document.getElementById('pd-original-price');
+      const discBadge = document.getElementById('pd-discount-badge');
+      if (origEl) {
+        if (targetProduct.compareAt || (targetProduct.basePrice && targetProduct.basePrice > productState.basePrice)) {
+          const orig = targetProduct.compareAt || targetProduct.basePrice;
+          origEl.textContent = formatCurrency(orig);
+          origEl.classList.remove('hidden');
+          if (discBadge) {
+            const pct = Math.round(((orig - productState.basePrice) / orig) * 100);
+            if (pct > 0) {
+              discBadge.textContent = `SAVE ${pct}%`;
+              discBadge.classList.remove('hidden');
+            }
+          }
+        } else {
+          origEl.classList.add('hidden');
+          if (discBadge) discBadge.classList.add('hidden');
         }
-        window._activeProductRenderHash = prodDataHash;
+      }
 
-        // 1. Read dynamic customization settings from Admin DB
+      // 2. Product Images & Multi-Angle Setup (Immediate render)
+      const primaryImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+        ? DB.products.getImage(targetProduct)
+        : (targetProduct.image || targetProduct.imageUrl || (Array.isArray(targetProduct.images) && targetProduct.images[0]?.url) || ANGLE_IMAGES.front);
+
+      const imagesList = [];
+      if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
+        targetProduct.images.forEach(img => {
+          const url = typeof img === 'string' ? img : (img.url || '');
+          if (url) imagesList.push(url);
+        });
+      }
+      if (paramImage && !imagesList.includes(paramImage)) {
+        imagesList.unshift(paramImage);
+      }
+      if (primaryImg && !imagesList.includes(primaryImg)) {
+        imagesList.unshift(primaryImg);
+      }
+      if (imagesList.length === 0) {
+        imagesList.push(primaryImg || DEFAULT_FRONT_IMAGE);
+      }
+
+      productState.galleryImages = imagesList;
+      ANGLE_IMAGES.front = imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE;
+      ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE);
+      ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE);
+
+      const mainImg = document.getElementById('main-product-img');
+      if (mainImg) {
+        mainImg.src = ANGLE_IMAGES.front;
+        mainImg.alt = targetProduct.name;
+        mainImg.onerror = function() {
+          this.onerror = null;
+          this.src = DEFAULT_FRONT_IMAGE;
+        };
+      }
+
+      try {
+        renderGalleryThumbnails(imagesList);
+      } catch(e) {
+        console.warn('Gallery render notice:', e);
+      }
+
+      // Clean & shorten browser address bar to shareable link
+      try {
+        if (window.history && window.history.replaceState && targetProduct.id) {
+          const isMatchingRequested = !_initialRequestedId || 
+            String(_initialRequestedId).toLowerCase() === String(targetProduct.id).toLowerCase() || 
+            String(_initialRequestedId).toLowerCase() === String(targetProduct.slug || '').toLowerCase();
+          
+          if (isMatchingRequested) {
+            const shortQuery = `?id=${encodeURIComponent(targetProduct.id)}`;
+            if (window.location.search !== shortQuery) {
+              const currentPath = window.location.pathname.endsWith('product.html') ? window.location.pathname : 'product.html';
+              window.history.replaceState(null, '', `${currentPath}${shortQuery}`);
+            }
+          }
+        }
+      } catch (e) {}
+
+      // 3. Dynamic customization settings from Admin DB
+      try {
         let cs = {};
         if (typeof DB !== 'undefined' && DB.customizationSettings) {
           cs = DB.customizationSettings.get() || {};
         }
 
-        // Determine if customization is enabled on this specific product
         const hasCustomPrinting = (
           targetProduct.customNameNumber === true ||
           targetProduct.customName === true ||
@@ -1276,8 +1422,12 @@
             productState.personalizeFee = 0;
           }
         }
+      } catch (e) {
+        console.warn('Custom print setup error:', e);
+      }
 
-        // 2. Read dynamic patches from Admin DB (filter by targetProduct.assignedPatches)
+      // 4. Dynamic patches from Admin DB
+      try {
         if (typeof DB !== 'undefined' && DB.patches) {
           let dbPatches = DB.patches.enabled();
           if (Array.isArray(targetProduct.assignedPatches)) {
@@ -1295,8 +1445,12 @@
             productState.patchPrice = 0;
           }
         }
+      } catch (e) {
+        console.warn('Patches setup error:', e);
+      }
 
-        // 3. Read dynamic sleeves from Admin DB (filter by targetProduct.assignedSleeves)
+      // 5. Dynamic sleeves from Admin DB
+      try {
         if (typeof DB !== 'undefined' && DB.sleeves) {
           let dbSleeves = DB.sleeves.enabled();
           const hasExplicitEmptySleeves = Array.isArray(targetProduct.assignedSleeves) && targetProduct.assignedSleeves.length === 0 && targetProduct.hasOwnProperty('assignedSleeves');
@@ -1322,7 +1476,6 @@
                 dbSleeves = dbSleeves.filter(s => s.id === 'slv_half' || s.id === 'slv_full');
               }
             }
-            // Filter out any corrupted or anomalous sleeve
             dbSleeves = (dbSleeves || []).filter(s => (s.name || '').trim() !== '777');
             if (!dbSleeves || dbSleeves.length === 0) {
               dbSleeves = [
@@ -1336,8 +1489,12 @@
             }
           }
         }
+      } catch (e) {
+        console.warn('Sleeves setup error:', e);
+      }
 
-        // 4. Read dynamic sizes from Admin DB (filter by targetProduct.assignedSizes)
+      // 6. Dynamic sizes from Admin DB
+      try {
         if (typeof DB !== 'undefined' && DB.sizes) {
           let dbSizes = DB.sizes.enabled();
           if (Array.isArray(targetProduct.assignedSizes) && targetProduct.assignedSizes.length > 0) {
@@ -1346,105 +1503,45 @@
           }
           renderDynamicSizes(dbSizes);
         }
+      } catch (e) {
+        console.warn('Sizes setup error:', e);
+      }
 
-        // WhatsApp direct button visibility
+      // 7. WhatsApp direct button visibility
+      try {
         if (typeof DB !== 'undefined' && DB.storeSettings) {
           const storeCfg = DB.storeSettings.get();
           const waDesktop = document.getElementById('whatsapp-order-btn');
           const waMobile = document.getElementById('mobile-whatsapp-btn');
-          const isWaEnabled = storeCfg.whatsappEnabled !== false;
+          const isWaEnabled = storeCfg && storeCfg.whatsappEnabled !== false;
           if (waDesktop) waDesktop.style.display = isWaEnabled ? 'flex' : 'none';
           if (waMobile) waMobile.style.display = isWaEnabled ? 'flex' : 'none';
         }
+      } catch (e) {
+        console.warn('WhatsApp button setup error:', e);
+      }
 
-        // Clean & shorten browser address bar to shareable link (e.g. /product.html?id=108)
-        try {
-          if (window.history && window.history.replaceState && targetProduct.id) {
-            const isMatchingRequested = !_initialRequestedId || 
-              String(_initialRequestedId).toLowerCase() === String(targetProduct.id).toLowerCase() || 
-              String(_initialRequestedId).toLowerCase() === String(targetProduct.slug || '').toLowerCase();
-            
-            if (isMatchingRequested) {
-              const shortQuery = `?id=${encodeURIComponent(targetProduct.id)}`;
-              if (window.location.search !== shortQuery) {
-                const currentPath = window.location.pathname.endsWith('product.html') ? window.location.pathname : 'product.html';
-                window.history.replaceState(null, '', `${currentPath}${shortQuery}`);
-              }
-            }
-          }
-        } catch (e) {}
+      // Stock status, Stock count & Stock Out handling
+      const stockEl = document.getElementById('pd-stock-tag');
+      const isStockOut = (typeof targetProduct.stock === 'number' && targetProduct.stock <= 0);
+      const isPreorder = Boolean(targetProduct.isPreorder && ((typeof targetProduct.preorderPrice === 'number' && targetProduct.preorderPrice > 0) || targetProduct.preorderStatus === 'OPEN' || targetProduct.preorderStatus === 'CLOSING_SOON'));
+      const currentStock = typeof targetProduct.stock === 'number' ? targetProduct.stock : 10;
 
-        // Update page title & headings
-        document.title = `${targetProduct.name} | ZENVY Elite Performance`;
-        const titleEl = document.getElementById('pd-title');
-        if (titleEl) titleEl.textContent = targetProduct.name;
-        
-        const catEl = document.getElementById('pd-category-tag');
-        if (catEl) catEl.textContent = (targetProduct.categoryName || 'MEN\'S FOOTBALL').toUpperCase();
-        
-        const priceEl = document.getElementById('pd-base-price');
-        if (priceEl) priceEl.textContent = formatCurrency(productState.basePrice);
-
-        const origEl = document.getElementById('pd-original-price');
-        const discBadge = document.getElementById('pd-discount-badge');
-        if (origEl) {
-          if (targetProduct.compareAt || (targetProduct.basePrice && targetProduct.basePrice > productState.basePrice)) {
-            const orig = targetProduct.compareAt || targetProduct.basePrice;
-            origEl.textContent = formatCurrency(orig);
-            origEl.classList.remove('hidden');
-            if (discBadge) {
-              const pct = Math.round(((orig - productState.basePrice) / orig) * 100);
-              if (pct > 0) {
-                discBadge.textContent = `SAVE ${pct}%`;
-                discBadge.classList.remove('hidden');
-              }
-            }
-          } else {
-            origEl.classList.add('hidden');
-            if (discBadge) discBadge.classList.add('hidden');
-          }
+      if (stockEl) {
+        if (isStockOut) {
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>STOCK OUT (Out of Stock)</span>`;
+          stockEl.className = 'font-bold';
+        } else if (isPreorder) {
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span>PRE-ORDER</span>`;
+          stockEl.className = 'font-bold';
+        } else if (currentStock <= 5) {
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>LOW STOCK • Only ${currentStock} left in stock!</span>`;
+          stockEl.className = 'font-bold';
+        } else {
+          stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IN STOCK (${currentStock} available)</span>`;
+          stockEl.className = 'font-bold';
         }
-
-        // Product Images & Multi-Angle Setup
-        const primaryImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
-          ? DB.products.getImage(targetProduct)
-          : (targetProduct.image || ANGLE_IMAGES.front);
-
-        const imagesList = [];
-        if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
-          targetProduct.images.forEach(img => {
-            const url = typeof img === 'string' ? img : (img.url || '');
-            if (url) imagesList.push(url);
-          });
-        }
-        if (paramImage && !imagesList.includes(paramImage)) {
-          imagesList.unshift(paramImage);
-        }
-        if (primaryImg && !imagesList.includes(primaryImg)) {
-          imagesList.unshift(primaryImg);
-        }
-        if (imagesList.length === 0) {
-          imagesList.push(primaryImg);
-        }
-
-        productState.galleryImages = imagesList;
-        ANGLE_IMAGES.front = imagesList[0] || primaryImg;
-        ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || primaryImg);
-        ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || primaryImg);
-
-        const mainImg = document.getElementById('main-product-img');
-        if (mainImg) {
-          if (!mainImg.src.includes(ANGLE_IMAGES.front)) {
-            mainImg.src = ANGLE_IMAGES.front;
-          }
-          mainImg.alt = targetProduct.name;
-        }
-
-        // Render Gallery Thumbnails Strip
-        renderGalleryThumbnails(imagesList);
-
-        // Stock status, Stock count & Stock Out handling
-        const stockEl = document.getElementById('pd-stock-tag');
+      }
         const stockoutBanner = document.getElementById('pd-stockout-banner');
         const addToCartBtn = document.getElementById('add-to-cart-btn');
         const addToCartIcon = document.getElementById('add-to-cart-icon');
@@ -1458,26 +1555,6 @@
         const mobileNotifyAdminBtn = document.getElementById('mobile-notify-admin-btn');
         const mobileSummary = document.getElementById('mobile-bar-summary');
         const waText = document.getElementById('whatsapp-order-btn-text');
-
-        const isStockOut = (typeof targetProduct.stock === 'number' && targetProduct.stock <= 0);
-        const isPreorder = Boolean(targetProduct.isPreorder && ((typeof targetProduct.preorderPrice === 'number' && targetProduct.preorderPrice > 0) || targetProduct.preorderStatus === 'OPEN' || targetProduct.preorderStatus === 'CLOSING_SOON'));
-        const currentStock = typeof targetProduct.stock === 'number' ? targetProduct.stock : 10;
-
-        if (stockEl) {
-          if (isStockOut) {
-            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>STOCK OUT (Out of Stock)</span>`;
-            stockEl.className = 'font-bold';
-          } else if (isPreorder) {
-            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span>PRE-ORDER</span>`;
-            stockEl.className = 'font-bold';
-          } else if (currentStock <= 5) {
-            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>LOW STOCK • Only ${currentStock} left in stock!</span>`;
-            stockEl.className = 'font-bold';
-          } else {
-            stockEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IN STOCK (${currentStock} available)</span>`;
-            stockEl.className = 'font-bold';
-          }
-        }
 
         // Toggle Stock Out Alert Banner
         if (stockoutBanner) {
@@ -1667,10 +1744,9 @@
 
         // Sync initial size selection
         selectSize(productState.selectedSize || 'M');
-      }
 
-      calculateLiveTotal();
-    }
+        calculateLiveTotal();
+      }
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -1960,16 +2036,53 @@
     }
 
     // ─────────────────────────────────────────
-    // Real-Time Total Calculation
+    // Dynamic Sleeves & Sizes
     // ─────────────────────────────────────────
-    
+    function renderDynamicSleeves(sleeves) {
+      const container = document.getElementById('sleeve-options-container');
+      if (!container) return;
+
+      const validSleeves = (sleeves || []).filter(s => s && (s.name || '').trim() !== '777');
+      if (validSleeves.length === 0) {
+        validSleeves.push(
+          { id: 'slv_half', name: 'Half Sleeve', additionalPrice: 0 },
+          { id: 'slv_full', name: 'Full Sleeve', additionalPrice: 100 }
+        );
+      }
+
+      // Ensure current selection is valid
+      let activeSleeve = validSleeves.find(s => s.id === productState.selectedSleeve || s.name === productState.selectedSleeveName);
+      if (!activeSleeve) {
+        activeSleeve = validSleeves[0];
+        productState.selectedSleeve = activeSleeve.id;
+        productState.selectedSleeveName = activeSleeve.name;
+        productState.sleevePrice = parseFloat(activeSleeve.additionalPrice !== undefined ? activeSleeve.additionalPrice : (activeSleeve.price || 0));
+      }
+
+      container.innerHTML = validSleeves.map(s => {
+        const priceVal = parseFloat(s.additionalPrice !== undefined ? s.additionalPrice : (s.price || 0));
+        const priceBadge = priceVal > 0 ? `+৳${priceVal}` : 'Included';
+        const isActive = (s.id === productState.selectedSleeve || s.name === productState.selectedSleeveName);
+        const cls = isActive
+          ? 'sleeve-card active flex items-center justify-between p-3 rounded-xl border-2 border-black bg-black/5 cursor-pointer transition-all'
+          : 'sleeve-card flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-gray-400 bg-white cursor-pointer transition-all';
+        
+        const safeName = (s.name || '').replace(/'/g, "\\'");
+        return `<div onclick="selectSleeve('${s.id}', ${priceVal}, '${safeName}', this)" class="${cls}">
+          <span class="text-xs font-bold text-black">${s.name}</span>
+          <span class="text-[11px] font-mono-ui font-semibold text-gray-500">${priceBadge}</span>
+        </div>`;
+      }).join('');
+    }
+    window.renderDynamicSleeves = renderDynamicSleeves;
+
     function renderDynamicSizes(sizes) {
       const select = document.getElementById('pd-size-select');
       if (!select) return;
       const seen = new Set();
       const unique = [];
       (sizes || []).forEach(s => {
-        const code = (s.code || s.name || '').toUpperCase().trim();
+        const code = (typeof resolveSizeCode === 'function') ? resolveSizeCode(s) : (s.code || s.name || String(s)).toUpperCase().trim();
         if (code && !seen.has(code)) {
           seen.add(code);
           unique.push(code);
@@ -1982,21 +2095,29 @@
         : null;
 
       // Select in-stock size initially if current is 0
-      let current = productState.selectedSize || 'M';
-      if (curSizeStocks && curSizeStocks[current] === 0) {
-        const firstInStock = unique.find(sz => curSizeStocks[sz] === undefined || curSizeStocks[sz] > 0);
-        if (firstInStock) current = firstInStock;
+      let current = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
+      if (curSizeStocks && typeof hasSizeStockConfigured === 'function' && hasSizeStockConfigured(curSizeStocks, current)) {
+        const currentQty = (typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, current, productState.product?.stock) : curSizeStocks[current];
+        if (currentQty === 0) {
+          const firstInStock = unique.find(sz => {
+            const q = (typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, sz, productState.product?.stock) : (curSizeStocks[sz] !== undefined ? curSizeStocks[sz] : 10);
+            return q > 0;
+          });
+          if (firstInStock) current = firstInStock;
+        }
       }
       productState.selectedSize = current;
 
       select.innerHTML = unique.map(code => {
-        const hasStock = curSizeStocks && curSizeStocks[code] !== undefined;
-        const qty = hasStock ? parseInt(curSizeStocks[code]) : null;
+        const hasStock = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, code) : (curSizeStocks && curSizeStocks[code] !== undefined);
+        const qty = hasStock ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, code, productState.product?.stock) : parseInt(curSizeStocks[code])) : null;
         let suffix = '';
         if (qty === 0) {
           suffix = ' — ⚠️ Stock Out (0 left)';
         } else if (qty !== null && qty <= 3) {
           suffix = ` — Only ${qty} left!`;
+        } else if (qty !== null) {
+          suffix = ` (${qty} pcs)`;
         }
         return `<option value="${code}" ${code === current ? 'selected' : ''} ${qty === 0 ? 'data-out="1"' : ''}>${code}${suffix}</option>`;
       }).join('');
@@ -2008,12 +2129,14 @@
     function checkSelectedSizeStockState() {
       const p = productState.product;
       if (!p) return;
-      const selSize = productState.selectedSize || 'M';
+      const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
       const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : null;
       
-      const hasStockKey = curSizeStocks && curSizeStocks[selSize] !== undefined;
-      const sizeQty = hasStockKey ? parseInt(curSizeStocks[selSize]) : (p.stock !== undefined ? parseInt(p.stock) : 10);
-      const isSizeStockOut = (sizeQty === 0) || (p.stock === 0);
+      const hasConfig = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, selSize) : (curSizeStocks && curSizeStocks[selSize] !== undefined);
+      const sizeQty = hasConfig 
+        ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, selSize, p.stock) : parseInt(curSizeStocks[selSize])) 
+        : (typeof p.stock === 'number' ? p.stock : 10);
+      const isSizeStockOut = (sizeQty === 0) || (typeof p.stock === 'number' && p.stock === 0);
 
       const addToCartBtn = document.getElementById('add-to-cart-btn');
       const addToCartText = document.getElementById('add-to-cart-text');
@@ -2200,9 +2323,13 @@
         openRestockModal();
         return;
       }
-      const selSize = productState.selectedSize || 'M';
+      const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
       const curSizeStocks = (productState.product?.sizeStocks && typeof productState.product.sizeStocks === 'object') ? productState.product.sizeStocks : null;
-      if (curSizeStocks && curSizeStocks[selSize] !== undefined && curSizeStocks[selSize] <= 0) {
+      const hasConfig = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, selSize) : (curSizeStocks && curSizeStocks[selSize] !== undefined);
+      const sizeQty = hasConfig 
+        ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, selSize, productState.product?.stock) : parseInt(curSizeStocks[selSize])) 
+        : (typeof productState.product?.stock === 'number' ? productState.product.stock : 10);
+      if (sizeQty <= 0) {
         showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
         openRestockModal();
         return;
@@ -2305,9 +2432,13 @@
         openRestockModal();
         return;
       }
-      const selSize = productState.selectedSize || 'M';
+      const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
       const curSizeStocks = (productState.product?.sizeStocks && typeof productState.product.sizeStocks === 'object') ? productState.product.sizeStocks : null;
-      if (curSizeStocks && curSizeStocks[selSize] !== undefined && curSizeStocks[selSize] <= 0) {
+      const hasConfig = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, selSize) : (curSizeStocks && curSizeStocks[selSize] !== undefined);
+      const sizeQty = hasConfig 
+        ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, selSize, productState.product?.stock) : parseInt(curSizeStocks[selSize])) 
+        : (typeof productState.product?.stock === 'number' ? productState.product.stock : 10);
+      if (sizeQty <= 0) {
         showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
         openRestockModal();
         return;

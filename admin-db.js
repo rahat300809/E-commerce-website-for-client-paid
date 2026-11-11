@@ -22,18 +22,100 @@ if (typeof window !== 'undefined') {
   window.escapeHtml = escapeHtml;
 }
 
+// Test & Junk Product Filter
+function isTestOrJunkProduct(p) {
+  if (!p) return true;
+  const name = String(p.name || '').toLowerCase();
+  const id = String(p.id || '').toLowerCase();
+  if (name.includes('[test sync]') || name.includes('876 [test')) return true;
+  if (id === 'prod_876_user' || id === '876' || id.startsWith('prod_876')) return true;
+  return false;
+}
+if (typeof window !== 'undefined') {
+  window.isTestOrJunkProduct = isTestOrJunkProduct;
+}
+
+// Global Size Code Normalizer (e.g. sz_xl_mw935... -> XL, sz_m -> M)
+function resolveSizeCode(val) {
+  if (!val) return '';
+  if (typeof val === 'object') return (val.code || val.name || '').toUpperCase().trim();
+  const str = String(val).trim();
+  if (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.all === 'function') {
+    const found = DB.sizes.all().find(x => x.id === str || x.code === str || (x.code && x.code.toUpperCase() === str.toUpperCase()));
+    if (found && found.code) return found.code.toUpperCase().trim();
+  }
+  const match = str.match(/^sz_([a-z0-9]+)_/i);
+  if (match && match[1]) return match[1].toUpperCase();
+  const matchSimple = str.match(/^sz_([a-z0-9]+)$/i);
+  if (matchSimple && matchSimple[1]) return matchSimple[1].toUpperCase();
+  return str.toUpperCase();
+}
+if (typeof window !== 'undefined') {
+  window.resolveSizeCode = resolveSizeCode;
+}
+
+// Helper: Safely resolve size stock quantity
+function getSizeStockQty(curSizeStocks, sizeCode, fallbackTotal = 10) {
+  if (!curSizeStocks || typeof curSizeStocks !== 'object' || Object.keys(curSizeStocks).length === 0) {
+    return (typeof fallbackTotal === 'number') ? fallbackTotal : 10;
+  }
+  const targetCode = resolveSizeCode(sizeCode);
+  if (curSizeStocks[targetCode] !== undefined) {
+    return Math.max(0, parseInt(curSizeStocks[targetCode]) || 0);
+  }
+  for (const [k, v] of Object.entries(curSizeStocks)) {
+    if (resolveSizeCode(k) === targetCode || k.toUpperCase() === targetCode) {
+      return Math.max(0, parseInt(v) || 0);
+    }
+  }
+  return (typeof fallbackTotal === 'number') ? fallbackTotal : 10;
+}
+if (typeof window !== 'undefined') {
+  window.getSizeStockQty = getSizeStockQty;
+}
+
+function hasSizeStockConfigured(curSizeStocks, sizeCode) {
+  if (!curSizeStocks || typeof curSizeStocks !== 'object' || Object.keys(curSizeStocks).length === 0) return false;
+  const targetCode = resolveSizeCode(sizeCode);
+  if (curSizeStocks[targetCode] !== undefined) return true;
+  for (const k of Object.keys(curSizeStocks)) {
+    if (resolveSizeCode(k) === targetCode || k.toUpperCase() === targetCode) return true;
+  }
+  return false;
+}
+if (typeof window !== 'undefined') {
+  window.hasSizeStockConfigured = hasSizeStockConfigured;
+}
+
+// Purge any local junk products from in-memory and local storage on startup
+try {
+  const initRaw = localStorage.getItem(`${DB_VERSION}_products`);
+  if (initRaw) {
+    let initProds = JSON.parse(initRaw);
+    if (Array.isArray(initProds)) {
+      const cleanProds = initProds.filter(p => !isTestOrJunkProduct(p));
+      if (cleanProds.length !== initProds.length) {
+        localStorage.setItem(`${DB_VERSION}_products`, JSON.stringify(cleanProds));
+      }
+      window._ZENVY_PRODUCTS_CACHE = cleanProds;
+    }
+  }
+} catch(e){}
+
 // ──────────────────────────────────────────────────────────
 // Core Storage Engine
 // ──────────────────────────────────────────────────────────
 const Store = {
   get(key) {
     if (key === 'products' && Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
-      return window._ZENVY_PRODUCTS_CACHE;
+      return window._ZENVY_PRODUCTS_CACHE.filter(p => !isTestOrJunkProduct(p));
     }
     try { 
       const res = JSON.parse(localStorage.getItem(`${DB_VERSION}_${key}`) || '[]');
       if (key === 'products' && Array.isArray(res) && res.length > 0) {
-        window._ZENVY_PRODUCTS_CACHE = res;
+        const filtered = res.filter(p => !isTestOrJunkProduct(p));
+        window._ZENVY_PRODUCTS_CACHE = filtered;
+        return filtered;
       }
       return res;
     }
@@ -835,12 +917,13 @@ const DB = {
   products: {
     all() {
       if (Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
-        return window._ZENVY_PRODUCTS_CACHE;
+        return window._ZENVY_PRODUCTS_CACHE.filter(p => !isTestOrJunkProduct(p));
       }
       let items = Store.get('products');
       if (!items || !Array.isArray(items)) {
         return [];
       }
+      items = items.filter(p => !isTestOrJunkProduct(p));
       window._ZENVY_PRODUCTS_CACHE = items;
       return items;
     },
@@ -966,6 +1049,7 @@ const DB = {
       copy.isPublished = src.isPublished !== undefined ? Boolean(src.isPublished) : true;
       copy.status = copy.isPublished ? 'published' : 'draft';
       copy.stock = typeof src.stock === 'number' ? src.stock : 10;
+      copy.sizeStocks = (src.sizeStocks && typeof src.sizeStocks === 'object') ? JSON.parse(JSON.stringify(src.sizeStocks)) : null;
       copy.isArchived = false;
       copy.isPreorder = false; // Duplicated products are NEVER preorders by default
       copy.createdAt = Store.now();

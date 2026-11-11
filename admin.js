@@ -2688,6 +2688,23 @@ function saveCollection(id) {
   closeModal(); renderCollections(document.getElementById('admin-content'));
 }
 
+// Helper: Normalize database size IDs (sz_m_..., sz_l_...) into standard codes (M, L, XL)
+function resolveSizeCode(val) {
+  if (!val) return '';
+  if (typeof val === 'object') return (val.code || val.name || '').toUpperCase().trim();
+  const str = String(val).trim();
+  if (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.all === 'function') {
+    const found = DB.sizes.all().find(x => x.id === str || x.code === str || (x.code && x.code.toUpperCase() === str.toUpperCase()));
+    if (found && found.code) return found.code.toUpperCase().trim();
+  }
+  const match = str.match(/^sz_([a-z0-9]+)_/i);
+  if (match && match[1]) return match[1].toUpperCase();
+  const matchSimple = str.match(/^sz_([a-z0-9]+)$/i);
+  if (matchSimple && matchSimple[1]) return matchSimple[1].toUpperCase();
+  return str.toUpperCase();
+}
+window.resolveSizeCode = resolveSizeCode;
+
 // ──────────────────────────────────────────────────────────────
 // ═══ VIEW: INVENTORY ═══
 // ──────────────────────────────────────────────────────────────
@@ -2850,17 +2867,20 @@ function renderInventory(container) {
               products.map(p => {
                 const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : {};
                 const stdSizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
-                const availSizes = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
-                  ? p.assignedSizes.map(s => (typeof s === 'string' ? s : (s.code || s.name || '')).toUpperCase().trim())
+                const rawSizes = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
+                  ? p.assignedSizes
                   : stdSizes;
                 
                 const uniqueSizes = [];
-                availSizes.forEach(s => { if (s && !uniqueSizes.includes(s)) uniqueSizes.push(s); });
+                rawSizes.forEach(s => {
+                  const code = resolveSizeCode(s);
+                  if (code && !uniqueSizes.includes(code)) uniqueSizes.push(code);
+                });
                 if (uniqueSizes.length === 0) uniqueSizes.push('S','M','L','XL','XXL');
 
                 const sizePills = uniqueSizes.map(sz => {
-                  const hasStockVal = curSizeStocks[sz] !== undefined;
-                  const qty = hasStockVal ? parseInt(curSizeStocks[sz]) : null;
+                  const hasStock = hasSizeStockConfigured(curSizeStocks, sz);
+                  const qty = hasStock ? getSizeStockQty(curSizeStocks, sz, p.stock) : null;
                   if (qty === null) {
                     return `<span class="badge badge-gray font-mono cursor-pointer" onclick="openStockAdjust('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.stock||0})" style="font-size:11px;padding:2px 7px;" title="Size ${sz}: Click to set stock">${sz}: -</span>`;
                   } else if (qty === 0) {
@@ -2967,15 +2987,24 @@ function openStockAdjust(productId, productName, currentStock) {
   const p = DB.products.byId(productId) || { id: productId, name: productName, stock: currentStock };
   
   const stdSizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
-  const sizesToDisplay = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
-    ? p.assignedSizes.map(s => (typeof s === 'string' ? s : (s.code || s.name || '')).toUpperCase().trim())
+  const rawSizes = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
+    ? p.assignedSizes
     : stdSizes;
   
   const uniqueSizes = [];
-  sizesToDisplay.forEach(s => { if (s && !uniqueSizes.includes(s)) uniqueSizes.push(s); });
+  rawSizes.forEach(s => {
+    const code = resolveSizeCode(s);
+    if (code && !uniqueSizes.includes(code)) uniqueSizes.push(code);
+  });
   if (uniqueSizes.length === 0) uniqueSizes.push('S','M','L','XL','XXL');
 
   const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : {};
+  function getSzStock(sz) {
+    if (typeof hasSizeStockConfigured === 'function' && hasSizeStockConfigured(curSizeStocks, sz)) {
+      return (typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, sz, p.stock) : parseInt(curSizeStocks[sz]);
+    }
+    return null;
+  }
   const reasons = ['Restock', 'Manual adjustment', 'Size inventory recount', 'Damaged', 'Returned', 'Correction'];
 
   const html = `
@@ -3007,7 +3036,8 @@ function openStockAdjust(productId, productName, currentStock) {
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
         ${uniqueSizes.map(sz => {
-          const szQty = curSizeStocks[sz] !== undefined ? parseInt(curSizeStocks[sz]) : (uniqueSizes.length > 0 && (p.stock || 0) > 0 ? Math.floor((p.stock||0) / uniqueSizes.length) : 0);
+          const existingQty = getSzStock(sz);
+          const szQty = (existingQty !== null) ? existingQty : (uniqueSizes.length > 0 && (p.stock || 0) > 0 ? Math.floor((p.stock||0) / uniqueSizes.length) : 0);
           return `
             <div style="background:#ffffff;border:1.5px solid #E2E8F0;border-radius:10px;padding:8px 10px;box-shadow:0 1px 2px rgba(0,0,0,0.03);">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -3098,7 +3128,7 @@ function applyStockAdjust(productId, oldStock) {
   const breakdownParts = [];
 
   inputs.forEach(inp => {
-    const sz = inp.dataset.size;
+    const sz = resolveSizeCode(inp.dataset.size);
     const qty = Math.max(0, parseInt(inp.value) || 0);
     sizeStocks[sz] = qty;
     totalQty += qty;

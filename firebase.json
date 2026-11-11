@@ -8,6 +8,8 @@
     "trailingSlash": false,
     "ignore": [
       "firebase.json",
+      ".git/**",
+      ".firebase/**",
       "**/.*",
       "**/node_modules/**",
       "prisma/**",

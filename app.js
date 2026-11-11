@@ -2267,6 +2267,7 @@ function openGlobalSearch() {
   if (!modal) return;
   modal.classList.remove('hidden');
   modal.classList.add('flex');
+  modal.style.display = 'flex';
   const input = document.getElementById('global-search-input');
   if (input) {
     input.value = shopSearchQuery || '';
@@ -2284,6 +2285,7 @@ function closeGlobalSearch() {
   if (modal) {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+    modal.style.display = 'none';
   }
 }
 window.closeGlobalSearch = closeGlobalSearch;
@@ -2356,7 +2358,6 @@ function renderProductSearchList(matches, q) {
               Buy Now
             </button>
           `}
-          </button>
         </div>
       </div>
     `;

@@ -220,8 +220,9 @@
       <!-- Right Icons -->
       <div class="flex items-center gap-1.5 sm:gap-3">
         <!-- Search Button -->
-        <button type="button" onclick="openProductSearch()" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Search Jerseys (Ctrl+K or /)">
-          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">search</span>
+        <button type="button" onclick="openProductSearch()" class="hover:scale-105 transition-all duration-200 px-3 py-1.5 rounded-full bg-white hover:bg-gray-50 text-black border border-gray-200 hover:border-black/40 flex items-center gap-1.5 cursor-pointer shadow-2xs group" title="Search jerseys & kits (Ctrl+K or /)">
+          <span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">search</span>
+          <span class="text-xs font-headline font-semibold text-gray-800">Search</span>
         </button>
         <a href="account.html" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Account">
           <span class="material-symbols-outlined text-[20px] sm:text-[22px]">person</span>
@@ -916,9 +917,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v10"></script>
-  <script src="admin-db.js?v=20261111_v10"></script>
-  <script src="wishlist.js?v=20261111_v10"></script>
+  <script src="firebase-sync.js?v=20261111_v11"></script>
+  <script src="admin-db.js?v=20261111_v11"></script>
+  <script src="wishlist.js?v=20261111_v11"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -2614,6 +2615,7 @@ Please confirm my order details!`;
       if (!modal) return;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      modal.style.display = 'flex';
       const input = document.getElementById('product-search-input');
       if (input) {
         setTimeout(() => { input.focus(); input.select(); }, 60);
@@ -2627,6 +2629,7 @@ Please confirm my order details!`;
       if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        modal.style.display = 'none';
       }
     }
     window.closeProductSearch = closeProductSearch;

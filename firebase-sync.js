@@ -308,6 +308,17 @@
         }
       } catch(e){}
 
+      function isTestOrJunkProduct(p) {
+        if (!p) return true;
+        const name = String(p.name || '').toLowerCase();
+        const id = String(p.id || '').toLowerCase();
+        const sku = String(p.sku || '').toLowerCase();
+        if (name.includes('[test sync]') || name.includes('test sync')) return true;
+        if (id === 'prod_876_user' || id === '876') return true;
+        if (name.includes('876') && (sku.includes('o887') || name.includes('copy'))) return true;
+        return false;
+      }
+
       // 2. Fetch all individual products from Firestore /products/ collection
       const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
       let cloudList = [];
@@ -317,6 +328,10 @@
           if (!d.id) d.id = doc.id;
           const pid = String(d.id).trim();
           if (deletedIds.has(pid)) return; // Exclude deleted products
+          if (isTestOrJunkProduct(d)) {
+            try { _db.collection(FS_PRODUCTS_COLLECTION).doc(doc.id).delete(); } catch(e){}
+            return;
+          }
           const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
           const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';
           d.isPreorder = Boolean(d.isPreorder && (hasPrePrice || hasOpenStatus));
@@ -332,10 +347,14 @@
         if (raw) localList = JSON.parse(raw);
       } catch(e){}
 
-      // Filter out any locally deleted products
-      if (deletedIds.size > 0) {
-        localList = localList.filter(p => !deletedIds.has(String(p?.id || '').trim()));
-      }
+      // Filter out any locally deleted or test products
+      localList = localList.filter(p => {
+        if (!p || !p.id) return false;
+        const pid = String(p.id).trim();
+        if (deletedIds.has(pid)) return false;
+        if (isTestOrJunkProduct(p)) return false;
+        return true;
+      });
 
       // 4. Merge: Local vs Cloud
       // Any product present locally that is missing in cloud (e.g. added on another laptop/device)
@@ -348,6 +367,7 @@
         if (!p || !p.id) return;
         const pid = String(p.id).trim();
         if (deletedIds.has(pid)) return; // Never resurrect deleted items
+        if (isTestOrJunkProduct(p)) return; // Never upload test junk
 
         const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
         const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
@@ -408,6 +428,10 @@
 
   async function saveProductToCloud(p) {
     if (!p || !p.id) return;
+    const pName = String(p.name || '').toLowerCase();
+    if (pName.includes('[test sync]') || pName.includes('test sync') || p.id === 'prod_876_user' || (pName.includes('876') && pName.includes('copy'))) {
+      return;
+    }
     await ensureDb();
     const pid = String(p.id).trim();
 

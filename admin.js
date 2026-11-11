@@ -922,30 +922,36 @@ function clearAdminProductSearch() {
 window.clearAdminProductSearch = clearAdminProductSearch;
 
 async function manualCloudSyncProducts() {
+  const btn = document.getElementById('topbar-cloud-sync-btn');
+  const origHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;animation:spin 1s linear infinite;">sync</span> <span>Syncing...</span>`;
+    btn.disabled = true;
+  }
   toast('🔄 Syncing catalog with cloud server across all devices...', 'info');
   try {
+    let res = null;
     if (window.ZenvyFirebase && typeof window.ZenvyFirebase.forceSync === 'function') {
-      await window.ZenvyFirebase.forceSync();
-      const content = document.getElementById('admin-content');
-      if (content && typeof currentView !== 'undefined' && currentView === 'products') {
-        renderProducts(content);
-      }
-      if (typeof updateNavBadges === 'function') updateNavBadges();
-      const count = (DB.products.all() || []).filter(p => !p.isArchived).length;
-      toast(`✅ Cloud sync complete! ${count} products synchronized across all devices.`, 'success');
+      res = await window.ZenvyFirebase.forceSync();
     } else if (window.ZenvyFirebase && typeof window.ZenvyFirebase.syncProductsWithCloud === 'function') {
-      const res = await window.ZenvyFirebase.syncProductsWithCloud(true);
-      const content = document.getElementById('admin-content');
-      if (content && typeof currentView !== 'undefined' && currentView === 'products') {
-        renderProducts(content);
-      }
-      if (typeof updateNavBadges === 'function') updateNavBadges();
-      toast(`✅ Cloud sync complete! ${res?.count || DB.products.all().length} products live.`, 'success');
-    } else {
-      toast('✅ Catalog refreshed.', 'success');
+      res = await window.ZenvyFirebase.syncProductsWithCloud(true);
     }
+    const content = document.getElementById('admin-content');
+    if (content && typeof currentView !== 'undefined' && currentView === 'products') {
+      renderProducts(content);
+    }
+    if (typeof updateNavBadges === 'function') updateNavBadges();
+    const count = (DB.products.all() || []).filter(p => !p.isArchived).length;
+    const uploadedMsg = res?.uploaded ? ` (Uploaded ${res.uploaded} new)` : '';
+    toast(`✅ Cloud sync complete! ${count} products live across all devices.${uploadedMsg}`, 'success');
   } catch(err) {
+    console.error('manualCloudSyncProducts error:', err);
     toast('❌ Sync notice: ' + (err.message || 'Check connection'), 'warning');
+  } finally {
+    if (btn) {
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
+    }
   }
 }
 window.manualCloudSyncProducts = manualCloudSyncProducts;

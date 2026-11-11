@@ -2263,64 +2263,57 @@ function closeGlobalSearch() {
 }
 window.closeGlobalSearch = closeGlobalSearch;
 
-function handleGlobalSearch(query) {
-  const container = document.getElementById('global-search-results');
-  if (!container) return;
-  const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
-  const q = (query || '').trim();
-
-  // If search query is empty, show all available products immediately!
-  let matches = [];
-  if (!q) {
-    matches = all;
-  } else {
-    matches = all.filter(p => matchProductSearch(p, q));
+function highlightMatch(text, query) {
+  if (!text || !query) return (typeof escapeHtml === 'function' ? escapeHtml(text || '') : (text || ''));
+  const escaped = (typeof escapeHtml === 'function' ? escapeHtml(text) : String(text));
+  const tokens = query.trim().split(/\s+/).map(t => t.replace(/[^a-zA-Z0-9\u0980-\u09FF]/g, '')).filter(t => t.length > 0);
+  if (tokens.length === 0) return escaped;
+  try {
+    const pattern = tokens.map(t => t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
+    const rx = new RegExp(`(${pattern})`, 'gi');
+    return escaped.replace(rx, '<span class="bg-amber-200 text-black font-extrabold px-0.5 rounded">$1</span>');
+  } catch(e) {
+    return escaped;
   }
+}
+window.highlightMatch = highlightMatch;
 
-  if (matches.length === 0) {
-    container.innerHTML = `
-      <div class="text-center py-10 px-4">
-        <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
-        <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(q)}"</p>
-        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all match kits in the catalog.</p>
-        <button type="button" onclick="handleGlobalSearch('')" class="mt-3 px-4 py-2 text-xs font-bold text-black border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-          View All Products (${all.length})
-        </button>
-      </div>
-    `;
-    return;
+function fillGlobalSearch(text) {
+  const input = document.getElementById('global-search-input');
+  if (input) {
+    input.value = text;
+    input.focus();
+    handleGlobalSearch(text);
   }
+}
+window.fillGlobalSearch = fillGlobalSearch;
 
-  const headerHtml = `
-    <div class="px-2 py-1 flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider">
-      <span>${q ? `Found ${matches.length} matching kit${matches.length === 1 ? '' : 's'}` : `All Available Kits & Jerseys (${matches.length})`}</span>
-      ${q ? `<button type="button" onclick="const i=document.getElementById('global-search-input');if(i){i.value='';handleGlobalSearch('');i.focus();}" class="text-blue-600 hover:underline capitalize">Clear</button>` : ''}
-    </div>
-  `;
-
-  const itemsHtml = matches.map(p => {
+function renderProductSearchList(matches, q) {
+  return matches.map(p => {
     const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
       ? DB.products.getImage(p)
       : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
     const price = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origPrice = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
     const isOutOfStock = p.stock === 0;
+    const highlightedName = q ? highlightMatch(p.name, q) : escapeHtml(p.name);
+    const highlightedSku = (q && p.sku) ? highlightMatch(p.sku, q) : escapeHtml(p.sku || '');
 
     return `
-      <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-colors flex items-center justify-between gap-3 group cursor-pointer" onclick="closeGlobalSearch(); openProduct('${p.id}')">
+      <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-all duration-150 flex items-center justify-between gap-3 group cursor-pointer border border-transparent hover:border-gray-200" onclick="closeGlobalSearch(); openProduct('${p.id}')">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
             <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${p.name}</h4>
+              <h4 class="font-headline font-bold text-xs sm:text-sm text-black truncate group-hover:text-blue-600 transition-colors">${highlightedName}</h4>
               ${p.isPreorder ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">PREORDER</span>' : ''}
               ${isOutOfStock ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-600">OUT OF STOCK</span>' : ''}
             </div>
             <div class="flex items-center gap-2 text-[10px] font-mono-ui text-gray-400 mt-0.5">
               <span class="text-gray-600 font-semibold">${p.categoryName || 'Kit'}</span>
-              ${p.sku ? `<span>• SKU: ${p.sku}</span>` : ''}
+              ${p.sku ? `<span>• SKU: ${highlightedSku}</span>` : ''}
             </div>
           </div>
         </div>
@@ -2336,8 +2329,140 @@ function handleGlobalSearch(query) {
       </div>
     `;
   }).join('');
+}
 
-  container.innerHTML = headerHtml + itemsHtml;
+function handleGlobalSearch(query) {
+  const container = document.getElementById('global-search-results');
+  if (!container) return;
+  const all = (typeof DB !== 'undefined' && DB.products) ? DB.products.published() : [];
+  const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
+  const q = (query || '').trim();
+
+  // ── 1. When search input is empty (Initial state when modal opens from top search button) ──
+  if (!q) {
+    const trending = ['Barcelona', 'Real Madrid Home', 'Player Version', 'Club Sweat Shirt', '876', 'Preorders'];
+    container.innerHTML = `
+      <div class="p-4 space-y-4">
+        <!-- Trending Suggestions -->
+        <div>
+          <div class="flex items-center gap-1.5 text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider mb-2">
+            <span class="material-symbols-outlined text-amber-500 text-sm">local_fire_department</span>
+            <span>Trending Searches</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${trending.map(t => `
+              <button type="button" onclick="fillGlobalSearch('${t.replace(/'/g, "\\'")}')" class="text-xs font-semibold bg-gray-100 hover:bg-black hover:text-white text-gray-800 px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                <span class="material-symbols-outlined text-xs opacity-60">trending_up</span>
+                ${t}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Categories -->
+        ${categories.length > 0 ? `
+          <div>
+            <div class="flex items-center gap-1.5 text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider mb-2">
+              <span class="material-symbols-outlined text-blue-500 text-sm">category</span>
+              <span>Popular Categories</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              ${categories.map(c => `
+                <button type="button" onclick="viewAllSearchResultsInShop('${c.name.replace(/'/g, "\\'")}')" class="text-xs font-semibold bg-white border border-gray-200 hover:border-black text-gray-800 px-3 py-1.5 rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-xs text-gray-400">sports_soccer</span>
+                  ${c.name}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Latest Match Kits -->
+        <div class="pt-3 border-t border-gray-100">
+          <div class="flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider mb-2.5">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-emerald-500 text-sm">verified</span>
+              <span>Available Match Kits (${all.length})</span>
+            </span>
+            <button type="button" onclick="viewAllSearchResultsInShop('')" class="text-blue-600 hover:underline normal-case font-bold cursor-pointer">View in Shop →</button>
+          </div>
+          <div class="space-y-1.5">
+            ${renderProductSearchList(all, '')}
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // ── 2. When user has typed query (Live Instant Suggestions + Matching Products) ──
+  const matches = all.filter(p => matchProductSearch(p, q));
+
+  // Generate dynamic smart suggestions
+  const suggestionsSet = new Set();
+  const suggestions = [];
+
+  matches.slice(0, 4).forEach(p => {
+    if (!suggestionsSet.has(p.name)) {
+      suggestionsSet.add(p.name);
+      suggestions.push({ text: p.name, type: 'jersey', icon: 'sports_soccer' });
+    }
+  });
+
+  categories.forEach(c => {
+    if (c.name.toLowerCase().includes(q.toLowerCase()) && !suggestionsSet.has(c.name)) {
+      suggestionsSet.add(c.name);
+      suggestions.push({ text: c.name, type: 'category', icon: 'category' });
+    }
+  });
+
+  matches.forEach(p => {
+    if (p.sku && p.sku.toLowerCase().includes(q.toLowerCase()) && !suggestionsSet.has(p.sku)) {
+      suggestionsSet.add(p.sku);
+      suggestions.push({ text: p.sku, type: 'sku', icon: 'tag' });
+    }
+  });
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-10 px-4">
+        <span class="material-symbols-outlined text-4xl text-gray-300 mb-1">search_off</span>
+        <p class="font-headline font-bold text-sm text-gray-700">No jerseys found matching "${escapeHtml(q)}"</p>
+        <p class="font-mono-ui text-xs text-gray-400 mt-1">Try another keyword or view all match kits in the catalog.</p>
+        <button type="button" onclick="handleGlobalSearch('')" class="mt-3 px-4 py-2 text-xs font-bold text-black border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+          View All Products (${all.length})
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const suggestionsBar = suggestions.length > 0 ? `
+    <div class="px-4 py-2.5 bg-gray-50/90 border-b border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <span class="text-[10px] font-mono-ui font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+        <span class="material-symbols-outlined text-[13px] text-amber-500">lightbulb</span> Suggestions:
+      </span>
+      <div class="flex items-center gap-1.5 flex-nowrap">
+        ${suggestions.slice(0, 5).map(s => `
+          <button type="button" onclick="fillGlobalSearch('${s.text.replace(/'/g, "\\'")}')" class="text-xs font-semibold bg-white border border-gray-200 hover:border-black hover:bg-black hover:text-white rounded-lg px-2.5 py-1 transition-all flex items-center gap-1 shadow-2xs whitespace-nowrap cursor-pointer">
+            <span class="material-symbols-outlined text-[12px] opacity-60">${s.icon}</span>
+            <span>${highlightMatch(s.text, q)}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const headerHtml = `
+    <div class="px-4 py-2 flex items-center justify-between text-[11px] font-mono-ui font-bold text-gray-500 uppercase tracking-wider border-b border-gray-50">
+      <span>Found ${matches.length} matching kit${matches.length === 1 ? '' : 's'}</span>
+      <button type="button" onclick="const i=document.getElementById('global-search-input');if(i){i.value='';handleGlobalSearch('');i.focus();}" class="text-blue-600 hover:underline capitalize cursor-pointer">Clear</button>
+    </div>
+  `;
+
+  const itemsHtml = renderProductSearchList(matches, q);
+
+  container.innerHTML = suggestionsBar + headerHtml + `<div class="p-3 space-y-1.5">${itemsHtml}</div>`;
 }
 window.handleGlobalSearch = handleGlobalSearch;
 

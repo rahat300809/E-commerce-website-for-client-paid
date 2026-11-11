@@ -298,22 +298,7 @@
   async function syncProductsWithCloud(isManual = false) {
     if (!_db) return { count: 0, uploaded: 0 };
     try {
-      // 1. Fetch all individual products from Firestore /products/ collection
-      const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
-      let cloudList = [];
-      pSnap.forEach(doc => {
-        const d = doc.data();
-        if (d) {
-          if (!d.id) d.id = doc.id;
-          // Preorder normalization: only genuine preorders with open status/price are true
-          const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
-          const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';
-          d.isPreorder = Boolean(d.isPreorder && (hasPrePrice || hasOpenStatus));
-          cloudList.push(d);
-        }
-      });
-
-      // 2. Read deleted tracking IDs from storage so deleted products NEVER reappear
+      // 1. Fetch deleted tracking IDs from Firestore cloud doc so ALL devices honor deletions
       const deletedKey = `${DB_VERSION}_deleted_product_ids`;
       let deletedIds = new Set();
       try {
@@ -321,10 +306,32 @@
         if (delRaw) deletedIds = new Set(JSON.parse(delRaw));
       } catch(e){}
 
-      // Filter out any known deleted products from cloudList
-      if (deletedIds.size > 0) {
-        cloudList = cloudList.filter(p => !deletedIds.has(String(p.id).trim()));
-      }
+      try {
+        const delDoc = await _db.collection(FS_COLLECTION).doc('deleted_products').get();
+        if (delDoc.exists) {
+          const cIds = delDoc.data()?.ids;
+          if (Array.isArray(cIds)) {
+            cIds.forEach(id => deletedIds.add(String(id).trim()));
+            localStorage.setItem(deletedKey, JSON.stringify(Array.from(deletedIds)));
+          }
+        }
+      } catch(e){}
+
+      // 2. Fetch all individual products from Firestore /products/ collection
+      const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
+      let cloudList = [];
+      pSnap.forEach(doc => {
+        const d = doc.data();
+        if (d) {
+          if (!d.id) d.id = doc.id;
+          const pid = String(d.id).trim();
+          if (deletedIds.has(pid)) return; // Exclude deleted products
+          const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
+          const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';
+          d.isPreorder = Boolean(d.isPreorder && (hasPrePrice || hasOpenStatus));
+          cloudList.push(d);
+        }
+      });
 
       // 3. Read local products on this device
       const localKey = `${DB_VERSION}_products`;
@@ -333,30 +340,46 @@
         const raw = localStorage.getItem(localKey);
         if (raw) localList = JSON.parse(raw);
       } catch(e){}
+
+      // Filter out any locally deleted products
       if (deletedIds.size > 0) {
-        localList = localList.filter(p => !deletedIds.has(String(p.id).trim()));
+        localList = localList.filter(p => !deletedIds.has(String(p?.id || '').trim()));
       }
 
-      // 4. Merge: cloudList is master truth.
-      // If this device created a brand-new product within the last 5 minutes that hasn't reached cloud yet, preserve it!
+      // 4. Merge: Local vs Cloud
+      // Any product present locally that is missing in cloud (e.g. added on another laptop/device)
+      // MUST be preserved and uploaded to cloud so all devices stay 100% in sync!
       const cloudMap = new Map();
       cloudList.forEach(p => cloudMap.set(String(p.id).trim(), p));
 
-      const now = Date.now();
-      const freshLocalItems = localList.filter(p => {
-        if (!p || !p.id) return false;
+      const toUpload = [];
+      localList.forEach(p => {
+        if (!p || !p.id) return;
         const pid = String(p.id).trim();
-        if (deletedIds.has(pid)) return false;
-        if (cloudMap.has(pid)) return false;
-        const cTime = new Date(p.createdAt || 0).getTime();
-        const uTime = new Date(p.updatedAt || 0).getTime();
-        // Keep only if created or updated in this local session within the last 5 minutes
-        return (now - cTime < 300000) || (now - uTime < 300000);
+        if (deletedIds.has(pid)) return; // Never resurrect deleted items
+
+        const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+        const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+        p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
+
+        if (!cloudMap.has(pid)) {
+          // This product exists on this device but NOT yet in Firestore /products/!
+          // Add to cloud catalog and schedule upload
+          toUpload.push(p);
+          cloudMap.set(pid, p);
+        } else {
+          // Check if local has newer updates (e.g. offline edits)
+          const cloudP = cloudMap.get(pid);
+          const localTime = new Date(p.updatedAt || p.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudP.updatedAt || cloudP.createdAt || 0).getTime();
+          if (localTime > cloudTime + 1000) {
+            toUpload.push(p);
+            cloudMap.set(pid, p);
+          }
+        }
       });
 
-      const merged = [...cloudList];
-      freshLocalItems.forEach(p => merged.unshift(p));
-
+      const merged = Array.from(cloudMap.values());
       // Sort newest first
       merged.sort((a, b) => {
         const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -368,12 +391,13 @@
       localStorage.setItem(localKey, JSON.stringify(merged));
       localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
 
-      // 6. Upload any fresh local products to cloud /products/
-      if (freshLocalItems.length > 0) {
-        console.log(`[ZenvySync] Uploading ${freshLocalItems.length} fresh local products to cloud...`);
-        for (const p of freshLocalItems) {
+      // 6. Upload any missing/newer local products to Firestore /products/
+      if (toUpload.length > 0) {
+        console.log(`[ZenvySync] Uploading ${toUpload.length} local products to Firestore cloud /products/...`);
+        for (const p of toUpload) {
           try {
-            await _db.collection(FS_PRODUCTS_COLLECTION).doc(p.id).set(sanitize(p));
+            await _db.collection(FS_PRODUCTS_COLLECTION).doc(String(p.id).trim()).set(sanitize(p));
+            console.log(`[ZenvySync] Synced to cloud: ${p.name || p.id} ✅`);
           } catch(err) {
             console.warn('[ZenvySync] Upload error for product:', p.name, err);
           }
@@ -384,7 +408,7 @@
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
 
-      return { count: merged.length, uploaded: freshLocalItems.length };
+      return { count: merged.length, uploaded: toUpload.length };
     } catch(err) {
       console.warn('[ZenvySync] syncProductsWithCloud notice:', err);
       return { count: 0, uploaded: 0, error: err };
@@ -457,8 +481,8 @@
 
     // 1. Add to permanent deleted tracking set
     const deletedKey = `${DB_VERSION}_deleted_product_ids`;
+    let delSet = new Set();
     try {
-      let delSet = new Set();
       const delRaw = localStorage.getItem(deletedKey);
       if (delRaw) delSet = new Set(JSON.parse(delRaw));
       delSet.add(strId);
@@ -483,24 +507,33 @@
         console.warn('[ZenvySync] Cloud product delete error:', e);
       }
 
-      // 4. Delete from legacy zenvy_store/products doc so it NEVER comes back!
+      // 4. Save to cloud deleted_products document so other devices never resurrect it
+      try {
+        const delDocRef = _db.collection(FS_COLLECTION).doc('deleted_products');
+        const delDocSnap = await delDocRef.get();
+        let curIds = [];
+        if (delDocSnap.exists && Array.isArray(delDocSnap.data()?.ids)) {
+          curIds = delDocSnap.data().ids;
+        }
+        if (!curIds.includes(strId)) {
+          curIds.push(strId);
+          await delDocRef.set({ ids: curIds, updatedAt: Date.now() });
+        }
+      } catch(e){}
+
+      // 5. Delete from legacy zenvy_store/products doc
       try {
         const legDoc = await _db.collection(FS_COLLECTION).doc('products').get();
         if (legDoc.exists && Array.isArray(legDoc.data()?.data)) {
           const legList = legDoc.data().data.filter(p => String(p.id).trim() !== strId);
           await _db.collection(FS_COLLECTION).doc('products').set({ data: sanitize(legList), updatedAt: Date.now() });
-          console.log('[ZenvySync] Cleaned legacy products document ✅');
         }
       } catch(e){}
     }
 
-    // 5. Broadcast deletion to all open views & tabs
+    // 6. Broadcast deletion to all open views & tabs
     window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
-  }
-        console.warn('[ZenvySync] Cloud product delete failed:', e);
-      }
-    }
   }
 
   // ── Real-time listener — updates local storage & triggers UI ───

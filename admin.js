@@ -922,14 +922,24 @@ function clearAdminProductSearch() {
 window.clearAdminProductSearch = clearAdminProductSearch;
 
 async function manualCloudSyncProducts() {
-  toast('🔄 Syncing products with cloud server across all devices...', 'info');
+  toast('🔄 Syncing catalog with cloud server across all devices...', 'info');
   try {
-    if (window.ZenvyFirebase && typeof window.ZenvyFirebase.syncProductsWithCloud === 'function') {
+    if (window.ZenvyFirebase && typeof window.ZenvyFirebase.forceSync === 'function') {
+      await window.ZenvyFirebase.forceSync();
+      const content = document.getElementById('admin-content');
+      if (content && typeof currentView !== 'undefined' && currentView === 'products') {
+        renderProducts(content);
+      }
+      if (typeof updateNavBadges === 'function') updateNavBadges();
+      const count = (DB.products.all() || []).filter(p => !p.isArchived).length;
+      toast(`✅ Cloud sync complete! ${count} products synchronized across all devices.`, 'success');
+    } else if (window.ZenvyFirebase && typeof window.ZenvyFirebase.syncProductsWithCloud === 'function') {
       const res = await window.ZenvyFirebase.syncProductsWithCloud(true);
       const content = document.getElementById('admin-content');
       if (content && typeof currentView !== 'undefined' && currentView === 'products') {
         renderProducts(content);
       }
+      if (typeof updateNavBadges === 'function') updateNavBadges();
       toast(`✅ Cloud sync complete! ${res?.count || DB.products.all().length} products live.`, 'success');
     } else {
       toast('✅ Catalog refreshed.', 'success');
@@ -1240,15 +1250,20 @@ function bulkDelete() {
   const count = selectedProducts.size;
   showConfirm(
     'Delete Selected Products',
-    `Are you sure you want to delete ${count} selected product(s)? This will permanently remove them from your store.`,
+    `Are you sure you want to delete ${count} selected product(s)? This will permanently remove them from your store across all devices.`,
     () => {
-      const all = Store.get('products') || [];
-      const remaining = all.filter(p => !selectedProducts.has(String(p.id)));
-      Store.set('products', remaining);
+      const ids = Array.from(selectedProducts);
+      ids.forEach(id => {
+        DB.products.delete(id);
+      });
       selectedProducts.clear();
       toast(`${count} product(s) deleted successfully`, 'success');
       renderProducts(document.getElementById('admin-content'));
-      try { window.dispatchEvent(new Event('storage')); } catch(e){}
+      if (typeof updateNavBadges === 'function') updateNavBadges();
+      try {
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch(e){}
     },
     'Delete Selected',
     true
@@ -1258,20 +1273,25 @@ function bulkDelete() {
 function removeAllDemoProducts() {
   const all = Store.get('products') || [];
   const demoIds = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'];
-  const demoCount = all.filter(p => demoIds.includes(String(p.id))).length;
-  if (demoCount === 0) {
+  const targets = all.filter(p => demoIds.includes(String(p.id)));
+  if (targets.length === 0) {
     toast('No demo products found in catalog', 'info');
     return;
   }
   showConfirm(
     'Remove Demo Products',
-    `Are you sure you want to permanently remove all ${demoCount} sample/demo products? Your custom added products will remain intact.`,
+    `Are you sure you want to permanently remove all ${targets.length} sample/demo products? Your custom added products will remain intact.`,
     () => {
-      const remaining = all.filter(p => !demoIds.includes(String(p.id)));
-      Store.set('products', remaining);
-      toast(`${demoCount} demo product(s) removed successfully`, 'success');
+      targets.forEach(p => {
+        DB.products.delete(p.id);
+      });
+      toast(`${targets.length} demo product(s) removed successfully`, 'success');
       renderProducts(document.getElementById('admin-content'));
-      try { window.dispatchEvent(new Event('storage')); } catch(e){}
+      if (typeof updateNavBadges === 'function') updateNavBadges();
+      try {
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch(e){}
     },
     'Remove Demo Products',
     true

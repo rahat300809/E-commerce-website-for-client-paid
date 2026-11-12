@@ -264,7 +264,7 @@ const Uploader = {
         <div class="gallery-grid" id="${id}-grid">
           ${images.map((img, i) => `
             <div class="gallery-item ${img.isPrimary ? 'is-primary' : ''}" data-idx="${i}">
-              <img src="${img.url}" alt="${img.label || 'Image ' + (i+1)}" />
+              <img src="${img.url}" alt="${img.label || 'Image ' + (i+1)}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" />
               <div class="gallery-item-overlay">
                 <button type="button" class="gi-primary-btn" data-idx="${i}" title="Set as primary">
                   <span class="material-symbols-outlined text-xs">${img.isPrimary ? 'star' : 'star_border'}</span>
@@ -278,10 +278,10 @@ const Uploader = {
             </div>
           `).join('')}
           ${images.length < maxImages ? `
-            <div class="gallery-add-btn" id="${id}-add">
+            <div class="gallery-add-btn" id="${id}-add" style="cursor:pointer;" title="Click to select images from computer/phone">
               <input type="file" id="${id}-input" accept="image/*" multiple class="hidden" />
               <span class="material-symbols-outlined text-2xl text-slate-400">add_photo_alternate</span>
-              <p class="text-xs text-slate-400 mt-1">Add Images</p>
+              <p class="text-xs text-slate-400 mt-1">Upload Photos</p>
             </div>
           ` : ''}
         </div>

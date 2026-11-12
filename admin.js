@@ -1108,16 +1108,18 @@ function renderProducts(container) {
                 <tr>
                   <td><input type="checkbox" ${selectedProducts.has(p.id)?'checked':''} onchange="toggleSelectProduct('${p.id}',this.checked)"/></td>
                   <td>
-                    <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
                       ${(() => {
                         const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
                           ? DB.products.getImage(p)
-                          : (p.images?.[0]?.url || p.images?.[0] || p.image || '');
-                        return img
-                          ? `<img src="${img}" class="prod-thumb" alt="${p.name}" onerror="this.style.display='none'"/>`
-                          : `<div class="prod-thumb-placeholder"><span class="material-symbols-outlined" style="font-size:18px">image</span></div>`;
+                          : (p.images?.[0]?.url || p.images?.[0] || p.image || 'img/products/prod_mwafvhg25iobn348j.jpg');
+                        return `
+                          <div class="inventory-thumb-box" style="width:46px;height:46px;" onclick="openProductForm('${p.id}')" title="Click to view/edit product">
+                            <img src="${img}" class="inventory-thumb-img" alt="${p.name}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" loading="lazy"/>
+                          </div>
+                        `;
                       })()}
-                      <div><div style="font-weight:600;font-size:13px">${p.name}</div><div style="font-size:11px;color:#9CA3AF">${p.slug||''}</div></div>
+                      <div><div style="font-weight:600;font-size:13px;cursor:pointer;" onclick="openProductForm('${p.id}')">${p.name}</div><div style="font-size:11px;color:#9CA3AF">${p.slug||''}</div></div>
                     </div>
                   </td>
                   <td class="font-mono" style="font-size:12px">${p.sku||'-'}</td>
@@ -1560,12 +1562,15 @@ function openProductForm(id = null) {
 
       <!-- TAB: IMAGES -->
       <div id="prod-tab-images" class="prod-tab hidden">
-        <div class="form-group mb-4">
-          <label class="form-label">Main Image URL (Direct Link)</label>
-          <input type="text" name="directImageUrl" class="form-input" value="${product?.images?.[0]?.url || ''}" placeholder="https://images.unsplash.com/... or paste image URL"/>
-          <p class="form-hint" style="font-size:11px;color:#9CA3AF;margin-top:4px">Paste a direct image URL or use the drag & drop gallery uploader below.</p>
+        <div style="background:#F8FAFC;border:1px dashed #CBD5E1;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span class="material-symbols-outlined" style="font-size:26px;color:#0284C7;">add_photo_alternate</span>
+          </div>
+          <div>
+            <div style="font-weight:700;color:#0F172A;font-size:14px;">সরাসরি ছবি আপলোড (Direct Image Upload)</div>
+            <div style="font-size:12px;color:#64748B;margin-top:2px;">ডিভাইস থেকে সরাসরি ছবি যোগ করুন (JPG, PNG, WebP)। ছবির লিংক দেওয়ার প্রয়োজন নেই। ড্র্যাগ করে ক্রম সাজান এবং ☆ চেপে প্রধান ছবি সিলেক্ট করুন।</div>
+          </div>
         </div>
-        <p style="font-size:13px;color:#6B7280;margin-bottom:16px">Upload product images. Drag to reorder. Click ☆ to set primary image.</p>
         <div id="prod-image-gallery"></div>
       </div>
 
@@ -2160,12 +2165,8 @@ function saveProduct(e, id, asDraft = false) {
   const customText = !!form.querySelector('input[name="customText"]')?.checked;
   const customPrintPrice = get('customPrintPrice') ? parseFloat(get('customPrintPrice')) : null;
 
-  // Collect gallery images & direct image URL input
-  const directUrl = get('directImageUrl');
+  // Collect gallery images directly from uploader or existing product
   let images = window._lastFormImages || (id ? DB.products.byId(id)?.images : null) || [];
-  if (directUrl) {
-    images = [{ url: directUrl, alt: name, isPrimary: true }, ...images.filter(img => (typeof img === 'string' ? img : img.url) !== directUrl)];
-  }
   if (!images || images.length === 0) {
     const existing = id ? DB.products.byId(id) : null;
     const existingImg = existing?.image || existing?.imageUrl;
@@ -2823,6 +2824,7 @@ function renderInventory(container) {
           <thead>
             <tr>
               <th>Date</th>
+              <th style="width:52px;">Photo</th>
               <th>Customer</th>
               <th>Phone / WhatsApp</th>
               <th>Product Requested</th>
@@ -2835,7 +2837,7 @@ function renderInventory(container) {
           <tbody>
             ${restockRequests.length === 0 ? `
               <tr>
-                <td colspan="8">
+                <td colspan="9">
                   <div class="empty-state" style="padding:28px 16px;">
                     <span class="material-symbols-outlined empty-state-icon" style="color:#94A3B8;">notifications_off</span>
                     <div class="empty-state-title" style="font-size:14px;font-weight:700;">No customer restock requests yet</div>
@@ -2843,9 +2845,19 @@ function renderInventory(container) {
                   </div>
                 </td>
               </tr>
-            ` : restockRequests.map(r => `
+            ` : restockRequests.map(r => {
+              const reqProd = products.find(x => x.id === r.productId || x.name === r.productName);
+              const reqImg = (reqProd && typeof DB !== 'undefined' && DB.products)
+                ? DB.products.getImage(reqProd)
+                : 'img/products/prod_mwafvhg25iobn348j.jpg';
+              return `
               <tr style="${(r.status === 'PENDING' || !r.status) ? 'background:#F8FAFC;' : ''}">
                 <td style="font-size:12px;color:#64748B;white-space:nowrap;">${fmtDate(r.createdAt)}</td>
+                <td style="width:52px;">
+                  <div class="inventory-thumb-box" style="width:42px;height:42px;" ${reqProd ? `onclick="openProductForm('${reqProd.id}')"` : ''} title="${r.productName || 'Jersey'}">
+                    <img src="${reqImg}" class="inventory-thumb-img" alt="${r.productName || 'Jersey'}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" loading="lazy"/>
+                  </div>
+                </td>
                 <td style="font-weight:700;font-size:13px;color:#0F172A;">${r.customerName || 'Valued Customer'}</td>
                 <td class="font-mono" style="font-weight:700;color:#0284C7;font-size:13px;">
                   <a href="tel:${r.customerPhone}" style="color:#0284C7;text-decoration:none;">${r.customerPhone}</a>
@@ -2892,7 +2904,8 @@ function renderInventory(container) {
                   </div>
                 </td>
               </tr>
-            `).join('')}
+            `;
+            }).join('')}
           </tbody>
         </table>
       </div>
@@ -2908,6 +2921,7 @@ function renderInventory(container) {
         <table class="admin-table">
           <thead>
             <tr>
+              <th style="width:68px;">Photo</th>
               <th>Product & Sizes</th>
               <th>SKU</th>
               <th>Total Stock</th>
@@ -2917,8 +2931,11 @@ function renderInventory(container) {
             </tr>
           </thead>
           <tbody>
-            ${products.length === 0 ? `<tr><td colspan="6"><div class="empty-state"><p>No products yet</p></div></td></tr>` :
+            ${products.length === 0 ? `<tr><td colspan="7"><div class="empty-state"><p>No products yet</p></div></td></tr>` :
               products.map(p => {
+                const prodImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+                  ? DB.products.getImage(p)
+                  : (p.images?.[0]?.url || p.images?.[0] || p.image || p.imageUrl || 'img/products/prod_mwafvhg25iobn348j.jpg');
                 const curSizeStocks = (p.sizeStocks && typeof p.sizeStocks === 'object') ? p.sizeStocks : {};
                 const stdSizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
                 const rawSizes = (p.assignedSizes && Array.isArray(p.assignedSizes) && p.assignedSizes.length > 0)
@@ -2950,9 +2967,21 @@ function renderInventory(container) {
 
                 return `
                 <tr>
+                  <td style="width:68px;">
+                    <div class="inventory-thumb-box" onclick="openProductForm('${p.id}')" title="Click to view/edit ${p.name.replace(/"/g, '&quot;')}">
+                      <img src="${prodImg}" 
+                           alt="${p.name}" 
+                           class="inventory-thumb-img" 
+                           onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" 
+                           loading="lazy" />
+                    </div>
+                  </td>
                   <td>
-                    <div style="font-weight:700;color:#0F172A;font-size:13px;">${p.name}</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;align-items:center;">
+                    <div style="font-weight:700;color:#0F172A;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;line-height:1.3;" onclick="openProductForm('${p.id}')" title="Click to edit product">
+                      <span>${p.name}</span>
+                      <span class="material-symbols-outlined" style="font-size:14px;color:#94A3B8;">open_in_new</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;align-items:center;">
                       ${sizePills}
                     </div>
                   </td>

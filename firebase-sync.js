@@ -339,28 +339,31 @@
         if (delRaw) deletedIds = new Set(JSON.parse(delRaw));
       } catch(e){}
 
-      try {
-        const delDoc = await _db.collection(FS_COLLECTION).doc('deleted_products').get();
-        if (delDoc.exists) {
-          const cIds = delDoc.data()?.ids;
-          if (Array.isArray(cIds)) {
-            cIds.forEach(id => deletedIds.add(String(id).trim()));
-            localStorage.setItem(deletedKey, JSON.stringify(Array.from(deletedIds)));
-          }
-        }
-      } catch(e){}
-
       function isTestOrJunkProduct(p) {
-        if (!p) return true;
+        if (!p || typeof p !== 'object') return true;
         const name = String(p.name || '').toLowerCase();
         const id = String(p.id || '').toLowerCase();
-        if (name.includes('[test sync]')) return true;
-        if (id === 'prod_876_user' || id === '876') return true;
+        const sku = String(p.sku || '').toLowerCase();
+        if (name.includes('[test sync]') || name.includes('test sync')) return true;
+        if (id === 'prod_876_user' || id === '876' || sku.includes('o887')) return true;
+        if (['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'].includes(id)) return true;
+        if (name === 'aura strike pro jersey' || name === 'crimson velocity kit') return true;
         return false;
       }
 
-      // 2. Fetch all individual products from Firestore /products/ collection
-      const pSnap = await _db.collection(FS_PRODUCTS_COLLECTION).get();
+      // 1. Fetch deleted tracking IDs and /products/ collection IN PARALLEL for maximum speed (<200ms)
+      const [delDoc, pSnap] = await Promise.all([
+        _db.collection(FS_COLLECTION).doc('deleted_products').get().catch(() => null),
+        _db.collection(FS_PRODUCTS_COLLECTION).get().catch(() => null)
+      ]);
+
+      if (delDoc && delDoc.exists) {
+        const cIds = delDoc.data()?.ids;
+        if (Array.isArray(cIds)) {
+          cIds.forEach(id => deletedIds.add(String(id).trim()));
+          localStorage.setItem(deletedKey, JSON.stringify(Array.from(deletedIds)));
+        }
+      }
       let cloudList = [];
       pSnap.forEach(doc => {
         const d = doc.data();

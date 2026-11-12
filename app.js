@@ -2641,13 +2641,17 @@ if (!window._shopCarouselTimer) {
 let pdState = { product: null, size: 'M', qty: 1 };
 
 function openProduct(product) {
-  let prodId = '101';
+  let prodId = '';
   if (typeof product === 'string' || typeof product === 'number') {
     prodId = product;
   } else if (product && typeof product === 'object') {
-    prodId = product.id || product.slug || '101';
+    prodId = product.id || product.slug || '';
   }
-  window.location.href = `product.html?id=${encodeURIComponent(prodId)}`;
+  if (prodId) {
+    window.location.href = `product.html?id=${encodeURIComponent(prodId)}`;
+  } else {
+    window.location.href = 'product.html';
+  }
 }
 
 function closeProduct() {
@@ -2768,8 +2772,8 @@ function placeOrder() {
     }
 
     return {
-      productId: item.productId || item.id || '101',
-      productName: item.name || 'Aura Strike Pro Jersey',
+      productId: item.productId || item.id || '',
+      productName: item.name || 'Jersey',
       quantity: parseInt(item.qty) || 1,
       unitPrice: parseFloat(item.price) || 1450,
       totalPrice: itemTotal,

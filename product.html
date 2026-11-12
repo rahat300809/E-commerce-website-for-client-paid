@@ -271,7 +271,7 @@
       <span>/</span>
       <a href="index.html#shop" id="pd-breadcrumb-cat" class="hover:text-black">Men's Football</a>
       <span>/</span>
-      <span id="pd-breadcrumb-title" class="text-black font-bold truncate max-w-[220px] sm:max-w-md">Aura Strike Pro Jersey</span>
+      <span id="pd-breadcrumb-title" class="text-black font-bold truncate max-w-[220px] sm:max-w-md">Product Details</span>
     </nav>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10 items-start">
@@ -917,9 +917,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261111_v17"></script>
-  <script src="admin-db.js?v=20261111_v17"></script>
-  <script src="wishlist.js?v=20261111_v17"></script>
+  <script src="firebase-sync.js?v=20261112_v18"></script>
+  <script src="admin-db.js?v=20261112_v18"></script>
+  <script src="wishlist.js?v=20261112_v18"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1188,6 +1188,34 @@
         console.warn('[ProductPage] Direct Firestore fetch notice:', e);
       }
       _fetchingProdDirect = false;
+      // Product was explicitly requested by ID/slug but not found in Firestore (or was deleted)
+      renderProductNotFound();
+    }
+
+    function renderProductNotFound() {
+      const mainEl = document.querySelector('main');
+      if (mainEl) {
+        mainEl.innerHTML = `
+          <div class="max-w-2xl mx-auto py-20 px-4 text-center">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-full bg-gray-100 flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-gray-400">inventory_2</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-3 uppercase tracking-tight">Product Not Available</h1>
+            <p class="text-gray-500 mb-8 max-w-md mx-auto text-sm">This product has been removed or is no longer available in our collection.</p>
+            <div class="flex items-center justify-center gap-3 flex-wrap">
+              <a href="index.html#shop" class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-sm">
+                <span class="material-symbols-outlined text-sm">shopping_bag</span> Explore All Kits
+              </a>
+              <a href="index.html" class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition">
+                Return Home
+              </a>
+            </div>
+          </div>
+        `;
+      }
+      const mobBar = document.getElementById('mobile-sticky-bottom-bar');
+      if (mobBar) mobBar.style.display = 'none';
+      document.title = 'Product Not Available | ZENVY Elite Performance';
     }
 
     function loadDataFromAdminDB() {
@@ -1199,6 +1227,22 @@
       const paramImage = urlParams.get('image');
       const paramCat = urlParams.get('category');
       const paramBadge = urlParams.get('badge');
+
+      // 1. Immediate 0ms check: was this product deleted?
+      const targetQueryId = (prodId || prodSlug || '').trim().toLowerCase();
+      if (targetQueryId) {
+        try {
+          const delKey = 'zenvy_v1_deleted_product_ids';
+          const delRaw = localStorage.getItem(delKey);
+          if (delRaw) {
+            const delIds = JSON.parse(delRaw);
+            if (Array.isArray(delIds) && delIds.some(id => String(id).trim().toLowerCase() === targetQueryId)) {
+              renderProductNotFound();
+              return;
+            }
+          }
+        } catch(e){}
+      }
 
       let targetProduct = null;
 
@@ -1240,15 +1284,11 @@
 
         // Default fallback ONLY if NO specific product was requested in URL
         if (!targetProduct) {
-          targetProduct = allProducts[0] || {
-            id: '101',
-            name: 'Aura Strike Pro Jersey',
-            basePrice: 1450,
-            salePrice: 1450,
-            categoryName: "Men's Football",
-            images: [{ url: ANGLE_IMAGES.front, alt: 'Aura Strike Pro' }],
-            stock: 45
-          };
+          targetProduct = allProducts[0];
+          if (!targetProduct) {
+            renderProductNotFound();
+            return;
+          }
         }
       }
 

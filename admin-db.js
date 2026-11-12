@@ -8,6 +8,545 @@
 
 const DB_VERSION = 'zenvy_v1';
 
+// ── Active Live Catalog Baseline (Instant 0ms load across all devices) ──
+const ACTIVE_CATALOG_BASELINE = [
+  {
+    "id": "prod_mwafxrols41103ror",
+    "name": "Mancester City Third Kit",
+    "slug": "mancester-city-third-kit",
+    "sku": "ZNV-MWAFXROJ",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 4,
+    "sizeStocks": {
+      "S": 1,
+      "XL": 1,
+      "3XL": 0,
+      "L": 1,
+      "XXL": 1,
+      "4XL": 0,
+      "M": 0
+    },
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": true,
+    "isNewArrival": false,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mwafxrols41103ror.jpg",
+    "imageUrl": "img/products/prod_mwafxrols41103ror.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mwafxrols41103ror.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-10T08:41:16.389Z",
+    "updatedAt": "2026-11-11T20:32:23.712Z"
+  },
+  {
+    "id": "prod_mwafvhg25iobn348j",
+    "name": "Mancester City Away Kit",
+    "slug": "mancester-city-away-kit",
+    "sku": "ZNV-MWAFVHFY",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": true,
+    "isNewArrival": false,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mwafvhg25iobn348j.jpg",
+    "imageUrl": "img/products/prod_mwafvhg25iobn348j.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mwafvhg25iobn348j.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-10T08:39:29.810Z",
+    "updatedAt": "2026-11-10T08:47:52.972Z"
+  },
+  {
+    "id": "prod_mwafsdqhn64s1y787",
+    "name": "Mancester City Home Kit",
+    "slug": "mancester-city-home-kit",
+    "sku": "ZNV-MWAFSDQD",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1154,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": true,
+    "isNewArrival": false,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mwafsdqhn64s1y787.jpg",
+    "imageUrl": "img/products/prod_mwafsdqhn64s1y787.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mwafsdqhn64s1y787.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-10T08:37:05.033Z",
+    "updatedAt": "2026-11-10T08:37:05.033Z"
+  },
+  {
+    "id": "prod_mw9setzepymsatr9c",
+    "name": "Barcelona 4th Kit",
+    "slug": "barcelona-4th-kit",
+    "sku": "ZNV-MW9SETZB",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 3,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": true,
+    "isNewArrival": false,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half",
+      "mw9mgrcce7v5jp20j",
+      "slv_full"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy",
+      "patch_respect",
+      "patch_epl"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9setzepymsatr9c.jpg",
+    "imageUrl": "img/products/prod_mw9setzepymsatr9c.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9setzepymsatr9c.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:42:41.738Z",
+    "updatedAt": "2026-11-09T21:42:41.738Z"
+  },
+  {
+    "id": "prod_mw9sa6jrx2oh028td",
+    "name": "Barcelona Third Kit",
+    "slug": "barcelona-third-kit",
+    "sku": "ZNV-MW9SA6JN",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9sa6jrx2oh028td.jpg",
+    "imageUrl": "img/products/prod_mw9sa6jrx2oh028td.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9sa6jrx2oh028td.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:39:04.743Z",
+    "updatedAt": "2026-11-09T21:39:04.743Z"
+  },
+  {
+    "id": "prod_mw9s5gftya80x3w3n",
+    "name": "Barceleona Away Kit",
+    "slug": "barceleona-away-kit",
+    "sku": "ZNV-MW9S5GFR",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half",
+      "slv_full"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy",
+      "patch_respect",
+      "patch_epl"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9s5gftya80x3w3n.jpg",
+    "imageUrl": "img/products/prod_mw9s5gftya80x3w3n.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9s5gftya80x3w3n.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:35:24.281Z",
+    "updatedAt": "2026-11-09T21:35:24.281Z"
+  },
+  {
+    "id": "prod_mw9s02zyhy7iilqo4",
+    "name": "Barcelona Home Kit",
+    "slug": "barcelona-home-kit",
+    "sku": "ZNV-MW9S02ZV",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8",
+      "sz_3xl_mw935ci50qp9tjtzn",
+      "sz_4xl_mw935ci5pwymn3jo8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
+    "imageUrl": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:31:13.582Z",
+    "updatedAt": "2026-11-09T21:31:27.976Z"
+  },
+  {
+    "id": "prod_mw9ru5dmlxx3y3v5l",
+    "name": "Real Madrid Third Kit",
+    "slug": "real-madrid-third-kit",
+    "sku": "ZNV-MW9RU5DK",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s_mw935ci4lxnkh9bqk",
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
+    "imageUrl": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:26:36.730Z",
+    "updatedAt": "2026-11-10T08:32:15.147Z"
+  },
+  {
+    "id": "prod_mw9rkmru2ps3wt4hb",
+    "name": "Real Madrid Away Kit",
+    "slug": "real-madrid-away",
+    "sku": "ZNV-MW9RKMRS",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 20,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "assignedPatches": [
+      "patch_ucl",
+      "patch_trophy"
+    ],
+    "customNameNumber": true,
+    "image": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
+    "imageUrl": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T21:19:12.714Z",
+    "updatedAt": "2026-11-09T21:26:50.615Z"
+  },
+  {
+    "id": "prod_mw9jxtywllrlf2fec",
+    "name": "Barcelona",
+    "slug": "barcelona",
+    "sku": "ZNV-MW9JXTYV",
+    "categoryName": "Club Sweat Shirt",
+    "categoryId": "mw9joz7e8h740wqat",
+    "basePrice": 500,
+    "salePrice": 450,
+    "compareAt": 500,
+    "stock": 6,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_m_mw935ci4n4q1d75if",
+      "sz_l_mw935ci4uf5gmik01",
+      "sz_xl_mw935ci43o865w5xg",
+      "sz_xxl_mw935ci5ftm3psqi8"
+    ],
+    "assignedSleeves": [
+      "slv_half",
+      "slv_full"
+    ],
+    "assignedPatches": [],
+    "customNameNumber": false,
+    "image": "img/products/prod_mw9jxtywllrlf2fec.jpg",
+    "imageUrl": "img/products/prod_mw9jxtywllrlf2fec.jpg",
+    "images": [
+      {
+        "url": "img/products/prod_mw9jxtywllrlf2fec.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-09T17:45:31.640Z",
+    "updatedAt": "2026-11-10T06:24:51.264Z"
+  },
+  {
+    "id": "mw8a6nc4ecqhhqgcv",
+    "name": "Real Madrid Home",
+    "slug": "real-madrid-home",
+    "sku": "ZNV-MW8A6NC3",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "salePrice": 999,
+    "compareAt": 1150,
+    "stock": 10,
+    "sizeStocks": {},
+    "isPublished": true,
+    "status": "published",
+    "isArchived": false,
+    "isPreorder": false,
+    "isLimited": false,
+    "isNewArrival": false,
+    "isBestSeller": true,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "mw85up3szzhdox0i2",
+      "mw85up3uzi2b4c8xv"
+    ],
+    "assignedSleeves": [
+      "slv_half",
+      "slv_full",
+      "mw85up47v7er1mbhw"
+    ],
+    "assignedPatches": [
+      "mw85up488axuigm3h",
+      "mw85up495er82cf26"
+    ],
+    "customNameNumber": false,
+    "image": "img/products/mw8a6nc4ecqhhqgcv.jpg",
+    "imageUrl": "img/products/mw8a6nc4ecqhhqgcv.jpg",
+    "images": [
+      {
+        "url": "img/products/mw8a6nc4ecqhhqgcv.jpg",
+        "isPrimary": true
+      }
+    ],
+    "createdAt": "2026-11-08T20:24:40.612Z",
+    "updatedAt": "2026-11-08T20:25:19.971Z"
+  }
+];
+if (typeof window !== 'undefined') {
+  window.ACTIVE_CATALOG_BASELINE = ACTIVE_CATALOG_BASELINE;
+}
+
 // Global Universal HTML Escaper (Prevents ReferenceError across all views)
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -24,11 +563,14 @@ if (typeof window !== 'undefined') {
 
 // Test & Junk Product Filter
 function isTestOrJunkProduct(p) {
-  if (!p) return true;
+  if (!p || typeof p !== 'object') return true;
   const name = String(p.name || '').toLowerCase();
   const id = String(p.id || '').toLowerCase();
-  if (name.includes('[test sync]') || name.includes('876 [test')) return true;
-  if (id === 'prod_876_user' || id === '876' || id.startsWith('prod_876')) return true;
+  const sku = String(p.sku || '').toLowerCase();
+  if (name.includes('[test sync]') || name.includes('test sync')) return true;
+  if (id === 'prod_876_user' || id === '876' || sku.includes('o887')) return true;
+  if (['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'].includes(id)) return true;
+  if (name === 'aura strike pro jersey' || name === 'crimson velocity kit') return true;
   return false;
 }
 if (typeof window !== 'undefined') {
@@ -87,20 +629,31 @@ if (typeof window !== 'undefined') {
   window.hasSizeStockConfigured = hasSizeStockConfigured;
 }
 
-// Purge any local junk products from in-memory and local storage on startup
+// Initialize in-memory cache with active catalog baseline for instant 0ms first paint
 try {
   const initRaw = localStorage.getItem(`${DB_VERSION}_products`);
   if (initRaw) {
     let initProds = JSON.parse(initRaw);
-    if (Array.isArray(initProds)) {
+    if (Array.isArray(initProds) && initProds.length > 0) {
       const cleanProds = initProds.filter(p => !isTestOrJunkProduct(p));
-      if (cleanProds.length !== initProds.length) {
-        localStorage.setItem(`${DB_VERSION}_products`, JSON.stringify(cleanProds));
+      if (cleanProds.length > 0) {
+        if (cleanProds.length !== initProds.length) {
+          localStorage.setItem(`${DB_VERSION}_products`, JSON.stringify(cleanProds));
+        }
+        window._ZENVY_PRODUCTS_CACHE = cleanProds;
+      } else {
+        window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
       }
-      window._ZENVY_PRODUCTS_CACHE = cleanProds;
+    } else {
+      window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
     }
+  } else {
+    // 100% fresh device / cold start: populate immediately from active catalog baseline
+    window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
   }
-} catch(e){}
+} catch(e) {
+  window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
+}
 
 // ──────────────────────────────────────────────────────────
 // Core Storage Engine
@@ -290,328 +843,11 @@ function seedDefaultData() {
     payFirstNote: 'Advance payment via bKash or Nagad required to confirm your order.',
   });
 
-  // Seed Catalog Products
-  const DEFAULT_SEED_PRODUCTS = [
-    {
-      id: '101',
-      name: 'Aura Strike Pro Jersey',
-      sku: 'ZNV-ASP-01',
-      slug: 'aura-strike-pro-jersey',
-      basePrice: 1450,
-      salePrice: 1450,
-      compareAt: 1800,
-      stock: 45,
-      lowStockAlert: 5,
-      categoryName: "Men's Football",
-      categoryId: '',
-      description: "Men's authentic breathable jersey with AeroKnit technology. Lightweight, moisture-wicking engineered fabric.",
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA', alt: 'Aura Strike Pro' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '102',
-      name: 'Crimson Velocity Kit',
-      sku: 'ZNV-CVK-02',
-      slug: 'crimson-velocity-kit',
-      basePrice: 2800,
-      salePrice: 2800,
-      compareAt: 3500,
-      stock: 28,
-      lowStockAlert: 5,
-      categoryName: 'Unisex Replica',
-      categoryId: '',
-      description: 'Unisex replica jersey. Vibrant crimson with precision stitching and aero-mesh side panels.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEkIfW4povNNZmCZPpAtkbLE-KG7dymS7UvkxUxqgQLCfTYnQHY48OliKbOPxD4V1Krqxp6XqSFuA-NF73ut75mxMqPgULyY1TejG0qSMm8dZw6V6pLygkBx-CvLyIGmmGJLleT0_opdEUd36xIXylzO5tYti0T9C2k39YYp9yBFCfnh08ZuqeEa-LKdjw-ZQoSn86jCP351D4dTOZJ2dL_tDZKbLceB1OZSaeyoZ9CUE-wKzo0M9jOA', alt: 'Crimson Velocity Kit' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '103',
-      name: 'AeroWeave Gold Edition',
-      sku: 'ZNV-AWG-03',
-      slug: 'aeroweave-gold-edition',
-      basePrice: 4800,
-      salePrice: 4800,
-      compareAt: 5500,
-      stock: 15,
-      lowStockAlert: 5,
-      categoryName: 'Limited Edition',
-      categoryId: '',
-      description: 'Match-worn quality jersey with goldwork detailing and luxury tournament crest.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRowvY21H_JGsJ0D3Rb2f-8naBTnt9Jms1AYjLFn11PTIGUdeUvabLQLyg4lHvBgCo5jnX53OLUb9GKGkPZlPEtwe5E_UcsL7SiN_hYTfVKeV0JQIpVQemU_qBThBMnnndy2kPH9nZcmp6Hmm0tFA4Exgg1FLktCNtYjxIzzjJym2AnNw8SHk89KELYY8NKiPRjJBKe24w3Jw3BSbAg0Ek1gn9WmcYadKUBFOCTZbCYAa1zL8H6y6JoA', alt: 'AeroWeave Gold Edition' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '104',
-      name: 'Nimbus Windbreaker',
-      sku: 'ZNV-NWB-04',
-      slug: 'nimbus-windbreaker',
-      basePrice: 6200,
-      salePrice: 6200,
-      compareAt: 7500,
-      stock: 20,
-      lowStockAlert: 5,
-      categoryName: 'Outerwear Jacket',
-      categoryId: '',
-      description: 'Technical windbreaker engineered with weather-resistant ripstop shell and vented back panel.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRtghZsGtFKHlZIYqaxAa8EcbW83K4egjcrZw6V4BKNThg-IAlTlMAK7mBkx_cl17Vu7d2UuuImJuqgR8VWEBruONytgmwd_u56NZOtXfIj4EccnfmiRjMoLpTVBSjXF2sCqgz2Xbmmtc4gMfUG1L_-q82tQjpjnb76hU4-UPXEwVHQis53FgqSKTFOUlJYAHop_oph-8ZHd2YUllJzjsxTPEerlfKDZ2ysTRoudBnK-P0058K9dNXJA', alt: 'Nimbus Windbreaker' }
-      ],
-      isPublished: true,
-      isFeatured: false,
-      isPreorder: false
-    },
-    {
-      id: '105',
-      name: 'Velocity Track Top',
-      sku: 'ZNV-VTT-05',
-      slug: 'velocity-track-top',
-      basePrice: 4200,
-      salePrice: 4200,
-      compareAt: 5000,
-      stock: 35,
-      lowStockAlert: 5,
-      categoryName: 'Unisex Performance Layer',
-      categoryId: '',
-      description: 'Full-zip technical track jacket with articulated sleeves and lightweight thermal insulation.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1JwTdCYkkbAlMDWQnvcGsoH1_xejqEika1eBh9hKzncMJqkA-E_j9iJ4YxS_33YRwhy6hs7Ij64itm3UOWV9u5byfWZm-6GDDSxvsihpvcAOFCDxTSAgrivkSVmva0BrWhiGmrpk7SEzlV0WHlwqSp-B8UTuPmMCY6dDMgFFpET6PcIB7eHvHuvXXoimuWAUEjEBAp5CfojUli8_s-7Movyej_6NI4kcVltdm_VBh12fCnjCbo37H', alt: 'Velocity Track Top' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: true
-    },
-    {
-      id: '106',
-      name: 'Elite Kit Pro',
-      sku: 'ZNV-EKP-06',
-      slug: 'elite-kit-pro',
-      basePrice: 3800,
-      salePrice: 3800,
-      compareAt: 4500,
-      stock: 50,
-      lowStockAlert: 5,
-      categoryName: 'Tournament Grade',
-      categoryId: '',
-      description: 'Pro athlete tournament jersey featuring ultra-breathable micro-mesh and seamless collar construction.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCepIZHM8wJly735CyES_bkyiRjNmYVn4_r1yrpFSMZYyq9NCOW6sN9auKViuhLMz-WhQo-BpURR5DNmo6rs5xwkVrqHkjkRQqkHfAnwa4VVUuh6kMRQzVp7q6uioSOSohH1bfLavJfrg6Qmyf-mGvDzwhFYqXMH2OE_09K87jXXYpwJlzkBov5mcP7s17KAgCliJ79ao94bLYL8M6qXTASZyU8EWEqioPp2vGsfgCK9MqM3vZcWu_P', alt: 'Elite Kit Pro' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '107',
-      name: 'TechKnit Pro Shorts',
-      sku: 'ZNV-TKPS-07',
-      slug: 'techknit-pro-shorts',
-      basePrice: 1800,
-      salePrice: 1800,
-      compareAt: 2200,
-      stock: 30,
-      lowStockAlert: 5,
-      categoryName: 'Performance Active',
-      categoryId: '',
-      description: 'High-mobility athletic shorts with moisture-repellent finish and secure zip pocket.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA2ydFIZfe4g9uHcaAQeDyxyGLzem9Ssjwo_LVYh9dTwEMZxPuURha3BvuRacok16PdozLvoIyf3jQeUf7Umo7IE1f879PuWAxvbDVaLw-dtAihwCckOGfri-3vI5ygKsx_l8-zKkZmMUcaa2QAurogWGaxM7mV3jeGg_q2wvGLSVMpVU2OOxPM1nIb1hn8DdYSMl6Mbs4FLzbbT7rwEFyy1-VB5Y_iVzUGs4urN_h6De-yxzOXtPU2FA', alt: 'TechKnit Pro Shorts' }
-      ],
-      isPublished: true,
-      isFeatured: false,
-      isPreorder: false
-    },
-    {
-      id: '108',
-      name: 'Vapor Match Edition',
-      sku: 'ZNV-VME-08',
-      slug: 'vapor-match-edition',
-      basePrice: 3900,
-      salePrice: 3900,
-      compareAt: 4600,
-      stock: 25,
-      lowStockAlert: 5,
-      categoryName: "Men's Football",
-      categoryId: '',
-      description: 'Pro authentic match jersey with micro-perforated cooling panels.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA', alt: 'Vapor Match Edition' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '109',
-      name: 'Pace Compression Layer',
-      sku: 'ZNV-PCL-09',
-      slug: 'pace-compression-layer',
-      basePrice: 2400,
-      salePrice: 2400,
-      compareAt: 3000,
-      stock: 40,
-      lowStockAlert: 5,
-      categoryName: 'Unisex Performance Layer',
-      categoryId: '',
-      description: 'Ergonomic base layer engineered to support core muscles during match play.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRtghZsGtFKHlZIYqaxAa8EcbW83K4egjcrZw6V4BKNThg-IAlTlMAK7mBkx_cl17Vu7d2UuuImJuqgR8VWEBruONytgmwd_u56NZOtXfIj4EccnfmiRjMoLpTVBSjXF2sCqgz2Xbmmtc4gMfUG1L_-q82tQjpjnb76hU4-UPXEwVHQis53FgqSKTFOUlJYAHop_oph-8ZHd2YUllJzjsxTPEerlfKDZ2ysTRoudBnK-P0058K9dNXJA', alt: 'Pace Compression Layer' }
-      ],
-      isPublished: true,
-      isFeatured: false,
-      isPreorder: false
-    },
-    {
-      id: '110',
-      name: 'International Gold Kit',
-      sku: 'ZNV-IGK-10',
-      slug: 'international-gold-kit',
-      basePrice: 5200,
-      salePrice: 5200,
-      compareAt: 6000,
-      stock: 18,
-      lowStockAlert: 5,
-      categoryName: 'Limited Edition',
-      categoryId: '',
-      description: 'National team authentic tournament kit with metallic gold badging.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRowvY21H_JGsJ0D3Rb2f-8naBTnt9Jms1AYjLFn11PTIGUdeUvabLQLyg4lHvBgCo5jnX53OLUb9GKGkPZlPEtwe5E_UcsL7SiN_hYTfVKeV0JQIpVQemU_qBThBMnnndy2kPH9nZcmp6Hmm0tFA4Exgg1FLktCNtYjxIzzjJym2AnNw8SHk89KELYY8NKiPRjJBKe24w3Jw3BSbAg0Ek1gn9WmcYadKUBFOCTZbCYAa1zL8H6y6JoA', alt: 'International Gold Kit' }
-      ],
-      isPublished: true,
-      isFeatured: true,
-      isPreorder: false
-    },
-    {
-      id: '111',
-      name: 'Apex Storm Jacket',
-      sku: 'ZNV-ASJ-11',
-      slug: 'apex-storm-jacket',
-      basePrice: 6800,
-      salePrice: 6800,
-      compareAt: 8000,
-      stock: 12,
-      lowStockAlert: 5,
-      categoryName: 'Outerwear Jacket',
-      categoryId: '',
-      description: 'Waterproof sideline parka with fleece-lined collar and thermal storm hood.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCRtghZsGtFKHlZIYqaxAa8EcbW83K4egjcrZw6V4BKNThg-IAlTlMAK7mBkx_cl17Vu7d2UuuImJuqgR8VWEBruONytgmwd_u56NZOtXfIj4EccnfmiRjMoLpTVBSjXF2sCqgz2Xbmmtc4gMfUG1L_-q82tQjpjnb76hU4-UPXEwVHQis53FgqSKTFOUlJYAHop_oph-8ZHd2YUllJzjsxTPEerlfKDZ2ysTRoudBnK-P0058K9dNXJA', alt: 'Apex Storm Jacket' }
-      ],
-      isPublished: true,
-      isFeatured: false,
-      isPreorder: false
-    },
-    {
-      id: '112',
-      name: 'Heritage Club Jersey',
-      sku: 'ZNV-HCJ-12',
-      slug: 'heritage-club-jersey',
-      basePrice: 3200,
-      salePrice: 3200,
-      compareAt: 3800,
-      stock: 35,
-      lowStockAlert: 5,
-      categoryName: 'Unisex Replica',
-      categoryId: '',
-      description: 'Classic retro fit club jersey celebrating tournament heritage.',
-      images: [
-        { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEkIfW4povNNZmCZPpAtkbLE-KG7dymS7UvkxUxqgQLCfTYnQHY48OliKbOPxD4V1Krqxp6XqSFuA-NF73ut75mxMqPgULyY1TejG0qSMm8dZw6V6pLygkBx-CvLyIGmmGJLleT0_opdEUd36xIXylzO5tYti0T9C2k39YYp9yBFCfnh08ZuqeEa-LKdjw-ZQoSn86jCP351D4dTOZJ2dL_tDZKbLceB1OZSaeyoZ9CUE-wKzo0M9jOA', alt: 'Heritage Club Jersey' }
-      ],
-      isPublished: true,
-      isFeatured: false,
-      isPreorder: false
-    }
-  ];
-
-  // Additional rich seed products
-  const EXTRA_SEED_PRODUCTS = [
-    {
-      id: '113',
-      name: 'Pro Goalkeeper Kit',
-      sku: 'ZNV-GK-13',
-      slug: 'pro-goalkeeper-kit',
-      basePrice: 3500,
-      salePrice: 3150,
-      compareAt: 3500,
-      stock: 22,
-      lowStockAlert: 5,
-      categoryName: "Men's Football",
-      categoryId: '',
-      description: 'Professional goalkeeper jersey with padded elbows, moisture-barrier technology and non-slip grip bands.',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1580087256394-dc596e1c8f4f?w=800&q=80', alt: 'Pro Goalkeeper Kit' }
-      ],
-      isPublished: true, isFeatured: true, isPreorder: false
-    },
-    {
-      id: '114',
-      name: 'Club Training Bib Set',
-      sku: 'ZNV-CTB-14',
-      slug: 'club-training-bib-set',
-      basePrice: 850,
-      salePrice: 720,
-      compareAt: 850,
-      stock: 80,
-      lowStockAlert: 10,
-      categoryName: 'Training Gear',
-      categoryId: '',
-      description: 'Fluorescent mesh training bibs — sold as set of 10 in a carry bag. Ideal for team drills and scrimmage sessions.',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80', alt: 'Club Training Bib Set' }
-      ],
-      isPublished: true, isFeatured: false, isPreorder: false
-    },
-    {
-      id: '115',
-      name: 'Junior Academy Kit',
-      sku: 'ZNV-JAK-15',
-      slug: 'junior-academy-kit',
-      basePrice: 1200,
-      salePrice: 1200,
-      compareAt: 0,
-      stock: 45,
-      lowStockAlert: 5,
-      categoryName: "Kids Collection",
-      categoryId: '',
-      description: 'Lightweight, breathable junior kit for 6–14 year olds. Anti-odour fabric with reinforced seams.',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80', alt: 'Junior Academy Kit' }
-      ],
-      isPublished: true, isFeatured: true, isPreorder: false
-    },
-    {
-      id: '116',
-      name: 'Elite Compression Socks',
-      sku: 'ZNV-ECS-16',
-      slug: 'elite-compression-socks',
-      basePrice: 480,
-      salePrice: 380,
-      compareAt: 480,
-      stock: 120,
-      lowStockAlert: 10,
-      categoryName: 'Accessories',
-      categoryId: '',
-      description: 'Pro-grade graduated compression football socks with reinforced toe box and non-slip calf grip.',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80', alt: 'Elite Compression Socks' }
-      ],
-      isPublished: true, isFeatured: false, isPreorder: false
-    }
-  ];
-
-  // Sample Demo Catalog Products (Only loaded on explicit manual admin request, never auto-seeded)
-  window._SAMPLE_DEMO_PRODUCTS = [...DEFAULT_SEED_PRODUCTS, ...EXTRA_SEED_PRODUCTS];
+  // Seed active catalog on first launch if empty
+  if (!Store.get('products') || Store.get('products').length === 0) {
+    Store.set('products', JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE)));
+    window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
+  }
   // Homepage Config
   DB.homepage.save({
     announcement: { enabled: true, marqueeText: 'THE NEW SEASON • SHOP OFFICIAL JERSEYS • FREE EXPRESS SHIPPING OVER ৳1500 • INTERACTIVE 3D CUSTOM STUDIO LIVE • PRO-GRADE AEROKNIT WEAVE TECHNOLOGY', badgeText: 'SS/26 DROPS LIVE' },
@@ -636,9 +872,9 @@ function seedDefaultData() {
       title: 'Featured Collections',
       subtitle: 'EXPLORE BY CATEGORY',
       cards: [
-        { id: 'col1', tag: 'COLLECTION SS/26', title: 'CLUB MATCH KITS', desc: 'Official tournament jerseys engineered with micro-perforated Aeroknit weave.', link: 'product.html?id=101', bgImage: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80' },
-        { id: 'col2', tag: 'LIMITED DROP', title: 'INTERNATIONAL EDITIONS', desc: 'National team tournament kits with authentic gold badges and match typography.', link: 'product.html?id=103', bgImage: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80' },
-        { id: 'col3', tag: 'PRO TRAINING', title: 'PRECISION OUTERWEAR', desc: 'Technical windbreakers, compression layers and pace shorts built for all climates.', link: 'product.html?id=104', bgImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80' }
+        { id: 'col1', tag: 'COLLECTION SS/26', title: 'CLUB MATCH KITS', desc: 'Official tournament jerseys engineered with micro-perforated Aeroknit weave.', link: 'product.html?id=prod_mwafxrols41103ror', bgImage: 'img/products/prod_mwafxrols41103ror.jpg' },
+        { id: 'col2', tag: 'LIMITED DROP', title: 'INTERNATIONAL EDITIONS', desc: 'National team tournament kits with authentic gold badges and match typography.', link: 'product.html?id=prod_mw9setzepymsatr9c', bgImage: 'img/products/prod_mw9setzepymsatr9c.jpg' },
+        { id: 'col3', tag: 'PRO TRAINING', title: 'PRECISION OUTERWEAR', desc: 'Technical windbreakers, compression layers and pace shorts built for all climates.', link: 'product.html?id=prod_mw9ru5dmlxx3y3v5l', bgImage: 'img/products/prod_mw9ru5dmlxx3y3v5l.jpg' }
       ]
     },
     justDropped: { badge: 'NEW ARRIVALS', title: 'JUST DROPPED', subtitle: 'The latest high-performance releases from ZENVY Studio.' },
@@ -917,15 +1153,24 @@ const DB = {
   products: {
     all() {
       if (Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
-        return window._ZENVY_PRODUCTS_CACHE.filter(p => !isTestOrJunkProduct(p));
+        const filtered = window._ZENVY_PRODUCTS_CACHE.filter(p => !isTestOrJunkProduct(p));
+        if (filtered.length > 0) return filtered;
       }
       let items = Store.get('products');
-      if (!items || !Array.isArray(items)) {
-        return [];
+      if (Array.isArray(items) && items.length > 0) {
+        const filtered = items.filter(p => !isTestOrJunkProduct(p));
+        if (filtered.length > 0) {
+          window._ZENVY_PRODUCTS_CACHE = filtered;
+          return filtered;
+        }
       }
-      items = items.filter(p => !isTestOrJunkProduct(p));
-      window._ZENVY_PRODUCTS_CACHE = items;
-      return items;
+      // Instant fallback to baseline active catalog for fresh devices & cold starts (0ms load)
+      if (typeof ACTIVE_CATALOG_BASELINE !== 'undefined' && Array.isArray(ACTIVE_CATALOG_BASELINE) && ACTIVE_CATALOG_BASELINE.length > 0) {
+        const baselineCopy = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE));
+        window._ZENVY_PRODUCTS_CACHE = baselineCopy;
+        return baselineCopy;
+      }
+      return [];
     },
     byId(id) {
       if (!id) return null;

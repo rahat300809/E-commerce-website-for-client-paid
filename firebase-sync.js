@@ -911,6 +911,256 @@
     console.log('[ZenvySync] Live sync active 🔄');
   }
 
+  // ── Cloud Orders & Cross-Device Tracking ────────────────────────
+  const BN_DIGIT_MAP = { '০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9' };
+  function convertBnDigits(str) {
+    return String(str || '').replace(/[০-৯]/g, d => BN_DIGIT_MAP[d] || d);
+  }
+
+  function normalizeCloudOrder(raw, fallbackId = '') {
+    if (!raw || typeof raw !== 'object') return null;
+    const id = raw.id || raw.orderNumber || fallbackId || ('ord_' + Date.now());
+    const orderNumber = raw.orderNumber || raw.id || id || 'ZNV-ORDER';
+
+    // Items extraction
+    let items = [];
+    if (Array.isArray(raw.items) && raw.items.length > 0) {
+      items = raw.items.map(it => ({
+        name: it.name || it.productName || it.title || 'Jersey Kit',
+        size: it.size || it.variant || '',
+        qty: Number(it.quantity || it.qty || 1),
+        price: Number(it.price || it.unitPrice || 0),
+        img: it.img || it.image || it.imageUrl || (it.images && it.images[0]?.url) || 'img/products/prod_mwafvhg25iobn348j.jpg',
+        customName: it.customName || it.customization?.name || '',
+        customNumber: it.customNumber || it.customization?.number || '',
+        color: it.color || '',
+        sleeve: it.sleeve || ''
+      }));
+    } else if (raw.productName) {
+      items = [{
+        name: raw.productName,
+        size: raw.size || '',
+        qty: Number(raw.qty || raw.quantity || 1),
+        price: Number(raw.basePrice || raw.total || raw.totalAmount || 0),
+        img: raw.productImg || raw.img || raw.image || 'img/products/prod_mwafvhg25iobn348j.jpg',
+        customName: raw.customization?.name || '',
+        customNumber: raw.customization?.number || '',
+        color: raw.color || '',
+        sleeve: raw.sleeve || ''
+      }];
+    }
+
+    // Address extraction
+    let shippingAddress = '';
+    if (typeof raw.shippingAddress === 'string') {
+      shippingAddress = raw.shippingAddress;
+    } else if (raw.shippingAddress && typeof raw.shippingAddress === 'object') {
+      const parts = [
+        raw.shippingAddress.fullAddress || raw.shippingAddress.address || '',
+        raw.shippingAddress.city || '',
+        raw.shippingAddress.division || '',
+        raw.shippingAddress.postalCode || ''
+      ].filter(Boolean);
+      shippingAddress = parts.join(', ');
+    } else if (raw.address) {
+      shippingAddress = raw.city ? `${raw.address}, ${raw.city}` : raw.address;
+    }
+
+    const total = Number(raw.total || raw.totalAmount || raw.basePrice || 0);
+    const paid = Number(raw.paidAmount || raw.advanceAmount || raw.advancePayment || 0);
+    const due = raw.dueAmount !== undefined ? Number(raw.dueAmount) : Math.max(0, total - paid);
+
+    let createdAt = raw.createdAt;
+    if (createdAt && typeof createdAt.toDate === 'function') {
+      createdAt = createdAt.toDate().toISOString();
+    } else if (createdAt && typeof createdAt === 'object' && createdAt.seconds) {
+      createdAt = new Date(createdAt.seconds * 1000).toISOString();
+    } else if (typeof createdAt !== 'string') {
+      createdAt = new Date().toISOString();
+    }
+
+    return {
+      id,
+      orderNumber,
+      customerName: raw.customerName || (raw.customer && raw.customer.name) || 'Customer',
+      customerPhone: String(raw.customerPhone || raw.phone || (raw.customer && raw.customer.phone) || '').trim(),
+      customerEmail: raw.customerEmail || (raw.customer && raw.customer.email) || '',
+      shippingAddress: shippingAddress || 'Address on file',
+      items,
+      total,
+      paidAmount: paid,
+      dueAmount: due,
+      paymentMethod: raw.paymentMethod || 'Cash on Delivery',
+      paymentStatus: (raw.paymentStatus || 'PENDING').toUpperCase(),
+      paymentTrxId: raw.paymentTrxId || raw.trxId || raw.transactionId || '',
+      status: (raw.status || 'PENDING').toUpperCase(),
+      type: raw.type || (raw.expectedDate ? 'PREORDER' : 'REGULAR'),
+      expectedDate: raw.expectedDate || raw.expectedDeliveryDate || '',
+      notes: raw.notes || raw.preorderNote || '',
+      createdAt
+    };
+  }
+
+  async function searchOrdersInCloud(rawQuery) {
+    if (!rawQuery || typeof rawQuery !== 'string') return [];
+    const query = convertBnDigits(rawQuery.trim().replace(/^#\s*/, ''));
+    if (!query) return [];
+
+    const cleanQuery = query.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const digitsOnly = query.replace(/\D/g, '');
+    const phone11 = digitsOnly.length >= 11 ? digitsOnly.slice(-11) : (digitsOnly.length === 10 ? '0' + digitsOnly : digitsOnly);
+
+    const matched = new Map();
+
+    function addIfMatch(raw, fallbackId = '') {
+      if (!raw) return;
+      const order = normalizeCloudOrder(raw, fallbackId);
+      if (!order) return;
+
+      const num = order.orderNumber.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const oId = String(order.id).toLowerCase().replace(/[^a-z0-9]/g, '');
+      const phoneDigits = order.customerPhone.replace(/\D/g, '');
+      const p11 = phoneDigits.length >= 11 ? phoneDigits.slice(-11) : (phoneDigits.length === 10 ? '0' + phoneDigits : phoneDigits);
+      const trx = (order.paymentTrxId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      let hit = false;
+      // 1. Order Number / ID match
+      if (cleanQuery && (num.includes(cleanQuery) || cleanQuery.includes(num) || oId.includes(cleanQuery) || cleanQuery.includes(oId))) {
+        hit = true;
+      }
+      // 2. Phone match
+      if (!hit && phone11 && phone11.length >= 6) {
+        if (p11.includes(phone11) || phone11.includes(p11) || phoneDigits.includes(phone11) || phone11.includes(phoneDigits)) {
+          hit = true;
+        }
+      }
+      // 3. TrxID match
+      if (!hit && cleanQuery && trx && (trx.includes(cleanQuery) || cleanQuery.includes(trx))) {
+        hit = true;
+      }
+
+      if (hit) {
+        const key = order.orderNumber || order.id;
+        if (!matched.has(key)) {
+          matched.set(key, order);
+        } else {
+          // Merge to prefer more detailed data
+          const prev = matched.get(key);
+          matched.set(key, { ...prev, ...order, items: (order.items && order.items.length) ? order.items : (prev.items || []) });
+        }
+      }
+    }
+
+    // 1. Check local storage & DB.orders first
+    try {
+      const local1 = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.all() : [];
+      const local2 = JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]');
+      const local3 = JSON.parse(localStorage.getItem('zenvy_db_orders') || '[]');
+      [...local1, ...local2, ...local3].forEach(o => addIfMatch(o));
+    } catch(e){}
+
+    // 2. Query Cloud Firestore
+    try {
+      await ensureDb();
+      if (_db) {
+        // 2A. Search in zenvy_store/orders document (stores all orders synced by DB.orders)
+        try {
+          const docSnap = await _db.collection(FS_COLLECTION).doc('orders').get();
+          if (docSnap.exists) {
+            const data = docSnap.data()?.data || docSnap.data();
+            if (Array.isArray(data)) {
+              data.forEach(o => addIfMatch(o));
+            }
+          }
+        } catch(e) {
+          console.warn('[ZenvySync] zenvy_store/orders read warning:', e);
+        }
+
+        // 2B. Direct doc search in /orders/{query}
+        try {
+          const docSnap = await _db.collection('orders').doc(query).get();
+          if (docSnap.exists) {
+            addIfMatch(docSnap.data(), docSnap.id);
+          }
+        } catch(e){}
+
+        // 2C. Query /orders by orderNumber (exact & uppercase)
+        try {
+          const qSnap = await _db.collection('orders').where('orderNumber', '==', query).get();
+          qSnap.forEach(d => addIfMatch(d.data(), d.id));
+          if (query.toUpperCase() !== query) {
+            const qSnapUp = await _db.collection('orders').where('orderNumber', '==', query.toUpperCase()).get();
+            qSnapUp.forEach(d => addIfMatch(d.data(), d.id));
+          }
+        } catch(e){}
+
+        // 2D. Query /orders by customerPhone
+        if (phone11 && phone11.length >= 7) {
+          try {
+            const queries = [query, phone11, '+88' + phone11, '88' + phone11];
+            for (const ph of queries) {
+              const qSnap = await _db.collection('orders').where('customerPhone', '==', ph).get();
+              qSnap.forEach(d => addIfMatch(d.data(), d.id));
+            }
+          } catch(e){}
+        }
+
+        // 2E. Query /orders scan if query might be partial (e.g. 6162 or ZNV...)
+        if (matched.size === 0) {
+          try {
+            const snap = await _db.collection('orders').limit(50).get();
+            snap.forEach(d => addIfMatch(d.data(), d.id));
+          } catch(e){}
+        }
+      }
+    } catch(e) {
+      console.warn('[ZenvySync] Cloud search error:', e);
+    }
+
+    const list = Array.from(matched.values());
+    list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    return list;
+  }
+
+  async function saveOrderToCloud(order) {
+    if (!order) return;
+    try {
+      await ensureDb();
+      if (!_db) return;
+      const docId = order.id || order.orderNumber || ('ord_' + Date.now());
+      const sanitized = sanitize(order);
+      await _db.collection('orders').doc(docId).set(sanitized, { merge: true });
+      console.log('[ZenvySync] Order saved to cloud /orders/' + docId);
+    } catch(e) {
+      console.warn('[ZenvySync] saveOrderToCloud failed:', e);
+    }
+  }
+
+  async function updateCloudOrderStatus(orderIdOrNumber, status, extraFields = {}) {
+    if (!orderIdOrNumber) return;
+    try {
+      await ensureDb();
+      if (!_db) return;
+      const cleanStatus = (status || '').toUpperCase();
+      const updateData = { status: cleanStatus, updatedAt: Date.now(), ...sanitize(extraFields) };
+
+      // 1. Try doc by ID
+      try {
+        await _db.collection('orders').doc(orderIdOrNumber).set(updateData, { merge: true });
+      } catch(e){}
+
+      // 2. Try where orderNumber == orderIdOrNumber
+      try {
+        const snap = await _db.collection('orders').where('orderNumber', '==', orderIdOrNumber).get();
+        snap.forEach(async (d) => {
+          await d.ref.set(updateData, { merge: true });
+        });
+      } catch(e){}
+    } catch(e) {
+      console.warn('[ZenvySync] updateCloudOrderStatus failed:', e);
+    }
+  }
+
   // ── Public API ──────────────────────────────────────────────────
   const ADMIN_MANAGED_KEYS = [
     'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
@@ -941,6 +1191,9 @@
     syncProductsWithCloud,
     hydrate,
     startLiveSync,
+    searchOrders: searchOrdersInCloud,
+    saveOrder: saveOrderToCloud,
+    updateOrderStatus: updateCloudOrderStatus,
     isReady() { return !!_db; },
     ensureDb,
     async forceSync() {

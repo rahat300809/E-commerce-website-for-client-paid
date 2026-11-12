@@ -1820,8 +1820,8 @@ const DB = {
     totalRevenue() { return Store.get('orders').filter(o => o.paymentStatus==='PAID').reduce((s,o) => s+o.totalAmount, 0); },
     create(data) {
       const items = Store.get('orders');
-      const num = 'ZNV' + Date.now().toString().slice(-6);
-      const item = { id: Store.genId(), orderNumber: num, ...data, status: 'PENDING', createdAt: Store.now(), updatedAt: Store.now() };
+      const num = data.orderNumber || ('ZNV' + Date.now().toString().slice(-6));
+      const item = { id: data.id || Store.genId(), ...data, orderNumber: num, status: data.status || 'PENDING', createdAt: data.createdAt || Store.now(), updatedAt: Store.now() };
       items.push(item); Store.set('orders', items);
       // Deduct stock
       if (item.items) item.items.forEach(i => {
@@ -1830,6 +1830,13 @@ const DB = {
       });
       DB.log(`Order created: ${num}`);
       DB.activityLog.add({ action: 'Order Placed', entity: 'Order', entityId: item.id, detail: num });
+
+      // Save to cloud Firestore /orders collection (non-blocking)
+      try {
+        if (window.ZenvyFirebase && typeof window.ZenvyFirebase.saveOrder === 'function') {
+          window.ZenvyFirebase.saveOrder(item);
+        }
+      } catch(e) {}
 
       // Send Instant Telegram Bot Notification (non-blocking)
       try {
@@ -1849,6 +1856,13 @@ const DB = {
       const notifLog = Store.get('notifLog');
       notifLog.push({ orderId: id, orderNumber: old?.orderNumber, status, sentAt: Store.now() });
       Store.set('notifLog', notifLog);
+
+      // Cloud Firestore sync (non-blocking)
+      try {
+        if (window.ZenvyFirebase && typeof window.ZenvyFirebase.updateOrderStatus === 'function') {
+          window.ZenvyFirebase.updateOrderStatus(old?.orderNumber || id, status);
+        }
+      } catch(e) {}
     },
     updatePayment(id, { paymentStatus, paidAmount, paymentRemark, paymentTrxId }) {
       const old = DB.orders.byId(id);
@@ -1871,6 +1885,21 @@ const DB = {
       });
       DB.activityLog.add({ action: `Payment ${paymentStatus}`, entity: 'Order', entityId: id, detail: `${old.orderNumber} - ৳${finalPaidAmount} (${paymentRemark || 'No remark'})` });
       DB.log(`Order ${old.orderNumber} payment updated to ${paymentStatus}`);
+
+      // Cloud Firestore sync (non-blocking)
+      try {
+        if (window.ZenvyFirebase && typeof window.ZenvyFirebase.updateOrderStatus === 'function') {
+          window.ZenvyFirebase.updateOrderStatus(old?.orderNumber || id, updated.status || old.status, {
+            paymentStatus,
+            paidAmount: finalPaidAmount,
+            dueAmount: due,
+            paymentRemark: paymentRemark !== undefined ? paymentRemark : (old.paymentRemark || ''),
+            paymentTrxId: finalTrx,
+            paidAt: updated.paidAt
+          });
+        }
+      } catch(e) {}
+
       return updated;
     },
     update(id, data) {

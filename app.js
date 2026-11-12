@@ -1843,69 +1843,264 @@ window.scrollSlider = function(offset) {
   }
 };
 
-window.openOrderTrackingModal = function() {
+window.openOrderTrackingModal = function(prefillQuery = '') {
   const modal = document.getElementById('order-tracking-modal');
   if (modal) {
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     const input = document.getElementById('track-order-input');
-    if (input) input.focus();
+    if (input) {
+      if (prefillQuery) input.value = prefillQuery;
+      setTimeout(() => {
+        input.focus();
+        if (prefillQuery) performTrackOrder();
+      }, 60);
+    }
   }
 };
 
 window.closeOrderTrackingModal = function() {
   const modal = document.getElementById('order-tracking-modal');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
 };
 
-window.performTrackOrder = function() {
+window.performTrackOrder = async function() {
   const input = document.getElementById('track-order-input');
   const resultBox = document.getElementById('track-order-result');
   if (!input || !resultBox) return;
 
-  const query = input.value.trim().toLowerCase();
+  const query = input.value.trim();
   if (!query) {
     resultBox.classList.remove('hidden');
-    resultBox.innerHTML = `<div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-xl font-bold">অনুগ্রহ করে আপনার অর্ডার আইডি (যেমন: ORD-...) অথবা মোবাইল নম্বর দিন।</div>`;
+    resultBox.innerHTML = `
+      <div class="p-4 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-2xl flex items-center gap-3">
+        <span class="material-symbols-outlined text-amber-600 text-xl shrink-0">info</span>
+        <div>
+          <div class="font-bold text-sm">অর্ডার আইডি বা মোবাইল নম্বর দিন</div>
+          <div class="text-[11px] text-amber-700 mt-0.5">যেমন: <strong>ZNV-871538</strong>, <strong>ZPO-261111-6162</strong> অথবা আপনার ১১ ডিজিটের মোবাইল নম্বর (যেমন: <strong>019...</strong>)</div>
+        </div>
+      </div>
+    `;
     return;
   }
 
-  const allOrders = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.all() : (JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]'));
-  const found = allOrders.filter(o => {
-    const id = (o.id || o.orderNumber || '').toString().toLowerCase();
-    const phone = (o.customerPhone || o.phone || (o.customer && o.customer.phone) || '').toString().toLowerCase();
-    return id.includes(query) || (phone && phone.includes(query));
-  });
-
+  // Live searching spinner
   resultBox.classList.remove('hidden');
-  if (found.length === 0) {
+  resultBox.innerHTML = `
+    <div class="p-6 text-center text-xs text-gray-600 font-bold flex flex-col items-center justify-center gap-2.5">
+      <span class="animate-spin inline-block w-6 h-6 border-2 border-black border-t-transparent rounded-full"></span>
+      <span class="text-sm text-black font-semibold">লাইভ ক্লাউড সার্ভারে অর্ডার খোঁজা হচ্ছে...</span>
+      <span class="text-[11px] text-gray-400 font-normal">"${query}" এর ডাটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন</span>
+    </div>
+  `;
+
+  let found = [];
+  try {
+    if (window.ZenvyFirebase && typeof window.ZenvyFirebase.searchOrders === 'function') {
+      found = await window.ZenvyFirebase.searchOrders(query);
+    } else {
+      const allOrders = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.all() : (JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]'));
+      const qClean = query.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const qDigits = query.replace(/\D/g, '');
+      found = allOrders.filter(o => {
+        const id = (o.id || o.orderNumber || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const phone = (o.customerPhone || o.phone || (o.customer && o.customer.phone) || '').toString().replace(/\D/g, '');
+        return (qClean && id.includes(qClean)) || (qDigits && phone.includes(qDigits));
+      });
+    }
+  } catch (err) {
+    console.warn('[TrackOrder] Search error:', err);
+  }
+
+  if (!found || found.length === 0) {
     resultBox.innerHTML = `
-      <div class="p-4 bg-white border border-gray-200 text-gray-700 text-xs rounded-xl space-y-1">
-        <p class="font-bold text-black text-sm">কোনো অর্ডার পাওয়া যায়নি</p>
-        <p class="text-gray-500">"${query}" এর সাথে মিলে এমন কোনো অর্ডার ডাটাবেজে নেই। অনুগ্রহ করে সঠিক অর্ডার আইডি বা মোবাইল নম্বর চেক করুন।</p>
+      <div class="p-5 bg-white border border-gray-200 rounded-2xl text-xs space-y-3 shadow-2xs">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">search_off</span>
+          </div>
+          <div>
+            <div class="font-bold text-black text-sm">কোনো অর্ডার পাওয়া যায়নি</div>
+            <div class="text-[11px] text-gray-500 mt-0.5">"${query}" এর সাথে মিলে এমন কোনো অর্ডার ডাটাবেজে নেই।</div>
+          </div>
+        </div>
+        <div class="bg-gray-50 p-3 rounded-xl text-[11px] text-gray-600 space-y-1">
+          <div>💡 <strong>সহায়তা টিপস:</strong></div>
+          <div>• অর্ডার প্লেসের সময় যে ফোন নম্বর দিয়েছিলেন সেটি লিখুন (যেমন: 017..., 019...)।</div>
+          <div>• অথবা সম্পূর্ণ অর্ডার আইডি দিন (যেমন: <strong>ZNV-871538</strong> বা <strong>ZPO-261111-6162</strong>)।</div>
+        </div>
+        <a href="https://wa.me/8801926218536?text=${encodeURIComponent('হ্যালো ZENVY, আমি আমার অর্ডার ট্র্যাক করতে পারছি না। আমার নম্বর/আইডি: ' + query)}" target="_blank" rel="noopener" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-colors shadow-2xs">
+          <span class="material-symbols-outlined text-base">chat</span>
+          <span>সরাসরি WhatsApp এ হেল্প নিন</span>
+        </a>
       </div>
     `;
     return;
   }
 
   resultBox.innerHTML = found.map(order => {
-    const status = order.status || 'Pending';
-    const total = order.total || order.totalAmount || 0;
-    const date = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recent';
-    const statusColor = status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' :
-                        status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
-                        status === 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800';
+    const rawStatus = (order.status || 'PENDING').toUpperCase();
+    const isCancelled = rawStatus === 'CANCELLED';
+    const isDelivered = rawStatus === 'DELIVERED';
+    const isShipped = rawStatus === 'SHIPPED';
+    const isConfirmed = rawStatus === 'CONFIRMED' || rawStatus === 'PROCESSING';
+
+    let step = 1;
+    let progressPercent = 0;
+    if (isDelivered) { step = 4; progressPercent = 100; }
+    else if (isShipped) { step = 3; progressPercent = 66; }
+    else if (isConfirmed) { step = 2; progressPercent = 33; }
+    else { step = 1; progressPercent = 8; }
+
+    let statusLabel = 'অর্ডার গৃহীত (অপেক্ষমান)';
+    let statusBadgeClass = 'bg-amber-100 text-amber-800 border border-amber-200';
+    if (isDelivered) {
+      statusLabel = 'ডেলিভারি সম্পন্ন ✅';
+      statusBadgeClass = 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+    } else if (isShipped) {
+      statusLabel = 'কুরিয়ারে হস্তান্তর 🚚';
+      statusBadgeClass = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+    } else if (isConfirmed) {
+      statusLabel = 'প্রস্তুত হচ্ছে (Processing) ⚙️';
+      statusBadgeClass = 'bg-blue-100 text-blue-800 border border-blue-200';
+    } else if (isCancelled) {
+      statusLabel = 'অর্ডার বাতিল (Cancelled) ❌';
+      statusBadgeClass = 'bg-red-100 text-red-800 border border-red-200';
+    }
+
+    const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }) : 'আজকের অর্ডার';
+
     return `
-      <div class="p-3 bg-white border border-gray-200 rounded-xl space-y-2 text-xs mb-2 shadow-2xs">
-        <div class="flex justify-between items-center">
-          <span class="font-mono-ui font-bold text-black text-sm">${order.id || order.orderNumber}</span>
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${status.toUpperCase()}</span>
+      <div class="p-4 sm:p-5 bg-white border border-gray-200 rounded-2xl mb-3 last:mb-0 shadow-2xs space-y-3.5 text-left">
+        <!-- Order Header -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono-ui font-black text-black text-sm tracking-wide">#${order.orderNumber || order.id}</span>
+              ${order.type === 'PREORDER' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">PREORDER</span>' : ''}
+            </div>
+            <div class="text-[11px] text-gray-500 mt-0.5">অর্ডার তারিখ: ${dateStr}</div>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBadgeClass}">
+            ${statusLabel}
+          </span>
         </div>
-        <div class="flex justify-between text-gray-500 text-[11px]">
-          <span>তারিখ: ${date}</span>
-          <span class="font-bold text-black font-mono-ui">৳${Math.round(total).toLocaleString()}</span>
+
+        ${isCancelled ? `
+          <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-red-600 text-xl shrink-0">cancel</span>
+            <div>
+              <div class="font-bold">অর্ডারটি বাতিল করা হয়েছে</div>
+              <div class="text-[11px] text-red-600 mt-0.5">বিস্তারিত তথ্য বা রিফান্ডের জন্য অনুগ্রহ করে আমাদের সাপোর্টে যোগাযোগ করুন।</div>
+            </div>
+          </div>
+        ` : `
+          <!-- Visual 4-Step Stepper -->
+          <div class="py-2 px-1 sm:px-2">
+            <div class="flex items-center justify-between relative">
+              <div class="absolute left-4 right-4 top-4 h-0.5 bg-gray-200 z-0"></div>
+              <div class="absolute left-4 top-4 h-0.5 bg-black transition-all duration-500 z-0" style="width: ${progressPercent}%;"></div>
+
+              <!-- Step 1: Placed -->
+              <div class="relative z-10 flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${step >= 1 ? 'bg-black text-white shadow-sm' : 'bg-gray-200 text-gray-500'}">
+                  <span class="material-symbols-outlined text-base">receipt_long</span>
+                </div>
+                <span class="text-[10px] font-bold mt-1.5 text-center ${step >= 1 ? 'text-black' : 'text-gray-400'}">গৃহীত</span>
+              </div>
+
+              <!-- Step 2: Confirmed/Processing -->
+              <div class="relative z-10 flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${step >= 2 ? 'bg-black text-white shadow-sm' : (step === 1 ? 'bg-amber-500 text-white animate-pulse' : 'bg-gray-200 text-gray-400')}">
+                  <span class="material-symbols-outlined text-base">${step >= 2 ? 'check' : 'inventory_2'}</span>
+                </div>
+                <span class="text-[10px] font-bold mt-1.5 text-center ${step >= 2 ? 'text-black' : (step === 1 ? 'text-amber-600' : 'text-gray-400')}">প্রসেসিং</span>
+              </div>
+
+              <!-- Step 3: Shipped -->
+              <div class="relative z-10 flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${step >= 3 ? 'bg-black text-white shadow-sm' : (step === 2 ? 'bg-blue-600 text-white animate-pulse' : 'bg-gray-200 text-gray-400')}">
+                  <span class="material-symbols-outlined text-base">${step >= 3 ? 'check' : 'local_shipping'}</span>
+                </div>
+                <span class="text-[10px] font-bold mt-1.5 text-center ${step >= 3 ? 'text-black' : (step === 2 ? 'text-blue-600' : 'text-gray-400')}">কুরিয়ারে</span>
+              </div>
+
+              <!-- Step 4: Delivered -->
+              <div class="relative z-10 flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${step >= 4 ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-200 text-gray-400'}">
+                  <span class="material-symbols-outlined text-base">${step >= 4 ? 'task_alt' : 'home'}</span>
+                </div>
+                <span class="text-[10px] font-bold mt-1.5 text-center ${step >= 4 ? 'text-emerald-700 font-extrabold' : 'text-gray-400'}">ডেলিভার্ড</span>
+              </div>
+            </div>
+          </div>
+        `}
+
+        <!-- Items Breakdown -->
+        <div class="space-y-2 border-t border-b border-gray-100 py-3">
+          ${(order.items || []).map(it => `
+            <div class="flex items-center gap-3">
+              <img src="${it.img || 'img/products/prod_mwafvhg25iobn348j.jpg'}" alt="${it.name}" class="w-11 h-11 object-cover rounded-xl border border-gray-100 shrink-0" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" />
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-xs text-black truncate">${it.name}</div>
+                <div class="text-[11px] text-gray-500 flex flex-wrap items-center gap-1.5 mt-0.5">
+                  ${it.size ? `<span class="bg-gray-100 text-black px-1.5 py-0.2 rounded font-mono text-[10px] font-bold">Size: ${it.size}</span>` : ''}
+                  <span>× ${it.qty || 1}</span>
+                  ${it.customName ? `<span class="text-black font-semibold">• প্রিন্ট: ${it.customName} #${it.customNumber || ''}</span>` : ''}
+                </div>
+              </div>
+              <div class="text-right font-mono-ui font-bold text-xs text-black">
+                ৳${Math.round((it.price || 0) * (it.qty || 1)).toLocaleString()}
+              </div>
+            </div>
+          `).join('')}
         </div>
-        <div class="text-[11px] text-gray-600 border-t border-gray-100 pt-1.5">
-          গ্রাহক: <strong>${order.customerName || (order.customer && order.customer.name) || 'Customer'}</strong> • ${order.customerPhone || (order.customer && order.customer.phone) || ''}
+
+        <!-- Payment & Delivery Breakdown -->
+        <div class="bg-gray-50 rounded-2xl p-3.5 space-y-2 text-xs">
+          <div class="flex justify-between text-gray-600">
+            <span>মোট অর্ডারের মূল্য:</span>
+            <span class="font-bold text-black font-mono-ui">৳${Math.round(order.total || 0).toLocaleString()}</span>
+          </div>
+          ${order.paidAmount > 0 ? `
+            <div class="flex justify-between text-emerald-700 font-semibold">
+              <span>অগ্রিম পরিশোধ (Paid):</span>
+              <span class="font-bold font-mono-ui">৳${Math.round(order.paidAmount).toLocaleString()}</span>
+            </div>
+          ` : ''}
+          <div class="flex justify-between items-center text-amber-900 font-bold border-t border-gray-200/60 pt-1.5">
+            <span>কুরিয়ারে বাকি প্রদেয় টাকা (Due):</span>
+            <span class="font-black text-black font-mono-ui text-sm">৳${Math.round(order.dueAmount || 0).toLocaleString()}</span>
+          </div>
+          <div class="flex justify-between text-[11px] text-gray-500 pt-0.5">
+            <span>পেমেন্ট পদ্ধতি:</span>
+            <span class="font-semibold text-gray-700">${order.paymentMethod || 'ক্যাশ অন ডেলিভারি'}</span>
+          </div>
+          ${order.expectedDate ? `
+            <div class="flex justify-between text-[11px] text-purple-700 font-semibold pt-0.5">
+              <span>সম্ভাব্য ডেলিভারি তারিখ:</span>
+              <span class="font-bold">${order.expectedDate}</span>
+            </div>
+          ` : ''}
+          ${order.shippingAddress ? `
+            <div class="border-t border-gray-200/60 pt-1.5 text-[11px] text-gray-600">
+              <span class="font-bold text-gray-700">ডেলিভারি ঠিকানা:</span> ${order.shippingAddress}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Action / Contact Buttons -->
+        <div class="flex gap-2 pt-1">
+          <a href="https://wa.me/8801926218536?text=${encodeURIComponent('হ্যালো ZENVY, আমার অর্ডার #' + (order.orderNumber || order.id) + ' এর লাইভ আপডেট জানতে চাই।')}" target="_blank" rel="noopener" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-colors shadow-2xs">
+            <span class="material-symbols-outlined text-base">chat</span>
+            <span>WhatsApp এ লাইভ আপডেট</span>
+          </a>
+          <a href="tel:01926218536" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-black font-bold rounded-xl flex items-center justify-center gap-1 text-xs transition-colors" title="সরাসরি কল করুন">
+            <span class="material-symbols-outlined text-base">call</span>
+          </a>
         </div>
       </div>
     `;
@@ -2712,6 +2907,7 @@ window.viewAllSearchResultsInShop = viewAllSearchResultsInShop;
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeGlobalSearch();
+    if (typeof closeOrderTrackingModal === 'function') closeOrderTrackingModal();
   }
   if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
     e.preventDefault();

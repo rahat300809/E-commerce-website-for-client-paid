@@ -140,8 +140,8 @@
     clearTimeout(_writeTimer);
     ensureDb().then(db => {
       if (db) {
-        // Critical catalog and transactional keys flush immediately to prevent navigation race conditions
-        if (key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests') {
+        // Critical catalog, brand and transactional keys flush immediately to prevent navigation race conditions
+        if (key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests' || key === 'brand' || key === 'storeSettings' || key === 'homepage' || key === 'banners' || key === 'shipping' || key === 'paymentConfig') {
           flushWriteQueue();
         } else {
           _writeTimer = setTimeout(flushWriteQueue, 25);

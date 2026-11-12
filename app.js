@@ -1035,10 +1035,40 @@ function syncFooterSocialLinks() {
   const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
   const brandName = (brand.brandName || 'ZENVY').trim();
 
-  // 1. Update Brand Name Across the Page
-  document.querySelectorAll('[data-brand-name], .brand-name-display, #site-brand-logo, #footer-brand-logo').forEach(el => {
+  // 1. Update Brand Logo or Brand Name Across the Page
+  const logoElements = document.querySelectorAll('#site-brand-logo, #footer-brand-logo');
+  logoElements.forEach(el => {
+    if (brand.logoUrl && brand.logoUrl.trim()) {
+      el.innerHTML = `<img src="${brand.logoUrl}" alt="${brandName}" class="h-7 sm:h-9 max-h-9 w-auto object-contain inline-block" />`;
+    } else {
+      el.textContent = brandName;
+    }
+  });
+
+  document.querySelectorAll('[data-brand-name]:not(#site-brand-logo):not(#footer-brand-logo), .brand-name-display').forEach(el => {
     el.textContent = brandName;
   });
+
+  // Dynamic Favicon
+  if (brand.faviconUrl && brand.faviconUrl.trim()) {
+    let favEl = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
+    if (!favEl) {
+      favEl = document.createElement('link');
+      favEl.rel = 'icon';
+      document.head.appendChild(favEl);
+    }
+    favEl.href = brand.faviconUrl;
+  }
+
+  // Tagline and Description
+  const descEl = document.getElementById('footer-brand-desc');
+  if (descEl && brand.description && brand.description.trim()) {
+    descEl.textContent = brand.description;
+  }
+  const taglineEl = document.getElementById('site-brand-tagline') || document.querySelector('[data-brand-tagline]');
+  if (taglineEl && brand.tagline) {
+    taglineEl.textContent = brand.tagline;
+  }
 
   const copyrightEl = document.getElementById('footer-copyright');
   if (copyrightEl) {
@@ -1074,6 +1104,9 @@ function syncFooterSocialLinks() {
   const phoneEl = document.getElementById('footer-support-phone');
   if (phoneEl) {
     phoneEl.textContent = brand.phone || ('+' + cleanWa);
+    if (phoneEl.tagName === 'A') {
+      phoneEl.href = 'tel:' + (brand.phone || cleanWa).replace(/[^0-9+]/g, '');
+    }
   }
 
   // 4. Global Floating Contact Widget (WhatsApp + Call)

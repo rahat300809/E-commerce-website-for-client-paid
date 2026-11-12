@@ -51,9 +51,20 @@
 
 body {
   background-color: #f9f9f9;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Hind Siliguri', sans-serif;
   color: #1a1c1c;
   overflow-x: hidden;
+}
+
+/* Bengali Typography Enhancement */
+[lang="bn"], .font-bangla, body, input, select, textarea, button {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure Bengali text does not clip ascenders or descenders */
+.leading-normal, p, span, h1, h2, h3, h4, h5, h6, button, input, label {
+  line-height: normal;
 }
 
 /* Glassmorphism Components */

@@ -13,13 +13,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Hind+Siliguri:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     rel="stylesheet" />
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261112_v18">
+  <link rel="stylesheet" href="styles.css?v=20261112_v19">
 
   <!-- Preload critical hero & bento assets to eliminate first-paint reload flash -->
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80"
@@ -252,14 +252,15 @@
             "section-padding": "120px"
           },
           fontFamily: {
-            "display-lg": ["Hanken Grotesk", "sans-serif"],
-            "display-sm": ["Hanken Grotesk", "sans-serif"],
-            "headline-lg": ["Hanken Grotesk", "sans-serif"],
-            "headline-lg-mobile": ["Hanken Grotesk", "sans-serif"],
-            "body-lg": ["DM Sans", "sans-serif"],
-            "body-md": ["DM Sans", "sans-serif"],
-            "label-caps": ["Geist", "sans-serif"],
-            "mono-ui": ["Geist", "monospace"]
+            "display-lg": ["Hanken Grotesk", "Hind Siliguri", "sans-serif"],
+            "display-sm": ["Hanken Grotesk", "Hind Siliguri", "sans-serif"],
+            "headline-lg": ["Hanken Grotesk", "Hind Siliguri", "sans-serif"],
+            "headline-lg-mobile": ["Hanken Grotesk", "Hind Siliguri", "sans-serif"],
+            "body-lg": ["DM Sans", "Hind Siliguri", "sans-serif"],
+            "body-md": ["DM Sans", "Hind Siliguri", "sans-serif"],
+            "label-caps": ["Geist", "Hind Siliguri", "sans-serif"],
+            "mono-ui": ["Geist", "Hind Siliguri", "monospace"],
+            "bangla": ["Hind Siliguri", "DM Sans", "sans-serif"]
           },
           fontSize: {
             "display-lg": ["72px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
@@ -312,42 +313,54 @@
         </a>
       </div>
 
-      <!-- Actions (Search, Profile, Wishlist, Cart, Mobile Menu Toggle) -->
+      <!-- Actions (Search, Track, Wishlist, Cart, Mobile Menu Toggle with 1-word label underneath) -->
       <div class="flex items-center gap-1 sm:gap-2">
+        <!-- Search Button -->
         <button type="button" id="header-search-btn" onclick="openGlobalSearch()"
-          class="hover:scale-105 transition-all duration-200 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-white/80 hover:bg-white text-primary border border-gray-200/80 hover:border-black/40 flex items-center gap-1.5 cursor-pointer shadow-2xs group"
+          class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group"
           title="Search jerseys & kits (Ctrl+K or /)">
-          <span class="material-symbols-outlined text-[18px] sm:text-[20px] group-hover:scale-110 transition-transform">search</span>
-          <span class="text-xs font-headline font-semibold text-gray-800">Search</span>
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">search</span>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">সার্চ</span>
         </button>
 
-        <a href="account.html"
-          class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 flex items-center justify-center cursor-pointer"
-          title="My Account & Orders">
-          <span class="material-symbols-outlined text-[20px]">person</span>
-        </a>
-
-        <button onclick="toggleWishlistModal()"
-          class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full hover:bg-white/80 text-primary border border-transparent hover:border-white/60 relative cursor-pointer"
-          title="Wishlist">
-          <span class="material-symbols-outlined text-[20px]">favorite</span>
-          <span id="wishlist-badge"
-            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">0</span>
+        <!-- Track Order Button -->
+        <button type="button" id="header-track-btn" onclick="openOrderTrackingModal()"
+          class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group"
+          title="Track Order (লাইভ অর্ডার ট্র্যাক)">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">local_shipping</span>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">ট্র্যাক</span>
         </button>
 
-        <button onclick="toggleCartDrawer()"
-          class="hover:scale-105 transition-transform duration-200 p-2 sm:p-2.5 rounded-full bg-primary text-on-primary hover:bg-primary/90 shadow-md flex items-center gap-1.5 px-3 sm:px-3.5 cursor-pointer"
-          title="Cart Drawer">
-          <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-          <span id="cart-badge"
-            class="bg-white text-primary rounded-full px-2 py-0.5 text-[11px] font-bold font-mono-ui">0</span>
+        <!-- Wishlist Button -->
+        <button type="button" id="header-wishlist-btn" onclick="toggleWishlistModal()"
+          class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group relative"
+          title="Wishlist (পছন্দের তালিকা)">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">favorite</span>
+            <span id="wishlist-badge"
+              class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">পছন্দ</span>
+        </button>
+
+        <!-- Cart Drawer Button -->
+        <button type="button" id="header-cart-btn" onclick="toggleCartDrawer()"
+          class="flex flex-col items-center justify-center min-w-[44px] sm:min-w-[50px] py-1 px-1 sm:px-1.5 rounded-xl bg-black text-white hover:bg-neutral-800 transition-all cursor-pointer group relative shadow-sm"
+          title="Shopping Cart (শপিং ব্যাগ)">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">shopping_bag</span>
+            <span id="cart-badge"
+              class="absolute -top-1 -right-2.5 bg-white text-black rounded-full px-1.5 h-4 flex items-center justify-center text-[10px] font-black font-mono-ui">0</span>
+          </div>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5 text-white">কার্ট</span>
         </button>
 
         <!-- Mobile Menu Hamburger Toggle -->
-        <button onclick="toggleMobileMenu()"
-          class="md:hidden hover:scale-105 transition-transform duration-200 p-2 rounded-full hover:bg-white/80 text-primary border border-transparent cursor-pointer"
+        <button type="button" onclick="toggleMobileMenu()"
+          class="md:hidden flex flex-col items-center justify-center min-w-[38px] py-1 px-1 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer"
           title="Mobile Navigation">
-          <span id="mobile-menu-icon" class="material-symbols-outlined text-[24px]">menu</span>
+          <span id="mobile-menu-icon" class="material-symbols-outlined text-[22px]">menu</span>
+          <span class="text-[10px] font-semibold leading-none mt-0.5">মেনু</span>
         </button>
       </div>
     </div>
@@ -380,18 +393,9 @@
       </a>
       <button type="button" onclick="openOrderTrackingModal(); toggleMobileMenu(true);"
         class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors text-left cursor-pointer w-full">
-        <span class="material-symbols-outlined text-lg">local_shipping</span> Track Order
+        <span class="material-symbols-outlined text-lg">local_shipping</span> ট্র্যাক করুন (Track Order)
       </button>
-      <a href="account.html" onclick="toggleMobileMenu(true);"
-        class="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container font-body-md text-sm text-primary font-bold transition-colors">
-        <span class="material-symbols-outlined text-lg">person</span> My Account & Orders
-      </a>
-      <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
-        <a href="admin.html" onclick="toggleMobileMenu(true);"
-          class="text-xs text-gray-500 hover:text-black font-mono-ui font-semibold flex items-center gap-1.5 py-1">
-          <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Admin Suite
-        </a>
-      </div>
+
     </div>
   </div>
 
@@ -1745,9 +1749,7 @@
                     class="hover:text-black transition-colors">All Jerseys & Kits</a></li>
                 <li><a href="preorders.html" class="hover:text-black transition-colors">Reserve Preorders</a></li>
                 <li><button type="button" onclick="openOrderTrackingModal()"
-                    class="hover:text-black transition-colors text-left cursor-pointer">Track Order</button></li>
-                <li><a href="account.html" class="hover:text-black transition-colors">My Account & Sign In</a></li>
-                <li><a href="admin.html" class="hover:text-black transition-colors">Admin Portal</a></li>
+                    class="hover:text-black transition-colors text-left cursor-pointer">Track Order (অর্ডার ট্র্যাক)</button></li>
               </ul>
             </div>
 
@@ -2161,9 +2163,9 @@
         </div>
 
         <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-          <span class="text-gray-500">Need full customer dashboard?</span>
-          <a href="account.html" class="font-bold text-black hover:underline flex items-center gap-1">
-            Open Account <span class="material-symbols-outlined text-sm">chevron_right</span>
+          <span class="text-gray-500">যেকোনো সহায়তায় সরাসরি আমাদের সাথে যোগাযোগ করুন</span>
+          <a href="https://wa.me/8801926218536" target="_blank" rel="noopener" class="font-bold text-emerald-700 hover:underline flex items-center gap-1">
+            WhatsApp সাপোর্ট <span class="material-symbols-outlined text-sm">chat</span>
           </a>
         </div>
       </div>
@@ -2221,12 +2223,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <!-- Zenvy Firestore Sync Layer -->
-    <script src="firebase-sync.js?v=20261112_v18"></script>
+    <script src="firebase-sync.js?v=20261112_v19"></script>
     <!-- Admin DB & Store State -->
-    <script src="admin-db.js?v=20261112_v18"></script>
+    <script src="admin-db.js?v=20261112_v19"></script>
     <!-- Main Application JavaScript -->
-    <script src="wishlist.js?v=20261112_v18"></script>
-    <script src="app.js?v=20261112_v18"></script>
+    <script src="wishlist.js?v=20261112_v19"></script>
+    <script src="app.js?v=20261112_v19"></script>
 </body>
 
 </html>

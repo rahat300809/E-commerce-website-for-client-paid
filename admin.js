@@ -7185,25 +7185,46 @@ function saveBrandSettings() {
   const description = document.getElementById('brand-desc')?.value?.trim() || '';
   const email = document.getElementById('brand-email')?.value?.trim() || '';
 
-  DB.brand.save({ 
+  const newLogo = (window._brandLogoUrl !== undefined && window._brandLogoUrl !== null) ? window._brandLogoUrl : (DB.brand.get().logoUrl || '');
+  const newFavicon = (window._brandFaviconUrl !== undefined && window._brandFaviconUrl !== null) ? window._brandFaviconUrl : (DB.brand.get().faviconUrl || '');
+
+  const updatedBrand = DB.brand.save({ 
     brandName, 
     tagline, 
     description, 
     email,
-    logoUrl: window._brandLogoUrl || DB.brand.get().logoUrl, 
-    faviconUrl: window._brandFaviconUrl || DB.brand.get().faviconUrl 
+    logoUrl: newLogo, 
+    faviconUrl: newFavicon 
   });
 
+  if (window.ZenvyFirebase && typeof window.ZenvyFirebase.push === 'function') {
+    window.ZenvyFirebase.push('brand', updatedBrand);
+  }
+
   syncAdminBrandDisplay();
+  try {
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'brand', data: updatedBrand } }));
+  } catch(e){}
+
   toast(`Brand settings saved! Brand name set to "${brandName}".`, 'success');
 }
 
 function saveBrandContact() {
-  DB.brand.save({ 
-    phone: document.getElementById('brand-phone')?.value?.trim(), 
-    email: document.getElementById('brand-contact-email')?.value?.trim(), 
-    address: document.getElementById('brand-address')?.value?.trim() 
+  const updatedBrand = DB.brand.save({ 
+    phone: document.getElementById('brand-phone')?.value?.trim() || '', 
+    email: document.getElementById('brand-contact-email')?.value?.trim() || '', 
+    address: document.getElementById('brand-address')?.value?.trim() || '' 
   });
+
+  if (window.ZenvyFirebase && typeof window.ZenvyFirebase.push === 'function') {
+    window.ZenvyFirebase.push('brand', updatedBrand);
+  }
+  try {
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'brand', data: updatedBrand } }));
+  } catch(e){}
+
   toast('Contact info saved successfully!', 'success');
 }
 
@@ -7212,13 +7233,13 @@ function saveSocialSettings() {
   let cleanWa = rawWa.replace(/[^0-9]/g, '');
   if (cleanWa.startsWith('01')) cleanWa = '88' + cleanWa;
 
-  DB.brand.save({ 
+  const updatedBrand = DB.brand.save({ 
     socialWhatsApp: rawWa || cleanWa,
-    socialFacebook: document.getElementById('social-socialFacebook')?.value?.trim(), 
-    socialInstagram: document.getElementById('social-socialInstagram')?.value?.trim(), 
-    socialTwitter: document.getElementById('social-socialTwitter')?.value?.trim(), 
-    socialTikTok: document.getElementById('social-socialTikTok')?.value?.trim(), 
-    socialYoutube: document.getElementById('social-socialYoutube')?.value?.trim() 
+    socialFacebook: document.getElementById('social-socialFacebook')?.value?.trim() || '', 
+    socialInstagram: document.getElementById('social-socialInstagram')?.value?.trim() || '', 
+    socialTwitter: document.getElementById('social-socialTwitter')?.value?.trim() || '', 
+    socialTikTok: document.getElementById('social-socialTikTok')?.value?.trim() || '', 
+    socialYoutube: document.getElementById('social-socialYoutube')?.value?.trim() || '' 
   });
 
   // Synchronize with storeSettings policy and direct WhatsApp config
@@ -7230,6 +7251,14 @@ function saveSocialSettings() {
       DB.whatsapp.save(cleanWa, true);
     }
   }
+
+  if (window.ZenvyFirebase && typeof window.ZenvyFirebase.push === 'function') {
+    window.ZenvyFirebase.push('brand', updatedBrand);
+  }
+  try {
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'brand', data: updatedBrand } }));
+  } catch(e){}
 
   toast('Social links and WhatsApp number saved! Live synced everywhere on the website.', 'success');
 }

@@ -32,11 +32,11 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261112_v19">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -60,9 +60,10 @@
             "zenvy-gray": "#F3F3F4",
           },
           fontFamily: {
-            "headline": ["Hanken Grotesk", "sans-serif"],
-            "body": ["DM Sans", "sans-serif"],
-            "mono-ui": ["Geist", "monospace"],
+            "headline": ["Hanken Grotesk", "Hind Siliguri", "sans-serif"],
+            "body": ["DM Sans", "Hind Siliguri", "sans-serif"],
+            "mono-ui": ["Geist", "Hind Siliguri", "monospace"],
+            "bangla": ["Hind Siliguri", "DM Sans", "sans-serif"]
           }
         }
       }
@@ -72,7 +73,7 @@
   <style>
     body {
       background-color: #ffffff;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', 'Hind Siliguri', sans-serif;
       color: #111111;
       -webkit-font-smoothing: antialiased;
     }
@@ -217,27 +218,42 @@
         <a href="preorders.html" class="text-gray-600 hover:text-black transition-colors">Preorders</a>
       </nav>
 
-      <!-- Right Icons -->
-      <div class="flex items-center gap-1.5 sm:gap-3">
+      <!-- Right Icons (Search, Track, Wishlist, Cart, Mobile Menu Toggle with 1-word label underneath) -->
+      <div class="flex items-center gap-1 sm:gap-2">
         <!-- Search Button -->
-        <button type="button" onclick="openProductSearch()" class="hover:scale-105 transition-all duration-200 px-3 py-1.5 rounded-full bg-white hover:bg-gray-50 text-black border border-gray-200 hover:border-black/40 flex items-center gap-1.5 cursor-pointer shadow-2xs group" title="Search jerseys & kits (Ctrl+K or /)">
-          <span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">search</span>
-          <span class="text-xs font-headline font-semibold text-gray-800">Search</span>
+        <button type="button" onclick="openProductSearch()" class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group" title="Search jerseys & kits (Ctrl+K or /)">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">search</span>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">সার্চ</span>
         </button>
-        <a href="account.html" class="text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Account">
-          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">person</span>
-        </a>
-        <button onclick="toggleWishlistModal()" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer" title="Wishlist">
-          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">favorite</span>
-          <span id="wishlist-badge" class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+
+        <!-- Track Button -->
+        <button type="button" onclick="openOrderTrackingModal()" class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group" title="Track Order (লাইভ অর্ডার ট্র্যাক)">
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">local_shipping</span>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">ট্র্যাক</span>
         </button>
-        <button onclick="toggleCartDrawer(true)" class="relative text-gray-700 hover:text-black transition-colors p-1.5 rounded-full hover:bg-gray-100" title="Shopping Bag">
-          <span class="material-symbols-outlined text-[22px] sm:text-[24px]">shopping_bag</span>
-          <span id="header-cart-badge" class="absolute top-0 right-0 bg-black text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+
+        <!-- Wishlist Button -->
+        <button type="button" onclick="toggleWishlistModal()" class="flex flex-col items-center justify-center min-w-[42px] sm:min-w-[48px] py-1 px-1 sm:px-1.5 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer group relative" title="Wishlist (পছন্দ)">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">favorite</span>
+            <span id="wishlist-badge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-mono-ui font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+          </div>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5">পছন্দ</span>
         </button>
+
+        <!-- Cart Button -->
+        <button type="button" onclick="toggleCartDrawer(true)" class="flex flex-col items-center justify-center min-w-[44px] sm:min-w-[50px] py-1 px-1 sm:px-1.5 rounded-xl bg-black text-white hover:bg-neutral-800 transition-all cursor-pointer group relative shadow-sm" title="Shopping Bag (কার্ট)">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px] sm:text-[22px] group-hover:scale-110 transition-transform">shopping_bag</span>
+            <span id="header-cart-badge" class="absolute -top-1 -right-2.5 bg-white text-black text-[10px] font-mono-ui font-bold px-1.5 h-4 rounded-full flex items-center justify-center">0</span>
+          </div>
+          <span class="text-[10px] sm:text-[11px] font-semibold leading-none mt-0.5 text-white">কার্ট</span>
+        </button>
+
         <!-- Mobile Menu Toggle Button -->
-        <button onclick="toggleProductMobileNav()" class="md:hidden text-gray-700 hover:text-black p-1.5 rounded-full hover:bg-gray-100" title="Navigation Menu">
+        <button type="button" onclick="toggleProductMobileNav()" class="md:hidden flex flex-col items-center justify-center min-w-[38px] py-1 px-1 rounded-xl hover:bg-black/5 text-gray-800 hover:text-black transition-all cursor-pointer" title="Navigation Menu">
           <span class="material-symbols-outlined text-[22px]">menu</span>
+          <span class="text-[10px] font-semibold leading-none mt-0.5">মেনু</span>
         </button>
       </div>
 
@@ -246,17 +262,20 @@
     <!-- Mobile Navigation Dropdown Menu -->
     <div id="product-mobile-nav" class="hidden md:hidden border-t border-gray-100 bg-white/98 px-4 py-3 shadow-lg flex flex-col gap-2">
       <button type="button" onclick="openProductSearch(); toggleProductMobileNav(false);" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5 w-full text-left cursor-pointer">
-        <span class="material-symbols-outlined text-lg">search</span> Search Jerseys & Kits...
+        <span class="material-symbols-outlined text-lg">search</span> সার্চ করুন (Search Kits...)
       </button>
       <a href="index.html#home" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-lg">home</span> Home
+        <span class="material-symbols-outlined text-lg">home</span> হোম (Home)
       </a>
       <a href="index.html#shop" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-lg">shopping_bag</span> Shop
+        <span class="material-symbols-outlined text-lg">shopping_bag</span> সব জার্সি (Shop)
       </a>
       <a href="preorders.html" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-lg">schedule</span> Preorders
+        <span class="material-symbols-outlined text-lg">schedule</span> প্রি-অর্ডার (Preorders)
       </a>
+      <button type="button" onclick="openOrderTrackingModal(); toggleProductMobileNav(false);" class="text-sm font-bold text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center gap-2.5 w-full text-left cursor-pointer">
+        <span class="material-symbols-outlined text-lg">local_shipping</span> অর্ডার ট্র্যাক (Track Order)
+      </button>
     </div>
   </header>
 
@@ -375,8 +394,8 @@
           <div id="pd-stockout-banner" class="hidden bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2.5 mt-2 shadow-2xs">
             <span class="material-symbols-outlined text-red-600 text-xl flex-shrink-0 mt-0.5">sentiment_dissatisfied</span>
             <div class="text-xs">
-              <div class="font-bold text-red-800">বর্তমানে এই পণ্যটির স্টক শেষ (Currently Out of Stock)</div>
-              <div class="text-[11px] text-red-600 mt-0.5">আপনি নিচের <span class="font-bold underline">"Notify Admin / Request Restock"</span> বাটনে ক্লিক করে রিকোয়েস্ট পাঠাতে পারেন। স্টক আসার সাথে সাথে আপনাকে জানানো হবে।</div>
+              <div class="font-bold text-red-800">দুঃখিত, বর্তমানে এই সাইজটির স্টক শেষ (Currently Out of Stock)</div>
+              <div class="text-[11px] text-red-600 mt-0.5">অন্য সাইজ বেছে নিয়ে অর্ডার করুন অথবা হোয়াটসঅ্যাপে আমাদের সাথে সরাসরি যোগাযোগ করুন।</div>
             </div>
           </div>
         </div>
@@ -387,11 +406,11 @@
         <div class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
             <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
-              Select Size
+              সাইজ বেছে নিন (Select Size)
             </label>
-            <button type="button" onclick="openSizeGuideModal()" id="btn-quick-chart-img" class="inline-flex items-center gap-1 text-[11px] font-mono-ui font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-0.5 rounded-full cursor-pointer transition-colors shadow-2xs" title="Click to view size chart image">
+            <button type="button" onclick="openSizeGuideModal()" id="btn-quick-chart-img" class="inline-flex items-center gap-1 text-[11px] font-mono-ui font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-0.5 rounded-full cursor-pointer transition-colors shadow-2xs" title="সাইজ চার্ট দেখুন">
               <span class="material-symbols-outlined text-[13px]">straighten</span>
-              <span>Size Chart</span>
+              <span>সাইজ চার্ট</span>
             </button>
           </div>
           <div class="relative">
@@ -410,17 +429,17 @@
         <div id="sleeve-section" class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
             <label class="text-xs font-headline font-bold text-black uppercase tracking-wider">
-              Sleeve Style
+              হাতা বাছাই (Sleeve Style)
             </label>
           </div>
           <div id="sleeve-options-container" class="grid grid-cols-2 gap-2.5">
             <div onclick="selectSleeve('short', 0, 'Half Sleeve', this)" class="sleeve-card active flex items-center justify-between p-3 rounded-xl border-2 border-black bg-black/5 cursor-pointer transition-all">
-              <span class="text-xs font-bold text-black">Half Sleeve</span>
-              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">Included</span>
+              <span class="text-xs font-bold text-black">হাফ হাতা (Half Sleeve)</span>
+              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">মূল্য অন্তর্ভুক্ত</span>
             </div>
             <div onclick="selectSleeve('long', 100, 'Full Sleeve', this)" class="sleeve-card flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-gray-400 bg-white cursor-pointer transition-all">
-              <span class="text-xs font-bold text-black">Full Sleeve</span>
-              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">+৳100</span>
+              <span class="text-xs font-bold text-black">ফুল হাতা (Full Sleeve)</span>
+              <span class="text-[11px] font-mono-ui font-semibold text-gray-500">+৳১০০</span>
             </div>
           </div>
         </div>
@@ -428,8 +447,8 @@
         <!-- ── ADD-ONS (PATCHES LIST MATCHING SCREENSHOT 1) ── -->
         <div id="patches-section" class="pt-1">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-headline font-black text-black uppercase tracking-wider">Add-ons</h3>
-            <span class="text-[10px] font-mono-ui text-gray-400">Official tournament badges</span>
+            <h3 class="text-xs font-headline font-black text-black uppercase tracking-wider">ব্যাজ ও প্যাচ (Add-ons)</h3>
+            <span class="text-[10px] font-mono-ui text-gray-500">অফিসিয়াল টুর্নামেন্ট ব্যাজ</span>
           </div>
 
           <div id="patches-list-container" class="space-y-2">
@@ -441,19 +460,19 @@
         <div id="custom-print-section" class="pt-1">
           <div class="flex items-center justify-between mb-1.5">
             <h3 id="custom-section-heading" class="text-xs font-headline font-black text-black uppercase tracking-wider">
-              Custom Name & Number (+200৳)
+              আপনার নাম ও জার্সি নম্বর (+৳২০০)
             </h3>
-            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">APPLIED (+৳200)</span>
+            <span id="custom-badge-status" class="text-[10px] font-mono-ui text-emerald-700 font-bold hidden">যুক্ত হয়েছে (+৳২০০)</span>
           </div>
           
           <div class="relative">
             <input type="text" 
                    id="custom-name-number-input" 
                    oninput="onCustomNameNumberChange(this.value)"
-                   placeholder="Enter Name + Number (e.g. RONALDO 7)" 
+                   placeholder="নাম ও নম্বর লিখুন (যেমন: RONALDO 7)" 
                    class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-black uppercase tracking-wider focus:outline-none focus:border-black placeholder:text-gray-400 placeholder:font-normal placeholder:normal-case shadow-2xs"/>
           </div>
-          <p class="text-[10px] text-gray-400 mt-1 font-mono-ui">Official match typography. Leave blank if you want an unprinted plain kit.</p>
+          <p class="text-[11px] text-gray-500 mt-1">অফিসিয়াল ম্যাচ ফন্ট প্রিন্টিং। প্রিন্ট ছাড়া সাধারণ প্লেইন জার্সি নিতে চাইলে এই ঘরটি ফাঁকা রাখুন।</p>
         </div>
 
         <!-- ── QUANTITY & ACTION BUTTONS (CLEAN, BEAUTIFUL, NEVER CRAMPED) ── -->
@@ -473,7 +492,7 @@
                     onclick="handleAddToCart()" 
                     class="flex-1 min-w-0 h-12 px-3 sm:px-4 bg-[#121c33] hover:bg-black active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer">
               <span id="add-to-cart-icon" class="material-symbols-outlined text-[18px] sm:text-[20px] flex-shrink-0">shopping_bag</span>
-              <span id="add-to-cart-text" class="whitespace-nowrap font-bold">Add to Cart</span>
+              <span id="add-to-cart-text" class="whitespace-nowrap font-bold">কার্টে যোগ করুন</span>
             </button>
 
             <!-- Wishlist Heart Button -->
@@ -492,16 +511,7 @@
                   onclick="buyNowDirect()" 
                   class="w-full h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] text-black font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
             <span class="material-symbols-outlined text-[19px] flex-shrink-0">bolt</span>
-            <span class="font-bold">Buy Now</span>
-          </button>
-
-          <!-- Row 2B: Notify Admin / Request Restock Button (Displayed when Stock === 0) -->
-          <button type="button" 
-                  id="pd-notify-admin-btn"
-                  onclick="openRestockModal()" 
-                  class="hidden w-full h-12 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 active:scale-[0.98] text-white font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md items-center justify-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[20px] flex-shrink-0">notifications_active</span>
-            <span class="font-bold">Notify Admin / Request Restock (স্টক রিকোয়েস্ট)</span>
+            <span id="buy-now-btn-text" class="font-bold">অর্ডার করুন (Buy Now)</span>
           </button>
 
           <!-- Row 3: Order via WhatsApp (Direct Chat & Custom Order) -->
@@ -512,12 +522,12 @@
             <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24">
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
             </svg>
-            <span id="whatsapp-order-btn-text" class="whitespace-nowrap font-bold">Order via WhatsApp</span>
+            <span id="whatsapp-order-btn-text" class="whitespace-nowrap font-bold">হোয়াটসঅ্যাপে অর্ডার করুন</span>
           </button>
 
           <!-- Total price indicator -->
           <div class="flex items-center justify-between text-xs text-gray-500 font-mono-ui pt-1 px-1">
-            <span>Item Subtotal:</span>
+            <span class="font-medium">মোট মূল্য:</span>
             <span id="pd-final-total" class="font-headline font-black text-base sm:text-lg text-black">1,350.00৳</span>
           </div>
           <!-- VIEW SIZE CHART BUTTON (MATCHING SCREENSHOT 1) -->
@@ -526,7 +536,7 @@
                   id="btn-view-size-chart" 
                   class="w-full mt-3 py-3 px-4 rounded-xl border border-[#2b6cb0] hover:bg-[#f0f6fc] text-[#1e4e8c] font-headline font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
             <span class="material-symbols-outlined text-base">straighten</span>
-            <span id="btn-size-chart-label">View Size Chart</span>
+            <span id="btn-size-chart-label">সাইজ চার্ট দেখুন (Size Chart)</span>
           </button>
         </div>
 
@@ -539,8 +549,8 @@
         <!-- Description & Reviews Tabs -->
         <div class="pt-3 border-t border-gray-100">
           <div class="flex border-b border-gray-200">
-            <button type="button" onclick="switchProductTab('desc')" id="tab-btn-desc" class="py-2 px-4 text-xs font-headline font-black text-black border-b-2 border-black -mb-px">Description</button>
-            <button type="button" onclick="switchProductTab('reviews')" id="tab-btn-reviews" class="py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black">Reviews (0)</button>
+            <button type="button" onclick="switchProductTab('desc')" id="tab-btn-desc" class="py-2 px-4 text-xs font-headline font-black text-black border-b-2 border-black -mb-px">বিবরণ (Description)</button>
+            <button type="button" onclick="switchProductTab('reviews')" id="tab-btn-reviews" class="py-2 px-4 text-xs font-headline font-medium text-gray-500 hover:text-black">রিভিউ (Reviews)</button>
           </div>
           <div id="tab-content-desc" class="py-3 text-xs text-gray-600 leading-relaxed space-y-2">
             <!-- Dynamically populated from targetProduct.description / shortDesc -->
@@ -564,7 +574,7 @@
     <div class="max-w-md mx-auto flex items-center justify-between gap-3">
       <div class="flex flex-col min-w-0">
         <div class="flex items-center gap-1 text-[10px] text-gray-500 font-mono-ui font-bold uppercase truncate">
-          <span>TOTAL</span>
+          <span>মোট</span>
           <span>•</span>
           <span id="mobile-bar-summary" class="text-black font-extrabold truncate">M • Half</span>
         </div>
@@ -588,22 +598,14 @@
                 id="mobile-add-cart-btn"
                 class="bg-black text-white hover:bg-neutral-800 active:scale-95 text-xs font-bold px-3.5 py-2.5 rounded-full flex items-center gap-1.5 shadow-sm transition-all">
           <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
-          <span id="mobile-add-cart-text">Add</span>
+          <span id="mobile-add-cart-text">কার্টে নিন</span>
         </button>
         <button type="button" 
                 onclick="buyNowDirect()" 
                 id="mobile-buy-now-btn"
                 class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-headline font-black text-xs px-3.5 py-2.5 rounded-full flex items-center gap-1 shadow-sm transition-all whitespace-nowrap">
           <span class="material-symbols-outlined text-[16px]">bolt</span>
-          <span>Buy Now</span>
-        </button>
-        <!-- Mobile Notify Admin Button (when Stock === 0) -->
-        <button type="button" 
-                onclick="openRestockModal()" 
-                id="mobile-notify-admin-btn"
-                class="hidden bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 text-white text-xs font-bold px-4 py-2.5 rounded-full items-center gap-1.5 shadow-sm whitespace-nowrap active:scale-95">
-          <span class="material-symbols-outlined text-[16px]">notifications_active</span>
-          <span>Notify Admin</span>
+          <span>অর্ডার করুন</span>
         </button>
       </div>
     </div>
@@ -917,9 +919,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261112_v18"></script>
-  <script src="admin-db.js?v=20261112_v18"></script>
-  <script src="wishlist.js?v=20261112_v18"></script>
+  <script src="firebase-sync.js?v=20261112_v19"></script>
+  <script src="admin-db.js?v=20261112_v19"></script>
+  <script src="wishlist.js?v=20261112_v19"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1055,10 +1057,36 @@
       const settings = (typeof DB !== 'undefined' && DB.storeSettings) ? DB.storeSettings.get() : {};
       const brandName = (brand.brandName || 'ZENVY').trim();
 
-      // 1. Update Brand Name across all elements
-      document.querySelectorAll('[data-brand-name], #site-brand-logo, #footer-brand-logo').forEach(el => {
+      // 1. Update Brand Logo or Brand Name across all elements
+      const logoElements = document.querySelectorAll('#site-brand-logo, #footer-brand-logo');
+      logoElements.forEach(el => {
+        if (brand.logoUrl && brand.logoUrl.trim()) {
+          el.innerHTML = `<img src="${brand.logoUrl}" alt="${brandName}" class="h-7 sm:h-9 max-h-9 w-auto object-contain inline-block" />`;
+        } else {
+          el.textContent = brandName;
+        }
+      });
+
+      document.querySelectorAll('[data-brand-name]:not(#site-brand-logo):not(#footer-brand-logo)').forEach(el => {
         el.textContent = brandName;
       });
+
+      // Dynamic Favicon
+      if (brand.faviconUrl && brand.faviconUrl.trim()) {
+        let favEl = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
+        if (!favEl) {
+          favEl = document.createElement('link');
+          favEl.rel = 'icon';
+          document.head.appendChild(favEl);
+        }
+        favEl.href = brand.faviconUrl;
+      }
+
+      // Tagline and Description
+      const descEl = document.getElementById('footer-brand-desc');
+      if (descEl && brand.description && brand.description.trim()) {
+        descEl.textContent = brand.description;
+      }
 
       const copyrightEl = document.getElementById('footer-copyright');
       if (copyrightEl) {
@@ -2148,7 +2176,7 @@
         const hasStock = (typeof hasSizeStockConfigured === 'function') ? hasSizeStockConfigured(curSizeStocks, code) : (curSizeStocks && curSizeStocks[code] !== undefined);
         const qty = hasStock ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, code, productState.product?.stock) : parseInt(curSizeStocks[code])) : null;
         const isOut = (qty === 0);
-        return `<option value="${code}" ${code === current ? 'selected' : ''} ${isOut ? 'data-out="1"' : ''}>${code}</option>`;
+        return `<option value="${code}" ${code === current ? 'selected' : ''} ${isOut ? 'data-out="1"' : ''}>${code}${isOut ? ' (স্টক শেষ)' : ''}</option>`;
       }).join('');
 
       select.value = current;
@@ -2182,59 +2210,71 @@
       if (isSizeStockOut) {
         if (stockTag) {
           stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-red-100 text-red-700';
-          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">cancel</span> Size ${selSize}: Stock Out`;
+          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">cancel</span> সাইজ ${selSize}: স্টক শেষ (Stock Out)`;
         }
         if (stockoutBanner) {
           stockoutBanner.classList.remove('hidden');
-          const span = stockoutBanner.querySelector('span:last-child');
-          if (span) span.textContent = `Size ${selSize} is currently out of stock. Click below to request restock.`;
+          stockoutBanner.innerHTML = `
+            <span class="material-symbols-outlined text-red-600 text-xl flex-shrink-0 mt-0.5">sentiment_dissatisfied</span>
+            <div class="text-xs">
+              <div class="font-bold text-red-800">দুঃখিত, সাইজ ${selSize}-এর স্টক শেষ (Stock Out)</div>
+              <div class="text-[11px] text-red-600 mt-0.5">অন্য সাইজ বেছে নিয়ে অর্ডার করুন অথবা হোয়াটসঅ্যাপে আমাদের সাথে সরাসরি যোগাযোগ করুন।</div>
+            </div>
+          `;
         }
         if (qtyContainer) qtyContainer.classList.add('opacity-40', 'pointer-events-none');
         if (addToCartBtn) {
           addToCartBtn.classList.remove('bg-[#121c33]', 'hover:bg-black', 'text-white');
           addToCartBtn.classList.add('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
-          addToCartBtn.title = `Size ${selSize} is Out of Stock`;
+          addToCartBtn.disabled = true;
+          addToCartBtn.title = `সাইজ ${selSize} এর স্টক শেষ`;
         }
         if (addToCartIcon) addToCartIcon.textContent = 'block';
-        if (addToCartText) addToCartText.textContent = `Size ${selSize} Sold Out`;
+        if (addToCartText) addToCartText.textContent = `স্টক শেষ (Stock Out)`;
         if (buyNowBtn) buyNowBtn.style.display = 'none';
         if (notifyAdminBtn) {
-          notifyAdminBtn.classList.remove('hidden');
-          notifyAdminBtn.classList.add('flex');
-          const span = notifyAdminBtn.querySelector('span:last-child');
-          if (span) span.textContent = `Notify Admin / Request Restock (স্টক রিকোয়েস্ট)`;
+          notifyAdminBtn.classList.add('hidden');
+          notifyAdminBtn.classList.remove('flex');
         }
-        if (mobileAddCartBtn) mobileAddCartBtn.style.display = 'none';
+        if (mobileAddCartBtn) {
+          mobileAddCartBtn.disabled = true;
+          mobileAddCartBtn.textContent = 'স্টক শেষ';
+          mobileAddCartBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        }
         if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = 'none';
         if (mobileNotifyAdminBtn) {
-          mobileNotifyAdminBtn.classList.remove('hidden');
-          mobileNotifyAdminBtn.classList.add('flex');
+          mobileNotifyAdminBtn.classList.add('hidden');
+          mobileNotifyAdminBtn.classList.remove('flex');
         }
 
-        if (triggerPopup) {
-          openRestockModal();
-        }
+        // Do not popup any modal per user request: "cce oda bad just size na thakle size click korle stock out dekhabe"
         return true;
       } else {
         if (stockTag) {
           stockTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-green-100 text-green-700';
-          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Size ${selSize}: In Stock`;
+          stockTag.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> সাইজ ${selSize}: স্টকে আছে`;
         }
         if (stockoutBanner) stockoutBanner.classList.add('hidden');
         if (qtyContainer) qtyContainer.classList.remove('opacity-40', 'pointer-events-none');
         if (addToCartBtn) {
           addToCartBtn.classList.add('bg-[#121c33]', 'hover:bg-black', 'text-white');
           addToCartBtn.classList.remove('bg-gray-200', 'text-gray-400', 'cursor-not-allowed', 'shadow-none', 'border', 'border-gray-300');
-          addToCartBtn.title = 'Add to Cart';
+          addToCartBtn.disabled = false;
+          addToCartBtn.title = 'কার্টে যোগ করুন';
         }
         if (addToCartIcon) addToCartIcon.textContent = 'shopping_bag';
-        if (addToCartText) addToCartText.textContent = 'Add to Cart';
+        if (addToCartText) addToCartText.textContent = 'কার্টে যোগ করুন';
         if (buyNowBtn) buyNowBtn.style.display = '';
         if (notifyAdminBtn) {
           notifyAdminBtn.classList.add('hidden');
           notifyAdminBtn.classList.remove('flex');
         }
-        if (mobileAddCartBtn) mobileAddCartBtn.style.display = '';
+        if (mobileAddCartBtn) {
+          mobileAddCartBtn.style.display = '';
+          mobileAddCartBtn.disabled = false;
+          mobileAddCartBtn.textContent = 'কার্টে নিন';
+          mobileAddCartBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
         if (mobileBuyNowBtn) mobileBuyNowBtn.style.display = '';
         if (mobileNotifyAdminBtn) {
           mobileNotifyAdminBtn.classList.add('hidden');
@@ -2248,7 +2288,7 @@
       productState.selectedSize = size;
       const select = document.getElementById('pd-size-select');
       if (select && select.value !== size) select.value = size;
-      checkSelectedSizeStockState(true);
+      checkSelectedSizeStockState(false);
       updateMobileBarSummary();
       calculateLiveTotal();
     }
@@ -2349,8 +2389,7 @@
     // ─────────────────────────────────────────
     function handleAddToCart(openDrawer = true) {
       if (productState.product && typeof productState.product.stock === 'number' && productState.product.stock <= 0) {
-        showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ! অ্যাডমিনকে জানাতে Request Restock বাটনে ক্লিক করুন।');
-        openRestockModal();
+        showToast('⚠️ দুঃখিত, এই পণ্যটির স্টক বর্তমানে শেষ!');
         return;
       }
       const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
@@ -2360,8 +2399,7 @@
         ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, selSize, productState.product?.stock) : parseInt(curSizeStocks[selSize])) 
         : (typeof productState.product?.stock === 'number' ? productState.product.stock : 10);
       if (sizeQty <= 0) {
-        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
-        openRestockModal();
+        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! অন্য সাইজ বেছে নিন।`);
         return;
       }
       const titleEl = document.getElementById('pd-title');
@@ -2458,8 +2496,7 @@
 
     function buyNowDirect() {
       if (productState.product && typeof productState.product.stock === 'number' && productState.product.stock <= 0) {
-        showToast('⚠️ এই পণ্যটির স্টক বর্তমানে শেষ! অ্যাডমিনকে জানাতে Request Restock বাটনে ক্লিক করুন।');
-        openRestockModal();
+        showToast('⚠️ দুঃখিত, এই পণ্যটির স্টক বর্তমানে শেষ!');
         return;
       }
       const selSize = (typeof resolveSizeCode === 'function') ? resolveSizeCode(productState.selectedSize || 'M') : (productState.selectedSize || 'M');
@@ -2469,8 +2506,7 @@
         ? ((typeof getSizeStockQty === 'function') ? getSizeStockQty(curSizeStocks, selSize, productState.product?.stock) : parseInt(curSizeStocks[selSize])) 
         : (typeof productState.product?.stock === 'number' ? productState.product.stock : 10);
       if (sizeQty <= 0) {
-        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! স্টক রিকোয়েস্ট করতে নিচের বাটনে চাপ দিন।`);
-        openRestockModal();
+        showToast(`⚠️ সাইজ ${selSize}-এর স্টক বর্তমানে শেষ! অন্য সাইজ বেছে নিন।`);
         return;
       }
       // Add quietly to cart without triggering drawer
@@ -3253,5 +3289,108 @@ Please confirm my order details!`;
       </div>
     </div>
   </div>
+
+  <!-- ==================== ORDER TRACKING MODAL ==================== -->
+  <div id="order-tracking-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onclick="if(event.target===this)closeOrderTrackingModal()">
+    <div class="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 animate-slide-up">
+      <button type="button" onclick="closeOrderTrackingModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md">
+          <span class="material-symbols-outlined text-2xl">local_shipping</span>
+        </span>
+        <h3 class="font-headline text-xl font-bold text-black uppercase">লাইভ অর্ডার ট্র্যাকিং (Order Tracking)</h3>
+        <p class="font-body text-xs text-gray-500 mt-1">আপনার অর্ডার আইডি (যেমন: ORD-...) অথবা মোবাইল নম্বর দিয়ে স্ট্যাটাস চেক করুন।</p>
+      </div>
+
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="track-order-input" placeholder="অর্ডার আইডি বা মোবাইল (017...)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();performTrackOrder();}"
+          class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-mono-ui font-bold focus:outline-none focus:border-black uppercase" />
+        <button type="button" onclick="performTrackOrder()"
+          class="bg-black hover:bg-neutral-800 active:scale-95 text-white font-headline text-xs font-bold px-5 py-3 rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap">
+          ট্র্যাক
+        </button>
+      </div>
+
+      <div id="track-order-result" class="hidden rounded-2xl bg-gray-50 p-4 border border-gray-200 text-xs">
+        <!-- Live status populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.openOrderTrackingModal = function() {
+      const modal = document.getElementById('order-tracking-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        const input = document.getElementById('track-order-input');
+        if (input) setTimeout(() => { input.focus(); }, 60);
+      }
+    };
+
+    window.closeOrderTrackingModal = function() {
+      const modal = document.getElementById('order-tracking-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+
+    window.performTrackOrder = function() {
+      const input = document.getElementById('track-order-input');
+      const resultBox = document.getElementById('track-order-result');
+      if (!input || !resultBox) return;
+
+      const query = input.value.trim().toLowerCase();
+      if (!query) {
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = `<div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-xl font-bold">অনুগ্রহ করে আপনার অর্ডার আইডি অথবা মোবাইল নম্বর লিখুন।</div>`;
+        return;
+      }
+
+      const allOrders = (typeof DB !== 'undefined' && DB.orders) ? DB.orders.all() : (JSON.parse(localStorage.getItem('zenvy_v1_orders') || '[]'));
+      const found = allOrders.filter(o => {
+        const id = (o.id || o.orderNumber || '').toString().toLowerCase();
+        const phone = (o.customerPhone || o.phone || (o.customer && o.customer.phone) || '').toString().toLowerCase();
+        return id.includes(query) || (phone && phone.includes(query));
+      });
+
+      resultBox.classList.remove('hidden');
+      if (found.length === 0) {
+        resultBox.innerHTML = `
+          <div class="p-4 bg-white border border-gray-200 text-gray-700 text-xs rounded-xl space-y-1">
+            <p class="font-bold text-black text-sm">কোনো অর্ডার পাওয়া যায়নি</p>
+            <p class="text-gray-500">"${query}" এর সাথে মিলে এমন কোনো অর্ডার ডাটাবেজে নেই। অনুগ্রহ করে সঠিক অর্ডার আইডি বা মোবাইল নম্বর দিন।</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultBox.innerHTML = found.map(order => {
+        const num = order.orderNumber || order.id || 'N/A';
+        const status = (order.status || 'pending').toUpperCase();
+        const total = order.total || order.totalAmount || 0;
+        const statusColor = status === 'DELIVERED' ? 'text-emerald-700 bg-emerald-100' :
+                            status === 'CANCELLED' ? 'text-red-700 bg-red-100' :
+                            'text-amber-700 bg-amber-100';
+        return `
+          <div class="p-3.5 bg-white border border-gray-200 rounded-xl mb-2 last:mb-0 space-y-1.5 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="font-mono-ui font-black text-xs text-black">#${num}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${status}</span>
+            </div>
+            <div class="text-[11px] text-gray-500 flex justify-between">
+              <span>পেমেন্ট: ${order.paymentMethod || 'ক্যাশ অন ডেলিভারি'}</span>
+              <span class="font-bold text-black font-headline">৳${total}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+  </script>
 </body>
 </html>

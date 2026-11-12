@@ -307,7 +307,8 @@
             
             <!-- Cutout Jersey Image -->
             <img id="main-product-img" 
-                 src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80" 
+                 src="img/products/prod_mwafvhg25iobn348j.jpg" 
+                 onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" 
                  alt="Performance Jersey" 
                  class="max-h-[220px] sm:max-h-[280px] md:max-h-[400px] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300 group-hover:scale-105"/>
 
@@ -946,10 +947,10 @@
     };
     window.productState = productState;
 
-    // Authentic High-Res Default Angles
-    const DEFAULT_FRONT_IMAGE = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
-    const DEFAULT_BACK_IMAGE = 'https://images.unsplash.com/photo-1580087256394-dc596e1c8f4f?w=800&q=80';
-    const DEFAULT_DETAIL_IMAGE = 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80';
+    // Authentic High-Res Default Angles (Local High-Resolution Bundled Jerseys)
+    const DEFAULT_FRONT_IMAGE = 'img/products/prod_mwafvhg25iobn348j.jpg';
+    const DEFAULT_BACK_IMAGE = 'img/products/prod_mwafxrols41103ror.jpg';
+    const DEFAULT_DETAIL_IMAGE = 'img/products/mw8a6nc4ecqhhqgcv.jpg';
 
     // Images for different angles
     const ANGLE_IMAGES = {
@@ -1131,14 +1132,16 @@
         contactWidget.id = 'floating-contact-widget';
         contactWidget.className = 'fixed bottom-24 lg:bottom-6 right-4 sm:right-6 z-40 flex flex-col gap-2.5 items-end pointer-events-auto';
 
-        // Direct Call Button
+        // Direct WhatsApp Call Button
         const callBtn = document.createElement('a');
         callBtn.id = 'floating-call-btn';
+        callBtn.target = '_blank';
+        callBtn.rel = 'noopener';
         callBtn.className = 'bg-black hover:bg-neutral-800 text-white p-3 sm:p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group border border-white/20';
-        callBtn.setAttribute('title', 'Call Us Now');
+        callBtn.setAttribute('title', 'WhatsApp Call');
         callBtn.innerHTML = `
-          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">call</span>
-          <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Call Now</span>
+          <span class="material-symbols-outlined text-[20px] sm:text-[22px]">phone_in_talk</span>
+          <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">হোয়াটসঅ্যাপ কল</span>
         `;
 
         // WhatsApp Button
@@ -1162,10 +1165,13 @@
       const waBtn = document.getElementById('floating-whatsapp-btn');
       const rawPhone = (brand.phone || cleanWa || '01700000000').toString();
       const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+      const waCallTarget = (cleanWa || cleanPhone.replace(/^[+]/, '')).replace(/^0/, '880');
 
       if (callBtn) {
-        callBtn.href = `tel:${cleanPhone}`;
-        callBtn.setAttribute('title', `Call: ${rawPhone}`);
+        callBtn.target = '_blank';
+        callBtn.rel = 'noopener';
+        callBtn.href = `https://wa.me/${waCallTarget}?text=${encodeURIComponent('আসসালামু আলাইকুম, আমি সরাসরি WhatsApp Call-এ কথা বলতে চাচ্ছি এই জার্সি সম্পর্কে: ' + window.location.href)}`;
+        callBtn.setAttribute('title', `WhatsApp Call: ${rawPhone}`);
       }
       if (waBtn) {
         waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about this product: ' + window.location.href)}`;
@@ -1228,14 +1234,14 @@
             <div class="w-20 h-20 mx-auto mb-5 rounded-full bg-gray-100 flex items-center justify-center">
               <span class="material-symbols-outlined text-4xl text-gray-400">inventory_2</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-3 uppercase tracking-tight">Product Not Available</h1>
-            <p class="text-gray-500 mb-8 max-w-md mx-auto text-sm">This product has been removed or is no longer available in our collection.</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-3 tracking-tight font-headline">পণ্যটি পাওয়া যায়নি (Product Not Available)</h1>
+            <p class="text-gray-500 mb-8 max-w-md mx-auto text-sm">এই জার্সিটি বর্তমানে আমাদের কালেকশনে পাওয়া যাচ্ছে না অথবা সরিয়ে নেওয়া হয়েছে।</p>
             <div class="flex items-center justify-center gap-3 flex-wrap">
-              <a href="index.html#shop" class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-sm">
-                <span class="material-symbols-outlined text-sm">shopping_bag</span> Explore All Kits
+              <a href="index.html#shop" class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-sm font-headline text-sm">
+                <span class="material-symbols-outlined text-sm">shopping_bag</span> সব জার্সি দেখুন
               </a>
-              <a href="index.html" class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition">
-                Return Home
+              <a href="index.html" class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition font-headline text-sm">
+                হোমে ফিরে যান
               </a>
             </div>
           </div>
@@ -1243,7 +1249,7 @@
       }
       const mobBar = document.getElementById('mobile-sticky-bottom-bar');
       if (mobBar) mobBar.style.display = 'none';
-      document.title = 'Product Not Available | ZENVY Elite Performance';
+      document.title = 'পণ্যটি পাওয়া যায়নি | ZENVY';
     }
 
     function loadDataFromAdminDB() {
@@ -1404,12 +1410,13 @@
 
       const mainImg = document.getElementById('main-product-img');
       if (mainImg) {
-        mainImg.src = ANGLE_IMAGES.front;
-        mainImg.alt = targetProduct.name;
         mainImg.onerror = function() {
           this.onerror = null;
           this.src = DEFAULT_FRONT_IMAGE;
         };
+        const safeFront = (ANGLE_IMAGES.front && !ANGLE_IMAGES.front.includes('aida-public')) ? ANGLE_IMAGES.front : DEFAULT_FRONT_IMAGE;
+        mainImg.src = safeFront;
+        mainImg.alt = targetProduct.name;
       }
 
       try {
@@ -1857,7 +1864,7 @@
         <button type="button" 
                 onclick="handleThumbClick('${it.angle}', '${it.customUrl || ''}', this)" 
                 class="thumb-btn flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 ${idx === 0 ? 'border-black' : 'border-gray-200'} overflow-hidden bg-white p-1 hover:border-gray-400 transition-all flex items-center justify-center cursor-pointer shadow-xs">
-          <img src="${it.img}" class="w-full h-full object-contain" alt="${it.label}"/>
+          <img src="${it.img}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" class="w-full h-full object-contain" alt="${it.label}"/>
         </button>
       `).join('');
     }

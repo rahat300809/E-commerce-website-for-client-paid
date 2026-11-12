@@ -835,13 +835,16 @@ function syncBrandName() {
       contactWidget.id = 'floating-contact-widget';
       contactWidget.className = 'fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col gap-2.5 items-end pointer-events-auto';
 
+      // Direct WhatsApp Call Button
       const callBtn = document.createElement('a');
       callBtn.id = 'floating-call-btn';
+      callBtn.target = '_blank';
+      callBtn.rel = 'noopener';
       callBtn.className = 'bg-black hover:bg-neutral-800 text-white p-3 sm:p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group border border-white/20';
-      callBtn.setAttribute('title', 'Call Us Now');
+      callBtn.setAttribute('title', 'WhatsApp Call');
       callBtn.innerHTML = `
-        <span class="material-symbols-outlined text-[20px] sm:text-[22px]">call</span>
-        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Call Now</span>
+        <span class="material-symbols-outlined text-[20px] sm:text-[22px]">phone_in_talk</span>
+        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">হোয়াটসঅ্যাপ কল</span>
       `;
 
       const waBtn = document.createElement('a');
@@ -863,12 +866,15 @@ function syncBrandName() {
     const rawPhone = (brand.phone || '01700000000').toString();
     const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
     const cleanWa = (brand.whatsapp || rawPhone).replace(/[^0-9]/g, '');
+    const waCallTarget = (cleanWa || cleanPhone.replace(/^[+]/, '')).replace(/^0/, '880');
 
     const callEl = document.getElementById('floating-call-btn');
     const waEl = document.getElementById('floating-whatsapp-btn');
     if (callEl) {
-      callEl.href = `tel:${cleanPhone}`;
-      callEl.setAttribute('title', `Call: ${rawPhone}`);
+      callEl.target = '_blank';
+      callEl.rel = 'noopener';
+      callEl.href = `https://wa.me/${waCallTarget}?text=${encodeURIComponent('আসসালামু আলাইকুম, আমি সরাসরি WhatsApp Call-এ কথা বলতে চাচ্ছি প্রি-অর্ডার সম্পর্কে।')}`;
+      callEl.setAttribute('title', `WhatsApp Call: ${rawPhone}`);
     }
     if (waEl) {
       waEl.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + name + ', I have a question about pre-orders.')}`;

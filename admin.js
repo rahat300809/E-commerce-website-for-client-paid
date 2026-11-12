@@ -2135,7 +2135,7 @@ function saveProduct(e, id, asDraft = false) {
   }
   if (!images || images.length === 0) {
     images = [
-      { url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV_LbyyPJxnRKmU8_oYZoYTmwlX1dORf22Yeei2rC0v-Z24hFTXgPedjBdVIl7bJAWRpOsO3nAEVulUb9cHoyme1h5w9dqAuz3EFxMdSWawV_QZE4ar61iyYOGoH0d1r2Kf5G90TLU3ew4Vsxm1yiNzJ0fjylA9zDty3hULOVnT3xX-UmmQkKIr_TdTowvSGHavQeM_BxmRGvmq44rY8ERHWsx8LwDJ6TKBy45CfsowuBsWRcDozB7SA', alt: name, isPrimary: true }
+      { url: 'img/products/prod_mwafvhg25iobn348j.jpg', alt: name, isPrimary: true }
     ];
   }
 
@@ -2212,16 +2212,22 @@ function saveProduct(e, id, asDraft = false) {
     })()
   };
 
+  let savedProd = null;
   if (id) {
-    DB.products.update(id, data);
+    savedProd = DB.products.update(id, data);
     // Update variants
     DB.variants.deleteByProduct(id);
     saveVariants(id, form);
     toast('Product updated successfully', 'success');
   } else {
-    const p = DB.products.create(data);
-    saveVariants(p.id, form);
+    savedProd = DB.products.create(data);
+    saveVariants(savedProd.id, form);
     toast('Product created successfully', 'success');
+  }
+
+  // Push directly to cloud Firestore immediately so other devices see it
+  if (savedProd && window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
+    window.ZenvyFirebase.saveProduct(savedProd);
   }
 
   // Clear temporary uploader cache

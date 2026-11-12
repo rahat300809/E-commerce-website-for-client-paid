@@ -1116,14 +1116,16 @@ function syncFooterSocialLinks() {
     contactWidget.id = 'floating-contact-widget';
     contactWidget.className = 'fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col gap-2.5 items-end pointer-events-auto';
 
-    // Direct Call Button
+    // Direct WhatsApp Call Button
     const callBtn = document.createElement('a');
     callBtn.id = 'floating-call-btn';
+    callBtn.target = '_blank';
+    callBtn.rel = 'noopener';
     callBtn.className = 'bg-black hover:bg-neutral-800 text-white p-3 sm:p-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer group border border-white/20';
-    callBtn.setAttribute('title', 'Call Us Now');
+    callBtn.setAttribute('title', 'WhatsApp Call');
     callBtn.innerHTML = `
-      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">call</span>
-      <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">Call Now</span>
+      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">phone_in_talk</span>
+      <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-headline font-bold text-xs ml-0 group-hover:ml-2">হোয়াটসঅ্যাপ কল</span>
     `;
 
     // WhatsApp Button
@@ -1147,10 +1149,13 @@ function syncFooterSocialLinks() {
   const waBtn = document.getElementById('floating-whatsapp-btn');
   const rawPhone = (brand.phone || cleanWa || '01700000000').toString();
   const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+  const waCallTarget = (cleanWa || cleanPhone.replace(/^[+]/, '')).replace(/^0/, '880');
 
   if (callBtn) {
-    callBtn.href = `tel:${cleanPhone}`;
-    callBtn.setAttribute('title', `Call: ${rawPhone}`);
+    callBtn.target = '_blank';
+    callBtn.rel = 'noopener';
+    callBtn.href = `https://wa.me/${waCallTarget}?text=${encodeURIComponent('আসসালামু আলাইকুম, আমি সরাসরি WhatsApp Call-এ কথা বলতে চাচ্ছি।')}`;
+    callBtn.setAttribute('title', `WhatsApp Call: ${rawPhone}`);
   }
   if (waBtn) {
     waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about products and orders.')}`;
@@ -2101,7 +2106,7 @@ function renderShopProducts() {
 
   const startIndex = (shopCurrentPage - 1) * PAGE_SIZE;
   const pageProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
-  const defaultImg = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+  const defaultImg = 'img/products/prod_mwafvhg25iobn348j.jpg';
 
   const renderHash = `${shopActiveCategory}_${shopCurrentPage}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [p.id, p.name, p.salePrice || p.basePrice, p.stock]));
   if (grid.dataset.renderHash === renderHash && grid.children.length > 0) {
@@ -2143,7 +2148,7 @@ function renderShopProducts() {
         <!-- Image Area: Compact aspect-square with smooth zoom & interactive wishlist -->
         <div class="relative overflow-hidden bg-[#f7f7f9] cursor-pointer aspect-square flex items-center justify-center p-1.5 sm:p-3"
              onclick="openProduct('${p.id}')">
-          <img src="${imgUrl}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
+          <img src="${imgUrl}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" alt="${p.name}" loading="lazy"/>
           
           ${badgeText ? `<span class="absolute top-1 left-1 sm:top-2 sm:left-2 ${badgeClass} font-mono-ui font-black text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded-full shadow-2xs">${badgeText}</span>` : ''}
           
@@ -2352,7 +2357,7 @@ function renderProductSearchList(matches, q) {
   return matches.map(p => {
     const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
       ? DB.products.getImage(p)
-      : (p.images?.[0]?.url || p.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80');
+      : (p.images?.[0]?.url || p.image || 'img/products/prod_mwafvhg25iobn348j.jpg');
     const price = DB.currency ? DB.currency.format(p.salePrice || p.basePrice) : `৳${p.salePrice || p.basePrice}`;
     const origPrice = p.compareAt ? (DB.currency ? DB.currency.format(p.compareAt) : `৳${p.compareAt}`) : '';
     const isOutOfStock = p.stock === 0;
@@ -2363,7 +2368,7 @@ function renderProductSearchList(matches, q) {
       <div class="p-2 sm:p-2.5 hover:bg-gray-50 rounded-xl transition-all duration-150 flex items-center justify-between gap-3 group cursor-pointer border border-transparent hover:border-gray-200" onclick="closeGlobalSearch(); openProduct('${p.id}')">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
-            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80'"/>
+            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg'"/>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">

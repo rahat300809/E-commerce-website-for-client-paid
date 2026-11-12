@@ -570,7 +570,6 @@ function isTestOrJunkProduct(p) {
   if (name.includes('[test sync]') || name.includes('test sync')) return true;
   if (id === 'prod_876_user' || id === '876' || sku.includes('o887')) return true;
   if (['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'].includes(id)) return true;
-  if (name === 'aura strike pro jersey' || name === 'crimson velocity kit') return true;
   return false;
 }
 if (typeof window !== 'undefined') {
@@ -1199,15 +1198,16 @@ const DB = {
       );
     },
     getImage(p) {
-      if (!p) return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
-      if (typeof p.image === 'string' && p.image.trim()) return p.image.trim();
-      if (typeof p.imageUrl === 'string' && p.imageUrl.trim()) return p.imageUrl.trim();
+      const fallback = 'img/products/prod_mwafvhg25iobn348j.jpg';
+      if (!p) return fallback;
+      if (typeof p.image === 'string' && p.image.trim() && !p.image.includes('aida-public')) return p.image.trim();
+      if (typeof p.imageUrl === 'string' && p.imageUrl.trim() && !p.imageUrl.includes('aida-public')) return p.imageUrl.trim();
       if (Array.isArray(p.images) && p.images.length > 0) {
         const first = p.images[0];
-        if (typeof first === 'string' && first.trim()) return first.trim();
-        if (first && typeof first === 'object' && first.url) return first.url;
+        if (typeof first === 'string' && first.trim() && !first.includes('aida-public')) return first.trim();
+        if (first && typeof first === 'object' && first.url && !first.url.includes('aida-public')) return first.url;
       }
-      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+      return fallback;
     },
     create(data) {
       const items = Store.get('products') || [];

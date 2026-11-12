@@ -347,7 +347,6 @@
         if (name.includes('[test sync]') || name.includes('test sync')) return true;
         if (id === 'prod_876_user' || id === '876' || sku.includes('o887')) return true;
         if (['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116'].includes(id)) return true;
-        if (name === 'aura strike pro jersey' || name === 'crimson velocity kit') return true;
         return false;
       }
 

@@ -654,21 +654,40 @@ function resolveCartDeliveryAndAdvancePolicy() {
   };
 }
 
-function copyMfsNumber(num) {
+function copyMfsNumber(num, btnEl) {
   if (!num) return;
-  navigator.clipboard.writeText(num.replace(/[^0-9]/g, '')).then(() => {
+  const cleanNum = num.replace(/[^0-9]/g, '');
+  navigator.clipboard.writeText(cleanNum).then(() => {
+    if (btnEl) {
+      const origHtml = btnEl.innerHTML;
+      btnEl.innerHTML = '<span class="material-symbols-outlined text-[13px]">check_circle</span> কপি হয়েছে!';
+      btnEl.classList.add('!bg-emerald-600', '!text-white');
+      setTimeout(() => {
+        btnEl.innerHTML = origHtml;
+        btnEl.classList.remove('!bg-emerald-600', '!text-white');
+      }, 2500);
+    }
     const btn = document.getElementById('copy-btn-text');
     if (btn) {
       const orig = btn.textContent;
       btn.textContent = 'Copied!';
       setTimeout(() => { btn.textContent = orig; }, 2000);
     }
-    showToast(`Copied ${num} to clipboard`);
+    showToast(`নম্বর কপি করা হয়েছে: ${cleanNum}`);
   }).catch(() => {
-    showToast(`Account number: ${num}`);
+    showToast(`প্রাপক নম্বর: ${num}`);
   });
 }
 window.copyMfsNumber = copyMfsNumber;
+
+function selectMfsTile(methodId) {
+  const radio = document.querySelector(`input[name="payment-method"][value="${methodId}"]`);
+  if (radio) {
+    radio.checked = true;
+    updateCheckoutCalculations();
+  }
+}
+window.selectMfsTile = selectMfsTile;
 
 function renderCheckoutPaymentMethods() {
   const container = document.getElementById('checkout-payment-methods-list') || document.getElementById('checkout-payment-methods');
@@ -693,49 +712,49 @@ function renderCheckoutPaymentMethods() {
   const advanceMode = policy.advancePaymentMode || 'customer_choice';
 
   if (policy.isDeliveryChargeMandatory) {
-    if (badgeEl) badgeEl.textContent = 'MANDATORY DELIVERY FEE';
-    if (titleEl) titleEl.textContent = 'Delivery Fee Advance Required';
-    if (descEl) descEl.textContent = `This kit (${(policy.mandatoryDeliveryProducts||[]).join(', ') || 'Custom Apparel'}) requires the delivery fee in advance. Settle the delivery fee via bKash, Nagad, or Rocket to confirm your order. Product price will be collected upon delivery.`;
+    if (badgeEl) badgeEl.textContent = 'ডেলিভারি চার্জ অগ্রিম আবশ্যক';
+    if (titleEl) titleEl.textContent = 'অর্ডার নিশ্চিতে ডেলিভারি চার্জ অগ্রিম প্রযোজ্য';
+    if (descEl) descEl.textContent = `কাস্টমাইজড জার্সির ক্ষেত্রে ডেলিভারি চার্জ অগ্রিম প্রযোজ্য। বিকাশ, নগদ বা রকেটে ডেলিভারি ফি দিয়ে অর্ডার কনফার্ম করুন। জার্সির বাকি টাকা পার্সেল পৌঁছালে ক্যাশ দেবেন।`;
   } else if (advanceMode === 'delivery_only') {
-    if (badgeEl) badgeEl.textContent = 'DELIVERY ADVANCE POLICY';
-    if (titleEl) titleEl.textContent = 'Advance Delivery Fee Required';
-    if (descEl) descEl.textContent = policy.payFirstNote || 'Please pay the delivery fee in advance via bKash, Nagad, or Rocket to confirm order dispatch. The product price is collected in cash upon doorstep arrival.';
+    if (badgeEl) badgeEl.textContent = 'অগ্রিম ডেলিভারি পলিসি';
+    if (titleEl) titleEl.textContent = 'অর্ডার নিশ্চিতে অগ্রিম ডেলিভারি চার্জ প্রযোজ্য';
+    if (descEl) descEl.textContent = policy.payFirstNote || 'অর্ডার নিশ্চিত করতে বিকাশ, নগদ বা রকেটের মাধ্যমে অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। জার্সির মূল্য পার্সেল হাতে পেয়ে ক্যাশ পরিশোধ করবেন।';
   } else if (advanceMode === 'full_only') {
-    if (badgeEl) badgeEl.textContent = '100% PREPAID ONLY';
-    if (titleEl) titleEl.textContent = 'Full Payment Required';
-    if (descEl) descEl.textContent = 'Complete payment for product and shipping is required upfront to process and dispatch your order.';
+    if (badgeEl) badgeEl.textContent = '১০০% অগ্রিম পেমেন্ট';
+    if (titleEl) titleEl.textContent = 'সম্পূর্ণ মূল্য অগ্রিম পরিশোধ আবশ্যক';
+    if (descEl) descEl.textContent = 'দ্রুত ডেলিভারি ও প্যাকেজিংয়ের জন্য পণ্য ও ডেলিভারি চার্জ সম্পূর্ণ অনলাইনে পরিশোধ করতে হবে।';
   } else if (advanceMode === 'cod_only') {
-    if (badgeEl) badgeEl.textContent = 'CASH ON DELIVERY';
-    if (titleEl) titleEl.textContent = 'Doorstep Cash Payment';
-    if (descEl) descEl.textContent = policy.codNote || 'Pay the complete order value to the delivery courier upon arrival.';
+    if (badgeEl) badgeEl.textContent = 'ক্যাশ অন ডেলিভারি (COD)';
+    if (titleEl) titleEl.textContent = 'হোম ডেলিভারি ক্যাশ পেমেন্ট';
+    if (descEl) descEl.textContent = policy.codNote || 'কোনো অগ্রিম পেমেন্ট করতে হবে না। পণ্য ডেলিভারির সময় সম্পূর্ণ মূল্য ক্যাশ পরিশোধ করবেন।';
   } else {
     // customer_choice
-    if (badgeEl) badgeEl.textContent = 'FLEXIBLE PAYMENT';
-    if (titleEl) titleEl.textContent = 'Payment Terms & Preference';
-    if (descEl) descEl.textContent = 'Select whether to pay the advance delivery fee online, pay the full order value upfront, or settle full cash on delivery.';
+    if (badgeEl) badgeEl.textContent = 'পেমেন্ট সুবিধা';
+    if (titleEl) titleEl.textContent = 'সুবিধাজনক পেমেন্ট নিয়ম বেছে নিন';
+    if (descEl) descEl.textContent = 'আপনার সুবিধামতো অগ্রিম ডেলিভারি চার্জ, সম্পূর্ণ অনলাইন পেমেন্ট অথবা ফুল ক্যাশ অন ডেলিভারি বেছে নিন।';
   }
 
   if (splitOptions && splitContainer) {
     if (policy.isDeliveryChargeMandatory || advanceMode === 'delivery_only') {
       splitOptions.innerHTML = `
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm col-span-1 md:col-span-2 group">
+        <label class="relative flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-900 bg-neutral-50/90 cursor-pointer transition-all duration-200 col-span-1 md:col-span-2 shadow-xs group">
           <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
-          <div class="flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge in Advance</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-bold bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full">Required</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900">🚚 ডেলিভারি চার্জ অগ্রিম (Pay Delivery Fee)</span>
+              <span class="text-[9px] uppercase tracking-wider font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">বাধ্যতামূলক</span>
             </div>
-            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Pay shipping fee upfront via bKash / Nagad / Rocket. Pay product price on arrival!</p>
+            <p class="text-[11px] sm:text-xs text-neutral-600 font-medium mt-1 leading-relaxed">বিকাশ/নগদ/রকেটে শুধু ডেলিভারি ফি অগ্রিম দিন • বাকি টাকা পার্সেল হাতে পেয়ে ক্যাশ দিন</p>
           </div>
         </label>
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/80 has-[:checked]:shadow-sm col-span-1 md:col-span-2 group">
+        <label class="relative flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 col-span-1 md:col-span-2 group has-[:checked]:border-black has-[:checked]:bg-neutral-50/90">
           <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
-          <div class="flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount (100% Prepaid)</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-semibold bg-neutral-100 text-neutral-800 border border-neutral-200 px-2 py-0.5 rounded-full">Prepaid</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900">💳 সম্পূর্ণ মূল্য অগ্রিম (100% Prepaid)</span>
+              <span class="text-[9px] uppercase tracking-wider font-bold bg-neutral-100 text-neutral-800 border border-neutral-300 px-2 py-0.5 rounded-full">ক্যাশলেস</span>
             </div>
-            <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">Pay product + delivery charge upfront online. Zero payment needed at doorstep.</p>
+            <p class="text-[11px] sm:text-xs text-neutral-600 font-medium mt-1 leading-relaxed">সম্পূর্ণ মূল্য অনলাইনে পরিশোধ করুন • ডেলিভারির সময় কোনো টাকা দেওয়া লাগবে না</p>
           </div>
         </label>
       `;
@@ -746,35 +765,35 @@ function renderCheckoutPaymentMethods() {
     } else {
       splitContainer.style.display = '';
       splitOptions.innerHTML = `
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
+        <label class="relative flex items-start gap-3 p-3 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 group has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-xs">
           <input type="radio" name="checkout-payment-split" value="delivery_only" checked onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
-          <div class="flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Delivery Charge Only</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-neutral-900 text-white px-2 py-0.5 rounded-full shadow-2xs">Popular</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1.5 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900">🚚 ডেলিভারি চার্জ অগ্রিম</span>
+              <span class="text-[9px] font-extrabold bg-neutral-900 text-white px-2 py-0.5 rounded-full">জনপ্রিয়</span>
             </div>
-            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">Advance delivery fee via MFS • Balance collected on arrival</p>
+            <p class="text-[11px] sm:text-xs text-neutral-600 font-medium mt-1 leading-relaxed">অনলাইনে শুধু ডেলিভারি ফি দিন • বাকি টাকা ক্যাশ অন ডেলিভারি</p>
           </div>
         </label>
-        <label class="relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
+        <label class="relative flex items-start gap-3 p-3 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 group has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-xs">
           <input type="radio" name="checkout-payment-split" value="full" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
-          <div class="flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Pay Full Amount Now</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-neutral-900 text-white px-2 py-0.5 rounded-full shadow-2xs">100% Online</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1.5 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900">💳 ১০০% ফুল পেমেন্ট</span>
+              <span class="text-[9px] font-extrabold bg-neutral-100 text-neutral-800 border border-neutral-300 px-2 py-0.5 rounded-full">ক্যাশলেস</span>
             </div>
-            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">Full settlement upfront • Contactless doorstep drop</p>
+            <p class="text-[11px] sm:text-xs text-neutral-600 font-medium mt-1 leading-relaxed">সম্পূর্ণ মূল্য অনলাইনে পরিশোধ করুন • কন্টাক্টলেস ডেলিভারি</p>
           </div>
         </label>
         ${policy.cashOnDelivery !== false ? `
-        <label class="col-span-1 md:col-span-2 relative flex items-start gap-3.5 p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
-          <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-black mt-1 w-4 h-4 cursor-pointer" />
-          <div class="flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-headline font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-black">Full Cash on Delivery (COD)</span>
-              <span class="font-mono-ui text-[9px] uppercase tracking-wider font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full shadow-2xs">Courier COD</span>
+        <label class="col-span-1 md:col-span-2 relative flex items-start gap-3 p-3 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 group has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/60 has-[:checked]:shadow-xs">
+          <input type="radio" name="checkout-payment-split" value="cod" onchange="updateCheckoutCalculations()" class="accent-emerald-600 mt-1 w-4 h-4 cursor-pointer" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1.5 flex-wrap">
+              <span class="font-bold text-xs sm:text-sm text-neutral-900 group-hover:text-emerald-900">📦 ফুল ক্যাশ অন ডেলিভারি (COD)</span>
+              <span class="text-[9px] font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full">ফুল ক্যাশ</span>
             </div>
-            <p class="text-xs text-neutral-700 font-medium mt-1 leading-relaxed">No advance digital payment • Pay total cash directly to delivery rider</p>
+            <p class="text-[11px] sm:text-xs text-neutral-600 font-medium mt-1 leading-relaxed">কোনো অগ্রিম পেমেন্টের দরকার নেই • পার্সেল পাওয়ার পর রাইডারকে সম্পূর্ণ মূল্য ক্যাশ দিন</p>
           </div>
         </label>
         ` : ''}
@@ -782,7 +801,7 @@ function renderCheckoutPaymentMethods() {
     }
   }
 
-  // 3. Render Digital Payment Gateways (bKash, Nagad, Rocket) with Real Logos and 3D Interactive Design
+  // 3. Render Digital Payment Gateways (bKash, Nagad, Rocket)
   const bkashNum = payConfig.bkash?.number || '01700-000000';
   const nagadNum = payConfig.nagad?.number || '01800-000000';
   const rocketNum = payConfig.rocket?.number || '01900-000000';
@@ -794,58 +813,58 @@ function renderCheckoutPaymentMethods() {
     { 
       id: 'bkash', 
       name: 'bKash', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/BKash_Logo.svg/320px-BKash_Logo.svg.png', 
+      logo: 'img/mfs/bkash.png', 
       brandColor: '#D12053',
+      bgLight: '#FFF1F5',
+      borderColor: '#FCE7F3',
       num: bkashNum, 
-      type: bkashType, 
-      badgeClass: 'bg-rose-100 text-[#9f1239] border border-rose-300',
-      desc: `Send Money to ${bkashNum} • bKash App or *247#` 
+      type: bkashType
     },
     { 
       id: 'nagad', 
       name: 'Nagad', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Nagad_Logo.svg/320px-Nagad_Logo.svg.png', 
+      logo: 'img/mfs/nagad.png', 
       brandColor: '#EA580C',
+      bgLight: '#FFF7ED',
+      borderColor: '#FED7AA',
       num: nagadNum, 
-      type: nagadType, 
-      badgeClass: 'bg-orange-100 text-[#9a3412] border border-orange-300',
-      desc: `Send Money to ${nagadNum} • Nagad App or *167#` 
+      type: nagadType
     },
     { 
       id: 'rocket', 
       name: 'Rocket', 
-      logo: 'https://seeklogo.com/images/D/dutch-bangla-rocket-logo-B4D1CC458D-seeklogo.com.png', 
+      logo: 'img/mfs/rocket.png', 
       brandColor: '#7C3AED',
+      bgLight: '#FAF5FF',
+      borderColor: '#E9D5FF',
       num: rocketNum, 
-      type: rocketType, 
-      badgeClass: 'bg-purple-100 text-[#581c87] border border-purple-300',
-      desc: `Send Money to ${rocketNum} • Rocket App or *322#` 
+      type: rocketType
     }
   ];
 
   container.innerHTML = `
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+    <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
       ${mfsMethods.map((m, idx) => `
-        <label class="relative flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2.5 p-3.5 sm:p-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-400 bg-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md has-[:checked]:border-black has-[:checked]:bg-neutral-50/90 has-[:checked]:shadow-sm group">
-          <div class="flex items-center justify-between w-full">
-            <div class="w-14 h-11 rounded-xl bg-white border border-neutral-200 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
-              <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-weight:900;color:${m.brandColor};font-size:12px;\\'>${m.name}</span>';"/>
-            </div>
-            <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="accent-black w-4 h-4 cursor-pointer" />
+        <label id="payment-tile-${m.id}" onclick="selectMfsTile('${m.id}')" class="relative flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl border-2 cursor-pointer transition-all duration-200 select-none group has-[:checked]:shadow-sm ${idx === 0 ? 'border-neutral-900 bg-neutral-50/90' : 'border-neutral-200 bg-white hover:border-neutral-300'}">
+          <input type="radio" name="payment-method" value="${m.id}" ${idx === 0 ? 'checked' : ''} onchange="updateCheckoutCalculations()" class="sr-only" />
+          
+          <div class="w-12 h-10 sm:w-14 sm:h-11 rounded-xl bg-white border border-neutral-200/80 flex items-center justify-center p-1 sm:p-1.5 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden shrink-0">
+            <img src="${m.logo}" class="max-h-full max-w-full object-contain" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\'font-weight:900;color:${m.brandColor};font-size:12px;\'>${m.name}</span>';"/>
           </div>
 
-          <div class="flex-1 min-w-0 sm:w-full mt-0 sm:mt-1">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-headline font-bold text-sm sm:text-base text-neutral-900 group-hover:text-black tracking-tight">${m.name}</span>
-              <span class="font-mono-ui text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full ${m.badgeClass}">${m.type}</span>
-            </div>
-            <div class="text-xs text-neutral-700 font-medium mt-1 leading-snug break-words">${m.desc}</div>
+          <div class="text-center mt-2 w-full">
+            <div class="font-bold text-xs sm:text-sm text-neutral-900 leading-tight">${m.name}</div>
+            <div class="text-[10px] text-neutral-500 font-medium mt-0.5">${m.type === 'Personal' ? 'পার্সোনাল' : 'মার্চেন্ট'}</div>
+          </div>
+
+          <div id="payment-dot-${m.id}" class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-white font-bold transition-all ${idx === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}" style="background:${m.brandColor};">
+            ✓
           </div>
         </label>
       `).join('')}
     </div>
 
-    <!-- Active Payment Instructions Card (Dynamic TrxID / Number / COD Info) -->
+    <!-- Active Payment Instructions Card (Dynamic TrxID / Number / Step-by-Step Info) -->
     <div id="checkout-payment-instructions-card"></div>
   `;
 
@@ -867,6 +886,19 @@ function updateCheckoutCalculations() {
   // 2. Determine selected zone shipping fee
   const zoneInput = document.querySelector('input[name="checkout-delivery-zone"]:checked');
   const zone = zoneInput ? zoneInput.value : 'inside';
+
+  // Highlight active zone card
+  const zoneCards = document.querySelectorAll('#checkout-delivery-options label');
+  zoneCards.forEach(card => {
+    const radio = card.querySelector('input[name="checkout-delivery-zone"]');
+    if (radio && radio.checked) {
+      card.classList.add('border-black', 'bg-neutral-50/80');
+      card.classList.remove('border-neutral-200', 'bg-white');
+    } else if (radio) {
+      card.classList.remove('border-black', 'bg-neutral-50/80');
+      card.classList.add('border-neutral-200', 'bg-white');
+    }
+  });
 
   let baseShipping = policy.deliveryChargeInsideDhaka || 80;
   if (zone === 'outside') baseShipping = policy.deliveryChargeOutsideDhaka || 130;
@@ -915,6 +947,25 @@ function updateCheckoutCalculations() {
     if (selectedPaymentId === 'cod') selectedPaymentId = 'bkash';
   }
 
+  // Update MFS Tile Visual Selection Highlight
+  ['bkash', 'nagad', 'rocket'].forEach(id => {
+    const tile = document.getElementById(`payment-tile-${id}`);
+    const dot = document.getElementById(`payment-dot-${id}`);
+    if (tile && dot) {
+      if (id === selectedPaymentId) {
+        tile.classList.add('border-black', 'bg-neutral-50/90', 'shadow-xs');
+        tile.classList.remove('border-neutral-200', 'bg-white');
+        dot.classList.remove('opacity-0', 'scale-75');
+        dot.classList.add('opacity-100', 'scale-100');
+      } else {
+        tile.classList.remove('border-black', 'bg-neutral-50/90', 'shadow-xs');
+        tile.classList.add('border-neutral-200', 'bg-white');
+        dot.classList.add('opacity-0', 'scale-75');
+        dot.classList.remove('opacity-100', 'scale-100');
+      }
+    }
+  });
+
   const payConfig = (typeof DB !== 'undefined' && DB.payments) ? DB.payments.get() : {};
   const methodNames = {
     bkash: 'bKash',
@@ -930,45 +981,128 @@ function updateCheckoutCalculations() {
   let payNowAmount = 0;
   let dueAmount = 0;
   let payNowDesc = `Via ${currentMethodName}`;
-  let btnLabel = `CONFIRM ORDER (${currentMethodUpper})`;
+  let btnLabel = `অর্ডার কনফার্ম করুন (${currentMethodUpper}) →`;
 
   if (isCodSelected) {
     payNowAmount = 0;
     dueAmount = totalOrderValue;
-    payNowDesc = 'No advance digital payment required';
-    btnLabel = `CONFIRM CASH ON DELIVERY ORDER (৳${dueAmount.toLocaleString()}) →`;
+    payNowDesc = 'কোনো অগ্রিম অনলাইন পেমেন্ট প্রয়োজন নেই';
+    btnLabel = `ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম (৳${dueAmount.toLocaleString()}) →`;
   } else if (activeSplit === 'delivery_only') {
     payNowAmount = shippingFee;
     dueAmount = subtotal;
-    payNowDesc = `Advance Delivery Charge (${zone === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka'}) via ${currentMethodName}`;
+    payNowDesc = `অগ্রিম ডেলিভারি চার্জ (${zone === 'outside' ? 'ঢাকার বাইরে' : 'ঢাকার ভেতরে'}) • ${currentMethodName}`;
     btnLabel = payNowAmount > 0 
-      ? `PAY ৳${payNowAmount.toLocaleString()} DELIVERY CHARGE VIA ${currentMethodUpper} →`
-      : `CONFIRM ORDER (${currentMethodUpper}) →`;
+      ? `৳${payNowAmount.toLocaleString()} ডেলিভারি ফি দিয়ে অর্ডার কনফার্ম (${currentMethodUpper}) →`
+      : `অর্ডার কনফার্ম করুন (${currentMethodUpper}) →`;
   } else {
     // full
     payNowAmount = totalOrderValue;
     dueAmount = 0;
-    payNowDesc = `100% Full Payment via ${currentMethodName}`;
-    btnLabel = `PAY FULL ৳${payNowAmount.toLocaleString()} VIA ${currentMethodUpper} →`;
+    payNowDesc = `১০০% সম্পূর্ণ মূল্য পরিশোধ • ${currentMethodName}`;
+    btnLabel = `ফুল ৳${payNowAmount.toLocaleString()} দিয়ে অর্ডার কনফার্ম (${currentMethodUpper}) →`;
   }
 
-  // 6. Active Payment Instructions Card (Dynamic TrxID / Number / COD Info)
+  // 6. Active Payment Instructions Card (Dynamic TrxID / Number / Step-by-Step Info)
   const detailsBox = document.getElementById('checkout-payment-instructions-card');
   if (detailsBox) {
     if (isCodSelected || selectedPaymentId === 'cod' || activeSplit === 'cod') {
       detailsBox.innerHTML = `
         <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 shadow-2xs">
-          <div class="font-bold flex items-center gap-2 mb-1.5 text-emerald-800 font-mono-ui text-xs tracking-wide">
+          <div class="font-bold flex items-center gap-2 mb-1.5 text-emerald-800 font-headline text-xs tracking-wide">
             <span class="material-symbols-outlined text-base">local_shipping</span>
-            <span>Full Cash on Delivery (Doorstep Courier Handover)</span>
+            <span>ফুল ক্যাশ অন ডেলিভারি (Doorstep Cash Payment)</span>
           </div>
           <p class="text-[12px] text-emerald-700 leading-relaxed">
-            No advance digital payment needed. Pay total cash of <strong>৳${dueAmount.toLocaleString()}</strong> directly to the Steadfast / Pathao courier delivery rider when your package arrives at your doorstep.
+            কোনো অগ্রিম অনলাইন পেমেন্টের প্রয়োজন নেই। পার্সেল হাতে পেয়ে কুরিয়ার রাইডারকে মোট <strong>৳${dueAmount.toLocaleString()}</strong> ক্যাশ পরিশোধ করবেন।
           </p>
         </div>
       `;
     } else {
-      detailsBox.innerHTML = '';
+      const cfgObj = payConfig[selectedPaymentId] || {};
+      const mfsNum = cfgObj.number || (selectedPaymentId === 'bkash' ? '01700-000000' : selectedPaymentId === 'nagad' ? '01800-000000' : '01900-000000');
+      const mfsType = cfgObj.type || 'Personal';
+      const mfsTypeBn = mfsType === 'Personal' ? 'পার্সোনাল' : 'মার্চেন্ট';
+      const mfsLogo = `img/mfs/${selectedPaymentId}.png`;
+      const brandColors = {
+        bkash: { primary: '#D12053', bg: '#FFF1F5', border: '#FCE7F3' },
+        nagad: { primary: '#EA580C', bg: '#FFF7ED', border: '#FED7AA' },
+        rocket: { primary: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' }
+      };
+      const colors = brandColors[selectedPaymentId] || brandColors.bkash;
+
+      // Preserve existing in-page TrxID / sender phone if already typed by user
+      const existingTrx = document.getElementById('checkout-inpage-trxid')?.value || '';
+      const existingPhone = document.getElementById('checkout-inpage-sender-phone')?.value || '';
+
+      detailsBox.innerHTML = `
+        <div class="rounded-2xl border p-3.5 sm:p-4.5 transition-all shadow-xs" style="background:${colors.bg}; border-color:${colors.border};">
+          <!-- Top Row: Provider Header & Payable Badge -->
+          <div class="flex items-center justify-between gap-2 pb-3 border-b" style="border-color:${colors.border};">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-10 h-8 rounded-lg bg-white p-1 border border-neutral-200/60 shadow-2xs flex items-center justify-center shrink-0">
+                <img src="${mfsLogo}" class="max-h-full max-w-full object-contain" alt="${currentMethodName}" />
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-xs sm:text-sm font-black text-neutral-900 leading-tight">${currentMethodName} পেমেন্ট (${mfsTypeBn})</h4>
+                <p class="text-[10px] sm:text-[11px] text-neutral-600 font-medium mt-0.5">Send Money করুন</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">${activeSplit === 'full' ? 'সম্পূর্ণ মূল্য' : 'পরিশোধযোগ্য অগ্রিম'}</div>
+              <div class="text-base sm:text-lg font-black font-mono-ui leading-none" style="color:${colors.primary};">৳${payNowAmount.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <!-- Recipient Number Box with One-Touch Copy Button -->
+          <div class="mt-3 bg-white rounded-xl p-3 border border-neutral-200 flex items-center justify-between gap-2 shadow-2xs">
+            <div class="min-w-0">
+              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">${currentMethodName} প্রাপক নম্বর:</div>
+              <div class="text-base sm:text-lg font-black font-mono tracking-wider text-neutral-900 select-all">${mfsNum}</div>
+            </div>
+            <button type="button" onclick="copyMfsNumber('${mfsNum}', this)" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 cursor-pointer" style="background:${colors.primary};">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span>
+              <span>কপি করুন</span>
+            </button>
+          </div>
+
+          <!-- 3-Step Clear Bangla Guide -->
+          <div class="mt-3 text-[11px] sm:text-xs text-neutral-700 space-y-1.5 leading-relaxed bg-white/70 rounded-xl p-3 border border-neutral-200/60">
+            <div class="font-bold text-neutral-900 flex items-center gap-1.5 mb-1">
+              <span class="material-symbols-outlined text-sm" style="color:${colors.primary};">info</span>
+              <span>সহজ ৩টি ধাপে পেমেন্ট সম্পন্ন করুন:</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="font-bold text-neutral-900 shrink-0">১.</span>
+              <span>আপনার <strong>${currentMethodName}</strong> অ্যাপ বা ইউএসএসডি কোড দিয়ে <strong>Send Money</strong> সিলেক্ট করুন।</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="font-bold text-neutral-900 shrink-0">২.</span>
+              <span>প্রাপক নম্বরে <strong>${mfsNum}</strong> দিন এবং টাকার পরিমাণ ঠিক <strong>৳${payNowAmount.toLocaleString()}</strong> লিখে পিন দিন।</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="font-bold text-neutral-900 shrink-0">৩.</span>
+              <span>পেমেন্ট সফল হলে প্রাপ্ত <strong>Transaction ID (TrxID)</strong> নিচের ঘরে লিখুন এবং কনফার্ম করুন।</span>
+            </div>
+          </div>
+
+          <!-- In-Page TrxID & Sender Phone Fields (Instant Mobile Order Placement) -->
+          <div class="mt-3 pt-3 border-t grid grid-cols-1 sm:grid-cols-2 gap-2.5" style="border-color:${colors.border};">
+            <div>
+              <label class="block text-[11px] font-bold text-neutral-800 mb-1">
+                ট্রানজেকশন আইডি (TrxID) <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="checkout-inpage-trxid" value="${existingTrx}" placeholder="যেমন: 9B7X2K4M" class="w-full bg-white border border-neutral-300 rounded-xl px-3 py-2.5 font-mono text-sm uppercase text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all shadow-2xs" style="--tw-ring-color:${colors.primary};" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-neutral-800 mb-1">
+                যে নম্বর থেকে টাকা পাঠিয়েছেন (অপশনাল)
+              </label>
+              <input type="tel" id="checkout-inpage-sender-phone" value="${existingPhone}" placeholder="যেমন: 017XXXXXXXX" class="w-full bg-white border border-neutral-300 rounded-xl px-3 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all shadow-2xs" style="--tw-ring-color:${colors.primary};" />
+            </div>
+          </div>
+        </div>
+      `;
     }
   }
 
@@ -1013,7 +1147,7 @@ function updateCheckoutCalculations() {
   if (minOrderEl) {
     const minOrder = policy.minOrderAmount || 0;
     if (minOrder > 0 && subtotal < minOrder) {
-      minOrderEl.textContent = `Minimum order amount is ৳${minOrder}. Add ৳${Math.ceil(minOrder - subtotal)} more to checkout.`;
+      minOrderEl.textContent = `ন্যূনতম অর্ডার মূল্য ৳${minOrder}। অর্ডার করতে আরও ৳${Math.ceil(minOrder - subtotal)} টাকার পণ্য যোগ করুন।`;
       minOrderEl.style.display = '';
     } else {
       minOrderEl.style.display = 'none';
@@ -2950,8 +3084,51 @@ function placeOrder() {
     };
   }
 
-  // If advance payment via bKash / Nagad / Rocket is required, open the popup directly!
+  // If advance payment via bKash / Nagad / Rocket is required, check if TrxID was already entered in-page!
   if (payableNow > 0 && (selectedPaymentId === 'bkash' || selectedPaymentId === 'nagad' || selectedPaymentId === 'rocket')) {
+    const inpageTrx = (document.getElementById('checkout-inpage-trxid')?.value || '').trim();
+    const inpagePhone = (document.getElementById('checkout-inpage-sender-phone')?.value || '').trim();
+
+    if (inpageTrx) {
+      // In-page TrxID provided! Complete order immediately without modal popup
+      createdOrder.paymentTrxId = inpageTrx;
+      createdOrder.senderPhone = inpagePhone;
+      createdOrder.paymentStatus = 'AWAITING_VERIFICATION';
+      createdOrder.paidAmount = payableNow;
+      createdOrder.dueAmount = dueOnDelivery;
+
+      if (typeof DB !== 'undefined' && DB.orders && createdOrder.id) {
+        DB.orders.update(createdOrder.id, {
+          paymentTrxId: inpageTrx,
+          senderPhone: inpagePhone,
+          paymentStatus: 'AWAITING_VERIFICATION',
+          paidAmount: payableNow,
+          dueAmount: dueOnDelivery
+        });
+      }
+
+      // Send Telegram notification
+      if (typeof DB !== 'undefined' && DB.telegram && DB.telegram.sendOrderNotification) {
+        try {
+          DB.telegram.sendOrderNotification(createdOrder);
+        } catch(e) { console.error('Telegram error:', e); }
+      }
+
+      // Clear cart
+      appState.cart = [];
+      saveCartState();
+      renderCart();
+
+      // Redirect directly to shopping page
+      switchView('shop');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Show celebratory success popup
+      showOrderSuccessCelebration(createdOrder);
+      showToast('🎉 আপনার অর্ডার ও TrxID সফলভাবে গ্রহণ করা হয়েছে! ধন্যবাদ ZENVY-তে অর্ডার করার জন্য।');
+      return;
+    }
+
     openMfsPaymentModal(createdOrder, selectedPaymentId, payableNow, activeSplit, dueOnDelivery);
     return;
   }

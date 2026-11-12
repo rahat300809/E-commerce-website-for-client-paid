@@ -1334,168 +1334,156 @@
 
     <!-- ==================== VIEW 4: DISTRACTION-FREE CHECKOUT (Screen bff3d89b18dd42cc8e3f9dce42b7147c) ==================== -->
     <div id="view-checkout" class="page-view">
-      <main
-        class="w-full max-w-7xl mx-auto px-grid-margin py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter">
+      <main class="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
 
         <!-- Left Column: Delivery & Payment Details (7 Cols) -->
-        <div class="lg:col-span-7 space-y-8">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-neutral-200">
+        <div class="lg:col-span-7 space-y-5 sm:space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-3 border-b border-neutral-200">
             <div>
-              <h1 class="font-headline text-2xl sm:text-3xl md:text-4xl text-neutral-900 font-black tracking-tight">
-                Complete Your Order</h1>
-              <p class="font-body text-sm sm:text-base text-neutral-700 font-medium mt-1">Review your delivery details
-                and choose a payment method.</p>
+              <h1 class="font-headline text-xl sm:text-2xl md:text-3xl text-neutral-900 font-black tracking-tight">
+                অর্ডার সম্পন্ন করুন (Checkout)
+              </h1>
+              <p class="font-body text-xs sm:text-sm text-neutral-600 font-medium mt-0.5">
+                আপনার সঠিক ডেলিভারি ঠিকানা দিন এবং সুবিধাজনক পেমেন্ট মাধ্যম বেছে নিন।
+              </p>
             </div>
-            <div
-              class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-mono-ui font-bold self-start sm:self-center shadow-2xs">
-              <span class="material-symbols-outlined text-[16px] text-emerald-700">lock</span>
-              <span>256-Bit SSL Encrypted Checkout</span>
+            <div class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono-ui font-bold self-start sm:self-center shadow-2xs shrink-0">
+              <span class="material-symbols-outlined text-[15px] text-emerald-700">lock</span>
+              <span>২৫৬-বিট নিরাপদ চেকআউট</span>
             </div>
           </div>
 
           <!-- Section 1: Address -->
-          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-5">
-            <h2
-              class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest border-b border-neutral-200 pb-2.5 flex items-center gap-2">
-              <span
-                class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">1</span>
-              <span>Delivery Address</span>
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-4 sm:p-6 space-y-4">
+            <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest border-b border-neutral-200 pb-2.5 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold shrink-0">১</span>
+              <span>ডেলিভারির তথ্য (Delivery Information)</span>
             </h2>
-            <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" onsubmit="event.preventDefault(); placeOrder();">
               <div>
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Full
-                  Name</label>
-                <input type="text" id="checkout-name" placeholder="Your full name"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  আপনার নাম (Full Name) <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="checkout-name" placeholder="যেমন: তানভীর আহমেদ"
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
               <div>
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Phone
-                  Number</label>
-                <input type="tel" id="checkout-phone" placeholder="+880 17XX-XXXXXX"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  মোবাইল নম্বর (Phone Number) <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" id="checkout-phone" placeholder="যেমন: 017XXXXXXXX"
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
               <div class="col-span-1 md:col-span-2">
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Email
-                  Address (Optional)</label>
-                <input type="email" id="checkout-email" placeholder="your@email.com (optional)"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  ইমেইল এড্রেস (Email Address - ঐচ্ছিক)
+                </label>
+                <input type="email" id="checkout-email" placeholder="যেমন: yourname@gmail.com (ঐচ্ছিক)"
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
               <div class="col-span-1 md:col-span-2">
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Delivery
-                  Address</label>
-                <input type="text" id="checkout-address" placeholder="House #, Road, Area, City"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  সম্পূর্ণ ডেলিভারি ঠিকানা (Full Address) <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="checkout-address" placeholder="বাসা/হোল্ডিং নং, রোড নং, এলাকা, থানা/উপজেলা"
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
               <div>
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">City</label>
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  জেলা / শহর (City / District)
+                </label>
                 <input type="text" id="checkout-city" value="Dhaka"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
               <div>
-                <label
-                  class="block font-headline text-xs font-bold text-neutral-800 uppercase tracking-wider mb-1.5">Postal
-                  Code</label>
-                <input type="text" id="checkout-zip" value="1213"
-                  class="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
+                <label class="block font-headline text-xs font-bold text-neutral-800 mb-1.5">
+                  পোস্টাল কোড (Postal Code - ঐচ্ছিক)
+                </label>
+                <input type="text" id="checkout-postal" placeholder="যেমন: 1212"
+                  class="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2.5 sm:py-3 text-neutral-900 font-medium text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black placeholder:text-neutral-400 shadow-2xs transition-all" />
               </div>
             </form>
           </section>
 
-          <!-- Section 2: Delivery Area & Method -->
-          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-4">
+          <!-- Section 2: Delivery Area & Cost -->
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-4 sm:p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
-              <h2
-                class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
-                <span
-                  class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">2</span>
-                <span>Delivery Zone & Shipping Fee</span>
+              <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold shrink-0">২</span>
+                <span>ডেলিভারি এলাকা ও চার্জ (Delivery Zone)</span>
               </h2>
-              <span
-                class="text-xs text-neutral-700 font-bold font-mono-ui bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">Pre-calculated
-                Rates</span>
+              <span class="text-[11px] text-neutral-700 font-bold font-mono-ui bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">
+                নির্ধারিত রেট
+              </span>
             </div>
-            <div id="checkout-delivery-options" class="space-y-3">
-              <label
-                class="flex items-center p-4 border-2 border-black bg-neutral-50/80 rounded-2xl cursor-pointer transition-all hover:bg-neutral-100 shadow-2xs">
+            <div id="checkout-delivery-options" class="space-y-2.5 sm:space-y-3">
+              <label class="flex items-center p-3.5 sm:p-4 border-2 border-black bg-neutral-50/80 rounded-2xl cursor-pointer transition-all hover:bg-neutral-100 shadow-2xs">
                 <input type="radio" name="checkout-delivery-zone" value="inside" checked
-                  onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5">
-                <div class="ml-4 flex-grow flex justify-between items-center">
+                  onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5 shrink-0">
+                <div class="ml-3 sm:ml-4 flex-grow flex justify-between items-center gap-2">
                   <div>
-                    <p class="font-headline font-bold text-sm sm:text-base text-neutral-900">Inside Dhaka</p>
-                    <p class="font-mono-ui text-xs text-neutral-700 font-medium mt-0.5">Delivered within 24–48 Hours</p>
+                    <p class="font-headline font-bold text-xs sm:text-sm text-neutral-900 leading-tight">ঢাকার ভেতরে (Inside Dhaka)</p>
+                    <p class="font-mono-ui text-[11px] sm:text-xs text-neutral-600 font-medium mt-0.5">২৪ থেকে ৪৮ ঘণ্টার মধ্যে নিশ্চিত ডেলিভারি</p>
                   </div>
-                  <span id="rate-inside-dhaka" class="font-mono-ui text-base font-extrabold text-neutral-900">৳80</span>
+                  <span id="rate-inside-dhaka" class="font-mono-ui text-sm sm:text-base font-black text-neutral-900 shrink-0">৳৮০</span>
                 </div>
               </label>
 
-              <label
-                class="flex items-center p-4 border-2 border-neutral-200 rounded-2xl cursor-pointer hover:border-neutral-400 bg-white transition-all shadow-2xs">
+              <label class="flex items-center p-3.5 sm:p-4 border-2 border-neutral-200 rounded-2xl cursor-pointer hover:border-neutral-400 bg-white transition-all shadow-2xs">
                 <input type="radio" name="checkout-delivery-zone" value="outside"
-                  onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5">
-                <div class="ml-4 flex-grow flex justify-between items-center">
+                  onchange="updateCheckoutCalculations()" class="accent-black h-5 w-5 shrink-0">
+                <div class="ml-3 sm:ml-4 flex-grow flex justify-between items-center gap-2">
                   <div>
-                    <p class="font-headline font-bold text-sm sm:text-base text-neutral-900">Outside Dhaka (All
-                      Bangladesh)</p>
-                    <p class="font-mono-ui text-xs text-neutral-700 font-medium mt-0.5">Steadfast / Pathao Courier (2–3
-                      Days)</p>
+                    <p class="font-headline font-bold text-xs sm:text-sm text-neutral-900 leading-tight">ঢাকার বাইরে (Outside Dhaka)</p>
+                    <p class="font-mono-ui text-[11px] sm:text-xs text-neutral-600 font-medium mt-0.5">স্টেডফাস্ট / পাঠাও কুরিয়ার (সারা বাংলাদেশ ২–৩ দিন)</p>
                   </div>
-                  <span id="rate-outside-dhaka"
-                    class="font-mono-ui text-base font-extrabold text-neutral-900">৳130</span>
+                  <span id="rate-outside-dhaka" class="font-mono-ui text-sm sm:text-base font-black text-neutral-900 shrink-0">৳১৩০</span>
                 </div>
               </label>
             </div>
           </section>
 
           <!-- Section 3: Payment Type & Advance Policy -->
-          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-7 space-y-5">
+          <section class="bg-white rounded-2xl border border-neutral-200 shadow-sm p-4 sm:p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
-              <h2
-                class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
-                <span
-                  class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold">3</span>
-                <span>Payment Terms & Gateway</span>
+              <h2 class="font-headline text-xs font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-mono-ui text-xs font-bold shrink-0">৩</span>
+                <span>পেমেন্ট মাধ্যম ও পলিসি (Payment Terms)</span>
               </h2>
-              <span id="checkout-policy-badge"
-                class="font-mono-ui text-[10px] uppercase font-black tracking-wider bg-black text-white px-2.5 py-1 rounded-full shadow-2xs">Secure
-                Policy</span>
+              <span id="checkout-policy-badge" class="font-mono-ui text-[10px] uppercase font-black tracking-wider bg-black text-white px-2.5 py-1 rounded-full shadow-2xs">
+                নিরাপদ পেমেন্ট
+              </span>
             </div>
 
             <!-- Min order notice -->
-            <div id="checkout-min-order-notice"
-              class="hidden text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3">
-            </div>
+            <div id="checkout-min-order-notice" class="hidden text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3"></div>
 
             <!-- Policy Alert Box -->
-            <div id="checkout-policy-notice-box"
-              class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 shadow-2xs">
+            <div id="checkout-policy-notice-box" class="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 shadow-2xs">
               <div class="font-bold flex items-center gap-2 mb-1 text-neutral-900 font-headline text-xs tracking-wide">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span id="checkout-policy-title">Payment Settlement Terms</span>
+                <span id="checkout-policy-title">পেমেন্টের নিয়মাবলী</span>
               </div>
-              <p id="checkout-policy-desc" class="text-xs text-neutral-700 font-medium leading-relaxed">
-                Choose whether to pay the advance delivery fee online, settle full payment, or choose cash on delivery.
+              <p id="checkout-policy-desc" class="text-xs text-neutral-600 font-medium leading-relaxed">
+                আপনার সুবিধামতো অগ্রিম ডেলিভারি চার্জ, ফুল অনলাইন পেমেন্ট অথবা ক্যাশ অন ডেলিভারি বেছে নিন।
               </p>
             </div>
 
             <!-- Payment Split Choice Selector (when mode is customer_choice) -->
             <div id="checkout-split-choice-container" class="space-y-2">
-              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">Select
-                Payment Preference</label>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="checkout-split-options">
+              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">
+                পেমেন্টের ধরন বেছে নিন (Payment Preference)
+              </label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3" id="checkout-split-options">
                 <!-- Injected via JS based on policy -->
               </div>
             </div>
 
             <!-- Dynamic Payment Gateway Selector (bKash / Nagad / Rocket) -->
             <div id="checkout-gateway-group" class="pt-2">
-              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">Select
-                Payment Gateway</label>
+              <label class="block font-headline text-xs uppercase tracking-wider font-bold text-neutral-800 mb-2">
+                পেমেন্ট গেটওয়ে সিলেক্ট করুন (Payment Gateway)
+              </label>
               <div id="checkout-payment-methods" class="space-y-2">
                 <!-- Rendered by renderCheckoutPaymentMethods() -->
               </div>
@@ -1505,64 +1493,56 @@
 
         <!-- Right Column: Order Summary (5 Cols) -->
         <div class="lg:col-span-5 relative">
-          <aside
-            class="bg-white rounded-2xl p-6 sm:p-7 flex flex-col border border-neutral-200 shadow-xl sticky top-28">
-            <div class="flex justify-between items-center mb-5 border-b border-neutral-200 pb-4">
-              <h2 class="font-headline text-xl font-black text-neutral-900">Order Summary</h2>
-              <span id="checkout-items-badge"
-                class="font-mono-ui text-xs font-bold bg-black text-white px-3 py-1 rounded-full shadow-2xs">0
-                Items</span>
+          <aside class="bg-white rounded-2xl p-4 sm:p-6 flex flex-col border border-neutral-200 shadow-lg sticky top-24">
+            <div class="flex justify-between items-center mb-4 border-b border-neutral-200 pb-3">
+              <h2 class="font-headline text-lg sm:text-xl font-black text-neutral-900">অর্ডার সামারি (Order Summary)</h2>
+              <span id="checkout-items-badge" class="font-mono-ui text-xs font-bold bg-black text-white px-3 py-1 rounded-full shadow-2xs">
+                0 Items
+              </span>
             </div>
 
             <!-- Items List -->
-            <div id="checkout-items-list" class="space-y-3 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+            <div id="checkout-items-list" class="space-y-3 max-h-[280px] sm:max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
               <!-- Rendered via JS -->
             </div>
 
             <!-- Price Totals Breakdown -->
-            <div class="mt-5 border-t border-neutral-200 pt-4 space-y-3 font-mono-ui text-xs">
+            <div class="mt-4 border-t border-neutral-200 pt-3 space-y-2.5 font-mono-ui text-xs">
               <div class="flex justify-between items-center text-neutral-700">
-                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">Product
-                  Subtotal</span>
+                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">প্রোডাক্ট সাবটোটাল</span>
                 <span id="checkout-subtotal" class="font-bold text-sm text-neutral-900">৳0</span>
               </div>
               <div class="flex justify-between items-center text-neutral-700">
-                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">Delivery
-                  Charge</span>
-                <span id="checkout-delivery-fee" class="font-bold text-sm text-neutral-900">৳80</span>
+                <span class="font-headline font-bold text-xs uppercase tracking-wide text-neutral-800">ডেলিভারি চার্জ</span>
+                <span id="checkout-delivery-fee" class="font-bold text-sm text-neutral-900">৳৮০</span>
               </div>
-              <div
-                class="flex justify-between items-center font-bold text-sm text-neutral-900 pt-3 border-t border-dashed border-neutral-200">
-                <span class="font-headline font-extrabold text-sm uppercase tracking-wide">Total Order Value</span>
+              <div class="flex justify-between items-center font-bold text-sm text-neutral-900 pt-2.5 border-t border-dashed border-neutral-200">
+                <span class="font-headline font-extrabold text-sm uppercase tracking-wide">সর্বমোট অর্ডার মূল্য</span>
                 <span id="checkout-total" class="text-base sm:text-lg font-black text-neutral-900">৳0</span>
               </div>
 
               <!-- Pay Now Highlight Box -->
-              <div id="checkout-pay-now-container"
-                class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-3.5 flex justify-between items-center text-emerald-950 mt-3 shadow-2xs">
+              <div id="checkout-pay-now-container" class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-3 flex justify-between items-center text-emerald-950 mt-2 shadow-2xs">
                 <div>
-                  <div class="text-xs font-black uppercase tracking-wider text-emerald-900 font-headline">Payable Now
-                    (Advance)</div>
-                  <div class="text-xs text-emerald-800 font-semibold mt-0.5" id="checkout-pay-now-desc">Via bKash</div>
+                  <div class="text-[11px] font-black uppercase tracking-wider text-emerald-900 font-headline">পরিশোধযোগ্য অগ্রিম (Pay Now)</div>
+                  <div class="text-[11px] text-emerald-800 font-medium mt-0.5" id="checkout-pay-now-desc">Via bKash</div>
                 </div>
-                <span id="checkout-pay-now-amount" class="text-xl font-black text-emerald-900 font-mono-ui">৳80</span>
+                <span id="checkout-pay-now-amount" class="text-lg sm:text-xl font-black text-emerald-900 font-mono-ui">৳৮০</span>
               </div>
 
               <!-- Cash Due on Delivery Box -->
-              <div id="checkout-due-container"
-                class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3.5 flex justify-between items-center text-amber-950 shadow-2xs">
+              <div id="checkout-due-container" class="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 flex justify-between items-center text-amber-950 shadow-2xs">
                 <div>
-                  <div class="text-xs font-black uppercase tracking-wider text-amber-900 font-headline">Cash Due on
-                    Delivery</div>
-                  <div class="text-xs text-amber-800 font-semibold mt-0.5">Pay to rider when jersey arrives</div>
+                  <div class="text-[11px] font-black uppercase tracking-wider text-amber-900 font-headline">ক্যাশ বাকি (Due on Delivery)</div>
+                  <div class="text-[11px] text-amber-800 font-medium mt-0.5">পার্সেল হাতে পেয়ে রাইডারকে দেবেন</div>
                 </div>
-                <span id="checkout-due-amount" class="text-xl font-black text-amber-900 font-mono-ui">৳0</span>
+                <span id="checkout-due-amount" class="text-lg sm:text-xl font-black text-amber-900 font-mono-ui">৳০</span>
               </div>
             </div>
 
             <button id="checkout-place-order-btn" onclick="placeOrder()"
-              class="w-full mt-6 bg-black hover:bg-neutral-800 text-white py-4 rounded-xl font-headline font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-xl hover:shadow-2xl active:scale-[0.99] flex justify-center items-center gap-2 cursor-pointer">
-              <span>CONFIRM ORDER</span>
+              class="w-full mt-5 bg-black hover:bg-neutral-800 text-white py-3.5 sm:py-4 rounded-xl font-headline font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg hover:shadow-xl active:scale-[0.99] flex justify-center items-center gap-2 cursor-pointer">
+              <span>অর্ডার কনফার্ম করুন</span>
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </aside>

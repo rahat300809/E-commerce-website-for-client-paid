@@ -404,23 +404,34 @@
       cloudList.forEach(p => cloudMap.set(String(p.id).trim(), p));
 
       const toUpload = [];
-      if (isManual) {
-        // Only during explicit manual admin sync: upload any newly drafted local-only products
-        localList.forEach(p => {
-          if (!p || !p.id) return;
-          const pid = String(p.id).trim();
-          if (deletedIds.has(pid)) return;
-          if (isTestOrJunkProduct(p)) return;
+      // Preserve all valid local products across background and manual syncs
+      localList.forEach(p => {
+        if (!p || !p.id) return;
+        const pid = String(p.id).trim();
+        if (deletedIds.has(pid)) return;
+        if (isTestOrJunkProduct(p)) return;
 
-          const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
-          const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
-          p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
+        const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
+        const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
+        p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
 
-          if (!cloudMap.has(pid)) {
-            toUpload.push(p);
-            cloudMap.set(pid, p);
+        if (!cloudMap.has(pid)) {
+          toUpload.push(p);
+          cloudMap.set(pid, p);
+        }
+      });
+
+      // Background upload any local products that are not yet in Firestore
+      if (toUpload.length > 0 && _db) {
+        setTimeout(async () => {
+          for (const item of toUpload) {
+            try {
+              await saveProductToCloud(item);
+            } catch(e) {
+              console.warn('[ZenvySync] Background upload of local product notice:', item.id, e);
+            }
           }
-        });
+        }, 150);
       }
 
       const merged = Array.from(cloudMap.values());
@@ -489,6 +500,17 @@
     }
     if (p.imageUrl && p.image && p.imageUrl === p.image) {
       p.imageUrl = '';
+    }
+    if (Array.isArray(p.images)) {
+      p.images = p.images.map(img => {
+        if (typeof img === 'string') {
+          return { url: img, alt: p.name || '', isPrimary: false };
+        }
+        if (img && typeof img === 'object') {
+          return { url: img.url || '', alt: img.alt || p.name || '', isPrimary: !!img.isPrimary };
+        }
+        return null;
+      }).filter(img => img && typeof img.url === 'string' && img.url.trim().length > 0);
     }
 
     // Remove from deleted tracker if re-creating

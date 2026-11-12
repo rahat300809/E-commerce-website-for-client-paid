@@ -1395,6 +1395,20 @@ window.toggleChipsGroup = function(groupId, selectAll) {
   });
 };
 
+function autoUpdateProdSlug(nameInput) {
+  const form = nameInput.closest('form');
+  if (!form) return;
+  const slugInput = form.querySelector('input[name="slug"]');
+  if (!slugInput) return;
+  const newName = (nameInput.value || '').trim();
+  const newSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const curSlug = (slugInput.value || '').trim().toLowerCase();
+  if (!curSlug || curSlug.includes('-copy-') || !slugInput.dataset.userEdited) {
+    slugInput.value = newSlug;
+  }
+}
+window.autoUpdateProdSlug = autoUpdateProdSlug;
+
 function openProductForm(id = null) {
   const product = id ? DB.products.byId(id) : null;
   const cats = DB.categories.all();
@@ -1413,8 +1427,13 @@ function openProductForm(id = null) {
   const cs = DB.customizationSettings.get();
   const isEdit = !!product;
 
-  // State for form
-  let formImages = product?.images || [];
+  // State for form - defensive normalization so images are always properly formatted
+  let formImages = [];
+  if (product && Array.isArray(product.images) && product.images.length > 0) {
+    formImages = product.images.map(img => typeof img === 'string' ? { url: img, isPrimary: false } : img);
+  } else if (product && (product.image || product.imageUrl)) {
+    formImages = [{ url: product.image || product.imageUrl, isPrimary: true }];
+  }
   let formVariants = product ? DB.variants.byProduct(id) : [];
 
   const modalId = 'product-form-modal';
@@ -1439,7 +1458,7 @@ function openProductForm(id = null) {
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Product Name<span class="req">*</span></label>
-            <input type="text" name="name" class="form-input" value="${product?.name||''}" placeholder="e.g. Real Madrid Home Jersey"/>
+            <input type="text" name="name" class="form-input" value="${product?.name||''}" oninput="autoUpdateProdSlug(this)" placeholder="e.g. Real Madrid Home Jersey"/>
           </div>
           <div class="form-group">
             <label class="form-label">SKU</label>
@@ -1851,7 +1870,7 @@ function openProductForm(id = null) {
           <label class="form-label">URL Slug</label>
           <div class="input-group">
             <span class="input-prefix">/shop/</span>
-            <input type="text" name="slug" class="form-input" value="${product?.slug||''}" placeholder="real-madrid-home-jersey"/>
+            <input type="text" name="slug" class="form-input" value="${product?.slug||''}" oninput="this.dataset.userEdited='true'" placeholder="real-madrid-home-jersey"/>
           </div>
         </div>
         <div class="form-group">
@@ -2131,12 +2150,25 @@ function saveProduct(e, id, asDraft = false) {
   const directUrl = get('directImageUrl');
   let images = window._lastFormImages || (id ? DB.products.byId(id)?.images : null) || [];
   if (directUrl) {
-    images = [{ url: directUrl, alt: name, isPrimary: true }, ...images.filter(img => img.url !== directUrl)];
+    images = [{ url: directUrl, alt: name, isPrimary: true }, ...images.filter(img => (typeof img === 'string' ? img : img.url) !== directUrl)];
   }
   if (!images || images.length === 0) {
+    const existing = id ? DB.products.byId(id) : null;
+    const existingImg = existing?.image || existing?.imageUrl;
     images = [
-      { url: 'img/products/prod_mwafvhg25iobn348j.jpg', alt: name, isPrimary: true }
+      { url: existingImg || 'img/products/prod_mwafvhg25iobn348j.jpg', alt: name, isPrimary: true }
     ];
+  }
+
+  let requestedSlug = (get('slug') || name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g, '')).trim();
+  if (!requestedSlug) requestedSlug = 'product-' + Date.now().toString(36);
+  // Ensure unique slug: check if another product (different ID) already uses this slug
+  const allProds = DB.products.all();
+  let finalSlug = requestedSlug;
+  let counter = 1;
+  while (allProds.some(p => String(p.id).trim().toLowerCase() !== String(id||'').trim().toLowerCase() && String(p.slug || '').trim().toLowerCase() === finalSlug.toLowerCase())) {
+    finalSlug = `${requestedSlug}-${counter}`;
+    counter++;
   }
 
   const data = {
@@ -2160,7 +2192,7 @@ function saveProduct(e, id, asDraft = false) {
     gender: get('gender'),
     sport: get('sport'),
     team: get('team'),
-    slug: get('slug') || name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+    slug: finalSlug,
     seoTitle: get('seoTitle'),
     seoDesc: get('seoDesc'),
     isNewArrival: fd.get('isNewArrival') === 'on',

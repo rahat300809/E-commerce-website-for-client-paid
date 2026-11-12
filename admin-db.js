@@ -1174,7 +1174,13 @@ const DB = {
     byId(id) {
       if (!id) return null;
       const strId = String(id).trim().toLowerCase();
-      let p = DB.products.all().find(x => String(x.id).trim().toLowerCase() === strId || String(x.slug||'').trim().toLowerCase() === strId);
+      const all = DB.products.all();
+      // 1. Strict ID match first (highest priority)
+      let p = all.find(x => String(x.id || '').trim().toLowerCase() === strId);
+      // 2. Slug match only as secondary fallback
+      if (!p) {
+        p = all.find(x => String(x.slug || '').trim().toLowerCase() === strId);
+      }
       return p || null;
     },
     published() {
@@ -1203,9 +1209,11 @@ const DB = {
       if (typeof p.image === 'string' && p.image.trim() && !p.image.includes('aida-public')) return p.image.trim();
       if (typeof p.imageUrl === 'string' && p.imageUrl.trim() && !p.imageUrl.includes('aida-public')) return p.imageUrl.trim();
       if (Array.isArray(p.images) && p.images.length > 0) {
-        const first = p.images[0];
-        if (typeof first === 'string' && first.trim() && !first.includes('aida-public')) return first.trim();
-        if (first && typeof first === 'object' && first.url && !first.url.includes('aida-public')) return first.url;
+        for (let i = 0; i < p.images.length; i++) {
+          const item = p.images[i];
+          if (typeof item === 'string' && item.trim() && !item.includes('aida-public')) return item.trim();
+          if (item && typeof item === 'object' && typeof item.url === 'string' && item.url.trim() && !item.url.includes('aida-public')) return item.url.trim();
+        }
       }
       return fallback;
     },
@@ -1213,9 +1221,10 @@ const DB = {
       const items = Store.get('products') || [];
       const isPub = data.isPublished !== undefined ? Boolean(data.isPublished) : (data.status === 'draft' ? false : true);
       const isPre = data.isPreorder !== undefined ? Boolean(data.isPreorder) : false;
+      const newId = (data.id && String(data.id).trim()) || ('prod_' + Store.genId());
       const item = {
-        id: data.id || ('prod_' + Store.genId()),
         ...data,
+        id: newId,
         isPreorder: isPre,
         isPublished: isPub,
         status: isPub ? 'published' : 'draft',
@@ -1230,7 +1239,12 @@ const DB = {
       if (item.image && !item.imageUrl) {
         item.imageUrl = item.image;
       }
-      items.unshift(item); // Latest product placed at the top of the catalog
+      const existingIdx = items.findIndex(x => String(x.id).trim().toLowerCase() === String(newId).trim().toLowerCase());
+      if (existingIdx >= 0) {
+        items[existingIdx] = item;
+      } else {
+        items.unshift(item); // Latest product placed at the top of the catalog
+      }
       Store.set('products', items);
       if (window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
         window.ZenvyFirebase.saveProduct(item);
@@ -1242,6 +1256,8 @@ const DB = {
       return item;
     },
     update(id, data) {
+      if (!id) return null;
+      const strId = String(id).trim().toLowerCase();
       const old = DB.products.byId(id);
       const updates = { ...data, updatedAt: Store.now() };
       if (updates.isPreorder !== undefined) {
@@ -1259,21 +1275,25 @@ const DB = {
       if (updates.image && !updates.imageUrl) {
         updates.imageUrl = updates.image;
       }
-      const strId = String(id).trim().toLowerCase();
-      const targetId = old ? String(old.id).trim().toLowerCase() : strId;
-      const targetSlug = old?.slug ? String(old.slug).trim().toLowerCase() : null;
+
       let updatedItem = null;
       const items = (Store.get('products') || []).map(p => {
         const pId = String(p.id || '').trim().toLowerCase();
-        const pSlug = String(p.slug || '').trim().toLowerCase();
-        if (pId === targetId || pId === strId || (targetSlug && pSlug === targetSlug) || (pSlug && pSlug === strId)) {
-          updatedItem = { ...p, ...updates };
+        // STRICT ID MATCH ONLY: Never match by slug to prevent corrupting or overwriting other products!
+        if (pId === strId) {
+          updatedItem = { ...p, ...updates, id: p.id };
           return updatedItem;
         }
         return p;
       });
+
+      if (!updatedItem) {
+        updatedItem = { ...(old || {}), ...updates, id: (old?.id || id) };
+        items.unshift(updatedItem);
+      }
+
       Store.set('products', items);
-      const resItem = updatedItem || items.find(p => String(p.id).trim().toLowerCase() === targetId);
+      const resItem = updatedItem;
       if (resItem && window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
         window.ZenvyFirebase.saveProduct(resItem);
       }
@@ -1287,7 +1307,8 @@ const DB = {
       const src = DB.products.byId(id);
       if (!src) return null;
       const copy = JSON.parse(JSON.stringify(src));
-      delete copy.id;
+      const newId = 'prod_' + Store.genId();
+      copy.id = newId;
       copy.name = src.name + ' (Copy)';
       copy.sku = (src.sku ? String(src.sku).replace(/-COPY-[\w\d]+$/i, '') : 'ZNV') + '-COPY-' + Date.now().toString(36).toUpperCase();
       copy.slug = (src.slug ? String(src.slug).replace(/-copy-[\w\d]+$/i, '') : (src.name || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '-copy-' + Date.now().toString(36);

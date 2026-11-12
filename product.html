@@ -6,7 +6,7 @@
   <title>ZENVY Performance Jersey | ZENVY Elite Performance</title>
   
   <script>
-    // Immediate pre-hydration to eliminate reload flash
+    // Immediate pre-hydration to eliminate reload flash and blank render
     (function() {
       try {
         var p = new URLSearchParams(window.location.search);
@@ -20,6 +20,24 @@
           if (item) {
             window._preloadedProduct = item;
             document.title = item.name + ' | ZENVY Elite Performance';
+            document.addEventListener('DOMContentLoaded', function() {
+              try {
+                var tEl = document.getElementById('pd-title');
+                if (tEl && item.name) tEl.textContent = item.name;
+                var bEl = document.getElementById('pd-breadcrumb-title');
+                if (bEl && item.name) bEl.textContent = item.name;
+                var pEl = document.getElementById('pd-base-price');
+                if (pEl && (item.salePrice || item.basePrice)) {
+                  pEl.textContent = '৳' + Math.round(item.salePrice || item.basePrice).toLocaleString();
+                }
+                var mImg = document.getElementById('main-product-img');
+                var imgUrl = item.image || item.imageUrl || (item.images && item.images[0] && (item.images[0].url || item.images[0]));
+                if (mImg && imgUrl && typeof imgUrl === 'string' && !imgUrl.includes('aida-public')) {
+                  mImg.src = imgUrl;
+                  mImg.alt = item.name;
+                }
+              } catch(e){}
+            });
           }
         }
       } catch(e){}
@@ -36,7 +54,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261112_v19">
+  <link rel="stylesheet" href="styles.css?v=20261112_v20">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -920,9 +938,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261112_v19"></script>
-  <script src="admin-db.js?v=20261112_v19"></script>
-  <script src="wishlist.js?v=20261112_v19"></script>
+  <script src="firebase-sync.js?v=20261112_v20"></script>
+  <script src="admin-db.js?v=20261112_v20"></script>
+  <script src="wishlist.js?v=20261112_v20"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1312,6 +1330,14 @@
 
         // If product was explicitly requested by ID/slug in URL, do NOT fallback to dummy product! Fetch direct from cloud
         if (!targetProduct && (prodId || prodSlug)) {
+          const tEl = document.getElementById('pd-title');
+          if (tEl && !tEl.textContent.trim()) {
+            tEl.innerHTML = '<span class="inline-block w-48 h-7 bg-gray-200 animate-pulse rounded-lg"></span>';
+          }
+          const pEl = document.getElementById('pd-base-price');
+          if (pEl && !pEl.textContent.trim()) {
+            pEl.innerHTML = '<span class="inline-block w-24 h-7 bg-gray-200 animate-pulse rounded-lg"></span>';
+          }
           fetchProductDirectFromCloud(prodId || prodSlug);
           return;
         }
@@ -1338,7 +1364,7 @@
 
       // Compute render hash to prevent redundant re-renders and background reload flashing
       const currentTitleEl = document.getElementById('pd-title');
-      const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}_${JSON.stringify(targetProduct.sizeStocks||{})}`;
+      const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${targetProduct.image || ''}_${targetProduct.slug || ''}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}_${JSON.stringify(targetProduct.sizeStocks||{})}`;
       const isSameProduct = (window._activeProductRenderHash === prodDataHash);
 
       productState.product = targetProduct;
@@ -1384,29 +1410,30 @@
       // 2. Product Images & Multi-Angle Setup (Immediate render)
       const primaryImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
         ? DB.products.getImage(targetProduct)
-        : (targetProduct.image || targetProduct.imageUrl || (Array.isArray(targetProduct.images) && targetProduct.images[0]?.url) || ANGLE_IMAGES.front);
+        : (targetProduct.image || targetProduct.imageUrl || (Array.isArray(targetProduct.images) && (targetProduct.images[0]?.url || targetProduct.images[0])) || DEFAULT_FRONT_IMAGE);
 
       const imagesList = [];
       if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
         targetProduct.images.forEach(img => {
-          const url = typeof img === 'string' ? img : (img.url || '');
-          if (url) imagesList.push(url);
+          const url = typeof img === 'string' ? img.trim() : (img?.url || '');
+          if (url && !imagesList.includes(url) && !url.includes('aida-public')) imagesList.push(url);
         });
       }
-      if (paramImage && !imagesList.includes(paramImage)) {
+      const cleanPrimary = (typeof primaryImg === 'string' && primaryImg.trim()) ? primaryImg.trim() : DEFAULT_FRONT_IMAGE;
+      if (!imagesList.includes(cleanPrimary) && !cleanPrimary.includes('aida-public')) {
+        imagesList.unshift(cleanPrimary);
+      }
+      if (paramImage && typeof paramImage === 'string' && !imagesList.includes(paramImage) && !paramImage.includes('aida-public')) {
         imagesList.unshift(paramImage);
       }
-      if (primaryImg && !imagesList.includes(primaryImg)) {
-        imagesList.unshift(primaryImg);
-      }
       if (imagesList.length === 0) {
-        imagesList.push(primaryImg || DEFAULT_FRONT_IMAGE);
+        imagesList.push(DEFAULT_FRONT_IMAGE);
       }
 
       productState.galleryImages = imagesList;
-      ANGLE_IMAGES.front = imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE;
-      ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE);
-      ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || primaryImg || DEFAULT_FRONT_IMAGE);
+      ANGLE_IMAGES.front = imagesList[0] || DEFAULT_FRONT_IMAGE;
+      ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || DEFAULT_FRONT_IMAGE);
+      ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || DEFAULT_FRONT_IMAGE);
 
       const mainImg = document.getElementById('main-product-img');
       if (mainImg) {
@@ -1414,9 +1441,9 @@
           this.onerror = null;
           this.src = DEFAULT_FRONT_IMAGE;
         };
-        const safeFront = (ANGLE_IMAGES.front && !ANGLE_IMAGES.front.includes('aida-public')) ? ANGLE_IMAGES.front : DEFAULT_FRONT_IMAGE;
+        const safeFront = (typeof ANGLE_IMAGES.front === 'string' && ANGLE_IMAGES.front && !ANGLE_IMAGES.front.includes('aida-public')) ? ANGLE_IMAGES.front : DEFAULT_FRONT_IMAGE;
         mainImg.src = safeFront;
-        mainImg.alt = targetProduct.name;
+        mainImg.alt = targetProduct.name || 'Jersey';
       }
 
       try {

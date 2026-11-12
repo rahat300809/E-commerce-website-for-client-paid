@@ -73,7 +73,7 @@ const Uploader = {
 
   // Read file as data URL (with automatic compression)
   async readAsDataURL(file, opts = {}) {
-    return await Uploader.compressImage(file, opts.maxDimension || 1400, opts.quality || 0.82);
+    return await Uploader.compressImage(file, opts.maxDimension || 900, opts.quality || 0.76);
   },
 
   // Process one file: validate + read

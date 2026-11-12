@@ -518,7 +518,15 @@ function syncHomepageContent() {
   const sliderEl = document.getElementById('product-slider');
   if (sliderEl && DB.products) {
     const published = DB.products.published();
-    const sliderHash = JSON.stringify(published.map(p => [p.id, p.name, p.salePrice || p.basePrice, p.stock, p.images?.[0]?.url || p.image]));
+    const sliderHash = JSON.stringify(published.map(p => [
+      p.id, 
+      p.name, 
+      p.salePrice || p.basePrice, 
+      p.stock, 
+      p.updatedAt || '', 
+      p.images?.[0]?.url || p.image || '', 
+      p.slug || ''
+    ]));
     if (sliderEl.dataset.sliderHash !== sliderHash) {
       sliderEl.dataset.sliderHash = sliderHash;
       if (published && published.length > 0) {
@@ -2242,7 +2250,15 @@ function renderShopProducts() {
   const pageProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
   const defaultImg = 'img/products/prod_mwafvhg25iobn348j.jpg';
 
-  const renderHash = `${shopActiveCategory}_${shopCurrentPage}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [p.id, p.name, p.salePrice || p.basePrice, p.stock]));
+  const renderHash = `${shopActiveCategory}_${shopCurrentPage}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [
+    p.id, 
+    p.name, 
+    p.salePrice || p.basePrice, 
+    p.stock, 
+    p.updatedAt || '', 
+    p.image || p.imageUrl || p.images?.[0]?.url || '', 
+    p.slug || ''
+  ]));
   if (grid.dataset.renderHash === renderHash && grid.children.length > 0) {
     return;
   }

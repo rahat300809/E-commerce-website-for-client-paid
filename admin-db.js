@@ -1259,7 +1259,8 @@ const DB = {
       if (!id) return null;
       const strId = String(id).trim().toLowerCase();
       const old = DB.products.byId(id);
-      const updates = { ...data, updatedAt: Store.now() };
+      const createdAt = data.createdAt || old?.createdAt || Store.now();
+      const updates = { ...data, createdAt, updatedAt: Store.now() };
       if (updates.isPreorder !== undefined) {
         updates.isPreorder = Boolean(updates.isPreorder);
       }
@@ -1294,6 +1295,12 @@ const DB = {
 
       Store.set('products', items);
       const resItem = updatedItem;
+      // Direct in-memory cache update for 0ms latency
+      if (Array.isArray(window._ZENVY_PRODUCTS_CACHE)) {
+        const cIdx = window._ZENVY_PRODUCTS_CACHE.findIndex(x => String(x.id).trim().toLowerCase() === strId);
+        if (cIdx >= 0) window._ZENVY_PRODUCTS_CACHE[cIdx] = resItem;
+        else window._ZENVY_PRODUCTS_CACHE.unshift(resItem);
+      }
       if (resItem && window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
         window.ZenvyFirebase.saveProduct(resItem);
       }
@@ -1309,15 +1316,15 @@ const DB = {
       const copy = JSON.parse(JSON.stringify(src));
       const newId = 'prod_' + Store.genId();
       copy.id = newId;
-      copy.name = src.name + ' (Copy)';
+      copy.name = src.name.replace(/\s*\(Copy(\s*\d+)?\)$/i, '') + ' (Copy)';
       copy.sku = (src.sku ? String(src.sku).replace(/-COPY-[\w\d]+$/i, '') : 'ZNV') + '-COPY-' + Date.now().toString(36).toUpperCase();
       copy.slug = (src.slug ? String(src.slug).replace(/-copy-[\w\d]+$/i, '') : (src.name || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '-copy-' + Date.now().toString(36);
-      copy.isPublished = src.isPublished !== undefined ? Boolean(src.isPublished) : true;
-      copy.status = copy.isPublished ? 'published' : 'draft';
-      copy.stock = typeof src.stock === 'number' ? src.stock : 10;
+      copy.isPublished = true;
+      copy.status = 'published';
+      copy.stock = (typeof src.stock === 'number' && src.stock > 0) ? src.stock : 10;
       copy.sizeStocks = (src.sizeStocks && typeof src.sizeStocks === 'object') ? JSON.parse(JSON.stringify(src.sizeStocks)) : null;
       copy.isArchived = false;
-      copy.isPreorder = false; // Duplicated products are NEVER preorders by default
+      copy.isPreorder = Boolean(src.isPreorder);
       copy.createdAt = Store.now();
       copy.updatedAt = Store.now();
 

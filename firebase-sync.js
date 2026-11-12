@@ -494,6 +494,14 @@
     await ensureDb();
     const pid = String(p.id).trim();
 
+    // Ensure timestamps and status are consistent
+    if (!p.createdAt) p.createdAt = new Date().toISOString();
+    p.updatedAt = new Date().toISOString();
+    if (p.isPublished === undefined) {
+      p.isPublished = p.status !== 'draft';
+    }
+    p.status = p.isPublished ? 'published' : 'draft';
+
     // Optimize payload before pushing to Firestore
     if (p.sizeChartImage && p.sizeChartImage.length > 50000) {
       p.sizeChartImage = '';
@@ -561,19 +569,25 @@
       } catch(e2){}
     }
 
-    // 2. Upload directly to Firestore /products/{pid}
+    // 2. Upload directly to Firestore /products/{pid} with merge to preserve fields
     if (_db) {
       try {
-        await _db.collection(FS_PRODUCTS_COLLECTION).doc(pid).set(sanitize(p));
+        await _db.collection(FS_PRODUCTS_COLLECTION).doc(pid).set(sanitize(p), { merge: true });
         console.log('[ZenvySync] Saved product to cloud /products:', p.name, pid);
       } catch(e) {
         console.warn('[ZenvySync] Cloud product save failed:', e);
       }
     }
 
+    // Update signature to avoid self-triggered re-render storms
+    try {
+      const currentProds = window._ZENVY_PRODUCTS_CACHE || [];
+      window._lastProductsSnapshotSignature = currentProds.map(it => `${it.id}_${it.updatedAt || ''}_${it.name || ''}_${it.salePrice || it.basePrice || ''}_${it.stock}_${it.status || ''}_${(it.images && it.images[0] && (it.images[0].url || it.images[0])) || it.image || ''}`).join('|');
+    } catch(e){}
+
     // 3. Broadcast to all open views & tabs
     window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products', isSelf: true } }));
   }
 
   async function deleteProductFromCloud(id) {
@@ -796,20 +810,85 @@
           }
         });
 
-        cloudProducts.sort((a, b) => {
-          const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        // MERGE LOGIC: Combine cloud data with existing local catalog so nothing ever vanishes
+        const localKey = `${DB_VERSION}_products`;
+        let localList = [];
+        try {
+          const raw = localStorage.getItem(localKey);
+          if (raw) localList = JSON.parse(raw);
+        } catch(e){}
+        if (!Array.isArray(localList) || localList.length === 0) {
+          if (Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
+            localList = window._ZENVY_PRODUCTS_CACHE;
+          }
+        }
+
+        const productMap = new Map();
+        cloudProducts.forEach(cp => {
+          const cId = String(cp.id || '').trim().toLowerCase();
+          if (cId) productMap.set(cId, cp);
+        });
+
+        if (Array.isArray(localList)) {
+          localList.forEach(lp => {
+            if (!lp || !lp.id) return;
+            const lId = String(lp.id).trim().toLowerCase();
+            if (deletedIds.has(String(lp.id).trim()) || deletedIds.has(lId)) return;
+            if (typeof isTestOrJunkProduct === 'function' && isTestOrJunkProduct(lp)) return;
+
+            const existingCloud = productMap.get(lId);
+            if (!existingCloud) {
+              // Local product not yet in cloud: retain it so it never vanishes!
+              productMap.set(lId, lp);
+              // Asynchronously push to cloud so other devices get it too
+              if (_db) {
+                try {
+                  _db.collection(FS_PRODUCTS_COLLECTION).doc(String(lp.id).trim()).set(sanitize(lp), { merge: true }).catch(() => {});
+                } catch(e){}
+              }
+            } else {
+              // Both local and cloud exist: check timestamps
+              const tLocal = lp.updatedAt ? new Date(lp.updatedAt).getTime() : 0;
+              const tCloud = existingCloud.updatedAt ? new Date(existingCloud.updatedAt).getTime() : 0;
+              if (tLocal > tCloud) {
+                // Local is newer! Preserve local edits
+                productMap.set(lId, { ...existingCloud, ...lp });
+              } else {
+                // Cloud is equal or newer, but preserve images if cloud lost them
+                const cloudHasImg = existingCloud.image || (existingCloud.images && existingCloud.images.length > 0);
+                const localHasImg = lp.image || (lp.images && lp.images.length > 0);
+                if (!cloudHasImg && localHasImg) {
+                  existingCloud.image = lp.image;
+                  existingCloud.imageUrl = lp.imageUrl;
+                  existingCloud.images = lp.images;
+                }
+              }
+            }
+          });
+        }
+
+        const mergedProducts = Array.from(productMap.values());
+        mergedProducts.sort((a, b) => {
+          const tA = (a.createdAt ? new Date(a.createdAt).getTime() : 0) || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0) || 0;
+          const tB = (b.createdAt ? new Date(b.createdAt).getTime() : 0) || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0) || 0;
           return tB - tA;
         });
 
-        window._ZENVY_PRODUCTS_CACHE = cloudProducts;
-        const localKey = `${DB_VERSION}_products`;
+        // Compute stable catalog signature to avoid redundant re-renders and loop thrashing
+        const newSig = mergedProducts.map(p => `${p.id}_${p.updatedAt || ''}_${p.name || ''}_${p.salePrice || p.basePrice || ''}_${p.stock}_${p.status || ''}_${(p.images && p.images[0] && (p.images[0].url || p.images[0])) || p.image || ''}`).join('|');
+        if (window._lastProductsSnapshotSignature === newSig) {
+          // No changes detected! Avoid redundant writes and event storms
+          return;
+        }
+        window._lastProductsSnapshotSignature = newSig;
+        window._ZENVY_PRODUCTS_CACHE = mergedProducts;
+
         try {
-          localStorage.setItem(localKey, JSON.stringify(cloudProducts));
+          localStorage.setItem(localKey, JSON.stringify(mergedProducts));
           localStorage.setItem(`${localKey}_updatedAt`, Date.now().toString());
         } catch(e) {
           try {
-            const slimmed = cloudProducts.map(p => {
+            const slimmed = mergedProducts.map(p => {
               const cp = { ...p };
               if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
               if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
@@ -820,9 +899,9 @@
           } catch(e2){}
         }
 
-        console.log(`[ZenvySync] Live product update received from server 🔄 (${cloudProducts.length} products)`);
+        console.log(`[ZenvySync] Live product update merged from server 🔄 (${mergedProducts.length} products)`);
         window.dispatchEvent(new Event('storage'));
-        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products', source: 'cloud-snapshot' } }));
         _listeners.forEach(cb => { try { cb(); } catch(e){} });
       }, err => {
         console.warn('[ZenvySync] Products collection listener warning:', err);

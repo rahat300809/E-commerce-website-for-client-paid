@@ -957,7 +957,14 @@ async function manualCloudSyncProducts() {
 window.manualCloudSyncProducts = manualCloudSyncProducts;
 
 // Instant Live Concurrency: Re-render products when another admin saves or updates on any device
+let _liveSyncPillTimer = null;
+let _lastLiveSyncPillTime = 0;
+let _prodRerenderDebounce = null;
+
 window.addEventListener('zenvy-store-updated', (e) => {
+  // If the event came from this tab's own save action, do not show "synced from server" pill or re-render again
+  if (e.detail && e.detail.isSelf) return;
+
   if (e.detail && (e.detail.key === 'products' || e.detail.key === 'all')) {
     if (typeof currentView !== 'undefined' && currentView === 'products') {
       const isModalOpen = !document.getElementById('generic-modal')?.classList.contains('hidden') ||
@@ -965,11 +972,18 @@ window.addEventListener('zenvy-store-updated', (e) => {
       const activeEl = document.activeElement;
       const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
       if (!isModalOpen && !isTyping) {
-        const content = document.getElementById('admin-content');
-        if (content) {
-          renderProducts(content);
-          showLiveSyncPill('🔄 Products synced from server');
-        }
+        clearTimeout(_prodRerenderDebounce);
+        _prodRerenderDebounce = setTimeout(() => {
+          const content = document.getElementById('admin-content');
+          if (content) {
+            renderProducts(content);
+            const now = Date.now();
+            if (now - _lastLiveSyncPillTime > 15000 && e.detail?.source === 'cloud-snapshot') {
+              _lastLiveSyncPillTime = now;
+              showLiveSyncPill('🔄 Products synced from server');
+            }
+          }
+        }, 150);
       }
     }
   }
@@ -2171,7 +2185,12 @@ function saveProduct(e, id, asDraft = false) {
     counter++;
   }
 
+  const existingProd = id ? DB.products.byId(id) : null;
+  const createdAt = (existingProd && existingProd.createdAt) ? existingProd.createdAt : Store.now();
+
   const data = {
+    id: id || undefined,
+    createdAt,
     name, sku, basePrice,
     shortDesc: get('shortDesc'),
     description: get('description'),
@@ -2257,23 +2276,20 @@ function saveProduct(e, id, asDraft = false) {
     toast('Product created successfully', 'success');
   }
 
-  // Push directly to cloud Firestore immediately so other devices see it
-  if (savedProd && window.ZenvyFirebase && typeof window.ZenvyFirebase.saveProduct === 'function') {
-    window.ZenvyFirebase.saveProduct(savedProd);
-  }
-
   // Clear temporary uploader cache
   window._lastFormImages = null;
 
-  // Trigger cross-tab/storefront storage sync
+  // Trigger cross-tab/storefront storage sync (isSelf: true prevents redundant pill spam)
   try {
-    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products', isSelf: true } }));
     window.dispatchEvent(new Event('storage'));
   } catch(e){}
 
   _isSavingModalForm = true;
   closeModal(true);
   productPage = 1;
+  productSort = 'newest';
+  productSearch = '';
   updateNavBadges();
   renderProducts(document.getElementById('admin-content'));
 }

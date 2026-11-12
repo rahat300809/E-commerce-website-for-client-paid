@@ -32,9 +32,10 @@
                 }
                 var mImg = document.getElementById('main-product-img');
                 var imgUrl = item.image || item.imageUrl || (item.images && item.images[0] && (item.images[0].url || item.images[0]));
-                if (mImg && imgUrl && typeof imgUrl === 'string' && !imgUrl.includes('aida-public')) {
-                  mImg.src = imgUrl;
-                  mImg.alt = item.name;
+                if (mImg) {
+                  var safeUrl = (imgUrl && typeof imgUrl === 'string' && !imgUrl.includes('aida-public')) ? imgUrl : 'img/products/prod_mwafvhg25iobn348j.jpg';
+                  mImg.src = safeUrl;
+                  mImg.alt = item.name || 'Performance Jersey';
                 }
               } catch(e){}
             });
@@ -54,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261112_v20">
+  <link rel="stylesheet" href="styles.css?v=20261112_v21">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -938,9 +939,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261112_v20"></script>
-  <script src="admin-db.js?v=20261112_v20"></script>
-  <script src="wishlist.js?v=20261112_v20"></script>
+  <script src="firebase-sync.js?v=20261112_v21"></script>
+  <script src="admin-db.js?v=20261112_v21"></script>
+  <script src="wishlist.js?v=20261112_v21"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State

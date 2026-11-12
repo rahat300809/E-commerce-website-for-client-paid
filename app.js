@@ -539,19 +539,19 @@ function syncHomepageContent() {
           return `
             <div class="min-w-[240px] sm:min-w-[270px] flex-shrink-0 group">
               <div class="bg-[#f5f5f7] rounded-2xl p-4 sm:p-5 mb-3 relative h-[260px] sm:h-[300px] flex items-center justify-center overflow-hidden cursor-pointer"
-                   onclick="window.location.href='product.html?id=${p.id}'">
+                   onclick="openProduct('${p.id}')">
                 ${isPreorderItem ? '<span class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">PRE-ORDER</span>' : '<span class="absolute top-3 left-3 bg-black text-white text-[10px] font-mono-ui font-bold px-2 py-0.5 rounded">NEW</span>'}
                 <button onclick="event.stopPropagation(); toggleWishlist('${p.name.replace(/'/g, "\\'")}', ${p.basePrice})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors z-10" aria-label="Wishlist">
                   <span class="material-symbols-outlined text-[16px]">favorite</span>
                 </button>
                 <img src="${imgUrl}" class="max-h-[200px] sm:max-h-[230px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md" alt="${p.name}"/>
                 <div class="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-white/95 to-transparent">
-                  <a href="product.html?id=${p.id}" class="block w-full text-center bg-black text-white text-xs font-bold py-2 rounded-full shadow">VIEW & CUSTOMIZE</a>
+                  <a href="product.html?id=${p.id}" onclick="event.preventDefault(); openProduct('${p.id}');" class="block w-full text-center bg-black text-white text-xs font-bold py-2 rounded-full shadow">VIEW & CUSTOMIZE</a>
                 </div>
               </div>
               <div class="flex justify-between items-start">
                 <div>
-                  <h4 class="font-headline text-sm font-bold text-black group-hover:underline cursor-pointer" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</h4>
+                  <h4 class="font-headline text-sm font-bold text-black group-hover:underline cursor-pointer" onclick="openProduct('${p.id}')">${p.name}</h4>
                   <p class="text-xs text-gray-500">${p.categoryName || 'Performance Edition'}</p>
                 </div>
                 <span class="font-mono-ui text-sm font-bold text-black">${priceDisplay}</span>
@@ -3026,17 +3026,47 @@ let pdState = { product: null, size: 'M', qty: 1 };
 
 function openProduct(product) {
   let prodId = '';
+  let prodObj = null;
   if (typeof product === 'string' || typeof product === 'number') {
-    prodId = product;
+    prodId = String(product);
+    if (typeof DB !== 'undefined' && DB.products) {
+      prodObj = DB.products.byId(prodId);
+    }
   } else if (product && typeof product === 'object') {
-    prodId = product.id || product.slug || '';
+    prodId = String(product.id || product.slug || '');
+    prodObj = product;
   }
+
+  if (!prodObj && prodId && typeof DB !== 'undefined' && DB.products) {
+    prodObj = DB.products.byId(prodId);
+  }
+
+  if (prodObj) {
+    try {
+      const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+        ? DB.products.getImage(prodObj)
+        : (prodObj.image || prodObj.imageUrl || (Array.isArray(prodObj.images) && (prodObj.images[0]?.url || prodObj.images[0])) || '');
+      sessionStorage.setItem('zenvy_active_product_preview', JSON.stringify({
+        id: String(prodObj.id || prodId),
+        slug: String(prodObj.slug || ''),
+        name: prodObj.name || '',
+        price: prodObj.salePrice || prodObj.basePrice || 0,
+        salePrice: prodObj.salePrice || prodObj.basePrice || 0,
+        basePrice: prodObj.basePrice || 0,
+        compareAt: prodObj.compareAt || 0,
+        image: img,
+        categoryName: prodObj.categoryName || ''
+      }));
+    } catch(e){}
+  }
+
   if (prodId) {
     window.location.href = `product.html?id=${encodeURIComponent(prodId)}`;
   } else {
     window.location.href = 'product.html';
   }
 }
+window.openProduct = openProduct;
 
 function closeProduct() {
   const modal = document.getElementById('product-modal');
@@ -4022,7 +4052,7 @@ function renderWishlistDrawer() {
       <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'}" class="w-14 h-14 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
       <div class="flex-1 min-w-0">
         <div class="flex justify-between items-start">
-          <h4 class="font-bold text-xs text-black truncate cursor-pointer hover:underline" onclick="window.location.href='product.html?id=${item.id}'">${item.name}</h4>
+          <h4 class="font-bold text-xs text-black truncate cursor-pointer hover:underline" onclick="openProduct('${item.id}')">${item.name}</h4>
           <button onclick="removeWishlistItem(${idx})" class="text-gray-400 hover:text-red-500 p-0.5 cursor-pointer" title="Remove">
             <span class="material-symbols-outlined text-base">close</span>
           </button>
@@ -4031,7 +4061,7 @@ function renderWishlistDrawer() {
         <div class="flex justify-between items-center mt-2">
           <span class="font-mono-ui font-black text-xs text-black">৳${Math.round(item.price || 1450).toLocaleString()}</span>
           <div class="flex items-center gap-1.5">
-            <a href="product.html?id=${item.id}" class="text-[11px] font-bold text-blue-700 hover:underline">View Kit</a>
+            <a href="product.html?id=${item.id}" onclick="event.preventDefault(); openProduct('${item.id}');" class="text-[11px] font-bold text-blue-700 hover:underline">View Kit</a>
             <button onclick="addWishlistItemToCart(${idx})" class="bg-black hover:bg-neutral-800 text-white text-[10px] font-bold px-2.5 py-1 rounded-full cursor-pointer flex items-center gap-1">
               <span class="material-symbols-outlined text-[13px]">add_shopping_cart</span>
               <span>Add</span>

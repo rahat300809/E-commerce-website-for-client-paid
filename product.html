@@ -6,39 +6,50 @@
   <title>ZENVY Performance Jersey | ZENVY Elite Performance</title>
   
   <script>
-    // Immediate pre-hydration to eliminate reload flash and blank render
+    // Immediate 0ms pre-hydration: eliminate reload flash and any wrong product render
     (function() {
       try {
         var p = new URLSearchParams(window.location.search);
         var pid = (p.get('id') || p.get('slug') || '').trim().toLowerCase();
-        var raw = localStorage.getItem('zenvy_v1_products');
-        if (pid && raw) {
-          var list = JSON.parse(raw);
-          var item = list.find(function(x) {
-            return String(x.id).trim().toLowerCase() === pid || String(x.slug||'').trim().toLowerCase() === pid;
-          });
-          if (item) {
-            window._preloadedProduct = item;
-            document.title = item.name + ' | ZENVY Elite Performance';
-            document.addEventListener('DOMContentLoaded', function() {
-              try {
-                var tEl = document.getElementById('pd-title');
-                if (tEl && item.name) tEl.textContent = item.name;
-                var bEl = document.getElementById('pd-breadcrumb-title');
-                if (bEl && item.name) bEl.textContent = item.name;
-                var pEl = document.getElementById('pd-base-price');
-                if (pEl && (item.salePrice || item.basePrice)) {
-                  pEl.textContent = '৳' + Math.round(item.salePrice || item.basePrice).toLocaleString();
-                }
-                var mImg = document.getElementById('main-product-img');
-                var imgUrl = item.image || item.imageUrl || (item.images && item.images[0] && (item.images[0].url || item.images[0]));
-                if (mImg) {
-                  var safeUrl = (imgUrl && typeof imgUrl === 'string' && !imgUrl.includes('aida-public')) ? imgUrl : 'img/products/prod_mwafvhg25iobn348j.jpg';
-                  mImg.src = safeUrl;
-                  mImg.alt = item.name || 'Performance Jersey';
-                }
-              } catch(e){}
-            });
+        var item = null;
+
+        // 1. Instant session preview (from clicked product card - 0ms synchronous latency)
+        try {
+          var sessRaw = sessionStorage.getItem('zenvy_active_product_preview');
+          if (sessRaw) {
+            var sessObj = JSON.parse(sessRaw);
+            if (sessObj && (!pid || String(sessObj.id).trim().toLowerCase() === pid || String(sessObj.slug||'').trim().toLowerCase() === pid)) {
+              item = sessObj;
+            }
+          }
+        } catch(e){}
+
+        // 2. Local storage products lookup
+        if (!item && pid) {
+          try {
+            var raw = localStorage.getItem('zenvy_v1_products');
+            if (raw) {
+              var list = JSON.parse(raw);
+              item = list.find(function(x) {
+                return String(x.id).trim().toLowerCase() === pid || String(x.slug||'').trim().toLowerCase() === pid;
+              });
+            }
+          } catch(e){}
+        }
+
+        if (item) {
+          window._preloadedProduct = item;
+          if (item.name) document.title = item.name + ' | ZENVY Elite Performance';
+          var imgUrl = item.image || item.imageUrl || (item.images && item.images[0] && (item.images[0].url || item.images[0]));
+          if (imgUrl && typeof imgUrl === 'string' && !imgUrl.includes('aida-public')) {
+            window._preloadedImageUrl = imgUrl;
+            try {
+              var preloadLink = document.createElement('link');
+              preloadLink.rel = 'preload';
+              preloadLink.as = 'image';
+              preloadLink.href = imgUrl;
+              document.head.appendChild(preloadLink);
+            } catch(e){}
           }
         }
       } catch(e){}
@@ -55,7 +66,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261112_v23">
+  <link rel="stylesheet" href="styles.css?v=20261112_v24">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -307,10 +318,20 @@
     <nav class="text-xs font-mono-ui text-gray-500 mb-3 sm:mb-4 flex items-center gap-1.5 flex-wrap">
       <a href="index.html" class="hover:text-black">Home</a>
       <span>/</span>
-      <a href="index.html#shop" id="pd-breadcrumb-cat" class="hover:text-black">Men's Football</a>
+      <a href="index.html#shop" id="pd-breadcrumb-cat" class="hover:text-black">Shop</a>
       <span>/</span>
-      <span id="pd-breadcrumb-title" class="text-black font-bold truncate max-w-[220px] sm:max-w-md">Product Details</span>
+      <span id="pd-breadcrumb-title" class="text-black font-bold truncate max-w-[220px] sm:max-w-md"></span>
     </nav>
+    <script>
+      (function() {
+        if (window._preloadedProduct) {
+          var bEl = document.getElementById('pd-breadcrumb-title');
+          if (bEl && window._preloadedProduct.name) bEl.textContent = window._preloadedProduct.name;
+          var cEl = document.getElementById('pd-breadcrumb-cat');
+          if (cEl && window._preloadedProduct.categoryName) cEl.textContent = window._preloadedProduct.categoryName;
+        }
+      })();
+    </script>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10 items-start">
       
@@ -324,12 +345,23 @@
           
           <div class="relative w-full h-[270px] sm:h-[340px] md:h-[460px] flex items-center justify-center p-4 sm:p-6 md:p-8">
             
-            <!-- Cutout Jersey Image -->
+            <!-- Cutout Jersey Image (Zero wrong-product flash) -->
             <img id="main-product-img" 
-                 src="img/products/prod_mwafvhg25iobn348j.jpg" 
-                 onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" 
+                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3C/svg%3E" 
+                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 400\'%3E%3C/svg%3E';" 
                  alt="Performance Jersey" 
-                 class="max-h-[220px] sm:max-h-[280px] md:max-h-[400px] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300 group-hover:scale-105"/>
+                 class="max-h-[220px] sm:max-h-[280px] md:max-h-[400px] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-opacity duration-200 opacity-0 group-hover:scale-105"/>
+            <script>
+              (function() {
+                var mImg = document.getElementById('main-product-img');
+                if (mImg && window._preloadedImageUrl) {
+                  mImg.src = window._preloadedImageUrl;
+                  mImg.alt = (window._preloadedProduct && window._preloadedProduct.name) ? window._preloadedProduct.name : 'Performance Jersey';
+                  mImg.classList.remove('opacity-0');
+                  mImg.classList.add('opacity-100');
+                }
+              })();
+            </script>
 
             <!-- Real-time Customization Overlay for Name & Number (Back View) -->
             <div id="live-custom-text-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden" style="top: -10px;">
@@ -391,8 +423,15 @@
         <!-- Header Info -->
         <div class="space-y-1">
           <!-- Product Title -->
-          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight min-h-[32px]">
-          </h1>
+          <h1 id="pd-title" class="font-headline text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight min-h-[32px]"></h1>
+          <script>
+            (function() {
+              if (window._preloadedProduct && window._preloadedProduct.name) {
+                var tEl = document.getElementById('pd-title');
+                if (tEl) tEl.textContent = window._preloadedProduct.name;
+              }
+            })();
+          </script>
 
           <!-- Subtitle / Team / Category -->
           <div class="text-xs font-mono-ui font-bold text-blue-900 flex items-center gap-2 flex-wrap">
@@ -407,6 +446,17 @@
             <span id="pd-base-price" class="font-headline font-black text-2xl sm:text-3xl text-black"></span>
             <span id="pd-discount-badge" class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">SALE</span>
           </div>
+          <script>
+            (function() {
+              if (window._preloadedProduct) {
+                var pr = window._preloadedProduct.salePrice || window._preloadedProduct.basePrice || window._preloadedProduct.price;
+                if (pr) {
+                  var pEl = document.getElementById('pd-base-price');
+                  if (pEl) pEl.textContent = '৳' + Math.round(pr).toLocaleString();
+                }
+              }
+            })();
+          </script>
           <!-- Product Short Description -->
           <p id="pd-short-desc" class="text-xs text-gray-600 leading-relaxed pt-1.5 hidden"></p>
 
@@ -939,9 +989,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261112_v23"></script>
-  <script src="admin-db.js?v=20261112_v23"></script>
-  <script src="wishlist.js?v=20261112_v23"></script>
+  <script src="firebase-sync.js?v=20261112_v24"></script>
+  <script src="admin-db.js?v=20261112_v24"></script>
+  <script src="wishlist.js?v=20261112_v24"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -966,10 +1016,10 @@
     };
     window.productState = productState;
 
-    // Authentic High-Res Default Angles (Local High-Resolution Bundled Jerseys)
-    const DEFAULT_FRONT_IMAGE = 'img/products/prod_mwafvhg25iobn348j.jpg';
-    const DEFAULT_BACK_IMAGE = 'img/products/prod_mwafxrols41103ror.jpg';
-    const DEFAULT_DETAIL_IMAGE = 'img/products/mw8a6nc4ecqhhqgcv.jpg';
+    // Neutral fallback silhouette SVG - NEVER a specific team's kit!
+    const DEFAULT_FRONT_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23f8f9fa'/%3E%3Cpath d='M200 130 C170 130 150 150 140 180 L110 200 L130 230 L150 215 L150 280 L250 280 L250 215 L270 230 L290 200 L260 180 C250 150 230 130 200 130 Z' fill='%23e5e7eb'/%3E%3C/svg%3E";
+    const DEFAULT_BACK_IMAGE = DEFAULT_FRONT_IMAGE;
+    const DEFAULT_DETAIL_IMAGE = DEFAULT_FRONT_IMAGE;
 
     // Images for different angles
     const ANGLE_IMAGES = {
@@ -1214,6 +1264,21 @@
     async function fetchProductDirectFromCloud(idOrSlug) {
       if (!idOrSlug || _fetchingProdDirect) return;
       _fetchingProdDirect = true;
+
+      // Show neutral loader so NO other product flashes in the background
+      const container = document.getElementById('main-view-container');
+      let spinner = document.getElementById('cloud-prod-spinner');
+      if (container && !spinner) {
+        spinner = document.createElement('div');
+        spinner.id = 'cloud-prod-spinner';
+        spinner.className = 'absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-xs z-30 transition-opacity';
+        spinner.innerHTML = `
+          <div class="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs font-bold text-gray-500 mt-2.5 font-headline">জার্সি লোড হচ্ছে...</span>
+        `;
+        container.appendChild(spinner);
+      }
+
       try {
         if (window.ZenvyFirebase && typeof window.ZenvyFirebase.ensureDb === 'function') {
           const db = await window.ZenvyFirebase.ensureDb();
@@ -1231,6 +1296,8 @@
                 if (idx >= 0) window._ZENVY_PRODUCTS_CACHE[idx] = pData;
                 else window._ZENVY_PRODUCTS_CACHE.unshift(pData);
               }
+              const sp = document.getElementById('cloud-prod-spinner');
+              if (sp) sp.remove();
               renderTargetProduct(pData);
               _fetchingProdDirect = false;
               return;
@@ -1240,6 +1307,8 @@
       } catch(e) {
         console.warn('[ProductPage] Direct Firestore fetch notice:', e);
       }
+      const sp = document.getElementById('cloud-prod-spinner');
+      if (sp) sp.remove();
       _fetchingProdDirect = false;
       // Product was explicitly requested by ID/slug but not found in Firestore (or was deleted)
       renderProductNotFound();
@@ -1368,6 +1437,9 @@
       const prodDataHash = `${targetProduct.id}_${targetProduct.updatedAt || ''}_${targetProduct.name}_${targetProduct.salePrice || targetProduct.basePrice}_${targetProduct.image || ''}_${targetProduct.slug || ''}_${(targetProduct.assignedSleeves||[]).join()}_${(targetProduct.assignedSizes||[]).join()}_${targetProduct.stock}_${JSON.stringify(targetProduct.sizeStocks||{})}`;
       const isSameProduct = (window._activeProductRenderHash === prodDataHash);
 
+      const sp = document.getElementById('cloud-prod-spinner');
+      if (sp) sp.remove();
+
       productState.product = targetProduct;
       productState.basePrice = parseFloat(targetProduct.salePrice || targetProduct.basePrice || 1450.00);
 
@@ -1411,7 +1483,7 @@
       // 2. Product Images & Multi-Angle Setup (Immediate render)
       const primaryImg = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
         ? DB.products.getImage(targetProduct)
-        : (targetProduct.image || targetProduct.imageUrl || (Array.isArray(targetProduct.images) && (targetProduct.images[0]?.url || targetProduct.images[0])) || DEFAULT_FRONT_IMAGE);
+        : (targetProduct.image || targetProduct.imageUrl || (Array.isArray(targetProduct.images) && (targetProduct.images[0]?.url || targetProduct.images[0])) || '');
 
       const imagesList = [];
       if (targetProduct.images && Array.isArray(targetProduct.images) && targetProduct.images.length > 0) {
@@ -1420,30 +1492,32 @@
           if (url && !imagesList.includes(url) && !url.includes('aida-public')) imagesList.push(url);
         });
       }
-      const cleanPrimary = (typeof primaryImg === 'string' && primaryImg.trim()) ? primaryImg.trim() : DEFAULT_FRONT_IMAGE;
-      if (!imagesList.includes(cleanPrimary) && !cleanPrimary.includes('aida-public')) {
+      const cleanPrimary = (typeof primaryImg === 'string' && primaryImg.trim()) ? primaryImg.trim() : '';
+      if (cleanPrimary && !imagesList.includes(cleanPrimary) && !cleanPrimary.includes('aida-public')) {
         imagesList.unshift(cleanPrimary);
       }
       if (paramImage && typeof paramImage === 'string' && !imagesList.includes(paramImage) && !paramImage.includes('aida-public')) {
         imagesList.unshift(paramImage);
       }
-      if (imagesList.length === 0) {
-        imagesList.push(DEFAULT_FRONT_IMAGE);
-      }
 
       productState.galleryImages = imagesList;
-      ANGLE_IMAGES.front = imagesList[0] || DEFAULT_FRONT_IMAGE;
-      ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : (imagesList[0] || DEFAULT_FRONT_IMAGE);
-      ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : (imagesList[0] || DEFAULT_FRONT_IMAGE);
+      const fallbackImg = imagesList[0] || DEFAULT_FRONT_IMAGE;
+      ANGLE_IMAGES.front = imagesList[0] || fallbackImg;
+      ANGLE_IMAGES.back = (imagesList.length > 1 && imagesList[1] !== ANGLE_IMAGES.front) ? imagesList[1] : fallbackImg;
+      ANGLE_IMAGES.detail = (imagesList.length > 2 && imagesList[2] !== ANGLE_IMAGES.front) ? imagesList[2] : fallbackImg;
 
       const mainImg = document.getElementById('main-product-img');
       if (mainImg) {
         mainImg.onerror = function() {
           this.onerror = null;
-          this.src = DEFAULT_FRONT_IMAGE;
+          if (fallbackImg) this.src = fallbackImg;
         };
-        const safeFront = (typeof ANGLE_IMAGES.front === 'string' && ANGLE_IMAGES.front && !ANGLE_IMAGES.front.includes('aida-public')) ? ANGLE_IMAGES.front : DEFAULT_FRONT_IMAGE;
-        mainImg.src = safeFront;
+        const safeFront = (typeof ANGLE_IMAGES.front === 'string' && ANGLE_IMAGES.front && !ANGLE_IMAGES.front.includes('aida-public')) ? ANGLE_IMAGES.front : fallbackImg;
+        if (safeFront) {
+          mainImg.src = safeFront;
+          mainImg.classList.remove('opacity-0');
+          mainImg.classList.add('opacity-100');
+        }
         mainImg.alt = targetProduct.name || 'Jersey';
       }
 
@@ -1871,20 +1945,22 @@
       const strip = document.getElementById('product-thumbs-strip');
       if (!strip) return;
 
-      const items = [
-        { label: 'Front', img: ANGLE_IMAGES.front, angle: 'front' },
-        { label: 'Back', img: ANGLE_IMAGES.back, angle: 'back' },
-        { label: 'Fabric', img: ANGLE_IMAGES.detail, angle: 'detail' }
-      ];
+      const validImages = Array.isArray(images) ? images.filter(x => x && typeof x === 'string' && !x.includes('aida-public')) : [];
+      if (validImages.length <= 1) {
+        // If product has only 1 image, don't show duplicate fake thumbnails
+        strip.innerHTML = '';
+        strip.style.display = 'none';
+        return;
+      }
+      strip.style.display = 'flex';
 
-      // Add extra images if available
-      (images || []).forEach((url, i) => {
-        if (!items.some(it => it.img === url)) {
-          items.push({ label: `Angle ${i+1}`, img: url, angle: 'custom', customUrl: url });
-        }
+      const items = validImages.map((url, i) => {
+        const label = i === 0 ? 'Front' : (i === 1 ? 'Back' : (i === 2 ? 'Detail' : `Angle ${i+1}`));
+        const angle = i === 0 ? 'front' : (i === 1 ? 'back' : (i === 2 ? 'detail' : 'custom'));
+        return { label, img: url, angle, customUrl: url };
       });
 
-      const tHash = JSON.stringify(items.map(it => [it.angle, it.img, it.customUrl]));
+      const tHash = JSON.stringify(items.map(it => [it.angle, it.img]));
       if (strip.dataset.thumbsHash === tHash && strip.children.length > 0) return;
       strip.dataset.thumbsHash = tHash;
 
@@ -1892,7 +1968,7 @@
         <button type="button" 
                 onclick="handleThumbClick('${it.angle}', '${it.customUrl || ''}', this)" 
                 class="thumb-btn flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 ${idx === 0 ? 'border-black' : 'border-gray-200'} overflow-hidden bg-white p-1 hover:border-gray-400 transition-all flex items-center justify-center cursor-pointer shadow-xs">
-          <img src="${it.img}" onerror="this.onerror=null; this.src='img/products/prod_mwafvhg25iobn348j.jpg';" class="w-full h-full object-contain" alt="${it.label}"/>
+          <img src="${it.img}" onerror="this.onerror=null; this.style.display='none';" class="w-full h-full object-contain" alt="${it.label}"/>
         </button>
       `).join('');
     }

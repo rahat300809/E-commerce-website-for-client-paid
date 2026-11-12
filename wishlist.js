@@ -154,7 +154,7 @@
         <img src="${item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80'}" class="w-14 h-14 object-contain rounded-xl bg-gray-50 p-1 flex-shrink-0" alt="${item.name}"/>
         <div class="flex-1 min-w-0">
           <div class="flex justify-between items-start">
-            <h4 class="font-bold text-xs text-black truncate cursor-pointer hover:underline" onclick="window.location.href='product.html?id=${item.id}'">${item.name}</h4>
+            <h4 class="font-bold text-xs text-black truncate cursor-pointer hover:underline" onclick="if(typeof openProduct==='function'){openProduct('${item.id}');}else{window.location.href='product.html?id=${item.id}';}">${item.name}</h4>
             <button onclick="removeWishlistItem(${idx})" class="text-gray-400 hover:text-red-500 p-0.5 cursor-pointer" title="Remove">
               <span class="material-symbols-outlined text-base">close</span>
             </button>

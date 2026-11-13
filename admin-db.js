@@ -2423,7 +2423,7 @@ if (typeof window !== 'undefined') {
 
 // Initialize in-memory cache with active catalog baseline for instant 0ms first paint
 try {
-  const initRaw = localStorage.getItem(${DB_VERSION}_products);
+  const initRaw = localStorage.getItem(`${DB_VERSION}_products`);
   let initProds = [];
   if (initRaw) {
     try { initProds = JSON.parse(initRaw); } catch(e){}
@@ -2467,7 +2467,7 @@ try {
 
   window._ZENVY_PRODUCTS_CACHE = merged;
   try {
-    localStorage.setItem(${DB_VERSION}_products, JSON.stringify(merged));
+    localStorage.setItem(`${DB_VERSION}_products`, JSON.stringify(merged));
   } catch(e){}
 } catch(e) {
   window._ZENVY_PRODUCTS_CACHE = JSON.parse(JSON.stringify(ACTIVE_CATALOG_BASELINE || []));
@@ -3024,9 +3024,6 @@ const DB = {
         .sort((a, b) => {
           const tA = (a.createdAt ? new Date(a.createdAt).getTime() : 0) || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0) || 0;
           const tB = (b.createdAt ? new Date(b.createdAt).getTime() : 0) || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0) || 0;
-          return tB - tA; // Newest products at the top!
-        });
-    },
           return tB - tA; // Newest products at the top!
         });
     },

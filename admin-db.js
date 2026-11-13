@@ -4560,20 +4560,22 @@ try {
 // Core Storage Engine
 // ──────────────────────────────────────────────────────────
 const Store = {
-  get(key) {
+  get(key, def = []) {
     if (key === 'products' && Array.isArray(window._ZENVY_PRODUCTS_CACHE) && window._ZENVY_PRODUCTS_CACHE.length > 0) {
       return window._ZENVY_PRODUCTS_CACHE.filter(p => !isTestOrJunkProduct(p));
     }
     try { 
-      const res = JSON.parse(localStorage.getItem(`${DB_VERSION}_${key}`) || '[]');
+      const raw = localStorage.getItem(`${DB_VERSION}_${key}`);
+      if (raw === null) return def;
+      const res = JSON.parse(raw);
       if (key === 'products' && Array.isArray(res) && res.length > 0) {
         const filtered = res.filter(p => !isTestOrJunkProduct(p));
         window._ZENVY_PRODUCTS_CACHE = filtered;
         return filtered;
       }
-      return res;
+      return res !== null && res !== undefined ? res : def;
     }
-    catch { return []; }
+    catch { return def; }
   },
   getObj(key, def = {}) {
     try { return JSON.parse(localStorage.getItem(`${DB_VERSION}_${key}`) || JSON.stringify(def)); }
@@ -4965,7 +4967,15 @@ const DB = {
       }
     ],
     all() {
-      let items = Store.get('categories');
+      const raw = localStorage.getItem(`${DB_VERSION}_categories`);
+      let items = [];
+      if (raw === null) {
+        items = JSON.parse(JSON.stringify(this.defaultItems));
+        Store.set('categories', items);
+      } else {
+        try { items = JSON.parse(raw) || []; } catch(e){ items = []; }
+      }
+
       const delKey = `${DB_VERSION}_deleted_category_ids`;
       let deletedIds = new Set();
       try {
@@ -4973,11 +4983,7 @@ const DB = {
         if (delRaw) deletedIds = new Set(JSON.parse(delRaw));
       } catch(e){}
 
-      if (!items || !Array.isArray(items) || items.length === 0) {
-        items = JSON.parse(JSON.stringify(this.defaultItems));
-        Store.set('categories', items);
-      }
-      return items
+      return (items || [])
         .filter(c => {
           if (!c) return false;
           const cid = String(c.id || '').trim().toLowerCase();
@@ -4995,9 +5001,25 @@ const DB = {
       return (this.all() || []).filter(c => c.isActive !== false);
     },
     create(data) {
-      const items = this.all() || [];
-      const item = { id: Store.genId(), ...data, createdAt: Store.now(), updatedAt: Store.now() };
+      const items = (this.all() || []).slice();
+      const item = { id: 'cat_' + Store.genId(), ...data, createdAt: Store.now(), updatedAt: Store.now() };
       items.push(item);
+
+      // Clean from deleted tracking if re-added
+      const delKey = `${DB_VERSION}_deleted_category_ids`;
+      try {
+        const raw = localStorage.getItem(delKey);
+        if (raw) {
+          let delIds = JSON.parse(raw);
+          if (Array.isArray(delIds)) {
+            const strSlug = String(item.slug || '').trim().toLowerCase();
+            const strId = String(item.id || '').trim().toLowerCase();
+            delIds = delIds.filter(x => x !== strSlug && x !== strId);
+            localStorage.setItem(delKey, JSON.stringify(delIds));
+          }
+        }
+      } catch(e){}
+
       Store.set('categories', items);
       DB.log(`Category created: ${item.name}`);
       return item;
@@ -5005,6 +5027,21 @@ const DB = {
     update(id, data) {
       const strId = String(id).trim().toLowerCase();
       const items = (this.all() || []).map(c => (String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
+
+      // Clean from deleted tracking if updated
+      const delKey = `${DB_VERSION}_deleted_category_ids`;
+      try {
+        const raw = localStorage.getItem(delKey);
+        if (raw) {
+          let delIds = JSON.parse(raw);
+          if (Array.isArray(delIds)) {
+            const strSlug = String(data.slug || '').trim().toLowerCase();
+            delIds = delIds.filter(x => x !== strSlug && x !== strId);
+            localStorage.setItem(delKey, JSON.stringify(delIds));
+          }
+        }
+      } catch(e){}
+
       Store.set('categories', items);
       DB.log(`Category updated: ${data.name || id}`);
       return items.find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(data.slug||'').trim().toLowerCase() === String(c.slug||'').trim().toLowerCase());
@@ -5015,20 +5052,21 @@ const DB = {
       const items = (this.all() || []).filter(c => String(c.id).trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
       Store.set('categories', items);
 
-      // Track deletion permanently in cloud and local deleted tracking
+      // 1. Immediately record in local deleted category registry
+      const delKey = `${DB_VERSION}_deleted_category_ids`;
+      try {
+        let delIds = [];
+        const raw = localStorage.getItem(delKey);
+        if (raw) delIds = JSON.parse(raw);
+        if (!delIds.includes(strId)) delIds.push(strId);
+        if (cat && cat.slug && !delIds.includes(String(cat.slug).trim().toLowerCase())) delIds.push(String(cat.slug).trim().toLowerCase());
+        localStorage.setItem(delKey, JSON.stringify(delIds));
+      } catch(e){}
+
+      // 2. Track in cloud Firestore
       if (window.ZenvyFirebase && typeof window.ZenvyFirebase.deleteCategory === 'function') {
         window.ZenvyFirebase.deleteCategory(id);
         if (cat && cat.slug) window.ZenvyFirebase.deleteCategory(cat.slug);
-      } else {
-        const delKey = `${DB_VERSION}_deleted_category_ids`;
-        try {
-          let delIds = [];
-          const raw = localStorage.getItem(delKey);
-          if (raw) delIds = JSON.parse(raw);
-          if (!delIds.includes(strId)) delIds.push(strId);
-          if (cat && cat.slug && !delIds.includes(String(cat.slug).trim().toLowerCase())) delIds.push(String(cat.slug).trim().toLowerCase());
-          localStorage.setItem(delKey, JSON.stringify(delIds));
-        } catch(e){}
       }
 
       try {
@@ -5103,11 +5141,11 @@ const DB = {
     ],
     all() {
       let items = Store.get('collections');
-      if (!items || !Array.isArray(items) || items.length === 0) {
+      if (items === null || !Array.isArray(items)) {
         items = JSON.parse(JSON.stringify(this.defaultItems));
         Store.set('collections', items);
       }
-      return items;
+      return items || [];
     },
     active() { return (this.all() || []).filter(c => c.isActive !== false); },
     byId(id) { return (this.all() || []).find(c => c.id === id); },
@@ -6078,11 +6116,11 @@ const DB = {
     ],
     all() {
       let items = Store.get('banners');
-      if (!items || !Array.isArray(items) || items.length === 0) {
+      if (items === null || !Array.isArray(items)) {
         items = JSON.parse(JSON.stringify(this.defaultItems));
         Store.set('banners', items);
       }
-      return items.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+      return (items || []).sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
     },
     active() { return (this.all() || []).filter(b => b.isActive !== false); },
     byId(id) { return (this.all() || []).find(b => b.id === id); },
@@ -7080,9 +7118,11 @@ const DB = {
 
   // ── Shorthand log ──
   log(msg) {
-    const items = Store.get('activityLog');
-    items.unshift({ id: Store.genId(), action: msg, admin: 'Admin', date: Store.now() });
-    Store.set('activityLog', items.slice(0, 1000));
+    try {
+      const items = Store.get('activityLog') || [];
+      items.unshift({ id: Store.genId(), action: msg, admin: 'Admin', date: Store.now() });
+      Store.set('activityLog', items.slice(0, 1000));
+    } catch(e){}
   },
 
   // ── Analytics ──

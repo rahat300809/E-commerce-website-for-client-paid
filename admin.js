@@ -2365,7 +2365,7 @@ function renderCategories(container) {
                     <td class="actions-cell" style="min-width:130px;text-align:right;white-space:nowrap;">
                       <button class="btn btn-ghost btn-sm" onclick="openCategoryForm('${c.id}')" title="Edit Category"><span class="material-symbols-outlined">edit</span></button>
                       <button class="btn btn-ghost btn-sm" onclick="toggleCategory('${c.id}')" title="Toggle Active"><span class="material-symbols-outlined">${c.isActive?'visibility_off':'visibility'}</span></button>
-                      <button class="btn btn-ghost btn-sm text-red" onclick="deleteCat('${c.id}', ${JSON.stringify(c.name)})" title="Delete Category"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                      <button class="btn btn-ghost btn-sm text-red" onclick="deleteCat('${c.id}')" title="Delete Category"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                     </td>
                   </tr>
                   ${DB.subcategories.byCategory(c.id).map(s => `
@@ -2377,7 +2377,7 @@ function renderCategories(container) {
                       <td></td>
                       <td class="actions-cell" style="min-width:130px;text-align:right;white-space:nowrap;">
                         <button class="btn btn-ghost btn-sm" onclick="openSubcatForm('${s.id}','${c.id}')" title="Edit Subcategory"><span class="material-symbols-outlined">edit</span></button>
-                        <button class="btn btn-ghost btn-sm" onclick="DB.subcategories.delete('${s.id}');renderCategories(document.getElementById('admin-content'));toast('Deleted','success')" title="Delete Subcategory"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
+                        <button class="btn btn-ghost btn-sm text-red" onclick="deleteSubcat('${s.id}')" title="Delete Subcategory"><span class="material-symbols-outlined" style="color:#DC2626">delete</span></button>
                       </td>
                     </tr>
                   `).join('')}
@@ -2405,13 +2405,32 @@ function toggleCategory(id) {
 window.toggleCategory = toggleCategory;
 
 function deleteCat(id, name) {
-  showConfirm('Delete Category', `Are you sure you want to delete category "${name}"? This will not delete products assigned to this category.`, () => {
+  const cat = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.byId(id) : null;
+  const catName = name || (cat ? cat.name : 'this category');
+  showConfirm('Delete Category', `Are you sure you want to delete category "${catName}"? This will not delete products assigned to this category.`, () => {
     DB.categories.delete(id);
-    toast(`Category "${name}" deleted successfully`, 'success');
+    toast(`Category "${catName}" deleted successfully`, 'success');
     renderCategories(document.getElementById('admin-content'));
-    try { window.dispatchEvent(new Event('storage')); } catch(e){}
+    try {
+      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'categories' } }));
+      window.dispatchEvent(new Event('storage'));
+    } catch(e){}
   });
 }
+window.deleteCat = deleteCat;
+
+function deleteSubcat(id) {
+  showConfirm('Delete Subcategory', 'Are you sure you want to delete this subcategory?', () => {
+    DB.subcategories.delete(id);
+    toast('Subcategory deleted', 'success');
+    renderCategories(document.getElementById('admin-content'));
+    try {
+      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'subcategories' } }));
+      window.dispatchEvent(new Event('storage'));
+    } catch(e){}
+  });
+}
+window.deleteSubcat = deleteSubcat;
 
 window.renderCatImageZone = function(imgUrl) {
   const zone = document.getElementById('cat-img-zone');
@@ -2607,6 +2626,7 @@ function addSubcatInline(catId) {
 
 function saveCategoryForm(id) {
   const form = document.getElementById('cat-form');
+  if (!form) return;
   const fd = new FormData(form);
   const name = fd.get('name')?.trim();
   const slug = fd.get('slug')?.trim();
@@ -2628,6 +2648,7 @@ function saveCategoryForm(id) {
     isFeatured: fd.get('isFeatured') === 'on',
   };
 
+  _isSavingModalForm = true;
   if (id) {
     DB.categories.update(id, data);
     toast('Category updated & synced!', 'success');
@@ -2635,10 +2656,14 @@ function saveCategoryForm(id) {
     DB.categories.create(data);
     toast('Category created & synced!', 'success');
   }
-  closeModal();
+  closeModal(true);
   renderCategories(document.getElementById('admin-content'));
-  try { window.dispatchEvent(new Event('storage')); } catch(e){}
+  try {
+    window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'categories' } }));
+    window.dispatchEvent(new Event('storage'));
+  } catch(e){}
 }
+window.saveCategoryForm = saveCategoryForm;
 
 function openSubcatForm(id, catId) {
   const s = DB.subcategories.byId(id);

@@ -26,7 +26,7 @@
   const FS_PRODUCTS_COLLECTION = 'products';
 
   const SYNC_KEYS = [
-    'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
+    'products', 'categories', 'subcategories', 'collections', 'banners', 'homepage', 'shopBanner',
     'brand', 'orders', 'customers', 'coupons', 'flashSales',
     'returns', 'refunds', 'shipping', 'paymentConfig', 'storeSettings',
     'notifConfig', 'telegramConfig', 'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons',
@@ -142,10 +142,26 @@
     if (key === 'products') return; // NEVER push products array to zenvy_store
     _writeQueue[key] = value;
     clearTimeout(_writeTimer);
+
+    if (key === 'categories' && Array.isArray(value) && value.length > 0) {
+      ensureDb().then(async (db) => {
+        if (!db) return;
+        try {
+          const activeSlugs = new Set(value.map(c => String(c.slug || c.id || '').trim().toLowerCase()));
+          const delRef = db.collection(FS_COLLECTION).doc('deleted_categories');
+          const snap = await delRef.get();
+          if (snap.exists && Array.isArray(snap.data()?.ids)) {
+            const cleaned = snap.data().ids.filter(id => !activeSlugs.has(String(id).trim().toLowerCase()));
+            await delRef.set({ ids: cleaned, updatedAt: Date.now() });
+          }
+        } catch(e){}
+      });
+    }
+
     ensureDb().then(db => {
       if (db) {
         // Critical catalog, brand and transactional keys flush immediately to prevent navigation race conditions
-        if (key === 'orders' || key === 'categories' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests' || key === 'brand' || key === 'storeSettings' || key === 'homepage' || key === 'banners' || key === 'shipping' || key === 'paymentConfig') {
+        if (key === 'orders' || key === 'categories' || key === 'subcategories' || key === 'collections' || key === 'sleeves' || key === 'preorderHero' || key === 'restockRequests' || key === 'brand' || key === 'storeSettings' || key === 'homepage' || key === 'banners' || key === 'shipping' || key === 'paymentConfig') {
           flushWriteQueue();
         } else {
           _writeTimer = setTimeout(flushWriteQueue, 25);
@@ -1314,7 +1330,7 @@
 
   // ── Public API ──────────────────────────────────────────────────
   const ADMIN_MANAGED_KEYS = [
-    'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
+    'products', 'categories', 'subcategories', 'collections', 'banners', 'homepage', 'shopBanner',
     'brand', 'storeSettings', 'shipping', 'paymentConfig', 'coupons', 'flashSales',
     'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons', 'printing', 'customization',
     'teams', 'reviews', 'preorderHero', 'modelShowcase', 'notifConfig', 'telegramConfig'

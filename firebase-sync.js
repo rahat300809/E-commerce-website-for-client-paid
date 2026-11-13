@@ -373,10 +373,14 @@
         if (d) {
           if (!d.id) d.id = doc.id;
           const pid = String(d.id).trim();
-          if (deletedIds.has(pid)) return; // Exclude deleted products
+          if (d.isArchived) return; // Exclude archived products
           if (isTestOrJunkProduct(d)) {
             try { _db.collection(FS_PRODUCTS_COLLECTION).doc(doc.id).delete(); } catch(e){}
             return;
+          }
+          // If the product exists in active Firestore collection, it is NOT deleted!
+          if (deletedIds.has(pid)) {
+            deletedIds.delete(pid);
           }
           const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
           const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';
@@ -808,10 +812,13 @@
           if (d) {
             if (!d.id) d.id = docSnap.id;
             const pid = String(d.id).trim();
-            if (deletedIds.has(pid)) return;
+            if (d.isArchived) return;
             if (typeof isTestOrJunkProduct === 'function' && isTestOrJunkProduct(d)) {
               try { _db.collection(FS_PRODUCTS_COLLECTION).doc(docSnap.id).delete(); } catch(e){}
               return;
+            }
+            if (deletedIds.has(pid)) {
+              deletedIds.delete(pid);
             }
             const hasPrePrice = typeof d.preorderPrice === 'number' && d.preorderPrice > 0;
             const hasOpenStatus = d.preorderStatus === 'OPEN' || d.preorderStatus === 'CLOSING_SOON';

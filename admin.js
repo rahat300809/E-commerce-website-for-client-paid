@@ -22,7 +22,7 @@ let currentView = 'dashboard';
 let confirmCallback = null;
 let chartInstances = {};
 let currentPage = {};
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 50;
 
 // ──────────────────────────────────────────────────────────────
 // Boot

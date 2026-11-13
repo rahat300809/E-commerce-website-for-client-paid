@@ -11,53 +11,88 @@ const DB_VERSION = 'zenvy_v1';
 // ── Active Live Catalog Baseline (Instant 0ms load across all devices) ──
 const ACTIVE_CATALOG_BASELINE = [
   {
+    "id": "prod_mwe087k8n71j75nf0",
     "isDeliveryChargeMandatory": false,
+    "sizeMapping": {
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "isLimited": true,
+    "preorderCapacity": 100,
+    "categoryName": "Player Version",
+    "isFeatured": false,
+    "deliveryChargeInsideDhaka": 80,
+    "deliveryChargeOutsideDhaka": 130,
+    "customLogo": false,
+    "gender": "Unisex",
+    "team": "Borussia Dortmund",
+    "hasCustomDelivery": false,
+    "isPreorder": false,
+    "name": "Borussia Dortmund Away Kit",
+    "tax": 0,
+    "sizeStocks": {},
+    "stock": 10,
+    "sku": "ZNV-MWE0AAOM",
+    "preorderDesc": "",
+    "seoTitle": "",
+    "sizeChartImage": "",
+    "image": "img/products/prod_mwe087k8n71j75nf0.webp",
+    "expectedDelivery": null,
     "images": [
       {
-        "url": "img/products/prod_mwdtbvzvlj9kypg6d.webp",
-        "alt": "Bayern Munich Third Kit",
+        "url": "img/products/prod_mwe087k8n71j75nf0.webp",
+        "alt": "Borussia Dortmund Away Kit",
         "isPrimary": true
       }
     ],
-    "id": "prod_mwdtbvzvlj9kypg6d",
-    "sizeChartType": "Player Edition",
-    "categoryName": "Player Version",
-    "expectedDelivery": null,
+    "categoryId": "cat_mens_football",
     "customBadge": "",
-    "customNumber": false,
-    "customLogo": false,
-    "isFeatured": false,
+    "updatedAt": "2026-11-12T20:34:11.787Z",
+    "preorderPrice": null,
+    "customName": false,
+    "customText": false,
+    "expectedArrival": null,
+    "slug": "borussia-dortmund-away-kit",
+    "discountEnd": null,
+    "advancePaymentMode": "cod_only",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isPublished": true,
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
     "assignedSleeves": [
       "slv_half"
     ],
-    "salePrice": 999,
-    "customNameNumber": true,
-    "seoDesc": "",
-    "collectionId": null,
-    "expectedArrival": null,
-    "discountEnd": null,
-    "preorderStatus": "OPEN",
-    "isNewArrival": false,
-    "isPreorder": false,
-    "stock": 10,
-    "hasCustomDelivery": false,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "costPrice": 750,
-    "seoTitle": "",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "team": "Bayern Munich",
-    "isPublished": true,
-    "sizeStocks": null,
-    "preorderPrice": null,
-    "name": "Bayern Munich Third Kit",
-    "sku": "ZNV-MWDTEFH7",
-    "categoryId": "cat_mens_football",
     "sport": "Football",
-    "isBestSeller": false,
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "discountStart": null,
-    "preorderCapacity": 100,
-    "sizeChartImage": "",
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -67,33 +102,845 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "preorderSold": 0,
-    "compareAt": 1150,
-    "lowStockAlert": 5,
-    "slug": "bayern-munich-third-kit",
-    "deliveryChargeInsideDhaka": 80,
-    "createdAt": "2026-11-12T17:19:28.699Z",
-    "gender": "Unisex",
-    "isArchived": false,
-    "customText": false,
-    "preorderCloseDate": null,
     "deliveryNote": "",
+    "isBestSeller": false,
+    "preorderSold": 0,
+    "isArchived": false,
+    "customNumber": false,
+    "sizeChartType": "Player Edition",
+    "isNewArrival": false,
+    "preorderStatus": "OPEN",
+    "salePrice": 999,
+    "costPrice": 750,
+    "collectionId": null,
+    "createdAt": "2026-11-12T20:32:34.376Z",
+    "imageUrl": "",
+    "assignedPatches": [],
+    "basePrice": 1150,
     "discountType": "percent",
+    "customPrintPrice": null,
+    "status": "published",
+    "customNameNumber": true,
+    "discountStart": null,
+    "lowStockAlert": 5,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "preorderCloseDate": null,
+    "discountValue": null,
+    "seoDesc": ""
+  },
+  {
+    "id": "prod_mwe01c9fwsp7p0fbh",
+    "deliveryNote": "",
+    "advancePaymentMode": "cod_only",
+    "expectedArrival": null,
+    "hasCustomDelivery": false,
+    "isArchived": false,
+    "name": "Atletico Madrid Away Kit",
+    "createdAt": "2026-11-12T20:27:13.875Z",
+    "basePrice": 1150,
+    "sizeChartImage": "",
+    "isNewArrival": false,
+    "images": [
+      {
+        "url": "img/products/prod_mwe01c9fwsp7p0fbh.webp",
+        "alt": "Atletico Madrid Away Kit",
+        "isPrimary": true
+      }
+    ],
+    "customNumber": false,
+    "team": "Atletico Madrid",
+    "stock": 10,
+    "preorderSold": 0,
+    "isBestSeller": false,
+    "imageUrl": "",
+    "customNameNumber": true,
+    "costPrice": 750,
+    "salePrice": 999,
+    "customPrintPrice": null,
+    "collectionId": null,
+    "gender": "Unisex",
+    "image": "img/products/prod_mwe01c9fwsp7p0fbh.webp",
+    "isPublished": true,
+    "preorderPrice": null,
+    "slug": "atletico-madrid-away-kit",
+    "deliveryChargeInsideDhaka": 80,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "compareAt": 1150,
+    "isDeliveryChargeMandatory": false,
+    "discountType": "percent",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "sku": "ZNV-MWE05I8L",
+    "categoryName": "Player Version",
+    "status": "published",
+    "customLogo": false,
+    "sport": "Football",
+    "updatedAt": "2026-11-12T20:34:17.695Z",
+    "isFeatured": false,
+    "seoTitle": "",
+    "sizeChartType": "Player Edition",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "discountEnd": null,
+    "assignedPatches": [],
+    "sizeStocks": {},
+    "customBadge": "",
+    "isPreorder": false,
+    "preorderCapacity": 100,
+    "seoDesc": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "preorderStatus": "OPEN",
+    "categoryId": "cat_mens_football",
+    "sizeMapping": {
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "preorderDesc": "",
+    "lowStockAlert": 5,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "discountValue": null,
+    "discountStart": null,
+    "tax": 0,
+    "expectedDelivery": null,
+    "customText": false,
+    "customName": false,
+    "isLimited": true,
+    "preorderCloseDate": null
+  },
+  {
+    "id": "prod_mwdzvb65s2tv6g5iv",
+    "updatedAt": "2026-11-12T20:23:09.709Z",
+    "collectionId": null,
+    "isPublished": true,
+    "expectedDelivery": null,
+    "sizeChartType": "Player Edition",
+    "sizeChartImage": "",
+    "status": "published",
+    "deliveryChargeOutsideDhaka": 130,
+    "tax": 0,
+    "discountType": "percent",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "advancePaymentMode": "cod_only",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "discountValue": null,
+    "lowStockAlert": 5,
+    "preorderCapacity": 100,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sku": "ZNV-MWDZW3T6",
+    "deliveryNote": "",
+    "discountStart": null,
+    "isLimited": true,
     "assignedPatches": [
       "patch_ucl"
     ],
-    "image": "img/products/prod_mwdtbvzvlj9kypg6d.webp",
-    "updatedAt": "2026-11-12T17:21:27.285Z",
+    "isBestSeller": false,
+    "isArchived": false,
+    "sport": "Football",
+    "preorderSold": 0,
+    "preorderCloseDate": null,
+    "isNewArrival": false,
+    "seoDesc": "",
+    "customNumber": false,
+    "seoTitle": "",
+    "preorderDesc": "",
+    "slug": "mancester-united-third-kit",
+    "sizeMapping": {
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "categoryId": "cat_mens_football",
+    "images": [
+      {
+        "url": "img/products/prod_mwdzvb65s2tv6g5iv.webp",
+        "alt": "Mancester United Third Kit",
+        "isPrimary": true
+      }
+    ],
+    "image": "img/products/prod_mwdzvb65s2tv6g5iv.webp",
+    "hasCustomDelivery": false,
+    "customText": false,
     "customName": false,
-    "imageUrl": "img/products/prod_mwdtbvzvlj9kypg6d.webp",
-    "deliveryChargeOutsideDhaka": 130,
-    "tax": 0,
     "basePrice": 1150,
+    "customNameNumber": true,
+    "createdAt": "2026-11-12T20:22:32.525Z",
+    "customPrintPrice": null,
+    "stock": 10,
+    "name": "Mancester United Third Kit",
+    "expectedArrival": null,
+    "preorderPrice": null,
+    "isFeatured": false,
+    "costPrice": 750,
+    "categoryName": "Player Version",
+    "salePrice": 999,
+    "customLogo": false,
+    "team": "Man United",
+    "gender": "Unisex",
+    "isDeliveryChargeMandatory": false,
+    "imageUrl": "",
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "customBadge": "",
+    "preorderStatus": "OPEN",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isPreorder": false,
+    "discountEnd": null,
+    "sizeStocks": {},
+    "deliveryChargeInsideDhaka": 80
+  },
+  {
+    "id": "prod_mwdzuhqo33wb2zexr",
+    "categoryId": "cat_mens_football",
+    "gender": "Unisex",
+    "salePrice": 999,
+    "costPrice": 750,
+    "discountType": "percent",
+    "deliveryChargeOutsideDhaka": 130,
+    "customNameNumber": true,
+    "customPrintPrice": null,
+    "seoDesc": "",
+    "sku": "ZNV-MWDZV8X5",
+    "collectionId": null,
+    "sizeMapping": {
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      }
+    },
+    "customName": false,
+    "customText": false,
+    "sport": "Football",
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "seoTitle": "",
+    "customLogo": false,
+    "isBestSeller": false,
+    "preorderPrice": null,
+    "customBadge": "",
+    "isFeatured": false,
+    "preorderSold": 0,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isNewArrival": false,
+    "advancePaymentMode": "cod_only",
+    "customNumber": false,
+    "discountEnd": null,
+    "preorderStatus": "OPEN",
+    "sizeStocks": {},
+    "basePrice": 1150,
+    "createdAt": "2026-11-12T20:21:54.384Z",
+    "isPreorder": false,
+    "tax": 0,
+    "expectedArrival": null,
+    "images": [
+      {
+        "url": "img/products/prod_mwdzuhqo33wb2zexr.webp",
+        "alt": "Mancester United Away Kit",
+        "isPrimary": true
+      }
+    ],
+    "hasCustomDelivery": false,
+    "deliveryNote": "",
+    "sizeChartType": "Player Edition",
+    "team": "Man United",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "stock": 10,
+    "name": "Mancester United Away Kit",
+    "expectedDelivery": null,
+    "preorderCloseDate": null,
+    "imageUrl": "",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "preorderDesc": "",
+    "sizeChartImage": "",
+    "isPublished": true,
+    "isLimited": true,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "lowStockAlert": 5,
     "status": "published",
     "discountValue": null,
-    "preorderDesc": "",
-    "advancePaymentMode": "cod_only",
+    "discountStart": null,
+    "updatedAt": "2026-11-12T20:22:29.677Z",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "slug": "mancester-united-away-kit",
+    "preorderCapacity": 100,
+    "deliveryChargeInsideDhaka": 80,
+    "isDeliveryChargeMandatory": false,
+    "isArchived": false,
+    "image": "img/products/prod_mwdzuhqo33wb2zexr.webp",
+    "categoryName": "Player Version"
+  },
+  {
+    "id": "prod_mwdzs36rkf46yv452",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "name": "Mancester United Home Kit",
+    "preorderCloseDate": null,
+    "team": "Man United",
+    "collectionId": null,
+    "expectedDelivery": null,
+    "gender": "Unisex",
+    "customBadge": "",
+    "sku": "ZNV-MWDZTXQ5",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isArchived": false,
+    "isLimited": true,
+    "discountType": "percent",
+    "discountEnd": null,
+    "seoTitle": "",
+    "preorderPrice": null,
+    "slug": "mancester-united-home-kit",
     "sizeMapping": {
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "deliveryNote": "",
+    "sizeChartImage": "",
+    "updatedAt": "2026-11-12T20:21:28.505Z",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "images": [
+      {
+        "url": "img/products/prod_mwdzs36rkf46yv452.webp",
+        "alt": "Mancester United Home Kit",
+        "isPrimary": true
+      }
+    ],
+    "tax": 0,
+    "isNewArrival": false,
+    "preorderCapacity": 100,
+    "customNumber": false,
+    "isBestSeller": false,
+    "sport": "Football",
+    "preorderSold": 0,
+    "customLogo": false,
+    "salePrice": 999,
+    "costPrice": 750,
+    "sizeChartType": "Player Edition",
+    "isFeatured": false,
+    "customNameNumber": true,
+    "customPrintPrice": null,
+    "preorderDesc": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "imageUrl": "",
+    "sizeStocks": {},
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "expectedArrival": null,
+    "isPreorder": false,
+    "preorderStatus": "OPEN",
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "image": "img/products/prod_mwdzs36rkf46yv452.webp",
+    "categoryId": "cat_mens_football",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "categoryName": "Player Version",
+    "lowStockAlert": 5,
+    "isPublished": true,
+    "deliveryChargeInsideDhaka": 80,
+    "hasCustomDelivery": false,
+    "discountValue": null,
+    "discountStart": null,
+    "isDeliveryChargeMandatory": false,
+    "stock": 10,
+    "status": "published",
+    "advancePaymentMode": "cod_only",
+    "basePrice": 1150,
+    "createdAt": "2026-11-12T20:20:02.212Z",
+    "customText": false,
+    "customName": false,
+    "seoDesc": ""
+  },
+  {
+    "id": "prod_mwdzp9ss9ctsb7vqz",
+    "expectedArrival": null,
+    "discountType": "percent",
+    "createdAt": "2026-11-12T20:17:50.813Z",
+    "customName": false,
+    "customText": false,
+    "sport": "Football",
+    "seoDesc": "",
+    "basePrice": 1150,
+    "name": "Inter Miami Away kit",
+    "status": "published",
+    "collectionId": null,
+    "discountValue": null,
+    "advancePaymentMode": "cod_only",
+    "isDeliveryChargeMandatory": false,
+    "lowStockAlert": 5,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "deliveryChargeInsideDhaka": 80,
+    "team": "Inter Miami",
+    "sizeMapping": {
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "categoryId": "cat_mens_football",
+    "discountStart": null,
+    "customPrintPrice": null,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "compareAt": 1150,
+    "customNameNumber": true,
+    "preorderSold": 0,
+    "discountEnd": null,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isBestSeller": false,
+    "isPreorder": false,
+    "imageUrl": "",
+    "customBadge": "",
+    "sizeStocks": {},
+    "isNewArrival": false,
+    "preorderStatus": "OPEN",
+    "customNumber": false,
+    "slug": "inter-miami-away-kit",
+    "deliveryChargeOutsideDhaka": 130,
+    "sizeChartType": "Player Edition",
+    "deliveryNote": "",
+    "isFeatured": false,
+    "preorderCloseDate": null,
+    "salePrice": 999,
+    "customLogo": false,
+    "costPrice": 750,
+    "sku": "ZNV-MWDZRLBN",
+    "images": [
+      {
+        "url": "img/products/prod_mwdzp9ss9ctsb7vqz.webp",
+        "alt": "Inter Miami Away kit",
+        "isPrimary": true
+      }
+    ],
+    "sizeChartImage": "",
+    "hasCustomDelivery": false,
+    "assignedPatches": [],
+    "preorderPrice": null,
+    "preorderDesc": "",
+    "updatedAt": "2026-11-12T20:19:39.120Z",
+    "preorderCapacity": 100,
+    "isPublished": true,
+    "stock": 10,
+    "isLimited": true,
+    "seoTitle": "",
+    "isArchived": false,
+    "image": "img/products/prod_mwdzp9ss9ctsb7vqz.webp",
+    "gender": "Unisex",
+    "tax": 0,
+    "expectedDelivery": null,
+    "categoryName": "Player Version",
+    "assignedSleeves": [
+      "slv_half"
+    ]
+  },
+  {
+    "id": "prod_mwdzm08vaxzqhjps3",
+    "preorderSold": 0,
+    "discountStart": null,
+    "stock": 10,
+    "categoryId": "cat_mens_football",
+    "salePrice": 999,
+    "status": "published",
+    "isBestSeller": false,
+    "costPrice": 750,
+    "seoDesc": "",
+    "lowStockAlert": 5,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "discountValue": null,
+    "customNumber": false,
+    "isNewArrival": false,
+    "sizeChartImage": "",
+    "customName": false,
+    "customText": false,
+    "expectedArrival": null,
+    "deliveryNote": "",
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "isPublished": true,
+    "customLogo": false,
+    "customNameNumber": true,
+    "discountType": "percent",
+    "isFeatured": false,
+    "customPrintPrice": null,
+    "sizeChartType": "Player Edition",
+    "imageUrl": "",
+    "sizeStocks": {},
+    "createdAt": "2026-11-12T20:15:18.463Z",
+    "collectionId": null,
+    "isPreorder": false,
+    "basePrice": 1150,
+    "deliveryChargeOutsideDhaka": 130,
+    "image": "img/products/prod_mwdzm08vaxzqhjps3.webp",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "preorderCloseDate": null,
+    "assignedPatches": [],
+    "sku": "ZNV-MWDZNU33",
+    "preorderPrice": null,
+    "hasCustomDelivery": false,
+    "name": "Inter Miami Third kit",
+    "sport": "Football",
+    "sizeMapping": {
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "team": "Inter Miami",
+    "images": [
+      {
+        "url": "img/products/prod_mwdzm08vaxzqhjps3.webp",
+        "alt": "Inter Miami Away kit",
+        "isPrimary": true
+      }
+    ],
+    "categoryName": "Player Version",
+    "preorderCapacity": 100,
+    "isLimited": true,
+    "discountEnd": null,
+    "seoTitle": "",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "advancePaymentMode": "cod_only",
+    "gender": "Unisex",
+    "customBadge": "",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "updatedAt": "2026-11-12T20:17:45.624Z",
+    "preorderStatus": "OPEN",
+    "slug": "inter-miami-third-kit",
+    "preorderDesc": "",
+    "isDeliveryChargeMandatory": false,
+    "deliveryChargeInsideDhaka": 80,
+    "isArchived": false,
+    "expectedDelivery": null,
+    "tax": 0
+  },
+  {
+    "id": "prod_mwdzkir4mnoj7j1g6",
+    "discountValue": null,
+    "slug": "inter-miami-home-kit",
+    "stock": 10,
+    "lowStockAlert": 5,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "discountType": "percent",
+    "seoTitle": "",
+    "discountStart": null,
+    "customPrintPrice": null,
+    "expectedArrival": null,
+    "customNameNumber": true,
+    "advancePaymentMode": "cod_only",
+    "updatedAt": "2026-11-12T20:15:14.265Z",
+    "preorderStatus": "OPEN",
+    "collectionId": null,
+    "name": "Inter Miami Home kit",
+    "customNumber": false,
+    "isNewArrival": false,
+    "sizeChartType": "Player Edition",
+    "isLimited": true,
+    "isBestSeller": false,
+    "team": "Inter Miami",
+    "preorderSold": 0,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "deliveryNote": "",
+    "image": "img/products/prod_mwdzkir4mnoj7j1g6.webp",
+    "isPublished": true,
+    "deliveryChargeInsideDhaka": 80,
+    "preorderCloseDate": null,
+    "isArchived": false,
+    "isDeliveryChargeMandatory": false,
+    "status": "published",
+    "categoryId": "cat_mens_football",
+    "basePrice": 1150,
+    "imageUrl": "",
+    "expectedDelivery": null,
+    "preorderPrice": null,
+    "createdAt": "2026-11-12T20:14:09.136Z",
+    "customBadge": "",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "discountEnd": null,
+    "assignedPatches": [],
+    "sku": "ZNV-MWDZLWYX",
+    "sport": "Football",
+    "customName": false,
+    "customText": false,
+    "hasCustomDelivery": false,
+    "preorderDesc": "",
+    "seoDesc": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "gender": "Unisex",
+    "sizeChartImage": "",
+    "customLogo": false,
+    "preorderCapacity": 100,
+    "images": [
+      {
+        "url": "img/products/prod_mwdzkir4mnoj7j1g6.webp",
+        "alt": "Inter Miami Home kit",
+        "isPrimary": true
+      }
+    ],
+    "isFeatured": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "tax": 0,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "compareAt": 1150,
+    "categoryName": "Player Version",
+    "costPrice": 750,
+    "sizeStocks": {},
+    "salePrice": 999,
+    "sizeMapping": {
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
       "XL": {
         "width": 42,
         "height": 29
@@ -102,21 +949,57 @@ const ACTIVE_CATALOG_BASELINE = [
         "width": 46,
         "height": 31
       },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "L": {
-        "width": 40,
-        "height": 28
+      "M": {
+        "width": 38,
+        "height": 27
       },
       "S": {
         "width": 36,
         "height": 26
+      }
+    },
+    "isPreorder": false
+  },
+  {
+    "id": "prod_mwdze6yw9wzww94nq",
+    "deliveryChargeInsideDhaka": 80,
+    "discountValue": null,
+    "preorderDesc": "",
+    "customBadge": "",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "lowStockAlert": 5,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "deliveryChargeOutsideDhaka": 130,
+    "expectedDelivery": null,
+    "customLogo": false,
+    "discountEnd": null,
+    "isLimited": true,
+    "discountStart": null,
+    "isFeatured": false,
+    "isDeliveryChargeMandatory": false,
+    "sizeStocks": {},
+    "isPreorder": false,
+    "stock": 10,
+    "sizeChartImage": "",
+    "sizeChartType": "Player Edition",
+    "advancePaymentMode": "cod_only",
+    "preorderCapacity": 100,
+    "image": "img/products/prod_mwdze6yw9wzww94nq.webp",
+    "categoryId": "cat_mens_football",
+    "categoryName": "Player Version",
+    "assignedPatches": [],
+    "status": "published",
+    "sizeMapping": {
+      "L": {
+        "height": 28,
+        "width": 40
       },
-      "4XL": {
-        "height": 31,
-        "width": 46
+      "S": {
+        "width": 36,
+        "height": 26
       },
       "M": {
         "width": 38,
@@ -125,14 +1008,25 @@ const ACTIVE_CATALOG_BASELINE = [
       "XS": {
         "width": 46,
         "height": 31
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
       }
     },
-    "customPrintPrice": null,
-    "isLimited": true
-  },
-  {
-    "isArchived": false,
-    "customText": false,
+    "seoTitle": "",
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -142,73 +1036,71 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "isBestSeller": false,
+    "customName": false,
+    "customText": false,
+    "preorderCloseDate": null,
+    "updatedAt": "2026-11-12T20:13:18.559Z",
+    "sku": "ZNV-MWDZJFP0",
+    "collectionId": null,
+    "preorderPrice": null,
+    "sport": "Football",
+    "slug": "al-nasser-third-kit",
+    "compareAt": 1150,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "customPrintPrice": null,
+    "hasCustomDelivery": false,
+    "gender": "Unisex",
     "customNameNumber": true,
-    "lowStockAlert": 5,
-    "discountEnd": null,
+    "discountType": "percent",
+    "isArchived": false,
+    "salePrice": 999,
+    "costPrice": 750,
+    "preorderStatus": "OPEN",
+    "seoDesc": "",
+    "team": "Al Nasser",
+    "createdAt": "2026-11-12T20:09:13.928Z",
+    "basePrice": 1150,
+    "name": "Al Nasser Third Kit",
+    "images": [
+      {
+        "url": "img/products/prod_mwdze6yw9wzww94nq.webp",
+        "alt": "Al Nasser Third Kit",
+        "isPrimary": true
+      },
+      {
+        "url": "img/products/prod_mwdze6yw9wzww94nq_1.webp",
+        "alt": "Al Nasser Third Kit",
+        "isPrimary": false
+      }
+    ],
+    "deliveryNote": "",
+    "isBestSeller": false,
     "preorderSold": 0,
     "isPublished": true,
-    "expectedDelivery": null,
-    "createdAt": "2026-11-12T17:16:10.100Z",
-    "isDeliveryChargeMandatory": false,
-    "advancePaymentMode": "cod_only",
+    "imageUrl": "",
+    "isNewArrival": false,
     "expectedArrival": null,
-    "discountStart": null,
-    "categoryId": "cat_mens_football",
-    "image": "img/products/prod_mwdt7mr7numexc9dh.webp",
-    "compareAt": 1150,
-    "discountValue": null,
-    "id": "prod_mwdt7mr7numexc9dh",
-    "deliveryChargeOutsideDhaka": 130,
-    "customBadge": "",
-    "preorderCloseDate": null,
-    "sizeChartImage": "",
-    "seoTitle": "",
+    "customNumber": false,
+    "tax": 0
+  },
+  {
+    "id": "prod_mwdzcjyygi3k7sd87",
+    "salePrice": 999,
     "assignedSleeves": [
       "slv_half"
     ],
-    "name": "Bayern Munich Away Kit",
-    "updatedAt": "2026-11-12T17:16:43.739Z",
-    "discountType": "percent",
-    "deliveryNote": "",
-    "slug": "bayern-munich-away-kit",
-    "basePrice": 1150,
-    "customName": false,
-    "images": [
-      {
-        "url": "img/products/prod_mwdt7mr7numexc9dh.webp",
-        "alt": "Bayern Munich Away Kit",
-        "isPrimary": true
-      }
-    ],
-    "isLimited": true,
-    "preorderDesc": "",
-    "sport": "Football",
-    "categoryName": "Player Version",
-    "deliveryChargeInsideDhaka": 80,
-    "status": "published",
-    "customNumber": false,
-    "preorderStatus": "OPEN",
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "preorderCapacity": 100,
+    "stock": 10,
+    "hasCustomDelivery": false,
+    "customText": false,
+    "preorderSold": 0,
     "sizeMapping": {
-      "M": {
-        "height": 27,
-        "width": 38
-      },
-      "3XL": {
-        "height": 31,
-        "width": 46
+      "XXL": {
+        "width": 44,
+        "height": 30
       },
       "S": {
         "width": 36,
         "height": 26
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
       },
       "L": {
         "width": 40,
@@ -218,53 +1110,501 @@ const ACTIVE_CATALOG_BASELINE = [
         "height": 29,
         "width": 42
       },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "updatedAt": "2026-11-12T20:08:50.930Z",
+    "collectionId": null,
+    "customName": false,
+    "customBadge": "",
+    "preorderDesc": "",
+    "seoTitle": "",
+    "isNewArrival": false,
+    "customNameNumber": true,
+    "name": "Al Nasser Away Kit",
+    "sku": "ZNV-MWDZDP6O",
+    "isArchived": false,
+    "imageUrl": "",
+    "isLimited": true,
+    "team": "Al Nasser",
+    "customLogo": false,
+    "isBestSeller": false,
+    "expectedDelivery": null,
+    "sizeStocks": {},
+    "isPublished": true,
+    "expectedArrival": null,
+    "categoryName": "Player Version",
+    "isFeatured": false,
+    "lowStockAlert": 5,
+    "preorderPrice": null,
+    "sport": "Football",
+    "deliveryChargeInsideDhaka": 80,
+    "tax": 0,
+    "costPrice": 750,
+    "discountStart": null,
+    "sizeChartImage": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "preorderCapacity": 100,
+    "customNumber": false,
+    "isPreorder": false,
+    "customPrintPrice": null,
+    "preorderStatus": "OPEN",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "discountEnd": null,
+    "basePrice": 1150,
+    "assignedPatches": [],
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "status": "published",
+    "isDeliveryChargeMandatory": false,
+    "image": "img/products/prod_mwdzcjyygi3k7sd87.webp",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "gender": "Unisex",
+    "categoryId": "cat_mens_football",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "deliveryNote": "",
+    "createdAt": "2026-11-12T20:07:57.466Z",
+    "preorderCloseDate": null,
+    "compareAt": 1150,
+    "slug": "al-nasser-away-kit",
+    "discountValue": null,
+    "discountType": "percent",
+    "advancePaymentMode": "cod_only",
+    "seoDesc": "",
+    "images": [
+      {
+        "url": "img/products/prod_mwdzcjyygi3k7sd87.webp",
+        "alt": "Al Nasser Away Kit",
+        "isPrimary": true
+      }
+    ]
+  },
+  {
+    "id": "prod_mwdz5xxlf44t9pakf",
+    "assignedPatches": [],
+    "customText": false,
+    "imageUrl": "",
+    "updatedAt": "2026-11-12T20:08:56.082Z",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "customName": false,
+    "team": "Al Nasser",
+    "sizeChartImage": "",
+    "seoTitle": "",
+    "isBestSeller": false,
+    "deliveryChargeInsideDhaka": 80,
+    "name": "Al Nasser Home Kit",
+    "salePrice": 999,
+    "isLimited": true,
+    "preorderStatus": "OPEN",
+    "expectedDelivery": null,
+    "tax": 0,
+    "customLogo": false,
+    "image": "img/products/prod_mwdz5xxlf44t9pakf.webp",
+    "discountValue": null,
+    "isArchived": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "categoryName": "Player Version",
+    "sizeStocks": {},
+    "collectionId": null,
+    "preorderSold": 0,
+    "customNameNumber": true,
+    "advancePaymentMode": "cod_only",
+    "preorderCloseDate": null,
+    "costPrice": 750,
+    "sku": "ZNV-MWDZARKV",
+    "isNewArrival": false,
+    "isFeatured": false,
+    "discountEnd": null,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "preorderDesc": "",
+    "seoDesc": "",
+    "isPublished": true,
+    "sport": "Football",
+    "expectedArrival": null,
+    "basePrice": 1150,
+    "preorderPrice": null,
+    "discountType": "percent",
+    "isPreorder": false,
+    "lowStockAlert": 5,
+    "isDeliveryChargeMandatory": false,
+    "hasCustomDelivery": false,
+    "discountStart": null,
+    "deliveryNote": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "status": "published",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "customNumber": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "sizeMapping": {
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
       "XS": {
         "width": 46,
         "height": 31
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      }
+    },
+    "customPrintPrice": null,
+    "gender": "Unisex",
+    "slug": "al-nasser-home-kit",
+    "stock": 10,
+    "categoryId": "cat_mens_football",
+    "preorderCapacity": 100,
+    "compareAt": 1150,
+    "createdAt": "2026-11-12T20:02:48.969Z",
+    "images": [
+      {
+        "url": "img/products/prod_mwdz5xxlf44t9pakf.webp",
+        "alt": "Al Nasser Hom Kit",
+        "isPrimary": true
+      }
+    ],
+    "customBadge": ""
+  },
+  {
+    "id": "prod_mwdw6m1wd63g1p2kw",
+    "name": "Real Madrid Home (Copy)",
+    "discountValue": null,
+    "deliveryChargeInsideDhaka": 80,
+    "customBadge": "",
+    "seoDesc": "",
+    "images": [
+      {
+        "url": "img/products/mw8a6nc4ecqhhqgcv.jpg",
+        "alt": "Real Madrid Home",
+        "isPrimary": true
+      }
+    ],
+    "team": "",
+    "isPreorder": false,
+    "advancePaymentMode": "default",
+    "customPrintPrice": null,
+    "expectedArrival": null,
+    "discountType": "percent",
+    "seoTitle": "",
+    "sizeMapping": {
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      }
+    },
+    "hasCustomDelivery": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "gender": "Unisex",
+    "imageUrl": "",
+    "preorderCapacity": 100,
+    "deliveryNote": "",
+    "subcategoryId": null,
+    "sizeChartType": "Player Edition",
+    "basePrice": 1150,
+    "image": "img/products/mw8a6nc4ecqhhqgcv.jpg",
+    "status": "published",
+    "customNumber": true,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "categoryId": "cat_mens_football",
+    "shortDesc": "",
+    "compareAt": 1150,
+    "createdAt": "2026-11-12T18:39:21.381Z",
+    "isPublished": true,
+    "assignedPatches": [],
+    "salePrice": 999,
+    "isArchived": false,
+    "customLogo": false,
+    "discountStart": null,
+    "isBestSeller": true,
+    "customNameNumber": false,
+    "updatedAt": "2026-11-12T18:39:21.434Z",
+    "lowStockAlert": 5,
+    "preorderPrice": null,
+    "discountEnd": null,
+    "sport": "Football",
+    "isDeliveryChargeMandatory": false,
+    "customName": true,
+    "sku": "ZNV-MW8A6NC3-COPY-MWDW6M1X",
+    "categoryName": "Player Version",
+    "isLimited": false,
+    "customText": false,
+    "slug": "real-madrid-home-copy-mwdw6m1x",
+    "preorderStatus": "OPEN",
+    "collectionId": null,
+    "description": "",
+    "preorderCloseDate": null,
+    "isFeatured": false,
+    "preorderSold": 0,
+    "expectedDelivery": null,
+    "isNewArrival": false,
+    "stock": 10,
+    "preorderDesc": "",
+    "costPrice": null,
+    "sizeChartImage": "",
+    "tax": 0,
+    "sizeStocks": {}
+  },
+  {
+    "id": "prod_mwdw1yp7zoy2fqrwv",
+    "categoryName": "Player Version",
+    "sizeChartImage": "",
+    "categoryId": "cat_mens_football",
+    "deliveryChargeOutsideDhaka": 130,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "sku": "ZNV-MWDW30JI",
+    "isPublished": true,
+    "isBestSeller": false,
+    "discountStart": null,
+    "compareAt": 1150,
+    "createdAt": "2026-11-12T18:35:44.492Z",
+    "customNameNumber": true,
+    "preorderPrice": null,
+    "preorderStatus": "OPEN",
+    "lowStockAlert": 5,
+    "isPreorder": false,
+    "preorderDesc": "",
+    "imageUrl": "",
+    "isNewArrival": false,
+    "customBadge": "",
+    "seoTitle": "",
+    "tax": 0,
+    "expectedDelivery": null,
+    "slug": "barcelona-goalkepper-kit",
+    "preorderSold": 0,
+    "image": "img/products/prod_mwdw1yp7zoy2fqrwv.webp",
+    "basePrice": 1150,
+    "deliveryChargeInsideDhaka": 80,
+    "sizeMapping": {
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "M": {
+        "width": 38,
+        "height": 27
       },
       "4XL": {
         "height": 31,
         "width": 46
       }
     },
-    "customLogo": false,
-    "team": "Bayern Munich",
-    "isFeatured": false,
-    "sizeChartType": "Player Edition",
-    "salePrice": 999,
-    "tax": 0,
-    "stock": 10,
+    "preorderCloseDate": null,
     "collectionId": null,
-    "customPrintPrice": null,
+    "isFeatured": false,
+    "deliveryNote": "",
+    "preorderCapacity": 100,
+    "expectedArrival": null,
     "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "imageUrl": "img/products/prod_mwdt7mr7numexc9dh.webp",
-    "isNewArrival": false,
-    "gender": "Unisex",
-    "sizeStocks": null,
-    "costPrice": 750,
-    "preorderPrice": null,
-    "sku": "ZNV-MWDT8COX",
+    "discountType": "percent",
+    "subcategoryId": null,
+    "sizeChartType": "Player Edition",
     "hasCustomDelivery": false,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "isPreorder": false,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "seoDesc": ""
+    "name": "Barcelona Goalkepper Kit",
+    "sizeStocks": {},
+    "team": "Barcelona",
+    "customPrintPrice": null,
+    "discountValue": null,
+    "costPrice": null,
+    "stock": 10,
+    "advancePaymentMode": "default",
+    "discountEnd": null,
+    "sport": "Football",
+    "salePrice": 999,
+    "images": [
+      {
+        "url": "img/products/prod_mwdw1yp7zoy2fqrwv.webp",
+        "alt": "Barcelona Goalkepper Kit",
+        "isPrimary": true
+      }
+    ],
+    "isDeliveryChargeMandatory": false,
+    "customLogo": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "isArchived": false,
+    "updatedAt": "2026-11-12T18:36:33.575Z",
+    "seoDesc": "",
+    "status": "published",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "customText": false,
+    "isLimited": true,
+    "customNumber": false,
+    "gender": "Unisex",
+    "customName": false
   },
   {
-    "sizeChartImage": "",
-    "categoryId": "cat_mens_football",
-    "seoDesc": "",
-    "gender": "Unisex",
-    "preorderSold": 0,
-    "team": "Bayern Munich",
-    "salePrice": 999,
-    "isArchived": false,
-    "customText": false,
-    "sport": "Football",
-    "isBestSeller": false,
+    "id": "prod_mwdw0pr4e23smtkbk",
+    "discountType": "percent",
+    "advancePaymentMode": "cod_only",
+    "customNameNumber": true,
+    "hasCustomDelivery": false,
+    "slug": "paris-saint-germain-away-kit-psg",
     "discountValue": null,
-    "customPrintPrice": null,
+    "deliveryNote": "",
+    "seoDesc": "",
+    "expectedArrival": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "sku": "ZNV-MWDW1BON",
+    "categoryId": "cat_mens_football",
+    "isPublished": true,
+    "costPrice": 750,
+    "salePrice": 999,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "customBadge": "",
+    "updatedAt": "2026-11-12T18:35:14.701Z",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "image": "img/products/prod_mwdw0pr4e23smtkbk.webp",
+    "customNumber": false,
+    "tax": 0,
     "sizeMapping": {
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
       "S": {
         "height": 26,
         "width": 36
@@ -273,50 +1613,151 @@ const ACTIVE_CATALOG_BASELINE = [
         "width": 40,
         "height": 28
       },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
       "XL": {
         "height": 29,
         "width": 42
       },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      }
+    },
+    "isPreorder": false,
+    "deliveryChargeInsideDhaka": 80,
+    "expectedDelivery": null,
+    "isLimited": true,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "deliveryChargeOutsideDhaka": 130,
+    "lowStockAlert": 5,
+    "stock": 10,
+    "customPrintPrice": null,
+    "preorderPrice": null,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "categoryName": "Player Version",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "sizeStocks": null,
+    "discountStart": null,
+    "createdAt": "2026-11-12T18:34:46.240Z",
+    "seoTitle": "",
+    "preorderCapacity": 100,
+    "compareAt": 1150,
+    "isBestSeller": false,
+    "isFeatured": false,
+    "imageUrl": "",
+    "isNewArrival": false,
+    "preorderStatus": "OPEN",
+    "team": "PSG",
+    "name": "Paris Saint-Germain Away Kit (PSG)",
+    "customName": false,
+    "images": [
+      {
+        "url": "img/products/prod_mwdw0pr4e23smtkbk.webp",
+        "alt": "Paris Saint-Germain Away Kit (PSG)",
+        "isPrimary": true
+      }
+    ],
+    "isDeliveryChargeMandatory": false,
+    "preorderDesc": "",
+    "customText": false,
+    "discountEnd": null,
+    "isArchived": false,
+    "preorderCloseDate": null,
+    "collectionId": null,
+    "gender": "Unisex",
+    "customLogo": false,
+    "sizeChartImage": "",
+    "sport": "Football",
+    "preorderSold": 0,
+    "status": "published",
+    "basePrice": 1150
+  },
+  {
+    "id": "prod_mwdvx1hidnhyrm6o0",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "preorderDesc": "",
+    "isFeatured": false,
+    "status": "published",
+    "preorderCapacity": 100,
+    "deliveryChargeInsideDhaka": 80,
+    "sport": "Football",
+    "isNewArrival": false,
+    "isPublished": true,
+    "gender": "Unisex",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "compareAt": 1150,
+    "customPrintPrice": null,
+    "createdAt": "2026-11-12T18:31:54.822Z",
+    "preorderSold": 0,
+    "hasCustomDelivery": false,
+    "sizeStocks": null,
+    "deliveryChargeOutsideDhaka": 130,
+    "images": [
+      {
+        "url": "img/products/prod_mwdvx1hidnhyrm6o0.webp",
+        "alt": "Paris Saint-Germain Home Kit (PSG)",
+        "isPrimary": true
+      }
+    ],
+    "slug": "paris-saint-germain-home-kit-psg",
+    "collectionId": null,
+    "categoryName": "Player Version",
+    "sizeMapping": {
       "4XL": {
-        "width": 46,
-        "height": 31
+        "height": 31,
+        "width": 46
       },
-      "M": {
-        "width": 38,
-        "height": 27
+      "XS": {
+        "height": 31,
+        "width": 46
       },
       "3XL": {
         "height": 31,
         "width": 46
       },
-      "XS": {
-        "width": 46,
-        "height": 31
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
       },
       "XXL": {
         "width": 44,
         "height": 30
+      },
+      "M": {
+        "height": 27,
+        "width": 38
       }
     },
-    "deliveryChargeOutsideDhaka": 130,
-    "tax": 0,
-    "customName": false,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "preorderDesc": "",
-    "preorderCapacity": 100,
-    "status": "published",
-    "imageUrl": "img/products/prod_mwdt4uwdo30gbqxdp.webp",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "sku": "ZNV-MWDT5ZKW",
-    "preorderCloseDate": null,
-    "id": "prod_mwdt4uwdo30gbqxdp",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "expectedArrival": null,
+    "isArchived": false,
+    "customLogo": false,
+    "isBestSeller": false,
+    "stock": 10,
+    "customBadge": "",
+    "customText": false,
     "discountStart": null,
-    "deliveryChargeInsideDhaka": 80,
-    "costPrice": 750,
-    "image": "img/products/prod_mwdt4uwdo30gbqxdp.webp",
+    "basePrice": 1150,
+    "lowStockAlert": 5,
+    "customName": false,
+    "preorderPrice": null,
+    "categoryId": "cat_mens_football",
+    "sizeChartImage": "",
+    "isDeliveryChargeMandatory": false,
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -326,16 +1767,906 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "seoTitle": "",
+    "customNameNumber": true,
+    "sku": "ZNV-MWDVZL59",
+    "image": "img/products/prod_mwdvx1hidnhyrm6o0.webp",
+    "imageUrl": "",
+    "customNumber": false,
+    "costPrice": 750,
+    "preorderStatus": "OPEN",
+    "isPreorder": false,
+    "salePrice": 999,
     "deliveryNote": "",
+    "preorderCloseDate": null,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
     "discountType": "percent",
-    "lowStockAlert": 5,
-    "isFeatured": false,
-    "collectionId": null,
-    "createdAt": "2026-11-12T17:14:00.685Z",
+    "updatedAt": "2026-11-12T18:33:53.652Z",
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "expectedDelivery": null,
+    "discountValue": null,
+    "tax": 0,
+    "advancePaymentMode": "cod_only",
+    "seoDesc": "",
+    "team": "PSG",
+    "discountEnd": null,
+    "isLimited": true,
+    "name": "Paris Saint-Germain Home Kit (PSG)"
+  },
+  {
+    "id": "prod_mwdtotn087sehyqui",
+    "createdAt": "2026-11-12T17:29:32.172Z",
     "compareAt": 1150,
+    "collectionId": null,
+    "preorderPrice": null,
+    "lowStockAlert": 5,
+    "slug": "ac-milan-away-kit",
+    "sku": "ZNV-MWDTPSYX",
+    "categoryId": "cat_mens_football",
+    "discountStart": null,
+    "preorderSold": 0,
+    "isNewArrival": false,
+    "isPublished": true,
+    "preorderCloseDate": null,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "preorderDesc": "",
+    "customNameNumber": true,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "expectedDelivery": null,
+    "deliveryChargeOutsideDhaka": 130,
+    "image": "img/products/prod_mwdtotn087sehyqui.webp",
+    "basePrice": 1150,
+    "isBestSeller": false,
+    "isPreorder": false,
+    "seoDesc": "",
+    "sizeChartImage": "",
+    "tax": 0,
+    "customBadge": "",
+    "isDeliveryChargeMandatory": false,
+    "preorderStatus": "OPEN",
+    "categoryName": "Player Version",
+    "sizeMapping": {
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      }
+    },
+    "customNumber": false,
+    "stock": 10,
+    "status": "published",
+    "advancePaymentMode": "cod_only",
+    "isFeatured": false,
+    "costPrice": 750,
+    "discountValue": null,
+    "gender": "Unisex",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "preorderCapacity": 100,
+    "expectedArrival": null,
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "images": [
+      {
+        "url": "img/products/prod_mwdtotn087sehyqui.webp",
+        "alt": "Ac Milan Away Kit",
+        "isPrimary": true
+      }
+    ],
+    "sizeStocks": null,
+    "customPrintPrice": null,
+    "deliveryChargeInsideDhaka": 80,
+    "hasCustomDelivery": false,
     "customLogo": false,
     "discountEnd": null,
+    "isArchived": false,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "name": "Ac Milan Away Kit",
+    "isLimited": true,
+    "team": "Ac Milan",
+    "discountType": "percent",
+    "salePrice": 999,
+    "customName": false,
+    "imageUrl": "",
+    "deliveryNote": "",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "sport": "Football",
+    "updatedAt": "2026-11-13T06:01:03.570Z",
+    "customText": false,
+    "seoTitle": ""
+  },
+  {
+    "id": "prod_mwdtnvopswdqcm154",
+    "isBestSeller": false,
+    "sku": "ZNV-MWDTOPRF",
+    "isLimited": true,
+    "deliveryChargeInsideDhaka": 80,
+    "stock": 10,
     "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "customBadge": "",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "discountValue": null,
+    "team": "Ac Milan",
+    "updatedAt": "2026-11-13T06:04:50.621Z",
+    "categoryName": "Player Version",
+    "name": "Ac Milan Home Kit",
+    "sizeMapping": {
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "salePrice": 999,
+    "isPreorder": false,
+    "preorderCloseDate": null,
+    "expectedDelivery": null,
+    "deliveryChargeOutsideDhaka": 130,
+    "seoTitle": "",
+    "costPrice": 750,
+    "expectedArrival": null,
+    "tax": 0,
+    "preorderSold": 0,
+    "status": "published",
+    "customNameNumber": true,
+    "imageUrl": "",
+    "preorderStatus": "OPEN",
+    "collectionId": null,
+    "gender": "Unisex",
+    "preorderDesc": "",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "isPublished": true,
+    "sizeChartImage": "",
+    "isNewArrival": false,
+    "categoryId": "cat_mens_football",
+    "sport": "Football",
+    "images": [
+      {
+        "alt": "Ac Milan Home Kit",
+        "url": "img/products/prod_mwdtnvopswdqcm154.webp",
+        "isPrimary": true
+      }
+    ],
+    "customName": false,
+    "advancePaymentMode": "cod_only",
+    "basePrice": 1150,
+    "discountEnd": null,
+    "customText": false,
+    "isArchived": false,
+    "customLogo": false,
+    "isDeliveryChargeMandatory": false,
+    "deliveryNote": "",
+    "discountStart": null,
+    "discountType": "percent",
+    "lowStockAlert": 5,
+    "preorderPrice": null,
+    "seoDesc": "",
+    "customPrintPrice": null,
+    "customNumber": false,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "sizeStocks": null,
+    "image": "img/products/prod_mwdtnvopswdqcm154.webp",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "compareAt": 1150,
+    "hasCustomDelivery": false,
+    "createdAt": "2026-11-12T17:28:48.170Z",
+    "slug": "ac-milan-home-kit",
+    "preorderCapacity": 100,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "isFeatured": false
+  },
+  {
+    "id": "prod_mwdtkv181mwc9koh8",
+    "discountType": "percent",
+    "updatedAt": "2026-11-13T06:04:55.482Z",
+    "customNameNumber": true,
+    "isPublished": true,
+    "discountValue": null,
+    "salePrice": 999,
+    "deliveryChargeInsideDhaka": 80,
+    "deliveryNote": "",
+    "preorderCloseDate": null,
+    "isLimited": true,
+    "isPreorder": false,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "sku": "ZNV-MWDTLZU6",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "preorderStatus": "OPEN",
+    "sizeMapping": {
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      }
+    },
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "seoDesc": "",
+    "customNumber": false,
+    "image": "img/products/prod_mwdtkv181mwc9koh8.webp",
+    "categoryId": "cat_mens_football",
+    "costPrice": 750,
+    "expectedDelivery": null,
+    "sizeChartImage": "",
+    "slug": "liverpool-third-kit",
+    "tax": 0,
+    "customBadge": "",
+    "customPrintPrice": null,
+    "customText": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "lowStockAlert": 5,
+    "preorderPrice": null,
+    "customName": false,
+    "categoryName": "Player Version",
+    "advancePaymentMode": "cod_only",
+    "discountStart": null,
+    "preorderCapacity": 100,
+    "deliveryChargeOutsideDhaka": 130,
+    "basePrice": 1150,
+    "isArchived": false,
+    "stock": 10,
+    "isBestSeller": false,
+    "customLogo": false,
+    "name": "Liverpool Third Kit",
+    "isDeliveryChargeMandatory": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "team": "Liverpool",
+    "isNewArrival": false,
+    "sport": "Football",
+    "sizeStocks": null,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "images": [
+      {
+        "alt": "Liverpool Third Kit",
+        "isPrimary": true,
+        "url": "img/products/prod_mwdtkv181mwc9koh8.webp"
+      }
+    ],
+    "preorderDesc": "",
+    "expectedArrival": null,
+    "status": "published",
+    "seoTitle": "",
+    "discountEnd": null,
+    "collectionId": null,
+    "isFeatured": false,
+    "gender": "Unisex",
+    "imageUrl": "",
+    "hasCustomDelivery": false,
+    "compareAt": 1150,
+    "preorderSold": 0,
+    "createdAt": "2026-11-12T17:26:27.357Z"
+  },
+  {
+    "id": "prod_mwdtghurjayd4us4t",
+    "createdAt": "2026-11-12T17:23:03.651Z",
+    "compareAt": 1150,
+    "stock": 10,
+    "sku": "ZNV-MWDTHAYH",
+    "deliveryChargeInsideDhaka": 80,
+    "customBadge": "",
+    "expectedArrival": null,
+    "team": "Liverpool",
+    "sizeMapping": {
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      }
+    },
+    "isPreorder": false,
+    "customNumber": false,
+    "name": "Liverpool Away Kit",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "tax": 0,
+    "preorderCapacity": 100,
+    "discountType": "percent",
+    "basePrice": 1150,
+    "deliveryNote": "",
+    "customPrintPrice": null,
+    "discountStart": null,
+    "categoryId": "cat_mens_football",
+    "preorderCloseDate": null,
+    "lowStockAlert": 5,
+    "preorderPrice": null,
+    "sport": "Football",
+    "isPublished": true,
+    "customText": false,
+    "isNewArrival": false,
+    "hasCustomDelivery": false,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "images": [
+      {
+        "alt": "Liverpool Away Kit",
+        "isPrimary": true,
+        "url": "img/products/prod_mwdtghurjayd4us4t.webp"
+      }
+    ],
+    "expectedDelivery": null,
+    "costPrice": 750,
+    "customName": false,
+    "discountEnd": null,
+    "preorderDesc": "",
+    "isDeliveryChargeMandatory": false,
+    "collectionId": null,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "gender": "Unisex",
+    "preorderSold": 0,
+    "customLogo": false,
+    "seoDesc": "",
+    "status": "published",
+    "isArchived": false,
+    "advancePaymentMode": "cod_only",
+    "deliveryChargeOutsideDhaka": 130,
+    "sizeStocks": null,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "isLimited": true,
+    "preorderStatus": "OPEN",
+    "image": "img/products/prod_mwdtghurjayd4us4t.webp",
+    "categoryName": "Player Version",
+    "sizeChartImage": "",
+    "customNameNumber": true,
+    "isFeatured": false,
+    "imageUrl": "",
+    "discountValue": null,
+    "salePrice": 999,
+    "slug": "liverpool-away-kit",
+    "isBestSeller": false,
+    "seoTitle": "",
+    "updatedAt": "2026-11-13T06:05:02.010Z"
+  },
+  {
+    "id": "prod_mwdteu3bvlwp2g91l",
+    "basePrice": 1150,
+    "expectedArrival": null,
+    "discountEnd": null,
+    "deliveryNote": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "tax": 0,
+    "customPrintPrice": null,
+    "discountType": "percent",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "isDeliveryChargeMandatory": false,
+    "preorderCapacity": 100,
+    "categoryId": "cat_mens_football",
+    "imageUrl": "",
+    "slug": "liverpool-home-kit",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "compareAt": 1150,
+    "seoTitle": "",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "createdAt": "2026-11-12T17:21:46.199Z",
+    "sku": "ZNV-MWDTGEX5",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "discountValue": null,
+    "customNumber": false,
+    "preorderCloseDate": null,
+    "isPreorder": false,
+    "image": "img/products/prod_mwdteu3bvlwp2g91l.webp",
+    "isLimited": true,
+    "name": "Liverpool Home Kit",
+    "team": "Liverpool",
+    "categoryName": "Player Version",
+    "sizeStocks": null,
+    "customBadge": "",
+    "deliveryChargeInsideDhaka": 80,
+    "hasCustomDelivery": false,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customNameNumber": true,
+    "stock": 10,
+    "updatedAt": "2026-11-13T06:05:07.190Z",
+    "isBestSeller": false,
+    "isFeatured": false,
+    "salePrice": 999,
+    "sizeMapping": {
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      }
+    },
+    "costPrice": 750,
+    "customName": false,
+    "preorderDesc": "",
+    "sizeChartImage": "",
+    "customText": false,
+    "advancePaymentMode": "cod_only",
+    "images": [
+      {
+        "isPrimary": true,
+        "alt": "Liverpool Home Kit",
+        "url": "img/products/prod_mwdteu3bvlwp2g91l.webp"
+      }
+    ],
+    "isNewArrival": false,
+    "sport": "Football",
+    "customLogo": false,
+    "preorderSold": 0,
+    "discountStart": null,
+    "isArchived": false,
+    "seoDesc": "",
+    "isPublished": true,
+    "expectedDelivery": null,
+    "status": "published",
+    "collectionId": null,
+    "preorderPrice": null,
+    "lowStockAlert": 5,
+    "preorderStatus": "OPEN",
+    "gender": "Unisex"
+  },
+  {
+    "id": "prod_mwdtbvzvlj9kypg6d",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "deliveryChargeInsideDhaka": 80,
+    "name": "Bayern Munich Third Kit",
+    "sizeMapping": {
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      }
+    },
+    "tax": 0,
+    "preorderCapacity": 100,
+    "team": "Bayern Munich",
+    "gender": "Unisex",
+    "lowStockAlert": 5,
+    "costPrice": 750,
+    "status": "published",
+    "sport": "Football",
+    "hasCustomDelivery": false,
+    "updatedAt": "2026-11-13T06:05:15.320Z",
+    "basePrice": 1150,
+    "sizeStocks": null,
+    "images": [
+      {
+        "alt": "Bayern Munich Third Kit",
+        "isPrimary": true,
+        "url": "img/products/prod_mwdtbvzvlj9kypg6d.webp"
+      }
+    ],
+    "discountValue": null,
+    "isDeliveryChargeMandatory": false,
+    "sku": "ZNV-MWDTEFH7",
+    "collectionId": null,
+    "customBadge": "",
+    "seoTitle": "",
+    "isPreorder": false,
+    "preorderDesc": "",
+    "isFeatured": false,
+    "customLogo": false,
+    "discountType": "percent",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "preorderStatus": "OPEN",
+    "discountEnd": null,
+    "isLimited": true,
+    "categoryName": "Player Version",
+    "createdAt": "2026-11-12T17:19:28.699Z",
+    "isPublished": true,
+    "expectedArrival": null,
+    "image": "img/products/prod_mwdtbvzvlj9kypg6d.webp",
+    "customName": false,
+    "customNumber": false,
+    "preorderCloseDate": null,
+    "discountStart": null,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "isNewArrival": false,
+    "categoryId": "cat_mens_football",
+    "stock": 10,
+    "sizeChartImage": "",
+    "compareAt": 1150,
+    "slug": "bayern-munich-third-kit",
+    "advancePaymentMode": "cod_only",
+    "salePrice": 999,
+    "preorderSold": 0,
+    "seoDesc": "",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "isBestSeller": false,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "preorderPrice": null,
+    "deliveryNote": "",
+    "customText": false,
+    "isArchived": false,
+    "customNameNumber": true,
+    "deliveryChargeOutsideDhaka": 130,
+    "imageUrl": ""
+  },
+  {
+    "id": "prod_mwdt7mr7numexc9dh",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "hasCustomDelivery": false,
+    "imageUrl": "",
+    "discountEnd": null,
+    "isBestSeller": false,
+    "image": "img/products/prod_mwdt7mr7numexc9dh.webp",
+    "preorderSold": 0,
+    "slug": "bayern-munich-away-kit",
+    "deliveryNote": "",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "discountStart": null,
+    "stock": 10,
+    "sku": "ZNV-MWDT8COX",
+    "expectedDelivery": null,
+    "customPrintPrice": null,
+    "isArchived": false,
+    "customText": false,
+    "isPublished": true,
+    "advancePaymentMode": "cod_only",
+    "isDeliveryChargeMandatory": false,
+    "basePrice": 1150,
+    "discountType": "percent",
+    "customLogo": false,
+    "updatedAt": "2026-11-13T06:05:21.811Z",
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "costPrice": 750,
+    "isNewArrival": false,
+    "preorderPrice": null,
+    "expectedArrival": null,
+    "deliveryChargeInsideDhaka": 80,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "customName": false,
+    "customNumber": false,
+    "sizeChartType": "Player Edition",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "customNameNumber": true,
+    "tax": 0,
+    "sizeChartImage": "",
+    "preorderCapacity": 100,
+    "preorderCloseDate": null,
+    "seoTitle": "",
+    "sport": "Football",
+    "sizeMapping": {
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      }
+    },
+    "images": [
+      {
+        "alt": "Bayern Munich Away Kit",
+        "url": "img/products/prod_mwdt7mr7numexc9dh.webp",
+        "isPrimary": true
+      }
+    ],
+    "isFeatured": false,
+    "lowStockAlert": 5,
+    "team": "Bayern Munich",
+    "preorderDesc": "",
+    "preorderStatus": "OPEN",
+    "deliveryChargeOutsideDhaka": 130,
+    "isPreorder": false,
+    "collectionId": null,
+    "name": "Bayern Munich Away Kit",
+    "salePrice": 999,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "status": "published",
+    "compareAt": 1150,
+    "gender": "Unisex",
+    "seoDesc": "",
+    "createdAt": "2026-11-12T17:16:10.100Z",
+    "isLimited": true,
+    "customBadge": "",
+    "discountValue": null,
+    "sizeStocks": null,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি"
+  },
+  {
+    "id": "prod_mwdt4uwdo30gbqxdp",
+    "isBestSeller": false,
+    "seoTitle": "",
+    "customBadge": "",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "isArchived": false,
+    "basePrice": 1150,
+    "preorderSold": 0,
+    "status": "published",
+    "customText": false,
+    "deliveryNote": "",
+    "updatedAt": "2026-11-13T06:05:28.415Z",
+    "preorderPrice": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "gender": "Unisex",
+    "preorderCapacity": 100,
+    "costPrice": 750,
+    "categoryId": "cat_mens_football",
+    "customName": false,
+    "discountType": "percent",
     "images": [
       {
         "url": "img/products/prod_mwdt4uwdo30gbqxdp.webp",
@@ -343,122 +2674,187 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "customNumber": false,
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "preorderPrice": null,
-    "isPublished": true,
     "categoryName": "Player Version",
-    "sizeChartType": "Player Edition",
-    "isLimited": true,
-    "hasCustomDelivery": false,
-    "expectedDelivery": null,
-    "seoTitle": "",
-    "isPreorder": false,
-    "advancePaymentMode": "cod_only",
-    "expectedArrival": null,
-    "slug": "bayern-munich-home-kit",
-    "isDeliveryChargeMandatory": false,
-    "customBadge": "",
-    "preorderStatus": "OPEN",
-    "basePrice": 1150,
-    "updatedAt": "2026-11-12T17:14:53.430Z",
-    "name": "Bayern Munich Home Kit",
-    "stock": 10,
-    "sizeStocks": null,
-    "isNewArrival": false,
-    "customNameNumber": true
-  },
-  {
-    "preorderDesc": "",
-    "deliveryChargeInsideDhaka": 80,
-    "categoryId": "cat_mens_football",
-    "isLimited": true,
-    "basePrice": 1150,
-    "customNameNumber": true,
-    "preorderPrice": null,
-    "status": "published",
-    "discountEnd": null,
-    "deliveryNote": "",
-    "expectedDelivery": null,
-    "discountType": "percent",
-    "tax": 0,
-    "image": "img/products/prod_mwdt2ma80pcwaiut4.webp",
-    "advancePaymentMode": "cod_only",
-    "isPublished": true,
-    "updatedAt": "2026-11-12T17:12:16.234Z",
-    "customText": false,
-    "hasCustomDelivery": false,
-    "isArchived": false,
-    "subcategoryId": null,
-    "gender": "Unisex",
-    "compareAt": 1150,
-    "sku": "ZNV-MWDT2MA7",
-    "createdAt": "2026-11-12T17:12:16.207Z",
-    "customBadge": "",
-    "seoTitle": "",
-    "customName": false,
+    "deliveryChargeOutsideDhaka": 130,
     "assignedPatches": [
       "patch_ucl"
     ],
-    "preorderSold": 0,
-    "preorderStatus": "OPEN",
-    "team": "Arsenal",
-    "isBestSeller": false,
-    "sizeChartType": "Player Edition",
-    "sport": "Football",
-    "id": "prod_mwdt2ma80pcwaiut4",
-    "discountValue": null,
-    "isFeatured": false,
-    "name": "Arsenal Third Kit",
+    "isNewArrival": false,
+    "discountStart": null,
     "customLogo": false,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "preorderCloseDate": null,
+    "customNumber": false,
+    "image": "img/products/prod_mwdt4uwdo30gbqxdp.webp",
     "sizeMapping": {
-      "XXL": {
-        "height": 30,
-        "width": 44
-      },
-      "3XL": {
+      "4XL": {
         "width": 46,
         "height": 31
       },
       "XS": {
-        "width": 46,
-        "height": 31
+        "height": 31,
+        "width": 46
       },
-      "4XL": {
-        "width": 46,
-        "height": 31
+      "XXL": {
+        "height": 30,
+        "width": 44
       },
       "XL": {
         "width": 42,
         "height": 29
       },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      },
       "S": {
-        "width": 36,
-        "height": 26
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      }
+    },
+    "name": "Bayern Munich Home Kit",
+    "preorderCloseDate": null,
+    "stock": 10,
+    "team": "Bayern Munich",
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "salePrice": 999,
+    "sku": "ZNV-MWDT5ZKW",
+    "compareAt": 1150,
+    "imageUrl": "",
+    "isFeatured": false,
+    "discountValue": null,
+    "createdAt": "2026-11-12T17:14:00.685Z",
+    "isPreorder": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "isDeliveryChargeMandatory": false,
+    "isLimited": true,
+    "preorderDesc": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "collectionId": null,
+    "lowStockAlert": 5,
+    "slug": "bayern-munich-home-kit",
+    "seoDesc": "",
+    "sizeStocks": null,
+    "advancePaymentMode": "cod_only",
+    "isPublished": true,
+    "sizeChartImage": "",
+    "customNameNumber": true,
+    "preorderStatus": "OPEN",
+    "tax": 0,
+    "discountEnd": null,
+    "sport": "Football",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "expectedArrival": null,
+    "deliveryChargeInsideDhaka": 80,
+    "hasCustomDelivery": false
+  },
+  {
+    "id": "prod_mwdt2ma80pcwaiut4",
+    "gender": "Unisex",
+    "compareAt": 1150,
+    "salePrice": 999,
+    "status": "published",
+    "createdAt": "2026-11-12T17:12:16.207Z",
+    "deliveryChargeOutsideDhaka": 130,
+    "hasCustomDelivery": false,
+    "preorderDesc": "",
+    "lowStockAlert": 5,
+    "isFeatured": false,
+    "customBadge": "",
+    "collectionId": null,
+    "isLimited": true,
+    "isPreorder": false,
+    "seoDesc": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "sport": "Football",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "images": [
+      {
+        "url": "img/products/prod_mwdt2ma80pcwaiut4.webp",
+        "alt": "Arsenal Third Kit",
+        "isPrimary": true
+      }
+    ],
+    "preorderCapacity": 100,
+    "sizeMapping": {
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "height": 27,
+        "width": 38
       },
       "L": {
         "height": 28,
         "width": 40
       },
-      "M": {
-        "height": 27,
-        "width": 38
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
       }
     },
     "slug": "arsenal-third-kit",
-    "stock": 0,
-    "costPrice": 750,
+    "imageUrl": "",
+    "discountValue": null,
+    "deliveryNote": "",
     "assignedSleeves": [
       "slv_half"
     ],
-    "preorderCapacity": 100,
-    "sizeChartImage": "",
-    "isNewArrival": false,
+    "basePrice": 1150,
     "isDeliveryChargeMandatory": false,
+    "discountStart": null,
+    "isBestSeller": false,
+    "preorderCloseDate": null,
+    "preorderSold": 0,
+    "updatedAt": "2026-11-13T06:05:35.538Z",
+    "customNameNumber": true,
+    "costPrice": 750,
+    "stock": 0,
+    "image": "img/products/prod_mwdt2ma80pcwaiut4.webp",
+    "customText": false,
+    "tax": 0,
+    "isArchived": false,
+    "categoryName": "Player Version",
+    "advancePaymentMode": "cod_only",
+    "discountEnd": null,
+    "team": "Arsenal",
+    "sizeChartImage": "",
+    "customLogo": false,
+    "discountType": "percent",
+    "deliveryChargeInsideDhaka": 80,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "sku": "ZNV-MWDT2MA7",
+    "name": "Arsenal Third Kit",
+    "expectedArrival": null,
+    "preorderStatus": "OPEN",
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -468,100 +2864,122 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "collectionId": null,
+    "categoryId": "cat_mens_football",
+    "preorderPrice": null,
+    "isNewArrival": false,
     "customPrintPrice": null,
-    "expectedArrival": null,
-    "seoDesc": "",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "imageUrl": "img/products/prod_mwdt2ma80pcwaiut4.webp",
-    "salePrice": 999,
-    "lowStockAlert": 5,
-    "isPreorder": false,
-    "customNumber": false,
-    "deliveryChargeOutsideDhaka": 130,
-    "categoryName": "Player Version",
-    "discountStart": null,
-    "images": [
-      {
-        "url": "img/products/prod_mwdt2ma80pcwaiut4.webp",
-        "alt": "Arsenal Third Kit",
-        "isPrimary": true
-      }
-    ]
+    "subcategoryId": null,
+    "expectedDelivery": null,
+    "seoTitle": "",
+    "isPublished": true,
+    "customName": false,
+    "sizeChartType": "Player Edition",
+    "customNumber": false
   },
   {
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "deliveryChargeOutsideDhaka": 130,
-    "seoDesc": "",
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "slug": "arsenal-away-kit",
-    "name": "Arsenal Away Kit",
-    "salePrice": 999,
-    "preorderPrice": null,
-    "gender": "Unisex",
-    "customName": false,
-    "isNewArrival": false,
-    "deliveryChargeInsideDhaka": 80,
-    "customPrintPrice": null,
-    "sku": "ZNV-MWDSZQID",
-    "seoTitle": "",
-    "collectionId": null,
+    "id": "prod_mwdszqiet4d9u1fip",
     "hasCustomDelivery": false,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "customText": false,
-    "isArchived": false,
-    "preorderStatus": "OPEN",
-    "sizeChartType": "Player Edition",
-    "costPrice": 750,
-    "tax": 0,
-    "preorderCapacity": 100,
-    "advancePaymentMode": "cod_only",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "sport": "Football",
+    "discountStart": null,
     "sizeMapping": {
-      "3XL": {
-        "height": 31,
-        "width": 46
-      },
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
-      "XXL": {
-        "height": 30,
-        "width": 44
-      },
-      "M": {
-        "height": 27,
-        "width": 38
-      },
       "S": {
         "width": 36,
         "height": 26
       },
-      "4XL": {
-        "width": 46,
-        "height": 31
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "L": {
+        "width": 40,
+        "height": 28
       },
       "XS": {
         "width": 46,
         "height": 31
       },
-      "L": {
-        "width": 40,
-        "height": 28
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
       }
     },
-    "customNumber": false,
+    "createdAt": "2026-11-12T17:10:01.717Z",
+    "salePrice": 999,
+    "compareAt": 1150,
+    "slug": "arsenal-away-kit",
+    "expectedDelivery": null,
+    "customPrintPrice": null,
+    "seoTitle": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "isLimited": true,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "sku": "ZNV-MWDSZQID",
+    "preorderStatus": "OPEN",
+    "isPreorder": false,
+    "isFeatured": false,
+    "tax": 0,
+    "expectedArrival": null,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "preorderPrice": null,
+    "collectionId": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "seoDesc": "",
+    "preorderDesc": "",
+    "sizeChartImage": "",
+    "sizeChartType": "Player Edition",
+    "customNameNumber": true,
+    "customBadge": "",
+    "updatedAt": "2026-11-13T06:05:45.825Z",
+    "image": "img/products/prod_mwdszqiet4d9u1fip.webp",
+    "customName": false,
+    "discountType": "percent",
+    "preorderCapacity": 100,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "categoryId": "cat_mens_football",
+    "preorderCloseDate": null,
     "status": "published",
     "stock": 0,
+    "discountEnd": null,
+    "gender": "Unisex",
     "categoryName": "Player Version",
-    "categoryId": "cat_mens_football",
-    "customBadge": "",
-    "isDeliveryChargeMandatory": false,
-    "id": "prod_mwdszqiet4d9u1fip",
-    "preorderDesc": "",
+    "basePrice": 1150,
+    "customNumber": false,
+    "team": "Arsenal",
+    "imageUrl": "",
+    "lowStockAlert": 5,
+    "customLogo": false,
+    "isNewArrival": false,
+    "isPublished": true,
+    "name": "Arsenal Away Kit",
+    "costPrice": 750,
+    "deliveryChargeInsideDhaka": 80,
+    "isArchived": false,
+    "customText": false,
+    "preorderSold": 0,
+    "isBestSeller": false,
+    "deliveryChargeOutsideDhaka": 130,
     "images": [
       {
         "url": "img/products/prod_mwdszqiet4d9u1fip.webp",
@@ -569,53 +2987,54 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "sizeChartImage": "",
-    "isPreorder": false,
-    "discountType": "percent",
     "deliveryNote": "",
-    "sport": "Football",
-    "createdAt": "2026-11-12T17:10:01.717Z",
-    "assignedSleeves": [
-      "slv_half"
-    ],
+    "advancePaymentMode": "cod_only",
+    "isDeliveryChargeMandatory": false,
     "discountValue": null,
-    "compareAt": 1150,
-    "imageUrl": "img/products/prod_mwdszqiet4d9u1fip.webp",
-    "discountStart": null,
-    "preorderSold": 0,
-    "discountEnd": null,
-    "updatedAt": "2026-11-12T17:12:29.676Z",
-    "expectedDelivery": null,
-    "preorderCloseDate": null,
-    "team": "Arsenal",
-    "expectedArrival": null,
-    "isPublished": true,
-    "customLogo": false,
-    "customNameNumber": true,
-    "basePrice": 1150,
-    "isFeatured": false,
-    "isBestSeller": false,
-    "lowStockAlert": 5,
-    "isLimited": true,
-    "image": "img/products/prod_mwdszqiet4d9u1fip.webp",
-    "assignedSizes": [
-      "sz_s",
-      "sz_m",
-      "sz_l",
-      "sz_xl",
-      "sz_xxl",
-      "sz_3xl",
-      "sz_4xl"
+    "assignedPatches": [
+      "patch_ucl"
     ]
   },
   {
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "isNewArrival": false,
-    "image": "img/products/prod_mwdr6retnv03s299i.webp",
+    "id": "prod_mwdr6retnv03s299i",
     "customNameNumber": true,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "isPreorder": false,
+    "isLimited": true,
     "isDeliveryChargeMandatory": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "lowStockAlert": 5,
+    "name": "Arsenal Home Kit",
+    "salePrice": 999,
+    "preorderSold": 0,
+    "compareAt": 1150,
+    "isArchived": false,
+    "customText": false,
+    "isBestSeller": false,
+    "team": "Arsenal",
+    "createdAt": "2026-11-12T16:19:30.245Z",
+    "advancePaymentMode": "default",
+    "deliveryNote": "",
+    "sport": "Football",
+    "customNumber": false,
+    "preorderCloseDate": null,
+    "seoTitle": "",
+    "isNewArrival": false,
+    "customLogo": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "deliveryChargeInsideDhaka": 80,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "isPublished": true,
+    "categoryId": "cat_mens_football",
+    "discountType": "percent",
+    "customName": false,
+    "discountEnd": null,
+    "expectedArrival": null,
+    "discountValue": null,
+    "categoryName": "Player Version",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
     "images": [
       {
         "url": "img/products/prod_mwdr6retnv03s299i.webp",
@@ -623,104 +3042,30 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "sku": "ZNV-MWDR6RES",
-    "preorderCloseDate": null,
-    "team": "Arsenal",
-    "expectedDelivery": null,
     "costPrice": 750,
-    "sizeMapping": {
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "M": {
-        "height": 27,
-        "width": 38
-      },
-      "S": {
-        "width": 36,
-        "height": 26
-      },
-      "L": {
-        "height": 28,
-        "width": 40
-      },
-      "XXL": {
-        "height": 30,
-        "width": 44
-      },
-      "3XL": {
-        "height": 31,
-        "width": 46
-      },
-      "XL": {
-        "height": 29,
-        "width": 42
-      }
-    },
-    "preorderPrice": null,
-    "sizeStocks": {
-      "4XL": 0,
-      "M": 1,
-      "S": 1,
-      "L": 1,
-      "XXL": 1,
-      "XL": 1,
-      "3XL": 0
-    },
+    "customBadge": "",
+    "discountStart": null,
+    "preorderStatus": "OPEN",
+    "slug": "arsenal-home-kit",
+    "collectionId": null,
+    "preorderDesc": "",
+    "seoDesc": "",
+    "tax": 0,
+    "basePrice": 1150,
+    "isFeatured": false,
+    "updatedAt": "2026-11-13T06:05:53.038Z",
+    "sizeChartImage": "",
+    "isPreorder": false,
+    "sku": "ZNV-MWDR6RES",
+    "image": "img/products/prod_mwdr6retnv03s299i.webp",
+    "gender": "Unisex",
+    "hasCustomDelivery": false,
+    "imageUrl": "",
     "assignedPatches": [
       "patch_ucl"
     ],
-    "sizeChartType": "Player Edition",
-    "sport": "Football",
-    "categoryName": "Player Version",
-    "deliveryChargeOutsideDhaka": 130,
-    "salePrice": 999,
-    "tax": 0,
-    "sizeChartImage": "",
-    "customLogo": false,
-    "isFeatured": false,
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "id": "prod_mwdr6retnv03s299i",
-    "customNumber": false,
-    "seoTitle": "",
-    "collectionId": null,
-    "preorderStatus": "OPEN",
-    "discountEnd": null,
     "stock": 4,
-    "basePrice": 1150,
-    "isLimited": true,
-    "discountType": "percent",
-    "deliveryNote": "",
-    "customName": false,
-    "gender": "Unisex",
-    "discountValue": null,
-    "deliveryChargeInsideDhaka": 80,
-    "preorderCapacity": 100,
-    "updatedAt": "2026-11-12T16:44:31.566Z",
-    "hasCustomDelivery": false,
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "preorderDesc": "",
-    "isPublished": true,
-    "seoDesc": "",
-    "customPrintPrice": null,
-    "categoryId": "cat_mens_football",
-    "createdAt": "2026-11-12T16:19:30.245Z",
-    "expectedArrival": null,
-    "discountStart": null,
-    "customBadge": "",
-    "isBestSeller": false,
-    "advancePaymentMode": "default",
-    "compareAt": 1150,
-    "name": "Arsenal Home Kit",
-    "preorderSold": 0,
-    "imageUrl": "img/products/prod_mwdr6retnv03s299i.webp",
+    "status": "published",
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -730,72 +3075,26 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "slug": "arsenal-home-kit",
-    "lowStockAlert": 5,
-    "isArchived": false,
-    "status": "published",
-    "customText": false
-  },
-  {
-    "expectedArrival": null,
-    "collectionId": null,
-    "customNameNumber": true,
-    "hasCustomDelivery": false,
-    "sizeChartImage": "",
-    "team": "",
-    "stock": 4,
-    "customLogo": false,
-    "description": "",
-    "sizeChartType": "Player Edition",
-    "isFeatured": false,
-    "salePrice": 999,
-    "seoDesc": "",
-    "images": [
-      {
-        "url": "img/products/prod_mwdqw21pcbottdjz0.webp",
-        "alt": "Mancester City Third Kit (Copy)",
-        "isPrimary": true
-      }
-    ],
-    "customNumber": true,
-    "categoryName": "Player Version",
-    "expectedDelivery": null,
-    "subcategoryId": null,
-    "deliveryChargeInsideDhaka": 80,
-    "deliveryChargeOutsideDhaka": 130,
-    "isPreorder": false,
-    "seoTitle": "",
-    "costPrice": null,
-    "preorderPrice": null,
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "shortDesc": "",
     "sizeStocks": {
       "3XL": 0,
-      "M": 0,
+      "4XL": 0,
       "XXL": 1,
-      "S": 1,
-      "L": 1,
       "XL": 1,
-      "4XL": 0
+      "S": 1,
+      "M": 1,
+      "L": 1
     },
+    "preorderPrice": null,
+    "preorderCapacity": 100,
+    "subcategoryId": "mw88n5w90qabal7hw",
     "sizeMapping": {
-      "3XL": {
+      "XS": {
         "width": 46,
         "height": 31
       },
       "XL": {
-        "height": 29,
-        "width": 42
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "M": {
-        "height": 27,
-        "width": 38
+        "width": 42,
+        "height": 29
       },
       "4XL": {
         "width": 46,
@@ -805,87 +3104,50 @@ const ACTIVE_CATALOG_BASELINE = [
         "width": 40,
         "height": 28
       },
-      "XS": {
-        "height": 31,
-        "width": 46
+      "XXL": {
+        "height": 30,
+        "width": 44
       },
-      "S": {
-        "width": 36,
-        "height": 26
-      }
-    },
-    "isNewArrival": false,
-    "discountStart": null,
-    "preorderCloseDate": null,
-    "categoryId": "cat_mens_football",
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "image": "img/products/prod_mwdqw21pcbottdjz0.webp",
-    "customBadge": "",
-    "gender": "Unisex",
-    "preorderSold": 0,
-    "lowStockAlert": 5,
-    "isBestSeller": false,
-    "id": "prod_mwdqw21pcbottdjz0",
-    "sku": "ZNV-MWAFXROJ-COPY-MWDQW21P",
-    "compareAt": 1150,
-    "assignedSizes": [
-      "sz_l"
-    ],
-    "preorderCapacity": 100,
-    "customText": false,
-    "isArchived": false,
-    "advancePaymentMode": "default",
-    "createdAt": "2026-11-12T16:11:10.813Z",
-    "preorderDesc": "",
-    "tax": 0,
-    "preorderStatus": "OPEN",
-    "status": "published",
-    "discountEnd": null,
-    "sport": "Football",
-    "imageUrl": "img/products/prod_mwdqw21pcbottdjz0.webp",
-    "slug": "mancester-city-third-kit-copy-mwdqw21p",
-    "customName": true,
-    "customPrintPrice": null,
-    "updatedAt": "2026-11-12T16:12:19.645Z",
-    "discountType": "percent",
-    "deliveryNote": "",
-    "basePrice": 1150,
-    "name": "Mancester City Third Kit (Copy)",
-    "isPublished": true,
-    "discountValue": null,
-    "isDeliveryChargeMandatory": false,
-    "isLimited": true
-  },
-  {
-    "deliveryChargeInsideDhaka": 80,
-    "updatedAt": "2026-11-12T16:10:37.401Z",
-    "expectedArrival": null,
-    "seoTitle": "",
-    "deliveryNote": "",
-    "discountType": "percent",
-    "sizeChartType": "Player Edition",
-    "preorderCloseDate": null,
-    "id": "prod_mwdqnvvpv1ravgb0o",
-    "stock": 0,
-    "isLimited": false,
-    "sizeMapping": {
-      "M": {
-        "width": 38,
-        "height": 27
+      "3XL": {
+        "width": 46,
+        "height": 31
       },
       "S": {
         "height": 26,
         "width": 36
       },
+      "M": {
+        "width": 38,
+        "height": 27
+      }
+    },
+    "sizeChartType": "Player Edition"
+  },
+  {
+    "id": "prod_mwdqw21pcbottdjz0",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "sizeMapping": {
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
       "L": {
         "height": 28,
         "width": 40
       },
-      "4XL": {
-        "height": 31,
-        "width": 46
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
       },
       "XL": {
         "width": 42,
@@ -895,21 +3157,169 @@ const ACTIVE_CATALOG_BASELINE = [
         "width": 46,
         "height": 31
       },
-      "3XL": {
+      "4XL": {
+        "width": 46,
+        "height": 31
+      }
+    },
+    "discountStart": null,
+    "deliveryNote": "",
+    "sizeStocks": {
+      "XXL": 1,
+      "4XL": 0,
+      "M": 0,
+      "S": 1,
+      "3XL": 0,
+      "XL": 1,
+      "L": 1
+    },
+    "isBestSeller": false,
+    "preorderSold": 0,
+    "slug": "mancester-city-third-kit-copy-mwdqw21p",
+    "shortDesc": "",
+    "deliveryChargeOutsideDhaka": 130,
+    "preorderCloseDate": null,
+    "isNewArrival": false,
+    "isLimited": true,
+    "customNumber": true,
+    "preorderPrice": null,
+    "isPreorder": false,
+    "sport": "Football",
+    "customBadge": "",
+    "preorderCapacity": 100,
+    "createdAt": "2026-11-12T16:11:10.813Z",
+    "categoryName": "Player Version",
+    "sizeChartType": "Player Edition",
+    "subcategoryId": null,
+    "isFeatured": false,
+    "assignedSizes": [
+      "sz_l"
+    ],
+    "imageUrl": "",
+    "compareAt": 1150,
+    "expectedArrival": null,
+    "discountType": "percent",
+    "salePrice": 999,
+    "preorderDesc": "",
+    "discountEnd": null,
+    "team": "",
+    "name": "Mancester City Third Kit (Copy)",
+    "collectionId": null,
+    "sku": "ZNV-MWAFXROJ-COPY-MWDQW21P",
+    "description": "",
+    "customLogo": false,
+    "images": [
+      {
+        "isPrimary": true,
+        "alt": "Mancester City Third Kit (Copy)",
+        "url": "img/products/prod_mwdqw21pcbottdjz0.webp"
+      }
+    ],
+    "deliveryChargeInsideDhaka": 80,
+    "customNameNumber": true,
+    "isPublished": true,
+    "lowStockAlert": 5,
+    "customName": true,
+    "categoryId": "cat_mens_football",
+    "preorderStatus": "OPEN",
+    "advancePaymentMode": "default",
+    "isDeliveryChargeMandatory": false,
+    "expectedDelivery": null,
+    "customPrintPrice": null,
+    "status": "published",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "gender": "Unisex",
+    "costPrice": null,
+    "seoDesc": "",
+    "hasCustomDelivery": false,
+    "image": "img/products/prod_mwdqw21pcbottdjz0.webp",
+    "discountValue": null,
+    "updatedAt": "2026-11-12T16:12:19.645Z",
+    "customText": false,
+    "tax": 0,
+    "isArchived": false,
+    "basePrice": 1150,
+    "sizeChartImage": "",
+    "stock": 4,
+    "seoTitle": ""
+  },
+  {
+    "id": "prod_mwdqnvvpv1ravgb0o",
+    "isNewArrival": false,
+    "customLogo": false,
+    "customNumber": true,
+    "isDeliveryChargeMandatory": false,
+    "hasCustomDelivery": false,
+    "discountValue": null,
+    "deliveryChargeOutsideDhaka": 130,
+    "customName": true,
+    "status": "published",
+    "categoryId": "cat_mens_football",
+    "discountType": "percent",
+    "customBadge": "",
+    "categoryName": "Player Version",
+    "expectedArrival": null,
+    "gender": "Unisex",
+    "preorderCapacity": 100,
+    "slug": "erfge",
+    "seoTitle": "",
+    "preorderStatus": "OPEN",
+    "createdAt": "2026-11-12T16:04:49.573Z",
+    "assignedSleeves": [
+      "slv_half",
+      "mw9mgrcce7v5jp20j",
+      "slv_full",
+      "mw85up47v7er1mbhw"
+    ],
+    "salePrice": null,
+    "deliveryChargeInsideDhaka": 80,
+    "seoDesc": "",
+    "sport": "Football",
+    "sizeMapping": {
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XS": {
         "height": 31,
         "width": 46
       },
       "XXL": {
         "width": 44,
         "height": 30
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "L": {
+        "height": 28,
+        "width": 40
       }
     },
-    "preorderDesc": "",
-    "preorderStatus": "OPEN",
-    "isPreorder": false,
-    "basePrice": 1,
-    "expectedDelivery": null,
-    "subcategoryId": null,
+    "compareAt": null,
+    "isArchived": false,
+    "customText": false,
+    "isBestSeller": false,
+    "preorderSold": 0,
+    "shortDesc": "",
+    "isLimited": false,
+    "deliveryNote": "",
+    "lowStockAlert": 5,
     "images": [
       {
         "url": "img/products/prod_mwdqnvvpv1ravgb0o.webp",
@@ -917,33 +3327,9 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "description": "",
-    "isBestSeller": false,
-    "createdAt": "2026-11-12T16:04:49.573Z",
-    "compareAt": null,
-    "preorderPrice": null,
-    "assignedSleeves": [
-      "slv_half",
-      "mw9mgrcce7v5jp20j",
-      "slv_full",
-      "mw85up47v7er1mbhw"
-    ],
-    "preorderSold": 0,
-    "isFeatured": false,
-    "deliveryChargeOutsideDhaka": 130,
-    "team": "",
-    "customNameNumber": true,
-    "customLogo": false,
-    "costPrice": null,
-    "hasCustomDelivery": false,
+    "sizeChartImage": "",
+    "preorderCloseDate": null,
     "sku": "ZNV-MWDQNVVO",
-    "discountStart": null,
-    "isNewArrival": false,
-    "name": "erfge",
-    "imageUrl": "img/products/prod_mwdqnvvpv1ravgb0o.webp",
-    "seoDesc": "",
-    "advancePaymentMode": "default",
-    "discountEnd": null,
     "assignedPatches": [
       "mw935ci5a7u2put3v",
       "mw935ci6apxu1zl69",
@@ -953,12 +3339,10 @@ const ACTIVE_CATALOG_BASELINE = [
       "patch_respect",
       "patch_epl"
     ],
-    "image": "img/products/prod_mwdqnvvpv1ravgb0o.webp",
-    "lowStockAlert": 5,
-    "customPrintPrice": null,
-    "status": "published",
-    "isPublished": true,
-    "shortDesc": "",
+    "preorderPrice": null,
+    "sizeChartType": "Player Edition",
+    "subcategoryId": null,
+    "advancePaymentMode": "default",
     "assignedSizes": [
       "sz_xs",
       "sz_s",
@@ -969,68 +3353,52 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "customName": true,
-    "isDeliveryChargeMandatory": false,
-    "slug": "erfge",
-    "categoryName": "Player Version",
-    "customBadge": "",
-    "preorderCapacity": 100,
-    "isArchived": false,
-    "customText": false,
-    "customNumber": true,
-    "categoryId": "cat_mens_football",
-    "sport": "Football",
-    "sizeChartImage": "",
-    "tax": 0,
-    "gender": "Unisex",
+    "customNameNumber": true,
+    "imageUrl": "",
+    "updatedAt": "2026-11-12T16:10:37.401Z",
+    "stock": 0,
+    "discountEnd": null,
+    "preorderDesc": "",
+    "description": "",
+    "image": "img/products/prod_mwdqnvvpv1ravgb0o.webp",
     "collectionId": null,
-    "salePrice": null,
-    "discountValue": null
+    "basePrice": 1,
+    "discountStart": null,
+    "expectedDelivery": null,
+    "customPrintPrice": null,
+    "tax": 0,
+    "isPreorder": false,
+    "costPrice": null,
+    "name": "erfge",
+    "team": "",
+    "isFeatured": false,
+    "isPublished": true
   },
   {
-    "updatedAt": "2026-11-12T16:02:36.643Z",
-    "seoTitle": "",
-    "customPrintPrice": null,
-    "preorderDesc": "",
-    "isDeliveryChargeMandatory": false,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "preorderStatus": "OPEN",
-    "sizeStocks": {
-      "4XL": 0,
-      "L": 1,
-      "XL": 1,
-      "S": 1,
-      "XXL": 1,
-      "M": 1,
-      "3XL": 0
-    },
-    "tax": 0,
-    "preorderPrice": null,
-    "isLimited": true,
-    "image": "img/products/prod_mwdqkrjb8d4glhnm7.webp",
-    "hasCustomDelivery": false,
-    "deliveryNote": "",
-    "discountType": "percent",
-    "gender": "Unisex",
-    "basePrice": 1150,
-    "subcategoryId": null,
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "id": "prod_mwdqkrjb8d4glhnm7",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "sport": "Football",
+    "discountStart": null,
+    "deliveryChargeInsideDhaka": 80,
     "advancePaymentMode": "cod_only",
-    "isPreorder": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "hasCustomDelivery": false,
+    "slug": "mancester-city-third-kit-copy-mwdqkrjb",
+    "isLimited": true,
+    "createdAt": "2026-11-12T16:02:23.975Z",
+    "deliveryNote": "",
     "sizeMapping": {
-      "XXL": {
-        "height": 30,
-        "width": 44
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
+      "L": {
+        "width": 40,
+        "height": 28
       },
       "XS": {
-        "width": 46,
-        "height": 31
+        "height": 31,
+        "width": 46
+      },
+      "M": {
+        "height": 27,
+        "width": 38
       },
       "S": {
         "width": 36,
@@ -1040,35 +3408,70 @@ const ACTIVE_CATALOG_BASELINE = [
         "height": 29,
         "width": 42
       },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
       "4XL": {
-        "width": 46,
-        "height": 31
+        "height": 31,
+        "width": 46
       },
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "M": {
-        "height": 27,
-        "width": 38
+      "3XL": {
+        "height": 31,
+        "width": 46
       }
     },
-    "preorderSold": 0,
-    "sizeChartType": "Player Edition",
-    "createdAt": "2026-11-12T16:02:23.975Z",
-    "sport": "Football",
     "isBestSeller": false,
     "compareAt": 1150,
-    "status": "published",
-    "preorderCapacity": 100,
+    "isPreorder": false,
+    "preorderSold": 0,
+    "salePrice": 999,
     "isFeatured": false,
-    "sku": "ZNV-MWAFXROJ-COPY-MWDQKRJB",
-    "customLogo": false,
-    "team": "Mancester City",
-    "imageUrl": "img/products/prod_mwdqkrjb8d4glhnm7.webp",
-    "name": "Mancester City Third Kit (Copy)",
-    "seoDesc": "",
+    "isDeliveryChargeMandatory": false,
+    "preorderCapacity": 100,
+    "customBadge": "",
+    "isNewArrival": false,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customNumber": false,
+    "categoryName": "Player Version",
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "sizeChartType": "Player Edition",
+    "subcategoryId": null,
+    "seoTitle": "",
+    "discountType": "percent",
+    "preorderPrice": null,
+    "sizeStocks": {
+      "XL": 1,
+      "4XL": 0,
+      "M": 1,
+      "S": 1,
+      "XXL": 1,
+      "L": 1,
+      "3XL": 0
+    },
+    "preorderDesc": "",
+    "isPublished": true,
+    "image": "img/products/prod_mwdqkrjb8d4glhnm7.webp",
+    "collectionId": null,
+    "preorderCloseDate": null,
+    "stock": 5,
     "costPrice": 750,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "customText": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isArchived": false,
     "images": [
       {
         "url": "img/products/prod_mwdqkrjb8d4glhnm7.webp",
@@ -1078,94 +3481,61 @@ const ACTIVE_CATALOG_BASELINE = [
       {
         "url": "img/products/prod_mwdqkrjb8d4glhnm7_1.webp",
         "alt": "Mancester City Third Kit (Copy)",
-        "isPrimary": false
+        "isPrimary": true
       }
     ],
-    "discountValue": null,
-    "expectedArrival": null,
-    "stock": 5,
-    "deliveryChargeInsideDhaka": 80,
-    "isNewArrival": false,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "customName": false,
-    "slug": "mancester-city-third-kit-copy-mwdqkrjb",
-    "preorderCloseDate": null,
-    "customBadge": "",
-    "collectionId": null,
-    "deliveryChargeOutsideDhaka": 130,
-    "assignedSizes": [
-      "sz_s",
-      "sz_m",
-      "sz_l",
-      "sz_xl",
-      "sz_xxl",
-      "sz_3xl",
-      "sz_4xl"
-    ],
-    "sizeChartImage": "",
-    "customText": false,
-    "isArchived": false,
-    "customNameNumber": true,
+    "team": "Mancester City",
+    "name": "Mancester City Third Kit (Copy)",
     "lowStockAlert": 5,
-    "isPublished": true,
-    "categoryId": "cat_mens_football",
-    "expectedDelivery": null,
-    "discountEnd": null,
-    "customNumber": false,
-    "id": "prod_mwdqkrjb8d4glhnm7",
-    "salePrice": 999,
-    "categoryName": "Player Version",
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "discountStart": null
-  },
-  {
-    "discountType": "percent",
-    "preorderStatus": "OPEN",
-    "deliveryNote": "",
     "customNameNumber": true,
-    "sizeMapping": {
-      "3XL": {
-        "width": 46,
-        "height": 31
-      },
-      "XL": {
-        "height": 29,
-        "width": 42
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "M": {
-        "height": 27,
-        "width": 38
-      },
-      "L": {
-        "height": 28,
-        "width": 40
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
-      "S": {
-        "width": 36,
-        "height": 26
-      }
-    },
-    "sport": "Football",
-    "discountStart": null,
-    "assignedSizes": [],
+    "updatedAt": "2026-11-12T16:02:36.643Z",
+    "basePrice": 1150,
+    "discountEnd": null,
+    "tax": 0,
     "customLogo": false,
     "seoDesc": "",
+    "sku": "ZNV-MWAFXROJ-COPY-MWDQKRJB",
+    "preorderStatus": "OPEN",
+    "sizeChartImage": "",
+    "customName": false,
+    "gender": "Unisex",
+    "categoryId": "cat_mens_football",
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "expectedArrival": null,
+    "discountValue": null,
+    "status": "published",
+    "imageUrl": ""
+  },
+  {
+    "id": "prod_mwafxrols41103ror",
+    "gender": "Unisex",
+    "costPrice": null,
+    "discountEnd": null,
+    "status": "published",
+    "preorderCapacity": 100,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "hasCustomDelivery": false,
+    "basePrice": 1150,
+    "lowStockAlert": 5,
+    "expectedArrival": null,
+    "team": "Mancester City",
+    "imageUrl": "",
+    "isDeliveryChargeMandatory": false,
+    "sizeStocks": {
+      "4XL": 0,
+      "XXL": 1,
+      "XL": 1,
+      "3XL": 0,
+      "L": 1,
+      "S": 1,
+      "M": 0
+    },
+    "updatedAt": "2026-11-13T06:05:55.466Z",
+    "isPublished": true,
+    "name": "Mancester City Third Kit",
+    "sport": "Football",
     "preorderDesc": "",
-    "isFeatured": false,
     "images": [
       {
         "url": "img/products/prod_mwafxrols41103ror.jpg",
@@ -1173,123 +3543,182 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "expectedDelivery": null,
-    "compareAt": 1150,
-    "createdAt": "2026-11-10T08:41:16.389Z",
-    "lowStockAlert": 5,
-    "sizeStocks": {
-      "L": 1,
-      "XXL": 1,
-      "S": 1,
-      "M": 0,
-      "3XL": 0,
-      "4XL": 0,
-      "XL": 1
-    },
-    "isBestSeller": false,
-    "isDeliveryChargeMandatory": false,
-    "seoTitle": "",
-    "image": "img/products/prod_mwafxrols41103ror.jpg",
-    "preorderCloseDate": null,
-    "updatedAt": "2026-11-12T18:38:21.937Z",
-    "slug": "mancester-city-third-kit",
-    "basePrice": 1150,
-    "isPreorder": false,
-    "discountValue": null,
-    "name": "Mancester City Third Kit",
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "preorderSold": 0,
-    "isLimited": true,
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "sizeChartType": "Player Edition",
     "assignedSleeves": [
       "slv_half"
     ],
-    "gender": "Unisex",
-    "customText": false,
-    "isArchived": false,
-    "isNewArrival": false,
-    "advancePaymentMode": "default",
-    "team": "Mancester City",
-    "isPublished": true,
-    "salePrice": 999,
-    "sku": "ZNV-MWAFXROJ",
-    "discountEnd": null,
-    "preorderCapacity": 100,
-    "id": "prod_mwafxrols41103ror",
-    "categoryId": "cat_mens_football",
-    "customNumber": true,
-    "tax": 0,
-    "hasCustomDelivery": false,
-    "stock": 4,
-    "imageUrl": "",
-    "status": "published",
-    "categoryName": "Player Version",
-    "costPrice": null,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "customPrintPrice": null,
-    "sizeChartImage": "",
-    "expectedArrival": null,
     "collectionId": null,
-    "customName": true,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "deliveryChargeInsideDhaka": 80,
-    "customBadge": "",
+    "sizeChartImage": "",
     "deliveryChargeOutsideDhaka": 130,
-    "preorderPrice": null
+    "advancePaymentMode": "default",
+    "deliveryChargeInsideDhaka": 80,
+    "discountValue": null,
+    "isFeatured": false,
+    "preorderStatus": "OPEN",
+    "isPreorder": false,
+    "customLogo": false,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "isLimited": true,
+    "slug": "mancester-city-third-kit",
+    "discountStart": null,
+    "isNewArrival": false,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "tax": 0,
+    "sizeMapping": {
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      }
+    },
+    "customNumber": true,
+    "categoryName": "Player Version",
+    "categoryId": "cat_mens_football",
+    "compareAt": 1150,
+    "preorderCloseDate": null,
+    "salePrice": 999,
+    "stock": 4,
+    "customName": true,
+    "expectedDelivery": null,
+    "seoDesc": "",
+    "customPrintPrice": null,
+    "createdAt": "2026-11-10T08:41:16.389Z",
+    "image": "img/products/prod_mwafxrols41103ror.jpg",
+    "seoTitle": "",
+    "discountType": "percent",
+    "assignedSizes": [],
+    "deliveryNote": "",
+    "customBadge": "",
+    "customText": false,
+    "customNameNumber": true,
+    "isArchived": false,
+    "preorderPrice": null,
+    "isBestSeller": false,
+    "sku": "ZNV-MWAFXROJ",
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "preorderSold": 0
   },
   {
-    "seoTitle": "",
-    "lowStockAlert": 5,
-    "salePrice": 999,
-    "gender": "Unisex",
-    "assignedSizes": [],
-    "isBestSeller": false,
+    "id": "prod_mwafvhg25iobn348j",
+    "tax": 0,
     "hasCustomDelivery": false,
-    "isDeliveryChargeMandatory": false,
-    "sizeStocks": {},
-    "customBadge": "",
-    "preorderSold": 0,
-    "discountStart": null,
-    "customPrintPrice": null,
-    "isPreorder": false,
-    "stock": 10,
-    "expectedArrival": null,
-    "isPublished": true,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "deliveryChargeOutsideDhaka": 130,
     "discountType": "percent",
-    "status": "published",
-    "deliveryNote": "",
-    "preorderCapacity": 100,
-    "team": "Mancester City",
-    "discountValue": null,
+    "assignedSizes": [],
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
+    "categoryName": "Player Version",
+    "preorderPrice": null,
+    "sizeMapping": {
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "isNewArrival": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "customNumber": true,
+    "slug": "mancester-city-away-kit",
+    "advancePaymentMode": "default",
+    "customText": false,
+    "isArchived": false,
     "assignedSleeves": [
       "slv_half"
     ],
-    "preorderStatus": "OPEN",
-    "discountEnd": null,
+    "isBestSeller": false,
+    "preorderSold": 0,
     "costPrice": null,
+    "deliveryNote": "",
     "customLogo": false,
-    "preorderDesc": "",
-    "isFeatured": false,
-    "categoryName": "Player Version",
-    "preorderCloseDate": null,
+    "expectedArrival": null,
     "imageUrl": "",
-    "customNumber": true,
-    "createdAt": "2026-11-10T08:39:29.810Z",
-    "slug": "mancester-city-away-kit",
-    "seoDesc": "",
-    "compareAt": 1150,
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "deliveryChargeInsideDhaka": 80,
+    "sku": "ZNV-MWAFVHFY",
+    "basePrice": 1150,
+    "discountStart": null,
+    "image": "img/products/prod_mwafvhg25iobn348j.jpg",
+    "customBadge": "",
+    "stock": 10,
+    "preorderCapacity": 100,
+    "categoryId": "cat_mens_football",
+    "updatedAt": "2026-11-13T06:05:56.354Z",
+    "customName": true,
     "name": "Mancester City Away Kit",
-    "id": "prod_mwafvhg25iobn348j",
-    "assignedPatches": [
-      "patch_ucl"
-    ],
+    "preorderCloseDate": null,
+    "discountEnd": null,
+    "customNameNumber": true,
+    "seoDesc": "",
+    "team": "Mancester City",
+    "status": "published",
+    "preorderStatus": "OPEN",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "gender": "Unisex",
+    "discountValue": null,
+    "sizeChartImage": "",
+    "isFeatured": false,
+    "isPreorder": false,
+    "deliveryChargeInsideDhaka": 80,
+    "isPublished": true,
+    "lowStockAlert": 5,
+    "isLimited": true,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "seoTitle": "",
+    "customPrintPrice": null,
     "images": [
       {
         "url": "img/products/prod_mwafvhg25iobn348j.jpg",
@@ -1297,74 +3726,51 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "image": "img/products/prod_mwafvhg25iobn348j.jpg",
-    "sizeChartImage": "",
-    "tax": 0,
-    "sizeChartType": "Player Edition",
-    "advancePaymentMode": "default",
-    "customName": true,
-    "collectionId": null,
-    "preorderPrice": null,
-    "isNewArrival": false,
-    "sizeMapping": {
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
-      "4XL": {
-        "height": 31,
-        "width": 46
-      },
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
-      },
-      "S": {
-        "height": 26,
-        "width": 36
-      },
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
-      "XXL": {
-        "height": 30,
-        "width": 44
-      }
-    },
-    "basePrice": 1150,
-    "isLimited": true,
-    "isArchived": false,
     "expectedDelivery": null,
-    "customText": false,
-    "sku": "ZNV-MWAFVHFY",
-    "customNameNumber": true,
-    "categoryId": "cat_mens_football",
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "updatedAt": "2026-11-12T18:38:06.478Z",
-    "sport": "Football"
+    "compareAt": 1150,
+    "sport": "Football",
+    "sizeStocks": {},
+    "salePrice": 999,
+    "preorderDesc": "",
+    "isDeliveryChargeMandatory": false,
+    "createdAt": "2026-11-10T08:39:29.810Z",
+    "collectionId": null,
+    "assignedPatches": [
+      "patch_ucl"
+    ]
   },
   {
+    "id": "prod_mwafsdqhn64s1y787",
+    "expectedArrival": null,
     "assignedSizes": [],
-    "deliveryChargeOutsideDhaka": 130,
+    "sizeStocks": {},
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "sizeChartType": "Player Edition",
     "name": "Mancester City Home Kit",
-    "lowStockAlert": 5,
-    "isNewArrival": false,
+    "isPublished": true,
+    "team": "Mancester City",
+    "preorderPrice": null,
+    "customNameNumber": true,
+    "discountEnd": null,
+    "image": "img/products/prod_mwafsdqhn64s1y787.jpg",
+    "hasCustomDelivery": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "stock": 10,
+    "imageUrl": "",
+    "collectionId": null,
+    "isPreorder": false,
+    "preorderDesc": "",
+    "isFeatured": false,
+    "updatedAt": "2026-11-13T06:05:56.802Z",
+    "basePrice": 1150,
+    "discountStart": null,
     "assignedSleeves": [
       "slv_half"
     ],
-    "customName": true,
-    "customBadge": "",
-    "stock": 10,
-    "slug": "mancester-city-home-kit",
+    "expectedDelivery": null,
+    "deliveryChargeOutsideDhaka": 130,
+    "customPrintPrice": null,
+    "costPrice": null,
     "images": [
       {
         "url": "img/products/prod_mwafsdqhn64s1y787.jpg",
@@ -1372,61 +3778,27 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "compareAt": 1154,
-    "discountStart": null,
-    "createdAt": "2026-11-10T08:37:05.033Z",
-    "sizeChartImage": "",
-    "customNameNumber": true,
-    "discountValue": null,
-    "discountEnd": null,
-    "customNumber": true,
-    "categoryId": "cat_mens_football",
     "isDeliveryChargeMandatory": false,
+    "customName": true,
+    "customNumber": true,
+    "discountValue": null,
+    "categoryId": "cat_mens_football",
+    "isNewArrival": false,
+    "slug": "mancester-city-home-kit",
     "preorderCloseDate": null,
-    "updatedAt": "2026-11-12T18:37:54.107Z",
-    "categoryName": "Player Version",
-    "seoTitle": "",
-    "collectionId": null,
-    "basePrice": 1150,
-    "expectedDelivery": null,
-    "isPublished": true,
-    "expectedArrival": null,
-    "isArchived": false,
-    "isLimited": true,
-    "customText": false,
-    "id": "prod_mwafsdqhn64s1y787",
-    "discountType": "percent",
-    "deliveryNote": "",
-    "isPreorder": false,
-    "customPrintPrice": null,
-    "image": "img/products/prod_mwafsdqhn64s1y787.jpg",
-    "gender": "Unisex",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "advancePaymentMode": "default",
-    "salePrice": 999,
-    "sizeChartType": "Player Edition",
-    "preorderDesc": "",
-    "sku": "ZNV-MWAFSDQD",
-    "sizeStocks": {},
-    "status": "published",
-    "hasCustomDelivery": false,
-    "isBestSeller": false,
-    "seoDesc": "",
-    "tax": 0,
-    "customLogo": false,
-    "preorderPrice": null,
-    "costPrice": null,
-    "isFeatured": false,
-    "sport": "Football",
-    "imageUrl": "",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "team": "Mancester City",
     "assignedPatches": [
       "patch_ucl"
     ],
-    "preorderStatus": "OPEN",
+    "seoDesc": "",
+    "sku": "ZNV-MWAFSDQD",
+    "sport": "Football",
+    "categoryName": "Player Version",
     "sizeMapping": {
-      "3XL": {
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XS": {
         "height": 31,
         "width": 46
       },
@@ -1438,90 +3810,91 @@ const ACTIVE_CATALOG_BASELINE = [
         "width": 44,
         "height": 30
       },
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "4XL": {
+      "3XL": {
         "height": 31,
         "width": 46
       },
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
       "L": {
-        "height": 28,
-        "width": 40
+        "width": 40,
+        "height": 28
+      },
+      "M": {
+        "height": 27,
+        "width": 38
       },
       "S": {
         "width": 36,
         "height": 26
       }
     },
+    "customLogo": false,
+    "discountType": "percent",
+    "seoTitle": "",
+    "createdAt": "2026-11-10T08:37:05.033Z",
+    "customBadge": "",
+    "lowStockAlert": 5,
+    "sizeChartImage": "",
+    "tax": 0,
+    "gender": "Unisex",
     "deliveryChargeInsideDhaka": 80,
-    "subcategoryId": "mw88n5w90qabal7hw",
+    "advancePaymentMode": "default",
+    "customText": false,
+    "compareAt": 1154,
+    "isArchived": false,
+    "preorderCapacity": 100,
+    "status": "published",
+    "salePrice": 999,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "deliveryNote": "",
     "preorderSold": 0,
-    "preorderCapacity": 100
+    "isBestSeller": false,
+    "isLimited": true,
+    "preorderStatus": "OPEN"
   },
   {
-    "preorderSold": 0,
-    "isFeatured": false,
-    "slug": "barcelona-4th-kit",
-    "updatedAt": "2026-11-12T18:37:39.427Z",
-    "customLogo": false,
-    "expectedDelivery": null,
-    "sizeMapping": {
-      "S": {
-        "height": 26,
-        "width": 36
-      },
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "XL": {
-        "height": 29,
-        "width": 42
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "M": {
-        "height": 27,
-        "width": 38
-      },
-      "3XL": {
-        "height": 31,
-        "width": 46
-      },
-      "XS": {
-        "height": 31,
-        "width": 46
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      }
-    },
-    "discountValue": null,
-    "isLimited": true,
     "id": "prod_mw9setzepymsatr9c",
+    "discountEnd": null,
+    "customText": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "name": "Barcelona 4th Kit",
+    "isNewArrival": false,
+    "isArchived": false,
+    "team": "Barcelona",
+    "customNumber": true,
+    "discountStart": null,
+    "categoryName": "Player Version",
     "customNameNumber": true,
+    "image": "img/products/prod_mw9setzepymsatr9c.jpg",
+    "isPublished": true,
+    "stock": 3,
+    "discountType": "percent",
+    "imageUrl": "",
+    "createdAt": "2026-11-09T21:42:41.738Z",
+    "preorderStatus": "OPEN",
+    "assignedSizes": [],
+    "preorderCloseDate": null,
+    "compareAt": 1150,
+    "sizeChartType": "Player Edition",
+    "customName": true,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "preorderPrice": null,
+    "salePrice": 999,
+    "categoryId": "cat_mens_football",
     "assignedPatches": [
       "patch_ucl",
       "patch_trophy",
       "patch_respect",
       "patch_epl"
     ],
-    "basePrice": 1150,
-    "sport": "Football",
-    "name": "Barcelona 4th Kit",
+    "deliveryNote": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "customLogo": false,
     "isBestSeller": false,
-    "isDeliveryChargeMandatory": false,
-    "isPreorder": false,
-    "discountStart": null,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "sizeChartImage": "",
+    "preorderSold": 0,
+    "isLimited": true,
     "images": [
       {
         "url": "img/products/prod_mw9setzepymsatr9c.jpg",
@@ -1529,130 +3902,108 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "preorderStatus": "OPEN",
-    "preorderDesc": "",
-    "hasCustomDelivery": false,
     "deliveryChargeOutsideDhaka": 130,
-    "compareAt": 1150,
-    "sizeStocks": {},
-    "createdAt": "2026-11-09T21:42:41.738Z",
-    "assignedSizes": [],
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "isPreorder": false,
+    "isFeatured": false,
     "lowStockAlert": 5,
-    "imageUrl": "",
-    "deliveryNote": "",
-    "image": "img/products/prod_mw9setzepymsatr9c.jpg",
-    "discountType": "percent",
-    "tax": 0,
-    "costPrice": null,
-    "sizeChartImage": "",
-    "collectionId": null,
-    "categoryId": "cat_mens_football",
-    "isPublished": true,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "preorderCapacity": 100,
-    "seoDesc": "",
-    "advancePaymentMode": "default",
-    "expectedArrival": null,
-    "isArchived": false,
-    "customText": false,
-    "discountEnd": null,
-    "categoryName": "Player Version",
-    "status": "published",
-    "preorderPrice": null,
-    "customNumber": true,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "customName": true,
+    "sizeMapping": {
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "3XL": {
+        "width": 46,
+        "height": 31
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      }
+    },
+    "isDeliveryChargeMandatory": false,
+    "slug": "barcelona-4th-kit",
     "assignedSleeves": [
       "slv_half",
       "mw9mgrcce7v5jp20j",
       "slv_full"
     ],
-    "team": "Barcelona",
-    "sizeChartType": "Player Edition",
-    "preorderCloseDate": null,
-    "isNewArrival": false,
-    "gender": "Unisex",
+    "seoDesc": "",
     "sku": "ZNV-MW9SETZB",
-    "customBadge": "",
-    "salePrice": 999,
+    "sport": "Football",
     "seoTitle": "",
-    "stock": 3,
+    "preorderDesc": "",
+    "expectedArrival": null,
+    "collectionId": null,
+    "tax": 0,
+    "sizeStocks": {},
+    "updatedAt": "2026-11-13T06:05:57.795Z",
+    "gender": "Unisex",
+    "basePrice": 1150,
+    "preorderCapacity": 100,
+    "discountValue": null,
+    "hasCustomDelivery": false,
+    "status": "published",
+    "advancePaymentMode": "default",
+    "customBadge": "",
     "deliveryChargeInsideDhaka": 80,
-    "customPrintPrice": null
+    "costPrice": null
   },
   {
-    "updatedAt": "2026-11-12T18:37:19.042Z",
-    "categoryName": "Player Version",
-    "isDeliveryChargeMandatory": false,
-    "seoTitle": "",
-    "sizeStocks": {},
-    "customNumber": true,
-    "discountStart": null,
-    "assignedSizes": [],
-    "isLimited": false,
-    "preorderCapacity": 100,
-    "image": "img/products/prod_mw9sa6jrx2oh028td.jpg",
-    "gender": "Unisex",
-    "collectionId": null,
-    "sizeMapping": {
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "L": {
-        "height": 28,
-        "width": 40
-      },
-      "3XL": {
-        "height": 31,
-        "width": 46
-      },
-      "S": {
-        "width": 36,
-        "height": 26
-      },
-      "M": {
-        "height": 27,
-        "width": 38
-      },
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      }
-    },
-    "isPreorder": false,
-    "lowStockAlert": 5,
-    "basePrice": 1150,
-    "isNewArrival": false,
+    "id": "prod_mw9sa6jrx2oh028td",
+    "categoryId": "cat_mens_football",
     "customPrintPrice": null,
+    "customNumber": true,
+    "isPublished": true,
+    "expectedDelivery": null,
+    "customName": true,
+    "isNewArrival": false,
+    "sizeChartImage": "",
+    "discountType": "percent",
     "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "slug": "barcelona-third-kit",
+    "tax": 0,
+    "discountStart": null,
+    "preorderStatus": "OPEN",
+    "gender": "Unisex",
+    "customLogo": false,
+    "discountEnd": null,
+    "status": "published",
+    "categoryName": "Player Version",
+    "costPrice": null,
+    "assignedSizes": [],
+    "imageUrl": "",
+    "isArchived": false,
+    "sku": "ZNV-MW9SA6JN",
+    "customText": false,
+    "hasCustomDelivery": false,
     "assignedPatches": [
       "patch_ucl",
       "patch_trophy"
     ],
-    "hasCustomDelivery": false,
-    "createdAt": "2026-11-09T21:39:04.743Z",
-    "team": "Barcelona",
-    "discountValue": null,
-    "compareAt": 1150,
-    "advancePaymentMode": "default",
-    "sport": "Football",
-    "status": "published",
-    "isFeatured": false,
+    "preorderPrice": null,
     "seoDesc": "",
-    "preorderStatus": "OPEN",
-    "customLogo": false,
-    "discountEnd": null,
-    "costPrice": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "customNameNumber": true,
     "sizeChartType": "Player Edition",
     "images": [
       {
@@ -1661,43 +4012,83 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "imageUrl": "",
-    "isBestSeller": true,
-    "name": "Barcelona Third Kit",
-    "customNameNumber": true,
     "preorderSold": 0,
+    "sport": "Football",
+    "isBestSeller": true,
+    "basePrice": 1150,
+    "updatedAt": "2026-11-13T06:05:58.445Z",
+    "deliveryNote": "",
+    "lowStockAlert": 5,
+    "advancePaymentMode": "default",
+    "deliveryChargeInsideDhaka": 80,
+    "sizeStocks": {},
     "assignedSleeves": [
       "slv_half"
     ],
-    "expectedDelivery": null,
-    "sku": "ZNV-MW9SA6JN",
-    "stock": 10,
-    "slug": "barcelona-third-kit",
-    "sizeChartImage": "",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "isPublished": true,
-    "customName": true,
-    "deliveryChargeInsideDhaka": 80,
-    "id": "prod_mw9sa6jrx2oh028td",
-    "expectedArrival": null,
+    "name": "Barcelona Third Kit",
+    "team": "Barcelona",
+    "sizeMapping": {
+      "L": {
+        "width": 40,
+        "height": 28
+      },
+      "XS": {
+        "width": 46,
+        "height": 31
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "preorderCapacity": 100,
     "deliveryChargeOutsideDhaka": 130,
+    "isLimited": false,
     "preorderCloseDate": null,
-    "tax": 0,
+    "seoTitle": "",
+    "isFeatured": false,
     "customBadge": "",
-    "isArchived": false,
-    "customText": false,
-    "discountType": "percent",
-    "deliveryNote": "",
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "categoryId": "cat_mens_football",
-    "preorderPrice": null,
+    "collectionId": null,
+    "isDeliveryChargeMandatory": false,
+    "discountValue": null,
+    "isPreorder": false,
+    "preorderDesc": "",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
     "salePrice": 999,
-    "preorderDesc": ""
+    "image": "img/products/prod_mw9sa6jrx2oh028td.jpg",
+    "compareAt": 1150,
+    "expectedArrival": null,
+    "stock": 10,
+    "createdAt": "2026-11-09T21:39:04.743Z"
   },
   {
-    "createdAt": "2026-11-09T21:35:24.281Z",
-    "discountEnd": null,
-    "compareAt": 1150,
+    "id": "prod_mw9s5gftya80x3w3n",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "customLogo": false,
+    "seoTitle": "",
+    "collectionId": null,
     "images": [
       {
         "url": "img/products/prod_mw9s5gftya80x3w3n.jpg",
@@ -1705,41 +4096,48 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "customText": false,
-    "slug": "barceleona-away-kit",
-    "isArchived": false,
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "hasCustomDelivery": false,
-    "isBestSeller": true,
-    "preorderStatus": "OPEN",
-    "name": "Barceleona Away Kit",
-    "seoTitle": "",
+    "preorderDesc": "",
+    "sku": "ZNV-MW9S5GFR",
+    "discountValue": null,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "customName": false,
     "categoryId": "cat_mens_football",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "status": "published",
+    "tax": 0,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "name": "Barceleona Away Kit",
+    "preorderStatus": "OPEN",
+    "gender": "Unisex",
+    "discountEnd": null,
+    "isLimited": false,
+    "team": "Barcelona",
+    "sizeChartImage": "",
+    "createdAt": "2026-11-09T21:35:24.281Z",
+    "advancePaymentMode": "default",
+    "isPublished": true,
+    "customNameNumber": true,
+    "compareAt": 1150,
+    "preorderCloseDate": null,
+    "customText": false,
+    "isArchived": false,
+    "sport": "Football",
+    "deliveryChargeOutsideDhaka": 130,
+    "lowStockAlert": 5,
+    "salePrice": 999,
+    "preorderCapacity": 100,
+    "imageUrl": "",
+    "expectedArrival": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
     "preorderSold": 0,
     "sizeChartType": "Player Edition",
-    "deliveryChargeInsideDhaka": 80,
-    "isPublished": true,
-    "isLimited": false,
-    "customNameNumber": true,
+    "isBestSeller": true,
     "preorderPrice": null,
-    "deliveryNote": "",
-    "basePrice": 1150,
-    "discountType": "percent",
-    "customBadge": "",
-    "updatedAt": "2026-11-12T18:37:05.545Z",
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "deliveryChargeOutsideDhaka": 130,
-    "expectedArrival": null,
-    "customName": false,
-    "stock": 10,
-    "preorderDesc": "",
-    "expectedDelivery": null,
-    "preorderCloseDate": null,
-    "lowStockAlert": 5,
+    "sizeStocks": {},
     "isDeliveryChargeMandatory": false,
-    "categoryName": "Player Version",
+    "customBadge": "",
+    "deliveryNote": "",
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -1749,80 +4147,161 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "customPrintPrice": null,
-    "salePrice": 999,
     "customNumber": false,
-    "imageUrl": "",
-    "advancePaymentMode": "default",
-    "id": "prod_mw9s5gftya80x3w3n",
-    "discountStart": null,
-    "gender": "Unisex",
-    "collectionId": null,
-    "isFeatured": false,
-    "sport": "Football",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "isNewArrival": false,
     "sizeMapping": {
-      "S": {
-        "width": 36,
-        "height": 26
+      "3XL": {
+        "width": 46,
+        "height": 31
       },
       "4XL": {
         "width": 46,
         "height": 31
       },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
       "XS": {
-        "height": 31,
-        "width": 46
+        "width": 46,
+        "height": 31
       },
       "L": {
         "height": 28,
         "width": 40
       },
+      "XL": {
+        "height": 29,
+        "width": 42
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      }
+    },
+    "discountStart": null,
+    "costPrice": null,
+    "slug": "barceleona-away-kit",
+    "discountType": "percent",
+    "isPreorder": false,
+    "stock": 10,
+    "seoDesc": "",
+    "isFeatured": false,
+    "updatedAt": "2026-11-13T06:05:59.244Z",
+    "deliveryChargeInsideDhaka": 80,
+    "basePrice": 1150,
+    "hasCustomDelivery": false,
+    "categoryName": "Player Version",
+    "image": "img/products/prod_mw9s5gftya80x3w3n.jpg"
+  },
+  {
+    "id": "prod_mw9s02zyhy7iilqo4",
+    "tax": 0,
+    "discountStart": null,
+    "isFeatured": false,
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "costPrice": null,
+    "isPreorder": false,
+    "preorderCapacity": 100,
+    "basePrice": 1150,
+    "advancePaymentMode": "default",
+    "slug": "barcelona-home-kit",
+    "updatedAt": "2026-11-13T06:06:00.185Z",
+    "sizeStocks": {},
+    "discountEnd": null,
+    "seoTitle": "",
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "expectedArrival": null,
+    "preorderDesc": "",
+    "sku": "ZNV-MW9S02ZV",
+    "image": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
+    "preorderCloseDate": null,
+    "collectionId": null,
+    "assignedSizes": [
+      "sz_s",
+      "sz_m",
+      "sz_l",
+      "sz_xl",
+      "sz_xxl",
+      "sz_3xl",
+      "sz_4xl"
+    ],
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "stock": 10,
+    "sizeChartType": "Player Edition",
+    "isPublished": true,
+    "preorderPrice": null,
+    "name": "Barcelona Home Kit",
+    "categoryName": "Player Version",
+    "seoDesc": "",
+    "isLimited": false,
+    "team": "Barcelona",
+    "status": "published",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "deliveryChargeInsideDhaka": 80,
+    "discountType": "percent",
+    "customText": false,
+    "gender": "Unisex",
+    "isArchived": false,
+    "compareAt": 1150,
+    "customBadge": "",
+    "lowStockAlert": 5,
+    "salePrice": 999,
+    "createdAt": "2026-11-09T21:31:13.582Z",
+    "isNewArrival": false,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "customNumber": false,
+    "deliveryNote": "",
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "deliveryChargeOutsideDhaka": 130,
+    "isDeliveryChargeMandatory": false,
+    "sizeMapping": {
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
       "M": {
         "width": 38,
         "height": 27
       },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
       "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XS": {
         "width": 46,
         "height": 31
+      },
+      "XXL": {
+        "height": 30,
+        "width": 44
+      },
+      "4XL": {
+        "width": 46,
+        "height": 31
+      },
+      "XL": {
+        "height": 29,
+        "width": 42
       }
     },
-    "tax": 0,
-    "customLogo": false,
-    "isNewArrival": false,
-    "seoDesc": "",
-    "sizeStocks": {},
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "discountValue": null,
-    "team": "Barcelona",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "sku": "ZNV-MW9S5GFR",
-    "costPrice": null,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "image": "img/products/prod_mw9s5gftya80x3w3n.jpg",
-    "preorderCapacity": 100,
-    "status": "published",
-    "sizeChartImage": "",
-    "isPreorder": false
-  },
-  {
-    "createdAt": "2026-11-09T21:31:13.582Z",
-    "isPublished": true,
-    "compareAt": 1150,
-    "categoryName": "Player Version",
-    "customPrintPrice": null,
-    "isArchived": false,
-    "customText": false,
-    "preorderPrice": null,
+    "isBestSeller": true,
     "images": [
       {
         "url": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
@@ -1830,84 +4309,23 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "name": "Barcelona Home Kit",
-    "customNumber": false,
-    "image": "img/products/prod_mw9s02zyhy7iilqo4.jpg",
+    "preorderStatus": "OPEN",
     "categoryId": "cat_mens_football",
-    "seoTitle": "",
-    "isDeliveryChargeMandatory": false,
-    "slug": "barcelona-home-kit",
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "collectionId": null,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "seoDesc": "",
-    "discountEnd": null,
-    "isLimited": false,
-    "isNewArrival": false,
-    "advancePaymentMode": "default",
-    "deliveryChargeOutsideDhaka": 130,
-    "id": "prod_mw9s02zyhy7iilqo4",
+    "preorderSold": 0,
+    "imageUrl": "",
+    "customName": false,
+    "customNameNumber": true,
+    "hasCustomDelivery": false,
     "sport": "Football",
     "sizeChartImage": "",
-    "basePrice": 1150,
-    "preorderCloseDate": null,
-    "updatedAt": "2026-11-12T18:38:44.152Z",
-    "sizeChartType": "Player Edition",
-    "preorderCapacity": 100,
-    "customBadge": "",
-    "customName": false,
-    "sizeMapping": {
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "XS": {
-        "width": 46,
-        "height": 31
-      },
-      "S": {
-        "width": 36,
-        "height": 26
-      },
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "XL": {
-        "height": 29,
-        "width": 42
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
-      }
-    },
-    "discountValue": null,
-    "preorderStatus": "OPEN",
-    "deliveryChargeInsideDhaka": 80,
-    "stock": 10,
-    "isBestSeller": true,
-    "salePrice": 999,
-    "expectedArrival": null,
-    "sku": "ZNV-MW9S02ZV",
-    "preorderSold": 0,
-    "gender": "Unisex",
-    "imageUrl": "",
-    "isFeatured": false,
     "customLogo": false,
-    "assignedSleeves": [
-      "slv_half"
-    ],
+    "discountValue": null
+  },
+  {
+    "id": "prod_mw9ru5dmlxx3y3v5l",
+    "sizeChartType": "Player Edition",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "preorderPrice": null,
     "tax": 0,
     "assignedSizes": [
       "sz_s",
@@ -1918,114 +4336,102 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "hasCustomDelivery": false,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "lowStockAlert": 5,
-    "sizeStocks": {},
-    "discountType": "percent",
-    "deliveryNote": "",
-    "customNameNumber": true,
-    "costPrice": null,
-    "expectedDelivery": null,
-    "team": "Barcelona",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "status": "published",
-    "discountStart": null,
-    "preorderDesc": "",
-    "isPreorder": false
-  },
-  {
-    "gender": "Unisex",
-    "expectedArrival": null,
-    "deliveryChargeInsideDhaka": 80,
-    "discountEnd": null,
-    "updatedAt": "2026-11-12T18:39:01.687Z",
-    "preorderCloseDate": null,
-    "sizeChartType": "Player Edition",
     "seoDesc": "",
-    "categoryId": "cat_mens_football",
-    "preorderDesc": "",
-    "isPublished": true,
-    "basePrice": 1150,
-    "isArchived": false,
-    "stock": 10,
-    "customText": false,
-    "preorderStatus": "OPEN",
-    "tax": 0,
-    "seoTitle": "",
-    "discountType": "percent",
-    "isLimited": false,
-    "deliveryNote": "",
-    "customBadge": "",
-    "preorderSold": 0,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "customName": false,
-    "status": "published",
-    "expectedDelivery": null,
-    "sku": "ZNV-MW9RU5DK",
-    "customNameNumber": true,
-    "preorderPrice": null,
-    "team": "Real Madrid",
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "advancePaymentMode": "default",
-    "compareAt": 1150,
-    "createdAt": "2026-11-09T21:26:36.730Z",
-    "isBestSeller": true,
-    "discountStart": null,
-    "customLogo": false,
     "hasCustomDelivery": false,
     "isFeatured": false,
-    "name": "Real Madrid Third Kit",
-    "deliveryChargeOutsideDhaka": 130,
-    "costPrice": null,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "slug": "real-madrid-third-kit",
-    "isNewArrival": false,
-    "lowStockAlert": 5,
-    "id": "prod_mw9ru5dmlxx3y3v5l",
-    "image": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "isDeliveryChargeMandatory": false,
     "sizeMapping": {
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
-      },
-      "S": {
-        "height": 26,
-        "width": 36
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      },
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
       "XS": {
         "width": 46,
         "height": 31
       },
       "4XL": {
-        "width": 46,
-        "height": 31
+        "height": 31,
+        "width": 46
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "width": 38,
+        "height": 27
       }
     },
+    "isPreorder": false,
+    "customNameNumber": true,
+    "deliveryChargeOutsideDhaka": 130,
+    "slug": "real-madrid-third-kit",
+    "customBadge": "",
+    "basePrice": 1150,
+    "advancePaymentMode": "default",
+    "updatedAt": "2026-11-13T06:06:00.983Z",
+    "sport": "Football",
+    "costPrice": null,
+    "expectedDelivery": null,
+    "preorderDesc": "",
     "customPrintPrice": null,
+    "seoTitle": "",
+    "sku": "ZNV-MW9RU5DK",
+    "collectionId": null,
+    "sizeStocks": {},
+    "discountStart": null,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "categoryName": "Player Version",
+    "discountValue": null,
+    "deliveryChargeInsideDhaka": 80,
+    "preorderStatus": "OPEN",
+    "isPublished": true,
+    "discountType": "percent",
+    "status": "published",
+    "isArchived": false,
+    "preorderCloseDate": null,
+    "sizeChartImage": "",
+    "discountEnd": null,
+    "customText": false,
+    "isNewArrival": false,
+    "gender": "Unisex",
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "customNumber": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "salePrice": 999,
+    "deliveryNote": "",
+    "preorderCapacity": 100,
+    "stock": 10,
+    "isDeliveryChargeMandatory": false,
+    "compareAt": 1150,
+    "customLogo": false,
+    "isBestSeller": true,
+    "image": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
+    "expectedArrival": null,
+    "createdAt": "2026-11-09T21:26:36.730Z",
+    "preorderSold": 0,
+    "lowStockAlert": 5,
     "imageUrl": "",
+    "isLimited": false,
+    "categoryId": "cat_mens_football",
+    "customName": false,
+    "name": "Real Madrid Third Kit",
+    "team": "Real Madrid",
     "images": [
       {
         "url": "img/products/prod_mw9ru5dmlxx3y3v5l.jpg",
@@ -2033,6 +4439,102 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি"
+  },
+  {
+    "id": "prod_mw9rkmru2ps3wt4hb",
+    "sizeMapping": {
+      "L": {
+        "height": 28,
+        "width": 40
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "S": {
+        "width": 36,
+        "height": 26
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "3XL": {
+        "height": 31,
+        "width": 46
+      }
+    },
+    "assignedSleeves": [
+      "slv_half"
+    ],
+    "hasCustomDelivery": false,
+    "discountType": "percent",
+    "isArchived": false,
+    "customText": false,
+    "basePrice": 1150,
+    "updatedAt": "2026-11-13T06:06:01.659Z",
+    "lowStockAlert": 5,
+    "name": "Real Madrid Away Kit",
+    "categoryName": "Player Version",
+    "seoDesc": "",
+    "team": "Real Madrid",
+    "costPrice": null,
+    "customNumber": false,
+    "isNewArrival": false,
+    "tax": 0,
+    "advancePaymentMode": "default",
+    "discountValue": null,
+    "categoryId": "cat_mens_football",
+    "preorderSold": 0,
+    "customName": false,
+    "isBestSeller": true,
+    "sku": "ZNV-MW9RKMRS",
+    "sport": "Football",
+    "deliveryNote": "",
+    "imageUrl": "",
+    "expectedArrival": null,
+    "preorderCapacity": 100,
+    "customLogo": false,
+    "customBadge": "",
+    "salePrice": 999,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "preorderCloseDate": null,
+    "compareAt": 1150,
+    "isFeatured": false,
+    "discountEnd": null,
+    "customNameNumber": true,
+    "isPreorder": false,
+    "createdAt": "2026-11-09T21:19:12.714Z",
+    "isLimited": false,
+    "status": "published",
+    "isPublished": true,
+    "slug": "real-madrid-away",
+    "gender": "Unisex",
+    "isDeliveryChargeMandatory": false,
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
+    "discountStart": null,
+    "preorderPrice": null,
+    "assignedPatches": [
+      "patch_ucl"
+    ],
+    "stock": 20,
+    "sizeChartType": "Player Edition",
+    "expectedDelivery": null,
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "customPrintPrice": null,
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -2042,40 +4544,13 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "isPreorder": false,
-    "preorderCapacity": 100,
-    "collectionId": null,
     "sizeChartImage": "",
-    "salePrice": 999,
-    "categoryName": "Player Version",
     "sizeStocks": {},
-    "sport": "Football",
-    "discountValue": null,
-    "customNumber": false
-  },
-  {
-    "expectedArrival": null,
-    "collectionId": null,
-    "seoDesc": "",
-    "preorderCloseDate": null,
-    "discountValue": null,
-    "customBadge": "",
-    "updatedAt": "2026-11-12T18:39:15.982Z",
-    "preorderStatus": "OPEN",
-    "basePrice": 1150,
-    "stock": 20,
-    "tax": 0,
-    "categoryName": "Player Version",
+    "image": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
     "deliveryChargeInsideDhaka": 80,
-    "customName": false,
+    "preorderStatus": "OPEN",
     "seoTitle": "",
-    "customNumber": false,
-    "isLimited": false,
-    "lowStockAlert": 5,
-    "sku": "ZNV-MW9RKMRS",
-    "expectedDelivery": null,
-    "discountEnd": null,
+    "collectionId": null,
     "images": [
       {
         "url": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
@@ -2083,157 +4558,59 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "assignedSizes": [
-      "sz_s",
-      "sz_m",
-      "sz_l",
-      "sz_xl",
-      "sz_xxl",
-      "sz_3xl",
-      "sz_4xl"
-    ],
-    "isArchived": false,
-    "customText": false,
-    "assignedSleeves": [
-      "slv_half"
-    ],
-    "discountStart": null,
-    "isNewArrival": false,
-    "team": "Real Madrid",
-    "categoryId": "cat_mens_football",
-    "compareAt": 1150,
-    "isPublished": true,
-    "id": "prod_mw9rkmru2ps3wt4hb",
-    "createdAt": "2026-11-09T21:19:12.714Z",
-    "customNameNumber": true,
-    "preorderPrice": null,
-    "isDeliveryChargeMandatory": false,
-    "hasCustomDelivery": false,
-    "preorderSold": 0,
-    "assignedPatches": [
-      "patch_ucl"
-    ],
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "costPrice": null,
-    "sizeStocks": {},
-    "advancePaymentMode": "default",
-    "name": "Real Madrid Away Kit",
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "status": "published",
-    "slug": "real-madrid-away",
-    "customPrintPrice": null,
-    "image": "img/products/prod_mw9rkmru2ps3wt4hb.jpg",
-    "isPreorder": false,
-    "isBestSeller": true,
-    "imageUrl": "",
-    "preorderCapacity": 100,
-    "sizeChartImage": "",
-    "preorderDesc": "",
-    "salePrice": 999,
-    "sport": "Football",
     "deliveryChargeOutsideDhaka": 130,
-    "gender": "Unisex",
-    "customLogo": false,
-    "deliveryNote": "",
-    "discountType": "percent",
-    "isFeatured": false,
-    "sizeMapping": {
-      "S": {
-        "width": 36,
-        "height": 26
-      },
-      "L": {
-        "height": 28,
-        "width": 40
-      },
-      "XL": {
-        "height": 29,
-        "width": 42
-      },
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
-      },
-      "XS": {
-        "height": 31,
-        "width": 46
-      },
-      "XXL": {
-        "width": 44,
-        "height": 30
-      }
-    },
-    "sizeChartType": "Player Edition"
+    "preorderDesc": ""
   },
   {
-    "isNewArrival": true,
-    "stock": 6,
-    "image": "img/products/prod_mw9jxtywllrlf2fec.jpg",
-    "customNameNumber": false,
-    "sizeStocks": {},
+    "id": "prod_mw9jxtywllrlf2fec",
+    "createdAt": "2026-11-09T17:45:31.640Z",
+    "name": "Barcelona",
     "updatedAt": "2026-11-10T06:24:51.264Z",
+    "basePrice": 500,
+    "compareAt": 500,
+    "assignedSleeves": [
+      "slv_half",
+      "slv_full"
+    ],
+    "status": "published",
+    "salePrice": 450,
+    "isPublished": true,
+    "isPreorder": false,
+    "isFeatured": false,
+    "customNameNumber": false,
+    "slug": "barcelona",
+    "isArchived": false,
+    "isBestSeller": false,
+    "isLimited": false,
+    "stock": 6,
     "images": [
       {
         "url": "img/products/prod_mw9jxtywllrlf2fec.jpg",
         "isPrimary": true
       }
     ],
-    "basePrice": 500,
-    "sku": "ZNV-MW9JXTYV",
-    "assignedSleeves": [
-      "slv_half",
-      "slv_full"
-    ],
-    "isPreorder": false,
-    "isLimited": false,
     "assignedPatches": [],
-    "status": "published",
-    "id": "prod_mw9jxtywllrlf2fec",
-    "categoryName": "Club Sweat Shirt",
+    "image": "img/products/prod_mw9jxtywllrlf2fec.jpg",
+    "isNewArrival": true,
     "imageUrl": "img/products/prod_mw9jxtywllrlf2fec.jpg",
-    "isPublished": true,
-    "isBestSeller": false,
-    "slug": "barcelona",
-    "isArchived": false,
-    "salePrice": 450,
-    "name": "Barcelona",
+    "sku": "ZNV-MW9JXTYV",
+    "sizeStocks": {},
+    "categoryName": "Club Sweat Shirt",
     "assignedSizes": [
       "sz_m_mw935ci4n4q1d75if",
       "sz_l_mw935ci4uf5gmik01",
       "sz_xl_mw935ci43o865w5xg",
       "sz_xxl_mw935ci5ftm3psqi8"
     ],
-    "categoryId": "mw9joz7e8h740wqat",
-    "compareAt": 500,
-    "isFeatured": false,
-    "createdAt": "2026-11-09T17:45:31.640Z"
+    "categoryId": "mw9joz7e8h740wqat"
   },
   {
     "id": "mw8a6nc4ecqhhqgcv",
-    "isBestSeller": true,
-    "subcategoryId": "mw88n5w90qabal7hw",
-    "updatedAt": "2026-11-12T18:39:42.044Z",
-    "preorderStatus": "OPEN",
-    "sport": "Football",
-    "seoDesc": "",
-    "discountEnd": null,
-    "preorderCloseDate": null,
-    "isPublished": true,
-    "basePrice": 1150,
-    "preorderPrice": null,
-    "customPrintPrice": null,
+    "discountType": "percent",
+    "slug": "real-madrid-home",
+    "image": "img/products/mw8a6nc4ecqhhqgcv.jpg",
     "isLimited": false,
-    "preorderSold": 0,
-    "customName": true,
+    "sku": "ZNV-MW8A6NC3",
     "images": [
       {
         "url": "img/products/mw8a6nc4ecqhhqgcv.jpg",
@@ -2241,88 +4618,50 @@ const ACTIVE_CATALOG_BASELINE = [
         "isPrimary": true
       }
     ],
-    "deliveryNote": "",
-    "discountType": "percent",
-    "imageUrl": "",
-    "customBadge": "",
-    "sizeChartType": "Player Edition",
-    "image": "img/products/mw8a6nc4ecqhhqgcv.jpg",
-    "preorderCapacity": 100,
-    "isArchived": false,
-    "customText": false,
-    "categoryId": "cat_mens_football",
-    "preorderDesc": "",
-    "deliveryChargeOutsideDhaka": 130,
-    "isDeliveryChargeMandatory": false,
-    "team": "Real Madrid",
-    "createdAt": "2026-11-08T20:24:40.612Z",
+    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
     "advancePaymentMode": "default",
+    "categoryId": "cat_mens_football",
+    "stock": 10,
+    "categoryName": "Player Version",
+    "customName": true,
+    "isDeliveryChargeMandatory": false,
     "compareAt": 1150,
-    "assignedPatches": [],
-    "name": "Real Madrid Home",
-    "sku": "ZNV-MW8A6NC3",
     "customNumber": true,
+    "isNewArrival": false,
+    "deliveryChargeOutsideDhaka": 130,
+    "salePrice": 999,
+    "createdAt": "2026-11-08T20:24:40.612Z",
+    "discountValue": null,
+    "preorderCapacity": 100,
+    "customLogo": false,
+    "deliveryChargeInsideDhaka": 80,
+    "preorderStatus": "OPEN",
+    "preorderSold": 0,
+    "hasCustomDelivery": false,
+    "status": "published",
+    "isBestSeller": true,
+    "discountEnd": null,
+    "seoTitle": "",
+    "customText": false,
+    "deliveryNote": "",
+    "isArchived": false,
+    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
+    "gender": "Unisex",
+    "assignedPatches": [],
+    "lowStockAlert": 5,
+    "tax": 0,
+    "seoDesc": "",
+    "sizeChartImage": "",
+    "isPublished": true,
+    "sizeStocks": {},
+    "sport": "Football",
+    "costPrice": null,
+    "customPrintPrice": null,
+    "expectedDelivery": null,
+    "basePrice": 1150,
     "assignedSleeves": [
       "slv_half"
     ],
-    "costPrice": null,
-    "categoryName": "Player Version",
-    "sizeStocks": {},
-    "collectionId": null,
-    "shortDesc": "চায়না থেকে Imported অথেনটিক Player Version জার্সি",
-    "sizeMapping": {
-      "S": {
-        "height": 26,
-        "width": 36
-      },
-      "XS": {
-        "height": 31,
-        "width": 46
-      },
-      "4XL": {
-        "width": 46,
-        "height": 31
-      },
-      "L": {
-        "width": 40,
-        "height": 28
-      },
-      "M": {
-        "width": 38,
-        "height": 27
-      },
-      "XXL": {
-        "height": 30,
-        "width": 44
-      },
-      "XL": {
-        "width": 42,
-        "height": 29
-      },
-      "3XL": {
-        "width": 46,
-        "height": 31
-      }
-    },
-    "status": "published",
-    "isPreorder": false,
-    "hasCustomDelivery": false,
-    "slug": "real-madrid-home",
-    "discountValue": null,
-    "sizeChartImage": "",
-    "discountStart": null,
-    "seoTitle": "",
-    "description": "* সরাসরি চায়না থেকে ইমপোর্ট করা শতভাগ প্রিমিয়াম কোয়ালিটির অথেনটিক প্লেয়ার ভার্সন জার্সি।\n* অত্যন্ত হালকা, স্ট্রেচেবল এবং বাতাস চলাচলের উপযোগী ফেব্রিক দিয়ে তৈরি।\n* ক্লাব লোগো, ব্র্যান্ড লোগো এবং স্পনসর প্রিন্ট নিখুঁত ও টেকসই হিট-প্রেসড প্রযুক্তিতে বসানো।\n* প্লেয়ারদের জার্সির মতো বডি-হাগিং অ্যাথলেটিক স্লিম ফিট ও নিখুঁত সেলাইয়ের ফিনিশিং।\n* নিয়মিত খেলাধুলা কিংবা ক্যাজুয়াল আউটফিট হিসেবে পরার জন্য অত্যন্ত আরামদায়ক ও আকর্ষণীয়।",
-    "stock": 10,
-    "deliveryChargeInsideDhaka": 80,
-    "isNewArrival": false,
-    "expectedDelivery": null,
-    "customNameNumber": false,
-    "tax": 0,
-    "expectedArrival": null,
-    "lowStockAlert": 5,
-    "salePrice": 999,
-    "customLogo": false,
     "assignedSizes": [
       "sz_s",
       "sz_m",
@@ -2332,10 +4671,58 @@ const ACTIVE_CATALOG_BASELINE = [
       "sz_3xl",
       "sz_4xl"
     ],
+    "customBadge": "",
+    "preorderPrice": null,
+    "name": "Real Madrid Home",
+    "subcategoryId": "mw88n5w90qabal7hw",
+    "team": "Real Madrid",
+    "updatedAt": "2026-11-13T06:06:02.391Z",
+    "sizeChartType": "Player Edition",
+    "expectedArrival": null,
+    "customNameNumber": false,
     "isFeatured": false,
-    "gender": "Unisex"
+    "discountStart": null,
+    "preorderCloseDate": null,
+    "isPreorder": false,
+    "imageUrl": "",
+    "sizeMapping": {
+      "3XL": {
+        "height": 31,
+        "width": 46
+      },
+      "4XL": {
+        "height": 31,
+        "width": 46
+      },
+      "XXL": {
+        "width": 44,
+        "height": 30
+      },
+      "XL": {
+        "width": 42,
+        "height": 29
+      },
+      "S": {
+        "height": 26,
+        "width": 36
+      },
+      "M": {
+        "height": 27,
+        "width": 38
+      },
+      "XS": {
+        "height": 31,
+        "width": 46
+      },
+      "L": {
+        "width": 40,
+        "height": 28
+      }
+    },
+    "collectionId": null,
+    "preorderDesc": ""
   }
-];
+]
 if (typeof window !== 'undefined') {
   window.ACTIVE_CATALOG_BASELINE = ACTIVE_CATALOG_BASELINE;
 }

@@ -4656,6 +4656,15 @@ function seedDefaultData() {
     if (Store.get('inventoryHistory') === null) Store.set('inventoryHistory', []);
     if (Store.get('priceHistory') === null) Store.set('priceHistory', []);
     if (Store.get('products') === null) Store.set('products', []);
+    if (Store.get('categories') === null || !Array.isArray(Store.get('categories')) || Store.get('categories').length === 0) {
+      Store.set('categories', DB.categories.defaultItems);
+    }
+    if (Store.get('collections') === null || !Array.isArray(Store.get('collections')) || Store.get('collections').length === 0) {
+      Store.set('collections', DB.collections.defaultItems);
+    }
+    if (Store.get('banners') === null || !Array.isArray(Store.get('banners')) || Store.get('banners').length === 0) {
+      Store.set('banners', DB.banners.defaultItems);
+    }
 
     Store.setObj('seeded', true);
     Store.setObj('seeded_version', SEED_VERSION);
@@ -4957,40 +4966,73 @@ const DB = {
     ],
     all() {
       let items = Store.get('categories');
-      if (!items || !Array.isArray(items)) {
-        return [];
+      const delKey = `${DB_VERSION}_deleted_category_ids`;
+      let deletedIds = new Set();
+      try {
+        const delRaw = localStorage.getItem(delKey);
+        if (delRaw) deletedIds = new Set(JSON.parse(delRaw));
+      } catch(e){}
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = JSON.parse(JSON.stringify(this.defaultItems));
+        Store.set('categories', items);
       }
-      return items.sort((a,b) => (parseInt(a.displayOrder) || 0) - (parseInt(b.displayOrder) || 0));
+      return items
+        .filter(c => {
+          if (!c) return false;
+          const cid = String(c.id || '').trim().toLowerCase();
+          const cslug = String(c.slug || '').trim().toLowerCase();
+          return !deletedIds.has(cid) && !deletedIds.has(cslug);
+        })
+        .sort((a,b) => (parseInt(a.displayOrder) || 0) - (parseInt(b.displayOrder) || 0));
     },
     byId(id) {
       if (!id) return null;
       const strId = String(id).trim().toLowerCase();
-      return Store.get('categories').find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) || null;
+      return (this.all() || []).find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) || null;
     },
     active() {
-      return Store.get('categories').filter(c => c.isActive !== false);
+      return (this.all() || []).filter(c => c.isActive !== false);
     },
     create(data) {
-      const items = Store.get('categories');
+      const items = this.all() || [];
       const item = { id: Store.genId(), ...data, createdAt: Store.now(), updatedAt: Store.now() };
-      items.push(item); Store.set('categories', items);
+      items.push(item);
+      Store.set('categories', items);
       DB.log(`Category created: ${item.name}`);
       return item;
     },
     update(id, data) {
       const strId = String(id).trim().toLowerCase();
-      const items = Store.get('categories').map(c => (String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
+      const items = (this.all() || []).map(c => (String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(c.name||'').trim().toLowerCase() === strId) ? { ...c, ...data, updatedAt: Store.now() } : c);
       Store.set('categories', items);
       DB.log(`Category updated: ${data.name || id}`);
       return items.find(c => String(c.id).trim().toLowerCase() === strId || String(c.slug||'').trim().toLowerCase() === strId || String(data.slug||'').trim().toLowerCase() === String(c.slug||'').trim().toLowerCase());
     },
     delete(id) {
       const strId = String(id).trim().toLowerCase();
-      const cat = DB.categories.byId(id);
-      const items = Store.get('categories').filter(c => String(c.id).trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
+      const cat = this.byId(id);
+      const items = (this.all() || []).filter(c => String(c.id).trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
       Store.set('categories', items);
+
+      // Track deletion permanently in cloud and local deleted tracking
+      if (window.ZenvyFirebase && typeof window.ZenvyFirebase.deleteCategory === 'function') {
+        window.ZenvyFirebase.deleteCategory(id);
+        if (cat && cat.slug) window.ZenvyFirebase.deleteCategory(cat.slug);
+      } else {
+        const delKey = `${DB_VERSION}_deleted_category_ids`;
+        try {
+          let delIds = [];
+          const raw = localStorage.getItem(delKey);
+          if (raw) delIds = JSON.parse(raw);
+          if (!delIds.includes(strId)) delIds.push(strId);
+          if (cat && cat.slug && !delIds.includes(String(cat.slug).trim().toLowerCase())) delIds.push(String(cat.slug).trim().toLowerCase());
+          localStorage.setItem(delKey, JSON.stringify(delIds));
+        } catch(e){}
+      }
+
       try {
-        const prods = Store.get('products');
+        const prods = Store.get('products') || [];
         let updatedProds = false;
         prods.forEach(p => {
           if (String(p.categoryId).trim().toLowerCase() === strId || (cat && String(p.categoryName || '').toLowerCase() === String(cat.name || '').toLowerCase())) {
@@ -5005,48 +5047,87 @@ const DB = {
       return items;
     },
     toggle(id, field) {
-      const cat = DB.categories.byId(id);
-      if (cat) DB.categories.update(id, { [field]: !cat[field] });
+      const cat = this.byId(id);
+      if (cat) this.update(id, { [field]: !cat[field] });
     }
   },
 
   // ── Subcategories ──
   subcategories: {
-    all() { return Store.get('subcategories'); },
-    byCategory(catId) { return Store.get('subcategories').filter(s => s.categoryId === catId); },
-    byId(id) { return Store.get('subcategories').find(s => s.id === id); },
+    all() { return Store.get('subcategories') || []; },
+    byCategory(catId) { return (this.all() || []).filter(s => s.categoryId === catId); },
+    byId(id) { return (this.all() || []).find(s => s.id === id); },
     create(data) {
-      const items = Store.get('subcategories');
+      const items = this.all() || [];
       const item = { id: Store.genId(), ...data, createdAt: Store.now() };
       items.push(item); Store.set('subcategories', items);
       DB.log(`Subcategory created: ${item.name}`); return item;
     },
     update(id, data) {
-      const items = Store.get('subcategories').map(s => s.id === id ? { ...s, ...data } : s);
+      const items = (this.all() || []).map(s => s.id === id ? { ...s, ...data } : s);
       Store.set('subcategories', items); return items.find(s => s.id === id);
     },
-    delete(id) { Store.set('subcategories', Store.get('subcategories').filter(s => s.id !== id)); }
+    delete(id) { Store.set('subcategories', (this.all() || []).filter(s => s.id !== id)); }
   },
 
   // ── Collections ──
   collections: {
-    all() { return Store.get('collections'); },
-    byId(id) { return Store.get('collections').find(c => c.id === id); },
+    defaultItems: [
+      {
+        id: 'col1',
+        name: 'Club Match Kits',
+        slug: 'club-match-kits',
+        description: 'Official tournament jerseys engineered with micro-perforated Aeroknit weave.',
+        imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
+        badge: 'COLLECTION SS/26',
+        isActive: true
+      },
+      {
+        id: 'col2',
+        name: 'International Editions',
+        slug: 'national-teams',
+        description: 'National team tournament kits with authentic gold badges and match typography.',
+        imageUrl: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=1200&q=80',
+        badge: 'LIMITED DROP',
+        isActive: true
+      },
+      {
+        id: 'col3',
+        name: 'Precision Outerwear',
+        slug: 'outerwear',
+        description: 'Technical windbreakers, compression layers and pace shorts built for all climates.',
+        imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&q=80',
+        badge: 'PRO TRAINING',
+        isActive: true
+      }
+    ],
+    all() {
+      let items = Store.get('collections');
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = JSON.parse(JSON.stringify(this.defaultItems));
+        Store.set('collections', items);
+      }
+      return items;
+    },
+    active() { return (this.all() || []).filter(c => c.isActive !== false); },
+    byId(id) { return (this.all() || []).find(c => c.id === id); },
     create(data) {
-      const items = Store.get('collections');
+      const items = this.all() || [];
       const item = { id: Store.genId(), ...data, createdAt: Store.now(), updatedAt: Store.now() };
       items.push(item); Store.set('collections', items);
       DB.log(`Collection created: ${item.name}`); return item;
     },
     update(id, data) {
-      const items = Store.get('collections').map(c => c.id === id ? { ...c, ...data, updatedAt: Store.now() } : c);
+      const items = (this.all() || []).map(c => c.id === id ? { ...c, ...data, updatedAt: Store.now() } : c);
       Store.set('collections', items); DB.log(`Collection updated: ${data.name||id}`);
       return items.find(c => c.id === id);
     },
     delete(id) {
-      const col = DB.collections.byId(id);
-      Store.set('collections', Store.get('collections').filter(c => c.id !== id));
+      const col = this.byId(id);
+      const items = (this.all() || []).filter(c => c.id !== id);
+      Store.set('collections', items);
       DB.log(`Collection deleted: ${col?.name}`);
+      return items;
     }
   },
 
@@ -5945,11 +6026,68 @@ const DB = {
 
   // ── Banners ──
   banners: {
-    all() { return Store.get('banners').sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0)); },
-    active() { return DB.banners.all().filter(b => b.isActive); },
-    byId(id) { return Store.get('banners').find(b => b.id === id); },
+    defaultItems: [
+      {
+        id: 'hero_1',
+        title: 'ENGINEERED FOR SUPREMACY',
+        subtitle: 'The new standard in high-performance kits. Ethereal technical design crafted for pro athletes.',
+        badge: 'NEW ARRIVAL • MATCH EDITION',
+        desktopImg: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
+        bgImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80',
+        ctaPrimaryText: 'SHOP',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: 'Pre-Orders',
+        ctaSecondaryLink: 'preorders.html',
+        type: 'hero',
+        displayOrder: 0,
+        isActive: true
+      },
+      {
+        id: 'hero_2',
+        title: 'AUTHENTIC UCL CLUB EDITIONS',
+        subtitle: 'Official club crests, tournament starball badges, and pro player customization precision.',
+        badge: 'EXCLUSIVE DROP • LIMITED STOCK',
+        desktopImg: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=80',
+        bgImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1920&q=80',
+        ctaPrimaryText: 'EXPLORE KITS',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: 'CUSTOMIZE',
+        ctaSecondaryLink: 'product.html',
+        type: 'hero',
+        displayOrder: 1,
+        isActive: true
+      },
+      {
+        id: 'hero_3',
+        title: 'AEROKNIT AIRFLOW TECHNOLOGY',
+        subtitle: 'Ultra-breathable micro-mesh engineered for 90 minutes of maximum pitch endurance.',
+        badge: 'PRO SPECIFICATION',
+        desktopImg: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&q=80',
+        mobileImg: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80',
+        bgImage: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&q=80',
+        ctaPrimaryText: 'BUY NOW',
+        ctaPrimaryLink: 'index.html#shop',
+        ctaSecondaryText: 'DISCOVER',
+        ctaSecondaryLink: 'product.html',
+        type: 'hero',
+        displayOrder: 2,
+        isActive: true
+      }
+    ],
+    all() {
+      let items = Store.get('banners');
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        items = JSON.parse(JSON.stringify(this.defaultItems));
+        Store.set('banners', items);
+      }
+      return items.sort((a,b) => (a.displayOrder||0) - (b.displayOrder||0));
+    },
+    active() { return (this.all() || []).filter(b => b.isActive !== false); },
+    byId(id) { return (this.all() || []).find(b => b.id === id); },
     create(data) {
-      const items = Store.get('banners');
+      const items = this.all() || [];
       const item = {
         id: Store.genId(),
         isActive: data.isActive !== undefined ? !!data.isActive : true,
@@ -5958,25 +6096,30 @@ const DB = {
         updatedAt: Store.now()
       };
       if (data.isActive !== undefined) item.isActive = !!data.isActive;
-      items.push(item); Store.set('banners', items);
-      DB.log(`Banner created: ${item.title}`); return item;
+      items.push(item);
+      Store.set('banners', items);
+      DB.log(`Banner created: ${item.title}`);
+      return item;
     },
     update(id, data) {
-      const items = Store.get('banners').map(b => b.id === id ? { ...b, ...data } : b);
-      Store.set('banners', items); DB.log(`Banner updated: ${data.title||id}`);
+      const items = (this.all() || []).map(b => b.id === id ? { ...b, ...data, updatedAt: Store.now() } : b);
+      Store.set('banners', items);
+      DB.log(`Banner updated: ${data.title||id}`);
       return items.find(b => b.id === id);
     },
     delete(id) {
-      const b = DB.banners.byId(id);
-      Store.set('banners', Store.get('banners').filter(b => b.id !== id));
+      const b = this.byId(id);
+      const items = (this.all() || []).filter(b => b.id !== id);
+      Store.set('banners', items);
       DB.log(`Banner deleted: ${b?.title}`);
+      return items;
     },
-    publish(id) { const b = DB.banners.update(id, { isActive: true }); DB.log(`Banner published`); return b; },
-    unpublish(id) { const b = DB.banners.update(id, { isActive: false }); DB.log(`Banner unpublished`); return b; },
+    publish(id) { const b = this.update(id, { isActive: true }); DB.log(`Banner published`); return b; },
+    unpublish(id) { const b = this.update(id, { isActive: false }); DB.log(`Banner unpublished`); return b; },
     toggle(id) {
-      const b = DB.banners.byId(id);
+      const b = this.byId(id);
       const next = b ? !b.isActive : true;
-      return DB.banners.update(id, { isActive: next });
+      return this.update(id, { isActive: next });
     }
   },
 

@@ -250,7 +250,7 @@
         console.warn('[ZenvySync] Product catalog sync notice:', prodErr);
       }
 
-      // 2. Fetch deleted restock IDs so deletions are strictly honored across all devices
+      // 2. Fetch deleted restock IDs and deleted category IDs so deletions are strictly honored across all devices
       const deletedRestockKey = `${DB_VERSION}_deleted_restock_ids`;
       let deletedRestockIds = new Set();
       try {
@@ -265,6 +265,20 @@
         }
       } catch(e){}
 
+      const deletedCategoryKey = `${DB_VERSION}_deleted_category_ids`;
+      let deletedCategoryIds = new Set();
+      try {
+        const raw = localStorage.getItem(deletedCategoryKey);
+        if (raw) deletedCategoryIds = new Set(JSON.parse(raw));
+      } catch(e){}
+      try {
+        const delCatDoc = await _db.collection(FS_COLLECTION).doc('deleted_categories').get();
+        if (delCatDoc.exists && Array.isArray(delCatDoc.data()?.ids)) {
+          delCatDoc.data().ids.forEach(id => deletedCategoryIds.add(String(id).trim().toLowerCase()));
+          localStorage.setItem(deletedCategoryKey, JSON.stringify(Array.from(deletedCategoryIds)));
+        }
+      } catch(e){}
+
       const snapshot = await _db.collection(FS_COLLECTION).get();
       let count = 0;
       if (!snapshot.empty) {
@@ -273,7 +287,7 @@
             const key = docSnap.id;
             // IMPORTANT: Do NOT hydrate products from the single legacy doc;
             // products are exclusively hydrated from the scalable /products/ collection!
-            if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks') return;
+            if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks' || key === 'deleted_categories') return;
 
             const payload = docSnap.data();
             if (payload && payload.data !== undefined) {
@@ -292,6 +306,35 @@
                 return;
               }
 
+              // Categories: cloud array is authoritative, filtered against deletedCategoryIds
+              if (key === 'categories') {
+                let list = Array.isArray(payload.data) ? payload.data : [];
+                list = list.filter(c => {
+                  if (!c) return false;
+                  const cid = String(c.id || '').trim().toLowerCase();
+                  const cslug = String(c.slug || '').trim().toLowerCase();
+                  return !deletedCategoryIds.has(cid) && !deletedCategoryIds.has(cslug);
+                });
+                localStorage.setItem(localKey, JSON.stringify(list));
+                if (cloudUpdatedAt) {
+                  localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                }
+                count++;
+                return;
+              }
+
+              // Admin-managed configurations (banners, collections, homepage, brand, shipping, etc.):
+              // Cloud payload is the single authoritative source of truth!
+              // NEVER merge with stale local array and NEVER resurrect deleted items!
+              if (ADMIN_MANAGED_KEYS.includes(key)) {
+                localStorage.setItem(localKey, JSON.stringify(payload.data));
+                if (cloudUpdatedAt) {
+                  localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                }
+                count++;
+                return;
+              }
+
               let finalData = payload.data;
               const rawLocal = localStorage.getItem(localKey);
               if (rawLocal && Array.isArray(payload.data)) {
@@ -299,9 +342,6 @@
                   const localParsed = JSON.parse(rawLocal);
                   if (Array.isArray(localParsed)) {
                     finalData = mergeArraysById(localParsed, payload.data, key);
-                    if (finalData.length > payload.data.length && _db) {
-                      pushToFirestore(key, finalData);
-                    }
                   }
                 } catch(e) {
                   finalData = payload.data;
@@ -735,7 +775,7 @@
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added' || change.type === 'modified') {
             const key = change.doc.id;
-            if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks') return; // Handled separately
+            if (key === 'products' || key === 'deleted_products' || key === 'deleted_restocks' || key === 'deleted_categories') return; // Handled separately
             const payload = change.doc.data();
             if (payload && payload.data !== undefined) {
               const localKey = `${DB_VERSION}_${key}`;
@@ -757,6 +797,45 @@
                   localStorage.setItem(localKey, incomingStr);
                   if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
                   changed = true;
+                  try { window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key, value: list } })); } catch(e){}
+                }
+                return;
+              }
+
+              // Categories: cloud array is authoritative, filtered against deletedCategoryIds
+              if (key === 'categories') {
+                const deletedCategoryKey = `${DB_VERSION}_deleted_category_ids`;
+                let deletedCategoryIds = new Set();
+                try {
+                  const raw = localStorage.getItem(deletedCategoryKey);
+                  if (raw) deletedCategoryIds = new Set(JSON.parse(raw));
+                } catch(e){}
+                let list = Array.isArray(payload.data) ? payload.data : [];
+                list = list.filter(c => {
+                  if (!c) return false;
+                  const cid = String(c.id || '').trim().toLowerCase();
+                  const cslug = String(c.slug || '').trim().toLowerCase();
+                  return !deletedCategoryIds.has(cid) && !deletedCategoryIds.has(cslug);
+                });
+                const incomingStr = JSON.stringify(list);
+                if (existingStr !== incomingStr) {
+                  localStorage.setItem(localKey, incomingStr);
+                  if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                  changed = true;
+                  try { window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key, value: list } })); } catch(e){}
+                }
+                return;
+              }
+
+              // Admin-managed configurations (banners, collections, homepage, brand, shipping, etc.):
+              // Cloud payload is authoritative. NEVER merge with stale local array and NEVER resurrect deleted items!
+              if (ADMIN_MANAGED_KEYS.includes(key)) {
+                const incomingStr = JSON.stringify(payload.data);
+                if (existingStr !== incomingStr) {
+                  localStorage.setItem(localKey, incomingStr);
+                  if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
+                  changed = true;
+                  try { window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key, value: payload.data } })); } catch(e){}
                 }
                 return;
               }
@@ -767,9 +846,6 @@
                   const existingParsed = JSON.parse(existingStr);
                   if (Array.isArray(existingParsed)) {
                     finalData = mergeArraysById(existingParsed, payload.data, key);
-                    if (finalData.length > payload.data.length && _db) {
-                      pushToFirestore(key, finalData);
-                    }
                   }
                 } catch(e) {
                   finalData = payload.data;
@@ -781,6 +857,7 @@
                 localStorage.setItem(localKey, incomingStr);
                 if (cloudUpdatedAt) localStorage.setItem(`${localKey}_updatedAt`, cloudUpdatedAt.toString());
                 changed = true;
+                try { window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key, value: finalData } })); } catch(e){}
               }
             }
           }
@@ -1178,11 +1255,69 @@
     }
   }
 
+  async function deleteCategoryFromCloud(idOrSlug) {
+    if (!idOrSlug) return;
+    const strId = String(idOrSlug).trim().toLowerCase();
+    await ensureDb();
+    if (!_db) return;
+
+    try {
+      // 1. Add to local deleted tracking
+      const delKey = `${DB_VERSION}_deleted_category_ids`;
+      let delIds = new Set();
+      try {
+        const raw = localStorage.getItem(delKey);
+        if (raw) delIds = new Set(JSON.parse(raw));
+      } catch(e){}
+      delIds.add(strId);
+      localStorage.setItem(delKey, JSON.stringify(Array.from(delIds)));
+
+      // 2. Remove from local categories
+      const catKey = `${DB_VERSION}_categories`;
+      try {
+        const raw = localStorage.getItem(catKey);
+        if (raw) {
+          const cats = JSON.parse(raw);
+          if (Array.isArray(cats)) {
+            const filtered = cats.filter(c => String(c.id||'').trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
+            localStorage.setItem(catKey, JSON.stringify(filtered));
+          }
+        }
+      } catch(e){}
+
+      // 3. Update Firestore deleted_categories doc
+      const delDocRef = _db.collection(FS_COLLECTION).doc('deleted_categories');
+      const delDocSnap = await delDocRef.get();
+      let curIds = [];
+      if (delDocSnap.exists && Array.isArray(delDocSnap.data()?.ids)) {
+        curIds = delDocSnap.data().ids;
+      }
+      if (!curIds.includes(strId)) {
+        curIds.push(strId);
+        await delDocRef.set({ ids: curIds, updatedAt: Date.now() });
+      }
+
+      // 4. Update Firestore categories doc with remaining categories
+      const catDocRef = _db.collection(FS_COLLECTION).doc('categories');
+      const catSnap = await catDocRef.get();
+      if (catSnap.exists && Array.isArray(catSnap.data()?.data)) {
+        const remaining = catSnap.data().data.filter(c => String(c.id||'').trim().toLowerCase() !== strId && String(c.slug||'').trim().toLowerCase() !== strId && String(c.name||'').trim().toLowerCase() !== strId);
+        await catDocRef.set({ data: remaining, updatedAt: Date.now() });
+      }
+
+      console.log(`[ZenvySync] Category ${strId} deleted from cloud & tracked ✅`);
+      try { window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'categories' } })); } catch(e){}
+    } catch(e) {
+      console.warn('[ZenvySync] deleteCategoryFromCloud error:', e);
+    }
+  }
+
   // ── Public API ──────────────────────────────────────────────────
   const ADMIN_MANAGED_KEYS = [
     'products', 'categories', 'collections', 'banners', 'homepage', 'shopBanner',
     'brand', 'storeSettings', 'shipping', 'paymentConfig', 'coupons', 'flashSales',
-    'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons', 'printing', 'customization'
+    'patches', 'sleeves', 'sizes', 'sizeChart', 'colors', 'addons', 'printing', 'customization',
+    'teams', 'reviews', 'preorderHero', 'modelShowcase', 'notifConfig', 'telegramConfig'
   ];
 
   window.ZenvyFirebase = {
@@ -1204,6 +1339,7 @@
     },
     saveProduct: saveProductToCloud,
     deleteProduct: deleteProductFromCloud,
+    deleteCategory: deleteCategoryFromCloud,
     deleteRestockRequest: deleteRestockRequest,
     syncProductsWithCloud,
     hydrate,

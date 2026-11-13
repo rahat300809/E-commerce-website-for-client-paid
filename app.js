@@ -256,11 +256,19 @@ function renderHeroBannerCarousel() {
   if (newBanners.length === 0) return;
 
   // Check if banners have actually changed to avoid wiping existing DOM and re-decoding images
-  const bannerHash = JSON.stringify(newBanners.map(b => b.id || b.title));
+  const bannerHash = JSON.stringify(newBanners.map(b => [
+    b.id,
+    b.title,
+    b.subtitle,
+    b.desktopImg || b.bgImage || b.image,
+    b.badge,
+    b.ctaPrimaryText || b.ctaText,
+    b.ctaPrimaryLink || b.destination,
+    b.isActive
+  ]));
   heroBannersList = newBanners;
 
-  if (wrapper.dataset.bannerHash === bannerHash || (wrapper.children.length >= 1 && !wrapper.dataset.bannerHash)) {
-    wrapper.dataset.bannerHash = bannerHash;
+  if (wrapper.dataset.bannerHash === bannerHash) {
     updateHeroBannerSlide(heroBannerActiveIndex);
     return;
   }
@@ -397,10 +405,20 @@ function syncHomepageContent() {
   const homeConfig = (typeof DB !== 'undefined' && DB.homepage) ? DB.homepage.get() : null;
 
   // 1. Top Announcement Marquee
+  const annBar = document.getElementById('store-announcement-bar');
   if (homeConfig && homeConfig.announcement) {
     const ann = homeConfig.announcement;
-    const marqueeEl = document.getElementById('store-marquee-text');
-    if (marqueeEl && ann.marqueeText) marqueeEl.textContent = ann.marqueeText;
+    if (annBar) {
+      if (ann.enabled === false) {
+        annBar.style.display = 'none';
+      } else {
+        annBar.style.display = 'flex';
+        const marqueeEl = document.getElementById('store-marquee-text');
+        if (marqueeEl && ann.marqueeText) marqueeEl.textContent = ann.marqueeText;
+        const badgeEl = document.getElementById('store-announcement-badge');
+        if (badgeEl && ann.badgeText) badgeEl.textContent = ann.badgeText;
+      }
+    }
   }
 
   // 2. Hero Banner Carousel (Auto-scrolling, Multi-banner support)
@@ -415,10 +433,8 @@ function syncHomepageContent() {
   ];
   const propsContainer = document.getElementById('store-value-props-container');
   if (propsContainer && props.length > 0) {
-    const propsHash = JSON.stringify(props.map(p => p.icon || p.title));
-    if (propsContainer.dataset.propsHash === propsHash || (propsContainer.children.length >= 4 && !propsContainer.dataset.propsHash)) {
-      propsContainer.dataset.propsHash = propsHash;
-    } else {
+    const propsHash = JSON.stringify(props.map(p => [p.icon, p.title, p.subtitle]));
+    if (propsContainer.dataset.propsHash !== propsHash) {
       propsContainer.dataset.propsHash = propsHash;
       propsContainer.innerHTML = props.map(p => `
         <div class="bg-[#f9f9fb] border border-gray-100 rounded-xl p-4 flex items-center gap-3">
@@ -442,8 +458,10 @@ function syncHomepageContent() {
 
   const bentoContainer = document.getElementById('collections-bento-grid');
   if (bentoContainer) {
-    const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.all().filter(c => c.isActive !== false) : [];
-    const bentoHash = JSON.stringify(categories.map(c => [c.id, c.name, c.imageUrl || c.image, c.badge]));
+    const customCollections = (typeof DB !== 'undefined' && DB.collections) ? DB.collections.active() : [];
+    const categories = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.active() : [];
+    const displayItems = (customCollections.length > 0) ? customCollections : categories;
+    const bentoHash = JSON.stringify(displayItems.map(c => [c.id, c.name, c.imageUrl || c.image || c.bgImage, c.badge || c.tag, c.description || c.desc]));
     if (bentoContainer.dataset.bentoHash !== bentoHash) {
       bentoContainer.dataset.bentoHash = bentoHash;
       const fallbackImages = [
@@ -453,29 +471,30 @@ function syncHomepageContent() {
         'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'
       ];
 
-      if (categories && categories.length > 0) {
-        const displayCats = categories.slice(0, 6);
+      if (displayItems && displayItems.length > 0) {
+        const displayCats = displayItems.slice(0, 6);
         bentoContainer.innerHTML = displayCats.map((c, idx) => {
-          const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : fallbackImages[idx % fallbackImages.length];
+          const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : (c.bgImage && !c.bgImage.includes('googleusercontent.com') ? c.bgImage : fallbackImages[idx % fallbackImages.length]);
           const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => {
             const pCat = (p.categoryName || '').toLowerCase();
-            const cName = c.name.toLowerCase();
-            return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id;
+            const cName = (c.name || c.title || '').toLowerCase();
+            return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id || p.collectionId === c.id;
           }).length : 0;
           const countBadge = prodCount > 0 ? `${prodCount} KITS AVAILABLE` : 'EXPLORE COLLECTION';
+          const itemName = c.name || c.title || 'Collection';
           return `
-            <div onclick="goToShopCategory('${c.name.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
+            <div onclick="goToShopCategory('${itemName.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
               <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
                    style="background-image: url('${bgImg}')">
               </div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
               <div class="absolute bottom-0 left-0 p-5 w-full">
-                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${c.badge ? `${c.badge} • ` : ''}${countBadge}</span>
-                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${c.name}</h3>
-                <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || 'Official High-Performance Kits'}</p>
+                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${(c.badge || c.tag) ? `${c.badge || c.tag} • ` : ''}${countBadge}</span>
+                <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${itemName}</h3>
+                <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || c.desc || 'Official High-Performance Kits'}</p>
               </div>
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-xs">
-                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${c.name}</span>
+                <span class="bg-white text-black text-xs px-4 py-2 rounded-full font-bold shadow-lg">Shop ${itemName}</span>
               </div>
             </div>
           `;
@@ -1303,6 +1322,11 @@ function syncFooterSocialLinks() {
     waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I have a question about products and orders.')}`;
     waBtn.setAttribute('title', `WhatsApp: ${cleanWa}`);
   }
+
+  // Update any other dynamic WhatsApp links on page
+  document.querySelectorAll('.dynamic-wa-link, #track-order-wa-help').forEach(el => {
+    el.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Salam ' + brandName + ', I need some assistance with my order.')}`;
+  });
 }
 
 // View Switcher Router with Short Shareable URL Sync

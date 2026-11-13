@@ -464,45 +464,19 @@
 
       // 4. Authoritative Cloud Catalog Sync
       // Cloud Firestore /products/ collection is the master source of truth across all devices.
-      const cloudMap = new Map();
-      cloudList.forEach(p => cloudMap.set(String(p.id).trim(), p));
-
-      const toUpload = [];
-      // Preserve all valid local products across background and manual syncs
-      localList.forEach(p => {
-        if (!p || !p.id) return;
-        const pid = String(p.id).trim();
-        if (deletedIds.has(pid)) return;
-        if (isTestOrJunkProduct(p)) return;
-
-        const hasPrePrice = typeof p.preorderPrice === 'number' && p.preorderPrice > 0;
-        const hasOpenStatus = p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON';
-        p.isPreorder = Boolean(p.isPreorder && (hasPrePrice || hasOpenStatus));
-
-        if (!cloudMap.has(pid)) {
-          toUpload.push(p);
-          cloudMap.set(pid, p);
-        }
-      });
-
-      // Background upload any local products that are not yet in Firestore
-      if (toUpload.length > 0 && _db) {
-        setTimeout(async () => {
-          for (const item of toUpload) {
-            try {
-              await saveProductToCloud(item);
-            } catch(e) {
-              console.warn('[ZenvySync] Background upload of local product notice:', item.id, e);
-            }
-          }
-        }, 150);
+      let merged = [];
+      if (cloudList.length > 0) {
+        // Master Firestore catalog is authoritative. NEVER resurrect deleted items!
+        merged = cloudList.filter(p => !deletedIds.has(String(p.id).trim()) && !isTestOrJunkProduct(p));
+      } else {
+        // Cold start fallback if Firestore collection is completely empty
+        merged = localList.filter(p => !deletedIds.has(String(p.id).trim()) && !isTestOrJunkProduct(p));
       }
 
-      const merged = Array.from(cloudMap.values());
       // Sort newest first
       merged.sort((a, b) => {
-        const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const tA = (a.createdAt ? new Date(a.createdAt).getTime() : 0) || 0;
+        const tB = (b.createdAt ? new Date(b.createdAt).getTime() : 0) || 0;
         return tB - tA;
       });
 
@@ -933,51 +907,14 @@
           }
         }
 
-        const productMap = new Map();
-        cloudProducts.forEach(cp => {
-          const cId = String(cp.id || '').trim().toLowerCase();
-          if (cId) productMap.set(cId, cp);
-        });
-
-        if (Array.isArray(localList)) {
-          localList.forEach(lp => {
-            if (!lp || !lp.id) return;
-            const lId = String(lp.id).trim().toLowerCase();
-            if (deletedIds.has(String(lp.id).trim()) || deletedIds.has(lId)) return;
-            if (typeof isTestOrJunkProduct === 'function' && isTestOrJunkProduct(lp)) return;
-
-            const existingCloud = productMap.get(lId);
-            if (!existingCloud) {
-              // Local product not yet in cloud: retain it so it never vanishes!
-              productMap.set(lId, lp);
-              // Asynchronously push to cloud so other devices get it too
-              if (_db) {
-                try {
-                  _db.collection(FS_PRODUCTS_COLLECTION).doc(String(lp.id).trim()).set(sanitize(lp), { merge: true }).catch(() => {});
-                } catch(e){}
-              }
-            } else {
-              // Both local and cloud exist: check timestamps
-              const tLocal = lp.updatedAt ? new Date(lp.updatedAt).getTime() : 0;
-              const tCloud = existingCloud.updatedAt ? new Date(existingCloud.updatedAt).getTime() : 0;
-              if (tLocal > tCloud) {
-                // Local is newer! Preserve local edits
-                productMap.set(lId, { ...existingCloud, ...lp });
-              } else {
-                // Cloud is equal or newer, but preserve images if cloud lost them
-                const cloudHasImg = existingCloud.image || (existingCloud.images && existingCloud.images.length > 0);
-                const localHasImg = lp.image || (lp.images && lp.images.length > 0);
-                if (!cloudHasImg && localHasImg) {
-                  existingCloud.image = lp.image;
-                  existingCloud.imageUrl = lp.imageUrl;
-                  existingCloud.images = lp.images;
-                }
-              }
-            }
-          });
+        // Master Firestore catalog is authoritative. NEVER resurrect deleted items!
+        let mergedProducts = [];
+        if (cloudProducts.length > 0) {
+          mergedProducts = cloudProducts.filter(p => !deletedIds.has(String(p.id).trim()) && (typeof isTestOrJunkProduct !== 'function' || !isTestOrJunkProduct(p)));
+        } else {
+          mergedProducts = localList.filter(p => !deletedIds.has(String(p.id).trim()) && (typeof isTestOrJunkProduct !== 'function' || !isTestOrJunkProduct(p)));
         }
 
-        const mergedProducts = Array.from(productMap.values());
         mergedProducts.sort((a, b) => {
           const tA = (a.createdAt ? new Date(a.createdAt).getTime() : 0) || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0) || 0;
           const tB = (b.createdAt ? new Date(b.createdAt).getTime() : 0) || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0) || 0;

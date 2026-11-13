@@ -2450,7 +2450,8 @@ function renderShopProducts() {
 
     return `
       <div class="shop-card bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-150 sm:border-gray-100 shadow-2xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between w-full max-w-full"
-           data-id="${p.id}" data-price="${p.salePrice || p.basePrice}" data-category="${p.categoryName || ''}">
+           data-id="${p.id}" data-price="${p.salePrice || p.basePrice}" data-category="${p.categoryName || ''}"
+           onmouseenter="prefetchProduct('${p.id}')" ontouchstart="prefetchProduct('${p.id}')">
         
         <!-- Image Area: Compact aspect-square with smooth zoom & interactive wishlist -->
         <div class="relative overflow-hidden bg-[#f7f7f9] cursor-pointer aspect-square flex items-center justify-center p-1.5 sm:p-3"
@@ -2986,6 +2987,32 @@ if (!window._shopCarouselTimer) {
 
 let pdState = { product: null, size: 'M', qty: 1 };
 
+// ── Instant Product Prefetching & Fast Navigation ──
+function prefetchProduct(product) {
+  if (!product) return;
+  const prodId = (typeof product === 'object') ? String(product.id || product.slug || '') : String(product);
+  if (!prodId) return;
+  try {
+    const existing = document.querySelector(`link[rel="prefetch"][href*="${prodId}"]`);
+    if (!existing) {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.as = 'document';
+      link.href = `product.html?id=${encodeURIComponent(prodId)}`;
+      document.head.appendChild(link);
+    }
+    const prodObj = (typeof product === 'object') ? product : (typeof DB !== 'undefined' && DB.products ? DB.products.byId(prodId) : null);
+    if (prodObj) {
+      const fullObj = { ...prodObj };
+      fullObj.image = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+        ? DB.products.getImage(prodObj)
+        : (prodObj.image || prodObj.imageUrl || (Array.isArray(prodObj.images) && (prodObj.images[0]?.url || prodObj.images[0])) || '');
+      sessionStorage.setItem('zenvy_active_product_preview', JSON.stringify(fullObj));
+    }
+  } catch(e){}
+}
+window.prefetchProduct = prefetchProduct;
+
 function openProduct(product) {
   let prodId = '';
   let prodObj = null;
@@ -3005,20 +3032,11 @@ function openProduct(product) {
 
   if (prodObj) {
     try {
-      const img = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
+      const fullObj = { ...prodObj };
+      fullObj.image = (typeof DB !== 'undefined' && DB.products && typeof DB.products.getImage === 'function')
         ? DB.products.getImage(prodObj)
         : (prodObj.image || prodObj.imageUrl || (Array.isArray(prodObj.images) && (prodObj.images[0]?.url || prodObj.images[0])) || '');
-      sessionStorage.setItem('zenvy_active_product_preview', JSON.stringify({
-        id: String(prodObj.id || prodId),
-        slug: String(prodObj.slug || ''),
-        name: prodObj.name || '',
-        price: prodObj.salePrice || prodObj.basePrice || 0,
-        salePrice: prodObj.salePrice || prodObj.basePrice || 0,
-        basePrice: prodObj.basePrice || 0,
-        compareAt: prodObj.compareAt || 0,
-        image: img,
-        categoryName: prodObj.categoryName || ''
-      }));
+      sessionStorage.setItem('zenvy_active_product_preview', JSON.stringify(fullObj));
     } catch(e){}
   }
 

@@ -66,7 +66,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261113_v25">
+  <link rel="stylesheet" href="styles.css?v=20261113_v26">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -439,6 +439,25 @@
             <span>•</span>
             <span id="pd-stock-tag" class="text-emerald-700 font-black">IN STOCK</span>
           </div>
+          <script>
+            (function() {
+              if (window._preloadedProduct) {
+                var p = window._preloadedProduct;
+                var subEl = document.getElementById('pd-subtitle-tags');
+                if (subEl) subEl.textContent = (p.categoryName || "MEN'S FOOTBALL").toUpperCase();
+                var stockEl = document.getElementById('pd-stock-tag');
+                if (stockEl) {
+                  if (typeof p.stock === 'number' && p.stock <= 0) {
+                    stockEl.className = 'text-red-700 font-black';
+                    stockEl.textContent = 'STOCK OUT';
+                  } else if (p.isPreorder) {
+                    stockEl.className = 'text-purple-700 font-black';
+                    stockEl.textContent = 'PRE-ORDER';
+                  }
+                }
+              }
+            })();
+          </script>
 
           <!-- Price Display -->
           <div class="pt-1 flex items-baseline gap-2.5">
@@ -989,9 +1008,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261113_v25"></script>
-  <script src="admin-db.js?v=20261113_v25"></script>
-  <script src="wishlist.js?v=20261113_v25"></script>
+  <script src="firebase-sync.js?v=20261113_v26"></script>
+  <script src="admin-db.js?v=20261113_v26"></script>
+  <script src="wishlist.js?v=20261113_v26"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1265,21 +1284,63 @@
       if (!idOrSlug || _fetchingProdDirect) return;
       _fetchingProdDirect = true;
 
-      // Show neutral loader so NO other product flashes in the background
-      const container = document.getElementById('main-view-container');
-      let spinner = document.getElementById('cloud-prod-spinner');
-      if (container && !spinner) {
-        spinner = document.createElement('div');
-        spinner.id = 'cloud-prod-spinner';
-        spinner.className = 'absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-xs z-30 transition-opacity';
-        spinner.innerHTML = `
-          <div class="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs font-bold text-gray-500 mt-2.5 font-headline">জার্সি লোড হচ্ছে...</span>
-        `;
-        container.appendChild(spinner);
+      // If we already have a preloaded product, render it immediately without any blocking spinner!
+      if (window._preloadedProduct) {
+        renderTargetProduct(window._preloadedProduct);
+      } else {
+        // Show neutral loader so NO other product flashes in the background
+        const container = document.getElementById('main-view-container');
+        let spinner = document.getElementById('cloud-prod-spinner');
+        if (container && !spinner) {
+          spinner = document.createElement('div');
+          spinner.id = 'cloud-prod-spinner';
+          spinner.className = 'absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-xs z-30 transition-opacity';
+          spinner.innerHTML = `
+            <div class="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-xs font-bold text-gray-500 mt-2.5 font-headline">জার্সি লোড হচ্ছে...</span>
+          `;
+          container.appendChild(spinner);
+        }
       }
 
       try {
+        // High-speed parallel REST fetch (<120ms) - bypasses SDK initialization delay
+        const restPromise = fetch(`https://firestore.googleapis.com/v1/projects/zenvy-storebd/databases/(default)/documents/products/${encodeURIComponent(idOrSlug)}`)
+          .then(res => res.ok ? res.json() : null)
+          .catch(() => null);
+
+        const restDoc = await restPromise;
+        if (restDoc && restDoc.fields) {
+          function parseRestVal(v) {
+            if (!v) return null;
+            if ('stringValue' in v) return v.stringValue;
+            if ('integerValue' in v) return parseInt(v.integerValue);
+            if ('doubleValue' in v) return parseFloat(v.doubleValue);
+            if ('booleanValue' in v) return Boolean(v.booleanValue);
+            if ('mapValue' in v) {
+              const res = {};
+              const f = v.mapValue.fields || {};
+              for (const k in f) res[k] = parseRestVal(f[k]);
+              return res;
+            }
+            if ('arrayValue' in v) return (v.arrayValue.values || []).map(parseRestVal);
+            return null;
+          }
+          const pData = {};
+          for (const k in restDoc.fields) pData[k] = parseRestVal(restDoc.fields[k]);
+          if (!pData.id) pData.id = restDoc.name.split('/').pop();
+          if (Array.isArray(window._ZENVY_PRODUCTS_CACHE)) {
+            const idx = window._ZENVY_PRODUCTS_CACHE.findIndex(x => x.id === pData.id);
+            if (idx >= 0) window._ZENVY_PRODUCTS_CACHE[idx] = pData;
+            else window._ZENVY_PRODUCTS_CACHE.unshift(pData);
+          }
+          const sp = document.getElementById('cloud-prod-spinner');
+          if (sp) sp.remove();
+          renderTargetProduct(pData);
+          _fetchingProdDirect = false;
+          return;
+        }
+
         if (window.ZenvyFirebase && typeof window.ZenvyFirebase.ensureDb === 'function') {
           const db = await window.ZenvyFirebase.ensureDb();
           if (db) {
@@ -1310,6 +1371,8 @@
       const sp = document.getElementById('cloud-prod-spinner');
       if (sp) sp.remove();
       _fetchingProdDirect = false;
+      // If we already rendered preloaded preview, do not replace with not found
+      if (window._preloadedProduct) return;
       // Product was explicitly requested by ID/slug but not found in Firestore (or was deleted)
       renderProductNotFound();
     }
@@ -1378,6 +1441,23 @@
         }
         if (!targetProduct && prodSlug) {
           targetProduct = allProducts.find(p => p.slug === prodSlug);
+        }
+        if (!targetProduct && window._preloadedProduct) {
+          const preId = String(window._preloadedProduct.id || window._preloadedProduct.slug || '').trim().toLowerCase();
+          const reqId = String(prodId || prodSlug || '').trim().toLowerCase();
+          if (!reqId || preId === reqId) {
+            targetProduct = window._preloadedProduct;
+          }
+        }
+        if (!targetProduct && (prodId || prodSlug)) {
+          try {
+            const rawProds = localStorage.getItem('zenvy_v1_products');
+            if (rawProds) {
+              const localList = JSON.parse(rawProds);
+              const qId = String(prodId || prodSlug).trim().toLowerCase();
+              targetProduct = localList.find(x => String(x.id).trim().toLowerCase() === qId || String(x.slug||'').trim().toLowerCase() === qId);
+            }
+          } catch(e){}
         }
         if (!targetProduct && paramName) {
           targetProduct = allProducts.find(p => p.name.toLowerCase() === paramName.toLowerCase());

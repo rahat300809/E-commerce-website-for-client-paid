@@ -19,7 +19,7 @@
     rel="stylesheet" />
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261112_v24">
+  <link rel="stylesheet" href="styles.css?v=20261113_v25">
 
   <!-- Preload critical hero & bento assets to eliminate first-paint reload flash -->
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80"
@@ -1098,23 +1098,8 @@
               <!-- Rendered dynamically from DB.products.published() -->
             </div><!-- /product grid -->
 
-            <!-- ── Dynamic Pagination ── -->
-            <div id="shop-pagination-container" class="flex justify-center items-center gap-1.5 mt-10">
-              <button onclick="changeShopPage(shopCurrentPage - 1)"
-                class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:bg-gray-100 border border-gray-200 transition-colors cursor-pointer">
-                <span class="material-symbols-outlined text-base">chevron_left</span>
-              </button>
-              <button onclick="changeShopPage(1)" id="shop-page-btn-1"
-                class="w-9 h-9 rounded-full bg-primary text-white font-mono-ui text-sm font-bold shadow cursor-pointer">1</button>
-              <button onclick="changeShopPage(2)" id="shop-page-btn-2"
-                class="w-9 h-9 rounded-full text-secondary hover:bg-gray-100 font-mono-ui text-sm transition-colors border border-gray-200 cursor-pointer">2</button>
-              <button onclick="changeShopPage(3)" id="shop-page-btn-3"
-                class="w-9 h-9 rounded-full text-secondary hover:bg-gray-100 font-mono-ui text-sm transition-colors border border-gray-200 cursor-pointer">3</button>
-              <button onclick="changeShopPage(shopCurrentPage + 1)"
-                class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:bg-gray-100 border border-gray-200 transition-colors cursor-pointer">
-                <span class="material-symbols-outlined text-base">chevron_right</span>
-              </button>
-            </div>
+            <!-- ── Dynamic Pagination (Hidden: All products rendered continuously in one serial grid) ── -->
+            <div id="shop-pagination-container" class="hidden" style="display:none;"></div>
 
           </div><!-- /right col -->
         </div><!-- /flex layout -->
@@ -2205,12 +2190,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <!-- Zenvy Firestore Sync Layer -->
-    <script src="firebase-sync.js?v=20261112_v24"></script>
+    <script src="firebase-sync.js?v=20261113_v25"></script>
     <!-- Admin DB & Store State -->
-    <script src="admin-db.js?v=20261112_v24"></script>
+    <script src="admin-db.js?v=20261113_v25"></script>
     <!-- Main Application JavaScript -->
-    <script src="wishlist.js?v=20261112_v24"></script>
-    <script src="app.js?v=20261112_v24"></script>
+    <script src="wishlist.js?v=20261113_v25"></script>
+    <script src="app.js?v=20261113_v25"></script>
 </body>
 
 </html>

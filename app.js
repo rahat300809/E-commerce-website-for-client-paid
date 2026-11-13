@@ -2398,59 +2398,21 @@ function renderShopProducts() {
     countEl.textContent = isCategoryFallback ? `${filtered.length} (All Kits)` : `${filtered.length}`;
   }
 
-  const PAGE_SIZE = 9;
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  if (shopCurrentPage > totalPages) shopCurrentPage = totalPages;
-  if (shopCurrentPage < 1) shopCurrentPage = 1;
-
-  // Render pagination buttons
+  // Single Continuous Grid: Display all catalog products without 1 2 3 pagination
   const pagContainer = document.getElementById('shop-pagination-container');
   if (pagContainer) {
-    if (totalPages <= 1) {
-      pagContainer.innerHTML = '';
-    } else {
-      let pagHtml = `
-        <button onclick="changeShopPage(${shopCurrentPage - 1})" ${shopCurrentPage <= 1 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''} class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:bg-gray-100 border border-gray-200 transition-colors cursor-pointer">
-          <span class="material-symbols-outlined text-base">chevron_left</span>
-        </button>
-      `;
-      for (let p = 1; p <= totalPages; p++) {
-        const activeClass = (p === shopCurrentPage)
-          ? 'w-9 h-9 rounded-full bg-primary text-white font-mono-ui text-sm font-bold shadow cursor-pointer'
-          : 'w-9 h-9 rounded-full text-secondary hover:bg-gray-100 font-mono-ui text-sm transition-colors border border-gray-200 cursor-pointer';
-        pagHtml += `<button onclick="changeShopPage(${p})" class="${activeClass}">${p}</button>`;
-      }
-      pagHtml += `
-        <button onclick="changeShopPage(${shopCurrentPage + 1})" ${shopCurrentPage >= totalPages ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''} class="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:bg-gray-100 border border-gray-200 transition-colors cursor-pointer">
-          <span class="material-symbols-outlined text-base">chevron_right</span>
-        </button>
-      `;
-      pagContainer.innerHTML = pagHtml;
-    }
+    pagContainer.innerHTML = '';
+    pagContainer.style.display = 'none';
   }
 
-  if (filtered.length === 0) {
-    grid.innerHTML = `
-      <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-gray-200 p-8">
-        <span class="material-symbols-outlined text-5xl text-gray-300 mb-3">inventory_2</span>
-        <h3 class="font-headline-lg text-lg font-bold text-primary mb-1">No products found</h3>
-        <p class="font-body-md text-xs text-secondary mb-4">No products in catalog match your current price filters.</p>
-        <button onclick="resetFilters()" class="bg-primary text-white font-label-caps text-xs px-5 py-2.5 rounded-full font-bold cursor-pointer">Reset Filters</button>
-      </div>
-    `;
-    return;
-  }
-
-  const startIndex = (shopCurrentPage - 1) * PAGE_SIZE;
-  const pageProducts = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+  const pageProducts = filtered;
   const defaultImg = 'img/products/prod_mwafvhg25iobn348j.jpg';
 
-  const renderHash = `${shopActiveCategory}_${shopCurrentPage}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [
+  const renderHash = `${shopActiveCategory}_${shopSortOrder}_${shopMaxPrice}_${isCategoryFallback}_` + JSON.stringify(pageProducts.map(p => [
     p.id, 
     p.name, 
     p.salePrice || p.basePrice, 
     p.stock, 
-    p.updatedAt || '', 
     p.image || p.imageUrl || p.images?.[0]?.url || '', 
     p.slug || ''
   ]));

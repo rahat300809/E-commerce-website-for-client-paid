@@ -483,7 +483,9 @@ function deleteProduct(id) {
     `Are you sure you want to delete "${p.name}"? This will immediately remove it from your online store.`,
     () => {
       DB.products.delete(id);
-      renderProducts(document.getElementById('admin-content'));
+      const adminContent = document.getElementById('admin-content');
+      if (adminContent) delete adminContent.dataset.lastProdSig;
+      renderProducts(adminContent);
       toast(`Product "${p.name}" deleted successfully`, 'success');
       try { window.dispatchEvent(new Event('storage')); } catch(e){}
     },
@@ -1025,6 +1027,12 @@ function renderProducts(container) {
   const page = Math.max(1, Math.min(productPage || 1, totalPages || 1));
   const paged = items.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
 
+  const renderSig = `${productPage}_${productSort}_${productCatFilter}_${productStatusFilter}_${productSearch}_${total}_` + paged.map(p => `${p.id}_${p.name}_${p.stock}_${p.basePrice}_${p.salePrice}_${p.status}`).join('|');
+  if (container && container.dataset && container.dataset.lastProdSig === renderSig && container.querySelector('.admin-table tbody tr')) {
+    return;
+  }
+  if (container && container.dataset) container.dataset.lastProdSig = renderSig;
+
   container.innerHTML = `
     <div class="page-header">
       <div class="page-header-left">
@@ -1251,6 +1259,7 @@ function duplicateProduct(id) {
 
       const content = document.getElementById('admin-content');
       if (content) {
+        delete content.dataset.lastProdSig;
         renderProducts(content);
       }
       updateNavBadges();
@@ -1297,7 +1306,9 @@ function bulkDelete() {
       });
       selectedProducts.clear();
       toast(`${count} product(s) deleted successfully`, 'success');
-      renderProducts(document.getElementById('admin-content'));
+      const adminContent = document.getElementById('admin-content');
+      if (adminContent) delete adminContent.dataset.lastProdSig;
+      renderProducts(adminContent);
       if (typeof updateNavBadges === 'function') updateNavBadges();
       try {
         window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
@@ -2292,7 +2303,9 @@ function saveProduct(e, id, asDraft = false) {
   productSort = 'newest';
   productSearch = '';
   updateNavBadges();
-  renderProducts(document.getElementById('admin-content'));
+  const adminContent = document.getElementById('admin-content');
+  if (adminContent) delete adminContent.dataset.lastProdSig;
+  renderProducts(adminContent);
 }
 window.saveProduct = saveProduct;
 

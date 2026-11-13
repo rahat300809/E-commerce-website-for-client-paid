@@ -46,7 +46,11 @@
   try {
     const rawProds = localStorage.getItem(`${DB_VERSION}_products`);
     if (rawProds) {
-      window._ZENVY_PRODUCTS_CACHE = JSON.parse(rawProds);
+      const parsedProds = JSON.parse(rawProds);
+      if (Array.isArray(parsedProds) && parsedProds.length > 0) {
+        window._ZENVY_PRODUCTS_CACHE = parsedProds;
+        window._lastProductsSnapshotSignature = parsedProds.map(p => `${p.id}_${p.name || ''}_${p.salePrice || p.basePrice || ''}_${p.stock}_${p.status || ''}_${(p.images && p.images[0] && (p.images[0].url || p.images[0])) || p.image || ''}`).join('|');
+      }
     }
   } catch(e){}
 
@@ -478,9 +482,15 @@
         }
       }
 
-      // 8. Dispatch events for instant UI reactivity across storefront and admin
-      window.dispatchEvent(new Event('storage'));
-      window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+      // 8. Compute signature and only broadcast if catalog content actually changed
+      const newSig = merged.map(p => `${p.id}_${p.name || ''}_${p.salePrice || p.basePrice || ''}_${p.stock}_${p.status || ''}_${(p.images && p.images[0] && (p.images[0].url || p.images[0])) || p.image || ''}`).join('|');
+      const isUnchanged = (window._lastProductsSnapshotSignature === newSig);
+      window._lastProductsSnapshotSignature = newSig;
+
+      if (!isUnchanged || toUpload.length > 0) {
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('zenvy-store-updated', { detail: { key: 'products' } }));
+      }
 
       return { count: merged.length, uploaded: toUpload.length };
     } catch(err) {
@@ -875,7 +885,7 @@
         });
 
         // Compute stable catalog signature to avoid redundant re-renders and loop thrashing
-        const newSig = mergedProducts.map(p => `${p.id}_${p.updatedAt || ''}_${p.name || ''}_${p.salePrice || p.basePrice || ''}_${p.stock}_${p.status || ''}_${(p.images && p.images[0] && (p.images[0].url || p.images[0])) || p.image || ''}`).join('|');
+        const newSig = mergedProducts.map(p => `${p.id}_${p.name || ''}_${p.salePrice || p.basePrice || ''}_${p.stock}_${p.status || ''}_${(p.images && p.images[0] && (p.images[0].url || p.images[0])) || p.image || ''}`).join('|');
         if (window._lastProductsSnapshotSignature === newSig) {
           // No changes detected! Avoid redundant writes and event storms
           return;

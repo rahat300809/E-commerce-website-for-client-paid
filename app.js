@@ -475,12 +475,7 @@ function syncHomepageContent() {
         const displayCats = displayItems.slice(0, 6);
         bentoContainer.innerHTML = displayCats.map((c, idx) => {
           const bgImg = (c.imageUrl && !c.imageUrl.includes('googleusercontent.com')) ? c.imageUrl : (c.bgImage && !c.bgImage.includes('googleusercontent.com') ? c.bgImage : fallbackImages[idx % fallbackImages.length]);
-          const prodCount = (typeof DB !== 'undefined' && DB.products) ? DB.products.published().filter(p => {
-            const pCat = (p.categoryName || '').toLowerCase();
-            const cName = (c.name || c.title || '').toLowerCase();
-            return pCat === cName || pCat.includes(cName) || cName.includes(pCat) || p.categoryId === c.id || p.collectionId === c.id;
-          }).length : 0;
-          const countBadge = prodCount > 0 ? `${prodCount} KITS AVAILABLE` : 'EXPLORE COLLECTION';
+          const countBadge = (c.badge || c.tag) ? String(c.badge || c.tag).toUpperCase() : 'OFFICIAL COLLECTION';
           const itemName = c.name || c.title || 'Collection';
           return `
             <div onclick="goToShopCategory('${itemName.replace(/'/g, "\\'")}')" class="group relative rounded-2xl overflow-hidden cursor-pointer shadow-md h-60 sm:h-72 ${idx === 2 && displayCats.length === 3 ? 'sm:col-span-2 md:col-span-1' : ''}">
@@ -489,7 +484,7 @@ function syncHomepageContent() {
               </div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
               <div class="absolute bottom-0 left-0 p-5 w-full">
-                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${(c.badge || c.tag) ? `${c.badge || c.tag} • ` : ''}${countBadge}</span>
+                <span class="text-[10px] font-mono-ui uppercase font-bold text-amber-400 tracking-wider">${countBadge}</span>
                 <h3 class="font-headline text-lg sm:text-xl text-white font-bold">${itemName}</h3>
                 <p class="text-xs text-gray-200 mt-1 line-clamp-1">${c.description || c.desc || 'Official High-Performance Kits'}</p>
               </div>
@@ -2419,7 +2414,7 @@ function renderShopProducts() {
   }
 
   if (countEl) {
-    countEl.textContent = isCategoryFallback ? `${filtered.length} (All Kits)` : `${filtered.length}`;
+    countEl.textContent = '';
   }
 
   // Single Continuous Grid: Display all catalog products without 1 2 3 pagination

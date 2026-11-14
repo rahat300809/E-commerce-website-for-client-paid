@@ -66,7 +66,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=20261113_v33">
+  <link rel="stylesheet" href="styles.css?v=20261114_v34">
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -811,7 +811,7 @@
 
 
   <!-- ═══════════════════════════════════════════
-       SIZE CHART IMAGE MODAL (ONLY IMAGE POPUP)
+       PER-PRODUCT SIZE CHART MODAL (GRAPHIC + TABLE)
   ════════════════════════════════════════════ -->
   <div id="modal-size-guide" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="if(event.target===this)closeSizeGuideModal()">
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh] animate-slide-up">
@@ -819,20 +819,60 @@
       <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-gray-700 text-lg">straighten</span>
-          <h3 id="modal-sizechart-title" class="font-headline font-black text-sm uppercase tracking-wide text-black">
+          <h3 id="modal-sizechart-title" class="font-headline font-black text-sm uppercase tracking-wide text-black truncate max-w-[240px] sm:max-w-[300px]">
             Size Chart
           </h3>
+          <span id="modal-sizechart-edition-tag" class="text-[10px] font-mono-ui font-black px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider shrink-0">
+            PLAYER EDITION
+          </span>
         </div>
-        <button type="button" onclick="closeSizeGuideModal()" class="w-8 h-8 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-700 flex items-center justify-center text-sm font-bold cursor-pointer transition-colors">✕</button>
+        <button type="button" onclick="closeSizeGuideModal()" class="w-8 h-8 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-700 flex items-center justify-center text-sm font-bold cursor-pointer transition-colors" title="Close">✕</button>
       </div>
 
-      <!-- Size Chart Image View (ONLY IMAGE) -->
-      <div class="p-3 sm:p-4 bg-neutral-900/5 flex items-center justify-center overflow-auto max-h-[72vh]">
-        <img id="modal-sizechart-img" src="size-chart-default.jpg" alt="Size Chart Graphic" class="max-h-[66vh] w-auto max-w-full rounded-xl shadow-md border border-gray-200 object-contain bg-white"/>
+      <!-- View Switcher (Graphic Chart vs Inches Table) -->
+      <div id="sizechart-view-toggle" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-100/70 border-b border-gray-200/80">
+        <button type="button" id="btn-chart-graphic" onclick="switchSizeChartModalView('graphic')" class="px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">image</span>
+          <span>সাইজ চার্ট (Graphic Chart)</span>
+        </button>
+        <button type="button" id="btn-chart-table" onclick="switchSizeChartModalView('table')" class="px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black hover:bg-gray-200/60 transition-all flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">table_chart</span>
+          <span>পরিমাপ টেবিল (Inches Table)</span>
+        </button>
+      </div>
+
+      <!-- Size Chart Image View (Default View) -->
+      <div id="modal-sizechart-img-view" class="p-3 sm:p-4 bg-neutral-900/5 flex items-center justify-center overflow-auto max-h-[68vh]">
+        <img id="modal-sizechart-img" src="img/sizecharts/sizechart-player.svg" alt="Size Chart Graphic" class="max-h-[64vh] w-auto max-w-full rounded-xl shadow-md border border-gray-200 object-contain bg-white"/>
+      </div>
+
+      <!-- Measurements Table View (Optional View) -->
+      <div id="modal-sizechart-table-view" class="p-4 overflow-auto max-h-[68vh] hidden space-y-3">
+        <div class="text-xs text-gray-500 flex items-center justify-between">
+          <span>সব মাপ ইঞ্চিতে (All sizes in inches)</span>
+          <span id="modal-table-fit-badge" class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px]">Player Edition (Slim Cut)</span>
+        </div>
+        <table class="w-full text-left border-collapse text-xs bg-white rounded-xl overflow-hidden border border-gray-200 shadow-2xs">
+          <thead>
+            <tr class="bg-gray-100 border-b border-gray-200 text-gray-700 font-headline font-black uppercase text-[11px]">
+              <th class="py-2.5 px-3">Size (সাইজ)</th>
+              <th class="py-2.5 px-3">Chest / বডি (Inches)</th>
+              <th class="py-2.5 px-3">Length / লম্বা (Inches)</th>
+            </tr>
+          </thead>
+          <tbody id="modal-size-tbody" class="divide-y divide-gray-100">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+        <div id="modal-size-note-callout" class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-2">
+          <span class="material-symbols-outlined text-amber-600 text-base shrink-0 mt-0.5">info</span>
+          <span id="modal-size-note-text">প্লেয়ার এডিশন বডি-ফিটেড হয়। সামান্য ঢিলেঢালা পরতে চাইলে ১ সাইজ বড় অর্ডার করুন।</span>
+        </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-5 py-3 bg-white border-t border-gray-100 flex items-center justify-end">
+      <div class="px-5 py-3 bg-white border-t border-gray-100 flex items-center justify-between">
+        <span class="text-[11px] text-gray-400 font-medium">ZENVY Official Apparel Sizing</span>
         <button type="button" onclick="closeSizeGuideModal()" class="bg-black text-white text-xs font-bold px-6 py-2 rounded-full cursor-pointer hover:bg-neutral-800 transition-colors">Close</button>
       </div>
     </div>
@@ -1008,9 +1048,9 @@
   ════════════════════════════════════════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-sync.js?v=20261113_v33"></script>
-  <script src="admin-db.js?v=20261113_v33"></script>
-  <script src="wishlist.js?v=20261113_v33"></script>
+  <script src="firebase-sync.js?v=20261114_v34"></script>
+  <script src="admin-db.js?v=20261114_v34"></script>
+  <script src="wishlist.js?v=20261114_v34"></script>
   <script>
     // ─────────────────────────────────────────
     // Product State
@@ -1983,13 +2023,9 @@
         }
 
         // Size Chart Image View Setup
-        let chartImg = targetProduct.sizeChartImage || '';
-        if (!chartImg && typeof DB !== 'undefined') {
-          if (DB.sizes && typeof DB.sizes.getSizeChart === 'function') chartImg = DB.sizes.getSizeChart();
-          if (!chartImg && DB.storeSettings) chartImg = DB.storeSettings.get()?.defaultSizeChartImage || '';
-          if (!chartImg && DB.brand) chartImg = DB.brand.get()?.sizeChartUrl || '';
-        }
-        if (!chartImg) chartImg = 'size-chart-default.jpg';
+        let chartImg = (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.getProductSizeChart === 'function')
+          ? DB.sizes.getProductSizeChart(targetProduct)
+          : (targetProduct.sizeChartImage || 'img/sizecharts/sizechart-player.svg');
         const toggleCont = document.getElementById('sizechart-view-toggle');
         const imgEl = document.getElementById('modal-sizechart-img');
         if (imgEl) imgEl.src = chartImg;
@@ -2503,24 +2539,116 @@
       calculateLiveTotal();
     }
 
+    function switchSizeChartModalView(view) {
+      const imgView = document.getElementById('modal-sizechart-img-view');
+      const tblView = document.getElementById('modal-sizechart-table-view');
+      const btnGraphic = document.getElementById('btn-chart-graphic');
+      const btnTable = document.getElementById('btn-chart-table');
+
+      if (view === 'table') {
+        if (imgView) imgView.classList.add('hidden');
+        if (tblView) tblView.classList.remove('hidden');
+        if (btnTable) btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer';
+        if (btnGraphic) btnGraphic.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black hover:bg-gray-200/60 transition-all flex items-center gap-1.5 cursor-pointer';
+      } else {
+        if (imgView) imgView.classList.remove('hidden');
+        if (tblView) tblView.classList.add('hidden');
+        if (btnGraphic) btnGraphic.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-black text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer';
+        if (btnTable) btnTable.className = 'px-3.5 py-1 rounded-full text-xs font-bold text-gray-600 hover:text-black hover:bg-gray-200/60 transition-all flex items-center gap-1.5 cursor-pointer';
+      }
+    }
+
+    function selectSizeAndCloseModal(size) {
+      if (typeof selectSize === 'function') selectSize(size);
+      closeSizeGuideModal();
+    }
+
     function openSizeGuideModal() {
       const modal = document.getElementById('modal-size-guide');
       if (!modal) return;
       const p = productState.product || {};
       const imgEl = document.getElementById('modal-sizechart-img');
       const titleEl = document.getElementById('modal-sizechart-title');
+      const editionTag = document.getElementById('modal-sizechart-edition-tag');
+      const fitBadge = document.getElementById('modal-table-fit-badge');
+      const noteText = document.getElementById('modal-size-note-text');
 
-      let storeDefault = '';
-      if (typeof DB !== 'undefined') {
-        if (DB.sizes && typeof DB.sizes.getSizeChart === 'function') storeDefault = DB.sizes.getSizeChart();
-        if (!storeDefault && DB.storeSettings) storeDefault = DB.storeSettings.get()?.defaultSizeChartImage || '';
-        if (!storeDefault && DB.brand) storeDefault = DB.brand.get()?.sizeChartUrl || '';
+      // 1. Determine accurate per-product size chart image
+      let chartImg = '';
+      if (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.getProductSizeChart === 'function') {
+        chartImg = DB.sizes.getProductSizeChart(p);
+      } else if (p.sizeChartImage && p.sizeChartImage.trim()) {
+        chartImg = p.sizeChartImage.trim();
+      } else {
+        const type = String(p.sizeChartType || '').toLowerCase();
+        if (type.includes('fan')) chartImg = 'img/sizecharts/sizechart-fan.svg';
+        else if (type.includes('retro')) chartImg = 'img/sizecharts/sizechart-retro.svg';
+        else if (type.includes('kid')) chartImg = 'img/sizecharts/sizechart-kids.svg';
+        else chartImg = 'img/sizecharts/sizechart-player.svg';
       }
-      const chartImg = p.sizeChartImage || storeDefault || 'size-chart-default.jpg';
 
-      if (imgEl) imgEl.src = chartImg;
-      if (titleEl) titleEl.textContent = `${p.name || 'Jersey'} Size Chart`;
+      if (imgEl) {
+        imgEl.src = chartImg;
+        imgEl.alt = `${p.name || 'Product'} Size Chart`;
+      }
+      if (titleEl) {
+        titleEl.textContent = `${p.name || 'Jersey'} Size Guide`;
+      }
+      const edition = p.sizeChartType || 'Player Edition';
+      if (editionTag) {
+        editionTag.textContent = edition.toUpperCase();
+      }
 
+      // 2. Populate measurements table
+      const presetInfo = (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.getSizePreset === 'function')
+        ? DB.sizes.getSizePreset(edition)
+        : null;
+      const defaultMapping = presetInfo?.measurements || {
+        S: { height: 26, width: 36 },
+        M: { height: 27, width: 38 },
+        L: { height: 28, width: 40 },
+        XL: { height: 29, width: 42 },
+        XXL: { height: 30, width: 44 }
+      };
+      const mapping = p.sizeMapping || defaultMapping;
+      const tbody = document.getElementById('modal-size-tbody');
+      if (tbody) {
+        const sizes = Object.keys(mapping).length > 0 ? Object.keys(mapping) : ['S', 'M', 'L', 'XL', 'XXL'];
+        tbody.innerHTML = sizes.map((s, idx) => {
+          const row = mapping[s] || defaultMapping[s] || { height: 26 + idx, width: 36 + (idx * 2) };
+          const isSelected = (productState.selectedSize === s);
+          return `
+            <tr onclick="selectSizeAndCloseModal('${s}')" class="hover:bg-blue-50/80 transition-colors cursor-pointer ${isSelected ? 'bg-blue-100/80 font-black' : (idx % 2 === 1 ? 'bg-gray-50/50' : '')}">
+              <td class="py-2.5 px-3 font-black text-black flex items-center gap-1.5">
+                ${s}
+                ${isSelected ? '<span class="text-[10px] font-bold px-1.5 py-0.2 bg-blue-600 text-white rounded">Selected</span>' : ''}
+              </td>
+              <td class="py-2.5 px-3 text-gray-800 font-bold">${row.width}"</td>
+              <td class="py-2.5 px-3 text-gray-800 font-bold">${row.height}"</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 3. Set advice note
+      if (fitBadge) {
+        fitBadge.textContent = edition;
+      }
+      if (noteText) {
+        if (edition.includes('Player')) {
+          noteText.textContent = 'প্লেয়ার এডিশন কিটস বডি-ফিটেড/স্লিম কাট হয়। সামান্য ঢিলেঢালা পরতে চাইলে ১ সাইজ বড় নেওয়ার পরামর্শ দেওয়া হচ্ছে।';
+        } else if (edition.includes('Fan')) {
+          noteText.textContent = 'ফ্যান এডিশন রেগুলার স্ট্যান্ডার্ড কাট। আপনি সচরাচর যে সাইজ পরেন সেটিই অর্ডার করতে পারেন।';
+        } else if (edition.includes('Retro')) {
+          noteText.textContent = 'রেট্রো এডিশন ভিন্টেজ ক্লাসিক রিল্যাক্সড কাট। আরামদায়ক ফিটিং এর জন্য স্বাভাবিক সাইজই উপযুক্ত।';
+        } else if (edition.includes('Kids')) {
+          noteText.textContent = 'বাচ্চাদের সাইজ বয়স ও উচ্চতা অনুযায়ী তৈরি। কেনার পূর্বে বডি ও লম্বা মাপ মিলিয়ে নিন।';
+        } else {
+          noteText.textContent = 'এই প্রডাক্টের সাইজ চার্ট ও পরিমাপ অনুযায়ী সঠিক সাইজ নির্বাচন করুন।';
+        }
+      }
+
+      switchSizeChartModalView('graphic');
       modal.classList.remove('hidden');
     }
 

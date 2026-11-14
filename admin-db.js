@@ -4580,7 +4580,7 @@ const Store = {
         try {
           const slimmed = value.map(p => {
             const cp = { ...p };
-            if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+            if (cp.sizeChartImage && cp.sizeChartImage.length > 400000) cp.sizeChartImage = '';
             if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
             return cp;
           });
@@ -5657,6 +5657,89 @@ const DB = {
 
       DB.log('Store size chart image removed');
       return true;
+    },
+    getProductSizeChart(product) {
+      if (!product) return 'img/sizecharts/sizechart-player.svg';
+      // 1. Per-product custom uploaded size chart image (Highest Priority!)
+      if (typeof product.sizeChartImage === 'string' && product.sizeChartImage.trim().length > 0) {
+        return product.sizeChartImage.trim();
+      }
+      // 2. Preset size chart graphic according to product's sizeChartType
+      const type = String(product.sizeChartType || '').trim().toLowerCase();
+      if (type.includes('fan')) {
+        return 'img/sizecharts/sizechart-fan.svg';
+      }
+      if (type.includes('retro') || type.includes('vintage')) {
+        return 'img/sizecharts/sizechart-retro.svg';
+      }
+      if (type.includes('kid') || type.includes('child') || type.includes('youth') || type.includes('junior')) {
+        return 'img/sizecharts/sizechart-kids.svg';
+      }
+      if (type.includes('player') || type.includes('match') || type.includes('authentic') || type.includes('slim')) {
+        return 'img/sizecharts/sizechart-player.svg';
+      }
+      // 3. Fall back to global store custom size chart if uploaded
+      const globalChart = DB.sizes.getSizeChart();
+      if (globalChart) return globalChart;
+      // 4. Default to Player Edition SVG
+      return 'img/sizecharts/sizechart-player.svg';
+    },
+    getSizePreset(presetName) {
+      const presets = {
+        'Player Edition': {
+          type: 'Player Edition',
+          title: 'Player Version (Slim Match-Day Cut)',
+          chartImage: 'img/sizecharts/sizechart-player.svg',
+          note: 'Player Version has an athletic slim cut. Fits closer to the body. Sizing up is recommended if you prefer extra room.',
+          measurements: {
+            S: { height: 26, width: 36 },
+            M: { height: 27, width: 38 },
+            L: { height: 28, width: 40 },
+            XL: { height: 29, width: 42 },
+            XXL: { height: 30, width: 44 }
+          }
+        },
+        'Fan Edition': {
+          type: 'Fan Edition',
+          title: 'Fan Version (Standard Regular Fit)',
+          chartImage: 'img/sizecharts/sizechart-fan.svg',
+          note: 'Fan Version features a standard regular fit. True to size for all-day comfort.',
+          measurements: {
+            S: { height: 27, width: 38 },
+            M: { height: 28, width: 40 },
+            L: { height: 29, width: 42 },
+            XL: { height: 30, width: 44 },
+            XXL: { height: 31, width: 46 }
+          }
+        },
+        'Retro Edition': {
+          type: 'Retro Edition',
+          title: 'Retro Edition (Vintage Classic Fit)',
+          chartImage: 'img/sizecharts/sizechart-retro.svg',
+          note: 'Retro Edition features a vintage relaxed silhouette. Standard comfortable cut.',
+          measurements: {
+            S: { height: 27, width: 38 },
+            M: { height: 28, width: 40 },
+            L: { height: 29, width: 42 },
+            XL: { height: 30, width: 44 },
+            XXL: { height: 31, width: 46 }
+          }
+        },
+        'Kids Edition': {
+          type: 'Kids Edition',
+          title: 'Kids Edition (Youth Academy Fit)',
+          chartImage: 'img/sizecharts/sizechart-kids.svg',
+          note: 'Youth sizing for ages 5-15. Check chest & length before purchasing.',
+          measurements: {
+            '22': { height: 20, width: 28 },
+            '24': { height: 22, width: 30 },
+            '26': { height: 24, width: 32 },
+            '28': { height: 25, width: 34 },
+            '30': { height: 26, width: 36 }
+          }
+        }
+      };
+      return presets[presetName] || presets['Player Edition'];
     }
   },
 

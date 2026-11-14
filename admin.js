@@ -1149,6 +1149,7 @@ function renderProducts(container) {
                       ${p.isFeatured?'<span class="badge badge-purple" style="font-size:9px">FEAT</span>':''}
                       ${(p.isPreorder === true && ((typeof p.preorderPrice === 'number' && p.preorderPrice > 0) || p.preorderStatus === 'OPEN' || p.preorderStatus === 'CLOSING_SOON'))?'<span class="badge badge-purple" style="font-size:9px">PRE</span>':''}
                       ${p.isLimited?'<span class="badge badge-red" style="font-size:9px">LTD</span>':''}
+                      ${p.sizeChartImage ? '<span class="badge" style="background:#ECFDF5;color:#059669;font-size:9px;font-weight:700;" title="Custom Size Chart Attached">CHART 🖼️</span>' : `<span class="badge" style="background:#F1F5F9;color:#475569;font-size:9px;" title="Size Chart: ${p.sizeChartType || 'Player Edition'}">${(p.sizeChartType || 'Player').replace(' Edition','').replace(' Version','')}</span>`}
                     </div>
                   </td>
                   <td class="actions-cell">
@@ -1168,6 +1169,9 @@ function renderProducts(container) {
                         <div class="action-menu-dropdown" id="prod-menu-${p.id}">
                           <div class="action-menu-item" onclick="openProductForm('${p.id}')">
                             <span class="material-symbols-outlined">edit</span> Edit Product
+                          </div>
+                          <div class="action-menu-item" onclick="previewProductSizeChart('${p.id}')">
+                            <span class="material-symbols-outlined">straighten</span> Preview Size Chart
                           </div>
                           <div class="action-menu-item" onclick="duplicateProduct('${p.id}')">
                             <span class="material-symbols-outlined">content_copy</span> Duplicate Product
@@ -1916,25 +1920,47 @@ function openProductForm(id = null) {
       <!-- TAB: SIZE CHART & MAPPING -->
       <div id="prod-tab-sizechart" class="prod-tab hidden">
         <div style="margin-bottom:14px;">
-          <h4 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Product Size Chart & Measurements Mapping</h4>
-          <p style="font-size:12px;color:#6B7280;">Set the size chart edition, custom measurements table (inches), and optional size chart graphic image for this product.</p>
+          <h4 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Product Size Chart & Sizing Guide</h4>
+          <p style="font-size:12px;color:#6B7280;">Configure a dedicated size chart edition, custom measurements table (inches), or upload a unique size chart graphic specifically for this product.</p>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Size Chart Edition / Type</label>
+            <label class="form-label">Size Chart Edition / Cut Preset</label>
             <select name="sizeChartType" id="prod-sizechart-type" class="form-select" onchange="window.applySizePreset(this.value)">
               <option value="Player Edition" ${(!product?.sizeChartType || product.sizeChartType==='Player Edition')?'selected':''}>Player Edition (Slim Match-Day Cut)</option>
               <option value="Fan Edition" ${product?.sizeChartType==='Fan Edition'?'selected':''}>Fan Edition (Standard Regular Fit)</option>
               <option value="Retro Edition" ${product?.sizeChartType==='Retro Edition'?'selected':''}>Retro Edition (Vintage Classic Fit)</option>
               <option value="Kids Edition" ${product?.sizeChartType==='Kids Edition'?'selected':''}>Kids Edition (Youth Academy Fit)</option>
-              <option value="Custom" ${product?.sizeChartType==='Custom'?'selected':''}>Custom Measurements</option>
+              <option value="Custom" ${product?.sizeChartType==='Custom'?'selected':''}>Custom Measurements / Custom Upload</option>
             </select>
+            <p style="font-size:11px;color:#6B7280;margin-top:4px;">Choosing an edition automatically sets the default high-resolution vector sizing graphic and measurements.</p>
           </div>
           <div class="form-group">
-            <label class="form-label">Size Chart Graphic Image</label>
+            <label class="form-label">Custom Size Chart Graphic (Optional - Overrides Preset)</label>
             <div id="prod-sizechart-img-zone" style="margin-bottom:8px;"></div>
-            <input type="text" name="sizeChartImage" id="prod-sizechart-img" class="form-input" value="${product?.sizeChartImage||''}" placeholder="Upload above or enter image path (e.g. size-chart-default.jpg)"/>
+            <input type="text" name="sizeChartImage" id="prod-sizechart-img" class="form-input" value="${product?.sizeChartImage||''}" oninput="window.updateSizeChartTabPreview(this.value)" placeholder="Upload above or enter image URL/path (e.g. size-chart-default.jpg)"/>
+          </div>
+        </div>
+
+        <!-- Live Preview & Status Bar -->
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;margin:12px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="prod-sizechart-preview-thumb-box" style="width:48px;height:48px;border-radius:8px;background:#fff;border:1px solid #CBD5E1;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="window.previewCurrentProdSizeChartModal()" title="Click to preview size chart graphic">
+              <img id="prod-sizechart-preview-thumb" src="" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='img/sizecharts/sizechart-player.svg'"/>
+            </div>
+            <div>
+              <div id="prod-sizechart-status-title" style="font-size:12px;font-weight:700;color:#0F172A;">Active Size Chart Graphic</div>
+              <div id="prod-sizechart-status-desc" style="font-size:11px;color:#64748B;">Loading chart...</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button type="button" class="btn btn-secondary btn-xs" onclick="window.previewCurrentProdSizeChartModal()" style="display:inline-flex;align-items:center;gap:4px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Preview Customer View
+            </button>
+            <button type="button" id="btn-clear-prod-sizechart" class="btn btn-ghost btn-xs ${product?.sizeChartImage?'':'hidden'}" onclick="window.clearProdSizeChartCustomImg()" style="color:#DC2626;display:inline-flex;align-items:center;gap:3px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">close</span> Clear Custom Image
+            </button>
           </div>
         </div>
 
@@ -1945,6 +1971,7 @@ function openProductForm(id = null) {
               <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Player Edition')">Player Cut</button>
               <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Fan Edition')">Fan Cut</button>
               <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Retro Edition')">Retro Cut</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="window.applySizePreset('Kids Edition')">Kids Cut</button>
             </div>
           </div>
 
@@ -2019,13 +2046,21 @@ function openProductForm(id = null) {
       const zone = Uploader.createSingleZone({
         id: 'prod-sizechart-uploader',
         value: product?.sizeChartImage || '',
-        placeholder: 'Upload Size Chart Graphic (JPG, PNG)',
+        placeholder: 'Upload Custom Size Chart Graphic (JPG, PNG, WebP)',
+        maxDimension: 800,
+        quality: 0.72,
         onchange: (v) => {
           const input = document.getElementById('prod-sizechart-img');
           if (input) input.value = v;
+          if (typeof window.updateSizeChartTabPreview === 'function') {
+            window.updateSizeChartTabPreview(v);
+          }
         }
       });
       sizeChartZone.appendChild(zone);
+    }
+    if (typeof window.updateSizeChartTabPreview === 'function') {
+      window.updateSizeChartTabPreview(product?.sizeChartImage || '');
     }
   }, 100);
 }
@@ -8207,12 +8242,12 @@ function emptyState(icon, title, sub = '', btnLabel = '', btnAction = '') {
   </div>`;
 }
 
-// ── Size Chart Presets for Admin Product Form ──
+// ── Size Chart Presets & Per-Product Handlers for Admin Product Form ──
 window.applySizePreset = function(presetName) {
   const presets = {
     'Player Edition': { S: { height: 26, width: 36 }, M: { height: 27, width: 38 }, L: { height: 28, width: 40 }, XL: { height: 29, width: 42 }, XXL: { height: 30, width: 44 } },
     'Fan Edition': { S: { height: 27, width: 38 }, M: { height: 28, width: 40 }, L: { height: 29, width: 42 }, XL: { height: 30, width: 44 }, XXL: { height: 31, width: 46 } },
-    'Retro Edition': { S: { height: 26, width: 36 }, M: { height: 27, width: 38 }, L: { height: 28, width: 40 }, XL: { height: 29, width: 42 }, XXL: { height: 30, width: 44 } },
+    'Retro Edition': { S: { height: 27, width: 38 }, M: { height: 28, width: 40 }, L: { height: 29, width: 42 }, XL: { height: 30, width: 44 }, XXL: { height: 31, width: 46 } },
     'Kids Edition': { S: { height: 20, width: 28 }, M: { height: 22, width: 30 }, L: { height: 24, width: 32 }, XL: { height: 25, width: 34 }, XXL: { height: 26, width: 36 } }
   };
   const p = presets[presetName] || presets['Player Edition'];
@@ -8224,7 +8259,87 @@ window.applySizePreset = function(presetName) {
   });
   const typeSelect = document.getElementById('prod-sizechart-type');
   if (typeSelect) typeSelect.value = presetName;
+  if (typeof window.updateSizeChartTabPreview === 'function') {
+    window.updateSizeChartTabPreview();
+  }
 };
+
+window.updateSizeChartTabPreview = function(customImg) {
+  const typeSelect = document.getElementById('prod-sizechart-type');
+  const edition = typeSelect ? typeSelect.value : 'Player Edition';
+  const input = document.getElementById('prod-sizechart-img');
+  const imgUrl = (typeof customImg === 'string' ? customImg : (input ? input.value : '')).trim();
+  
+  const thumb = document.getElementById('prod-sizechart-preview-thumb');
+  const title = document.getElementById('prod-sizechart-status-title');
+  const desc = document.getElementById('prod-sizechart-status-desc');
+  const clearBtn = document.getElementById('btn-clear-prod-sizechart');
+
+  let activeUrl = '';
+  if (imgUrl) {
+    activeUrl = imgUrl;
+    if (title) title.innerHTML = '<span style="color:#059669;font-weight:800;">Custom Chart Uploaded ✓</span>';
+    if (desc) desc.textContent = 'This custom graphic will display exclusively for this product.';
+    if (clearBtn) clearBtn.classList.remove('hidden');
+  } else {
+    if (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.getSizePreset === 'function') {
+      const preset = DB.sizes.getSizePreset(edition);
+      activeUrl = preset?.chartImage || 'img/sizecharts/sizechart-player.svg';
+    } else {
+      activeUrl = 'img/sizecharts/sizechart-player.svg';
+    }
+    if (title) title.textContent = `Using ${edition} Preset Graphic`;
+    if (desc) desc.textContent = 'Default vector infographic for this jersey edition.';
+    if (clearBtn) clearBtn.classList.add('hidden');
+  }
+  if (thumb) {
+    thumb.src = activeUrl;
+  }
+};
+
+window.clearProdSizeChartCustomImg = function() {
+  const input = document.getElementById('prod-sizechart-img');
+  if (input) input.value = '';
+  const zone = document.getElementById('prod-sizechart-uploader');
+  if (zone) {
+    const inner = zone.querySelector('.upload-zone-inner');
+    if (inner) {
+      inner.classList.remove('has-image');
+      inner.innerHTML = `<div class="upload-placeholder">
+        <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
+        <p class="text-sm text-slate-500 mt-1">Upload Custom Size Chart Graphic (JPG, PNG)</p>
+      </div>`;
+    }
+  }
+  window.updateSizeChartTabPreview('');
+};
+
+window.previewCurrentProdSizeChartModal = function() {
+  const typeSelect = document.getElementById('prod-sizechart-type');
+  const edition = typeSelect ? typeSelect.value : 'Player Edition';
+  const input = document.getElementById('prod-sizechart-img');
+  const imgUrl = (input ? input.value : '').trim();
+  let chart = imgUrl;
+  if (!chart) {
+    if (typeof DB !== 'undefined' && DB.sizes && typeof DB.sizes.getSizePreset === 'function') {
+      chart = DB.sizes.getSizePreset(edition)?.chartImage || 'img/sizecharts/sizechart-player.svg';
+    } else {
+      chart = 'img/sizecharts/sizechart-player.svg';
+    }
+  }
+  if (typeof previewSizeChartModal === 'function') {
+    previewSizeChartModal(encodeURIComponent(chart));
+  }
+};
+
+function previewProductSizeChart(id) {
+  const p = DB.products.byId(id);
+  if (!p) { toast('Product not found', 'error'); return; }
+  const url = (DB.sizes && typeof DB.sizes.getProductSizeChart === 'function')
+    ? DB.sizes.getProductSizeChart(p)
+    : (p.sizeChartImage || 'img/sizecharts/sizechart-player.svg');
+  previewSizeChartModal(encodeURIComponent(url));
+}
 
 // ── Explicit window bindings for reliable inline HTML onclick handlers ──
 Object.assign(window, {
@@ -8276,6 +8391,7 @@ Object.assign(window, {
   openStockAdjust,
   openSubcatForm,
   openTeamForm,
+  previewProductSizeChart,
   previewSizeChartModal,
   printInvoice,
   quickMarkOrderPaid,

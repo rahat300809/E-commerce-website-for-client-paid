@@ -492,7 +492,7 @@
         try {
           const slimmed = merged.map(p => {
             const cp = { ...p };
-            if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+            if (cp.sizeChartImage && cp.sizeChartImage.length > 400000) cp.sizeChartImage = '';
             if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
             return cp;
           });
@@ -546,8 +546,9 @@
     }
     p.status = p.isPublished ? 'published' : 'draft';
 
-    // Optimize payload before pushing to Firestore
-    if (p.sizeChartImage && p.sizeChartImage.length > 50000) {
+    // Optimize payload before pushing to Firestore (preserve custom size chart images up to Firestore 800KB single doc threshold)
+    if (p.sizeChartImage && p.sizeChartImage.length > 800000) {
+      console.warn('[ZenvySync] Product size chart image exceeds 800KB single document limit, skipping field:', p.name);
       p.sizeChartImage = '';
     }
     if (p.imageUrl && p.image && p.imageUrl === p.image) {
@@ -604,7 +605,7 @@
         let prods = window._ZENVY_PRODUCTS_CACHE || [];
         const slimmed = prods.map(item => {
           const cp = { ...item };
-          if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+          if (cp.sizeChartImage && cp.sizeChartImage.length > 400000) cp.sizeChartImage = '';
           if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
           return cp;
         });
@@ -937,7 +938,7 @@
           try {
             const slimmed = mergedProducts.map(p => {
               const cp = { ...p };
-              if (cp.sizeChartImage && cp.sizeChartImage.length > 5000) cp.sizeChartImage = '';
+              if (cp.sizeChartImage && cp.sizeChartImage.length > 400000) cp.sizeChartImage = '';
               if (cp.imageUrl && cp.image && cp.imageUrl === cp.image) cp.imageUrl = '';
               return cp;
             });

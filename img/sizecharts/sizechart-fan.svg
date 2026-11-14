@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradFan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091e1d"/>
+      <stop offset="100%" stop-color="#134e4a"/>
+    </linearGradient>
+    <linearGradient id="badgeGradFan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="shadowFan" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="520" rx="16" fill="url(#bgGradFan)"/>
+  
+  <!-- Subtle Grid Pattern -->
+  <g opacity="0.05" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="65" x2="800" y2="65"/>
+    <line x1="0" y1="130" x2="800" y2="130"/>
+    <line x1="0" y1="195" x2="800" y2="195"/>
+    <line x1="0" y1="260" x2="800" y2="260"/>
+    <line x1="0" y1="325" x2="800" y2="325"/>
+    <line x1="0" y1="390" x2="800" y2="390"/>
+    <line x1="0" y1="455" x2="800" y2="455"/>
+  </g>
+
+  <!-- Header Section -->
+  <g transform="translate(36, 32)">
+    <rect width="138" height="26" rx="6" fill="url(#badgeGradFan)"/>
+    <text x="69" y="17" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" letter-spacing="1" text-anchor="middle">FAN VERSION</text>
+    <text x="150" y="20" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600">STANDARD REGULAR CUT (ইঞ্চি / INCHES)</text>
+    <text x="0" y="52" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" letter-spacing="0.5">OFFICIAL FAN EDITION SIZE CHART</text>
+  </g>
+
+  <!-- Left: Illustrated Jersey Silhouette with Dimension Guides -->
+  <g transform="translate(40, 115)" filter="url(#shadowFan)">
+    <!-- Base Card -->
+    <rect width="240" height="340" rx="12" fill="#0f2926" stroke="#134e4a" stroke-width="1"/>
+    
+    <!-- Jersey Outline -->
+    <path d="M 70 65 L 95 65 C 105 78, 135 78, 145 65 L 170 65 L 202 95 L 175 120 L 162 108 L 162 255 L 78 255 L 78 108 L 65 120 L 38 95 Z" 
+          fill="#061c1a" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round"/>
+    
+    <!-- Collar Line -->
+    <path d="M 95 65 C 105 85, 135 85, 145 65" fill="none" stroke="#34d399" stroke-width="2"/>
+    
+    <!-- Measurement Line A (Length) -->
+    <line x1="185" y1="65" x2="185" y2="255" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3"/>
+    <polygon points="185,60 181,68 189,68" fill="#f59e0b"/>
+    <polygon points="185,260 181,252 189,252" fill="#f59e0b"/>
+    <rect x="195" y="148" width="36" height="24" rx="4" fill="#f59e0b"/>
+    <text x="213" y="164" fill="#000000" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="900" text-anchor="middle">A: লম্বা</text>
+
+    <!-- Measurement Line B (Chest Width) -->
+    <line x1="78" y1="140" x2="162" y2="140" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 3"/>
+    <polygon points="73,140 81,136 81,144" fill="#38bdf8"/>
+    <polygon points="167,140 159,136 159,144" fill="#38bdf8"/>
+    <rect x="100" y="128" width="40" height="24" rx="4" fill="#38bdf8"/>
+    <text x="120" y="144" fill="#000000" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="900" text-anchor="middle">B: বডি</text>
+
+    <!-- Legend -->
+    <text x="120" y="295" fill="#e2e8f0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" text-anchor="middle">A = Length (লম্বা) | B = Chest (বডি)</text>
+    <text x="120" y="315" fill="#99f6e4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="500" text-anchor="middle">সব মাপ ইঞ্চিতে (All sizes in inches)</text>
+  </g>
+
+  <!-- Right: Sizing Table -->
+  <g transform="translate(305, 115)" filter="url(#shadowFan)">
+    <!-- Table Container Card -->
+    <rect width="455" height="340" rx="12" fill="#0f2926" stroke="#134e4a" stroke-width="1"/>
+    
+    <!-- Table Header Row -->
+    <rect width="455" height="42" rx="12" fill="#061c1a"/>
+    <rect y="30" width="455" height="12" fill="#061c1a"/>
+    <line x1="0" y1="42" x2="455" y2="42" stroke="#134e4a" stroke-width="1"/>
+    
+    <text x="35" y="26" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" letter-spacing="1">SIZE (সাইজ)</text>
+    <text x="150" y="26" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" letter-spacing="1">CHEST / বডি (B)</text>
+    <text x="270" y="26" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" letter-spacing="1">LENGTH / লম্বা (A)</text>
+    <text x="385" y="26" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" letter-spacing="1">FIT</text>
+
+    <!-- Table Rows -->
+    <!-- Row S -->
+    <g transform="translate(0, 42)">
+      <rect width="455" height="46" fill="#0f2926"/>
+      <circle cx="48" cy="23" r="14" fill="#059669" fill-opacity="0.25"/>
+      <text x="48" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="900" text-anchor="middle">S</text>
+      <text x="150" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">38" <tspan fill="#a7f3d0" font-size="11" font-weight="500">(19" Flat)</tspan></text>
+      <text x="270" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">27"</text>
+      <text x="385" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700">Regular</text>
+      <line x1="20" y1="46" x2="435" y2="46" stroke="#134e4a" stroke-width="0.8"/>
+    </g>
+
+    <!-- Row M -->
+    <g transform="translate(0, 88)">
+      <rect width="455" height="46" fill="#0b2320"/>
+      <circle cx="48" cy="23" r="14" fill="#059669" fill-opacity="0.25"/>
+      <text x="48" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="900" text-anchor="middle">M</text>
+      <text x="150" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">40" <tspan fill="#a7f3d0" font-size="11" font-weight="500">(20" Flat)</tspan></text>
+      <text x="270" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">28"</text>
+      <text x="385" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700">Regular</text>
+      <line x1="20" y1="46" x2="435" y2="46" stroke="#134e4a" stroke-width="0.8"/>
+    </g>
+
+    <!-- Row L -->
+    <g transform="translate(0, 134)">
+      <rect width="455" height="46" fill="#0f2926"/>
+      <circle cx="48" cy="23" r="14" fill="#059669" fill-opacity="0.25"/>
+      <text x="48" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="900" text-anchor="middle">L</text>
+      <text x="150" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">42" <tspan fill="#a7f3d0" font-size="11" font-weight="500">(21" Flat)</tspan></text>
+      <text x="270" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">29"</text>
+      <text x="385" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700">Regular</text>
+      <line x1="20" y1="46" x2="435" y2="46" stroke="#134e4a" stroke-width="0.8"/>
+    </g>
+
+    <!-- Row XL -->
+    <g transform="translate(0, 180)">
+      <rect width="455" height="46" fill="#0b2320"/>
+      <circle cx="48" cy="23" r="14" fill="#059669" fill-opacity="0.25"/>
+      <text x="48" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="900" text-anchor="middle">XL</text>
+      <text x="150" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">44" <tspan fill="#a7f3d0" font-size="11" font-weight="500">(22" Flat)</tspan></text>
+      <text x="270" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">30"</text>
+      <text x="385" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700">Regular</text>
+      <line x1="20" y1="46" x2="435" y2="46" stroke="#134e4a" stroke-width="0.8"/>
+    </g>
+
+    <!-- Row XXL -->
+    <g transform="translate(0, 226)">
+      <rect width="455" height="46" fill="#0f2926"/>
+      <circle cx="48" cy="23" r="14" fill="#059669" fill-opacity="0.25"/>
+      <text x="48" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="900" text-anchor="middle">XXL</text>
+      <text x="150" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">46" <tspan fill="#a7f3d0" font-size="11" font-weight="500">(23" Flat)</tspan></text>
+      <text x="270" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800">31"</text>
+      <text x="385" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700">Regular</text>
+    </g>
+
+    <!-- Pro Tip Callout -->
+    <g transform="translate(16, 280)">
+      <rect width="423" height="46" rx="8" fill="#061c1a" stroke="#10b981" stroke-width="1" stroke-opacity="0.4"/>
+      <circle cx="28" cy="23" r="10" fill="#10b981" fill-opacity="0.2"/>
+      <text x="28" y="28" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="900" text-anchor="middle">✓</text>
+      <text x="48" y="20" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800">ফ্যান ভার্সন ফিটিং (Fan Version Fit):</text>
+      <text x="48" y="35" fill="#99f6e4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="500">ফ্যান এডিশন স্ট্যান্ডার্ড রেগুলার সাইজ। আপনি সচরাচর যে সাইজ পরেন সেটিই পারফেক্ট হবে।</text>
+    </g>
+  </g>
+</svg>
